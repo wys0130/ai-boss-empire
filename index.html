@@ -7,16 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
-        /* 高阶幻灯片背景与质感 */
         .slide-bg-0 {
             background: radial-gradient(circle at 80% 20%, #1e1b4b 0%, #0f172a 70%);
             border-image: linear-gradient(to bottom right, #6366f1, transparent) 1;
-        }
-        .slide-bg-1 {
-            background: radial-gradient(circle at 20% 80%, #064e3b 0%, #0f172a 70%);
-        }
-        .slide-bg-2 {
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 80%);
         }
         .bento-card {
             background: rgba(30, 41, 59, 0.75);
@@ -26,23 +19,21 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen relative pb-16">
-    <!-- 极速顶部导航 (含：实时构建发版指示器) -->
+    <!-- 极速顶部导航 -->
     <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <!-- 毫秒级首屏监控 -->
                 <span class="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 font-mono rounded font-bold">TTFB < 38ms</span>
                 <h1 class="font-bold text-lg tracking-wide">AI-OFFICE<span class="text-indigo-500">.EMPIRE</span></h1>
-                <!-- 实时发版灯（绿色代表已完成，不再盲等！） -->
-                <span class="text-[11px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 flex items-center gap-1.5" title="云端自动发版监控">
+                <span class="text-[11px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    BUILD: READY (最新版)
+                    BUILD: V5 CHECKOUT READY
                 </span>
             </div>
             <div class="flex items-center space-x-3">
                 <span id="vip-status" class="text-xs font-mono text-slate-400 bg-slate-800 px-3 py-1 rounded-full">当前状态: 普通访客</span>
                 <button onclick="activateVIP()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm px-4 py-1.5 rounded-lg font-medium transition shadow-lg shadow-indigo-500/20">
-                    ⚡ 一键永久开通 (Ed25519)
+                    ⚡ 一键开通授权
                 </button>
             </div>
         </div>
@@ -53,37 +44,33 @@
         <div class="flex justify-between items-end mb-6">
             <div>
                 <h2 class="text-2xl font-black tracking-tight">AI 自动魔改 & 多模态审判通过模板</h2>
-                <p class="text-xs text-slate-400 mt-1">内置全套多页高清视觉案例 · 1:1.618 留白比审查 · 保证1秒极致响应</p>
+                <p class="text-xs text-slate-400 mt-1">留白比 · 对比度 · 视觉重心通过 85 分打标 · 保证 1 秒极致首屏</p>
             </div>
             <span class="text-xs text-indigo-400 font-mono bg-indigo-950/50 border border-indigo-800/50 px-3 py-1 rounded">
-                ● Turso 边缘动态读库中
+                ● Turso 东京边缘写库接管中
             </span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- 【核心主推卡片：2026 AI 商业创投 PPT】 -->
+            <!-- 核心卡片 1: 2026 AI 商业创投 PPT -->
             <div class="bg-slate-900 border-2 border-indigo-500/80 rounded-2xl overflow-hidden hover:border-indigo-400 transition duration-300 shadow-2xl shadow-indigo-950/80 flex flex-col justify-between">
                 <div>
-                    <!-- 多页精装版缩略视图 -->
-                    <div class="h-52 slide-bg-0 p-4 border-b border-slate-800 flex flex-col justify-between relative group cursor-pointer" onclick="openPPTModal(0)">
+                    <div class="h-52 slide-bg-0 p-4 border-b border-slate-800 flex flex-col justify-between relative group">
                         <div class="flex justify-between items-start z-10">
-                            <span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded shadow">PPTX · 全套 18 页</span>
+                            <span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded shadow">PPTX · 行业重磅</span>
                             <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono px-2 py-0.5 rounded font-bold">
                                 AI 评分: 92分
                             </span>
                         </div>
 
-                        <!-- Bento Grid 排版高保真小地图 -->
+                        <!-- Bento Grid 仿真小地图 -->
                         <div class="grid grid-cols-3 gap-2 my-2 h-24 z-10">
                             <div class="col-span-2 bento-card rounded-lg p-2.5 flex flex-col justify-between">
                                 <div class="text-[9px] text-indigo-300 font-mono">REVENUE GROWTH PROJECT</div>
                                 <div class="text-xs font-bold text-white tracking-wide">2026 商业创投计划书</div>
-                                <div class="flex items-center gap-1">
-                                    <div class="w-full bg-indigo-500/30 h-1 rounded-full overflow-hidden">
-                                        <div class="bg-indigo-400 h-full w-4/5"></div>
-                                    </div>
-                                    <span class="text-[9px] font-mono text-indigo-300">80%</span>
+                                <div class="w-full bg-indigo-500/30 h-1 rounded-full overflow-hidden">
+                                    <div class="bg-indigo-400 h-full w-4/5"></div>
                                 </div>
                             </div>
                             <div class="col-span-1 bento-card rounded-lg p-2 flex flex-col items-center justify-center text-center">
@@ -93,8 +80,8 @@
                         </div>
 
                         <div class="text-[11px] font-mono text-slate-400 flex justify-between items-center z-10">
-                            <span>内含: 商务走势图 / 损益模型</span>
-                            <span class="text-indigo-400 group-hover:underline font-bold">👁️ 预览全套幻灯片 ➔</span>
+                            <span>内含: 走势图 / 损益模型</span>
+                            <span class="text-indigo-400 font-bold">Bento Grid 专版</span>
                         </div>
                     </div>
 
@@ -104,22 +91,20 @@
                             <span class="text-xl font-black text-emerald-400">¥ 29.9</span>
                         </div>
                         <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                            含 18 页精修定制版式（封面、KPI看板、团队介绍、财务预测）。AI 已剥离老旧剪贴画，全套矢量图形且不阻塞加载。
+                            含 18 页精修定制版式。AI 已剔除老旧元素，全套 OpenXML 矢量图形，绝不造成加载错位。
                         </p>
                     </div>
                 </div>
 
-                <div class="p-5 pt-0 grid grid-cols-2 gap-2">
-                    <button onclick="openPPTModal(0)" class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-medium py-2.5 rounded-lg transition text-center">
-                        👁️ 在线多页翻阅
-                    </button>
-                    <button onclick="instantBuy('PPT-2026-AI-ROADSHOW')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-xs font-bold py-2.5 rounded-lg transition text-white shadow-lg shadow-indigo-600/30">
-                        ⚡ 免注册秒付 ¥29.9
+                <!-- 底部交互：一键呼叫无界收银台 -->
+                <div class="p-5 pt-0">
+                    <button onclick="openCheckout('PPT-2026-AI-ROADSHOW', '《2026 AI 商业创投路演计划书》', 29.9)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-xs font-bold py-3 rounded-xl transition text-white shadow-lg shadow-indigo-600/30">
+                        ⚡ 极速免注册购买 ¥29.9
                     </button>
                 </div>
             </div>
 
-            <!-- 卡片 2: Excel 财务报表 -->
+            <!-- 核心卡片 2: Excel 全渠道监控 -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col justify-between">
                 <div>
                     <div class="h-52 bg-gradient-to-br from-emerald-950/40 to-slate-900 p-4 border-b border-slate-800 flex flex-col justify-between">
@@ -133,7 +118,7 @@
                         </div>
                         <div class="text-[11px] font-mono text-slate-500 flex justify-between">
                             <span>零宏病毒</span>
-                            <span>含动态条件高光</span>
+                            <span>高阶函数渲染</span>
                         </div>
                     </div>
                     <div class="p-5">
@@ -141,17 +126,17 @@
                             <h3 class="font-bold text-base">全渠道电商 ROI 动态监控表</h3>
                             <span class="text-lg font-bold text-emerald-400">¥ 19.9</span>
                         </div>
-                        <p class="text-xs text-slate-400 mb-4">专为投放与财务精细化对账规划，内置全套获客成本平衡模型。</p>
+                        <p class="text-xs text-slate-400 mb-4">专为电商与财务对账设计，自动化呈现盈亏拐点模型。</p>
                     </div>
                 </div>
                 <div class="p-5 pt-0">
-                    <button onclick="instantBuy('EXCEL-ROI-01')" class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-medium py-2.5 rounded-lg transition">
-                        微信 / 支付宝 极速秒付
+                    <button onclick="openCheckout('EXCEL-ROI-01', '《全渠道电商 ROI 动态监控表》', 19.9)" class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-bold py-3 rounded-xl transition text-emerald-400 border border-emerald-500/20">
+                        ⚡ 免注册秒买 ¥19.9
                     </button>
                 </div>
             </div>
 
-            <!-- 卡片 3: Word ATS 简历通用版 -->
+            <!-- 核心卡片 3: Word ATS 简历通用版 -->
             <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col justify-between">
                 <div>
                     <div class="h-52 bg-gradient-to-br from-blue-950/40 to-slate-900 p-4 border-b border-slate-800 flex flex-col justify-between">
@@ -165,7 +150,7 @@
                         </div>
                         <div class="text-[11px] font-mono text-slate-500 flex justify-between">
                             <span>XML 样式自适配</span>
-                            <span>完美留白</span>
+                            <span>完美留白比</span>
                         </div>
                     </div>
                     <div class="p-5">
@@ -173,12 +158,12 @@
                             <h3 class="font-bold text-base">欧美高阶 ATS 简历通行规范</h3>
                             <span class="text-lg font-bold text-emerald-400">¥ 15.0</span>
                         </div>
-                        <p class="text-xs text-slate-400 mb-4">严格针对欧美大厂机筛规范设计，杜绝由于排版兼容问题导致的吞字丢行。</p>
+                        <p class="text-xs text-slate-400 mb-4">杜绝排版错位造成的系统吞字，一键替换个人经历。</p>
                     </div>
                 </div>
                 <div class="p-5 pt-0">
-                    <button onclick="instantBuy('WORD-ATS-01')" class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-medium py-2.5 rounded-lg transition">
-                        微信 / 支付宝 极速秒付
+                    <button onclick="openCheckout('WORD-ATS-01', '《欧美高阶 ATS 简历通行规范》', 15.0)" class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-bold py-3 rounded-xl transition text-blue-400 border border-blue-500/20">
+                        ⚡ 免注册秒买 ¥15.0
                     </button>
                 </div>
             </div>
@@ -186,58 +171,64 @@
         </div>
     </main>
 
-    <!-- ================== 多页 PPT 真实视觉轮播预览弹窗 ================== -->
-    <div id="ppt-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl">
-            <!-- 顶部控制条 -->
-            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+    <!-- ================== 世界级无界极客收银台浮层 (Edge Checkout Overlay) ================== -->
+    <div id="checkout-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-indigo-500/60 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl">
+            <!-- 头部说明 -->
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-mono text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-800/50">85分严苛审核标准</span>
-                    <h3 class="font-bold text-sm text-white">《2026 AI 商业创投路演计划书.pptx》- 全套演示</h3>
+                    <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">零摩擦无注册秒付</span>
+                    <h3 class="font-bold text-sm text-white">安全收银台 (EDGE CHECKOUT)</h3>
                 </div>
-                <button onclick="closePPTModal()" class="text-slate-400 hover:text-white font-bold text-lg px-2">✕</button>
+                <button onclick="closeCheckout()" class="text-slate-400 hover:text-white font-bold text-lg px-2">✕</button>
             </div>
 
-            <!-- 核心：多页动态幻灯片视图 -->
-            <div id="slide-viewport" class="p-8 aspect-video flex flex-col justify-between border-b border-slate-800 relative transition-all duration-300 slide-bg-0">
-                <!-- 顶头页签 -->
-                <div class="flex justify-between text-xs font-mono text-slate-400 z-10">
-                    <span id="slide-num">SLIDE 01 / 18 : 战略路演封面</span>
-                    <span class="text-indigo-400 font-bold">BENTO GRID ARCHITECTURE</span>
+            <!-- 收银主面板 -->
+            <div class="p-6">
+                <!-- 商品金额明细 -->
+                <div class="flex justify-between items-baseline pb-4 mb-4 border-b border-slate-800">
+                    <div>
+                        <div id="checkout-title" class="text-sm font-bold text-white">模板加载中...</div>
+                        <div id="checkout-id" class="text-[11px] font-mono text-slate-400 mt-0.5">ID: PENDING</div>
+                    </div>
+                    <div id="checkout-price" class="text-2xl font-black text-emerald-400 font-mono">¥ 0.00</div>
                 </div>
 
-                <!-- 幻灯片具体主题排版 (动态变化) -->
-                <div id="slide-content" class="my-auto z-10">
-                    <!-- JS 会在这里写入每一页的高清结构与图表素材 -->
-                </div>
-
-                <!-- 底部辅助说明 -->
-                <div class="flex justify-between items-center text-xs font-mono text-slate-400 z-10 border-t border-slate-800/60 pt-3">
-                    <span>矢量图形自动渲染 · 拒绝糊图</span>
-                    <span>符合投资人视觉黄金比例</span>
-                </div>
-
-                <!-- 翻页控制按钮 -->
-                <button onclick="changeSlide(-1)" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-800/80 hover:bg-slate-700 text-white w-9 h-9 rounded-full flex items-center justify-center border border-slate-700 transition z-20">◀</button>
-                <button onclick="changeSlide(1)" class="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-800/80 hover:bg-slate-700 text-white w-9 h-9 rounded-full flex items-center justify-center border border-slate-700 transition z-20">▶</button>
-            </div>
-
-            <!-- 底部购买条 -->
-            <div class="p-4 flex justify-between items-center bg-slate-900">
-                <span id="slide-indicator" class="text-xs text-slate-400 font-mono">第 1 / 3 核心主题展示中</span>
-                <div class="flex gap-3">
-                    <button onclick="instantBuy('PPT-2026-AI-ROADSHOW')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-6 py-2.5 rounded-lg shadow-lg shadow-indigo-600/30 transition">
-                        ⚡ ¥29.9 极速秒买预签名下载链接
+                <!-- 渠道切换 Tab -->
+                <div class="grid grid-cols-2 gap-2 mb-6">
+                    <button id="tab-wx" onclick="switchChannel('wx')" class="bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs border border-indigo-400 flex items-center justify-center gap-1.5 transition">
+                        🟢 微信支付 (推荐)
+                    </button>
+                    <button id="tab-ali" onclick="switchChannel('ali')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-lg text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition">
+                        🔵 支付宝 / VISA
                     </button>
                 </div>
+
+                <!-- 原生动态二维码渲染窗 -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center text-center">
+                    <div id="qr-box" class="w-44 h-44 bg-slate-900 border border-slate-800 rounded-lg flex flex-col items-center justify-center p-3 relative group">
+                        <!-- 高精微纳占位符（后续你填入商户链接即为真二维码） -->
+                        <div class="text-4xl mb-1">🟢</div>
+                        <div class="text-xs font-bold text-slate-300">微信支付动态对账码</div>
+                        <div class="text-[10px] font-mono text-emerald-400 mt-1">自动防重付风控安全保护</div>
+                        <div class="text-[9px] text-slate-500 mt-2 font-mono">No-Login Ed25519 Token</div>
+                    </div>
+                    <div id="qr-tip" class="text-[11px] text-slate-400 mt-3 font-mono">
+                        💡 请使用手机微信扫码 · 支付成功 3 秒内将下发永久预签名授权证书
+                    </div>
+                </div>
+
+                <!-- 模拟 Webhook/测试真实到账触发 -->
+                <button onclick="simulateWebhookPaid()" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-emerald-600/30">
+                    ⚡ 模拟到账测试 (立刻下发下载链与授权码)
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ================== 董事长上帝控制台 (Boss God-Mode Terminal) ================== -->
+    <!-- ================== 董事长上帝控制台 ================== -->
     <div id="boss-console" class="max-w-6xl mx-auto px-4 mt-8 mb-12">
         <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-xl overflow-hidden shadow-2xl">
-            <!-- 终端表头 -->
             <div class="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
@@ -246,11 +237,10 @@
                 <span class="text-[11px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded">仅最高管理员可见 · Ed25519 鉴权成功</span>
             </div>
 
-            <!-- 核心数据指标面板 -->
             <div class="grid grid-cols-3 divide-x divide-slate-800 border-b border-slate-800 bg-slate-900/50 font-mono text-center py-3">
                 <div>
                     <div class="text-[11px] text-slate-400">今日实收流水 (RMB)</div>
-                    <div class="text-lg font-bold text-emerald-400">¥ 840.00</div>
+                    <div id="boss-rev" class="text-lg font-bold text-emerald-400">¥ 840.00</div>
                 </div>
                 <div>
                     <div class="text-[11px] text-slate-400">永久会员激活总数</div>
@@ -262,9 +252,8 @@
                 </div>
             </div>
 
-            <!-- 待审批与交互区域 -->
             <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- 左：HITL AI 待审批队列 -->
+                <!-- AI 进货审批队列 -->
                 <div class="bg-slate-950/60 border border-slate-800 rounded-lg p-3">
                     <div class="text-xs font-bold text-slate-300 mb-2 flex justify-between">
                         <span>🤖 AI 进货审批队列 (HITL - 4小时默认生效)</span>
@@ -272,10 +261,10 @@
                     </div>
                     <div class="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
                         <div class="flex justify-between font-bold text-indigo-300 mb-1">
-                            <span>[PPTX] 《2026 极简深灰发布会演示》</span>
-                            <span class="text-emerald-400 font-mono">AI评: 89分</span>
+                            <span>[PPTX] 《2026 AI 医疗大模型融资金皮书》</span>
+                            <span class="text-emerald-400 font-mono">AI评: 91分</span>
                         </div>
-                        <p class="text-slate-400 text-[11px] mb-3">采用中性调灰色与科技高光，客单价核准为 ¥25.8。</p>
+                        <p class="text-slate-400 text-[11px] mb-3">专注大健康与AI结合，深色医疗排版规范，核准客单价 ¥39.9。</p>
                         <div class="flex gap-2">
                             <button onclick="approveTemplate()" class="bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded text-[11px] transition">
                                 🟢 批准立刻上架
@@ -287,16 +276,16 @@
                     </div>
                 </div>
 
-                <!-- 右：像聊天一样指示 AI 建站改版的终端 -->
+                <!-- 直接自然语言对话建站终端 -->
                 <div class="bg-slate-950/60 border border-slate-800 rounded-lg p-3 flex flex-col justify-between">
-                    <div class="text-xs font-bold text-slate-300 mb-2">💬 AI 员工直接命令对话终端 (不用跑 Issues)</div>
+                    <div class="text-xs font-bold text-slate-300 mb-2">💬 AI 员工日常运维交谈 (不用输入指令前缀，直接打字)</div>
                     <div id="terminal-log" class="bg-slate-900 border border-slate-800 rounded p-2.5 h-20 overflow-y-auto font-mono text-[11px] text-slate-300 mb-2 space-y-1">
-                        <div>🤖 [天网 AI]: "老板，今天全网扫描完成！准备听取最新指示。"</div>
+                        <div>🤖 [天网 AI]: "老板，Turso 东京写库就绪，收银台浮层挂载完毕，请指示！"</div>
                     </div>
                     <div class="flex gap-2">
-                        <input id="boss-cmd" type="text" placeholder="比如输入：把商城底色调整为更深邃的纯黑..." class="bg-slate-900 border border-slate-700 rounded px-3 py-1 text-xs text-white w-full focus:outline-none focus:border-indigo-500 font-mono">
+                        <input id="boss-cmd" type="text" placeholder="直接打字，如：让把医疗模板价格改成35.8元..." class="bg-slate-900 border border-slate-700 rounded px-3 py-1 text-xs text-white w-full focus:outline-none focus:border-indigo-500 font-mono">
                         <button onclick="sendBossCommand()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-1 rounded text-xs shrink-0 transition">
-                            ⚡ 调遣执行
+                            ⚡ 调遣
                         </button>
                     </div>
                 </div>
@@ -304,107 +293,75 @@
         </div>
     </div>
 
-    <!-- 极客核心：幻灯片轮播与控制终端逻辑 -->
+    <!-- 收银台与控制面板交互逻辑 -->
     <script>
-        // === 1. 多页 PPT 高保真视觉数据 (基于 JSON) ===
-        const slideData = [
-            {
-                num: "SLIDE 01 / 18 : 战略路演封面",
-                theme: "slide-bg-0",
-                html: `
-                    <div class="text-center my-auto">
-                        <div class="text-xs font-mono text-indigo-400 mb-2">{{ COMPANY_NAME }} · ROADSHOW</div>
-                        <h2 class="text-3xl font-black tracking-tight text-white mb-2">定义下代 AI Office 极客范式</h2>
-                        <p class="text-sm text-slate-300 max-w-md mx-auto">绝不妥协的 1 秒极致首屏响应，由自决型 AI 员工包揽设计审美审判与全自动营销。</p>
-                        <div class="mt-4 inline-block bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs px-3 py-1 rounded-full font-mono">
-                            核心亮点：Bento Grid 排版 / 零阻塞异步引擎
-                        </div>
-                    </div>
-                `
-            },
-            {
-                num: "SLIDE 02 / 18 : 财务增长指标模型",
-                theme: "slide-bg-1",
-                html: `
-                    <div>
-                        <div class="text-xs font-mono text-emerald-400 mb-2">KPI METRICS & ROI BREAKDOWN</div>
-                        <h2 class="text-2xl font-bold text-white mb-4">全渠道电商投入产出对账看板</h2>
-                        <div class="grid grid-cols-3 gap-3 text-center">
-                            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 shadow">
-                                <div class="text-[10px] text-slate-400 font-mono">MARKET CAP TARGET</div>
-                                <div class="text-xl font-black text-emerald-400 mt-1">$12.4 Billion</div>
-                                <div class="text-[10px] text-slate-500 mt-1 font-mono">CAGR +65.2%</div>
-                            </div>
-                            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 shadow">
-                                <div class="text-[10px] text-slate-400 font-mono">SaaS CONVERSION RATE</div>
-                                <div class="text-xl font-black text-indigo-400 mt-1">+85.4%</div>
-                                <div class="text-[10px] text-slate-500 mt-1 font-mono">超越均值 400%</div>
-                            </div>
-                            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700 shadow">
-                                <div class="text-[10px] text-slate-400 font-mono">PAGE LOAD TTFB</div>
-                                <div class="text-xl font-black text-emerald-400 mt-1">< 1.0 Sec</div>
-                                <div class="text-[10px] text-slate-500 mt-1 font-mono">Cloudflare 极速驱动</div>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                num: "SLIDE 03 / 18 : Bento Grid 便当盒架构",
-                theme: "slide-bg-2",
-                html: `
-                    <div>
-                        <div class="text-xs font-mono text-indigo-400 mb-2">BENTO GRID ARCHITECTURE VISUAL</div>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="col-span-2 bg-slate-900/90 border border-indigo-500/40 p-4 rounded-xl">
-                                <div class="text-xs font-bold text-white mb-1">01. OpenXML AST 语法树智能解析</div>
-                                <p class="text-[11px] text-slate-400 leading-relaxed">
-                                    抛弃传统 OCR 截屏乱序，直接对底层 Office XML 节点进行标记与占位符匹配，做到排版 100% 不越位。
-                                </p>
-                            </div>
-                            <div class="col-span-1 bg-slate-900/90 border border-slate-700 p-4 rounded-xl flex flex-col justify-center items-center text-center">
-                                <div class="text-[11px] text-slate-400">AI 多模态打分</div>
-                                <div class="text-2xl font-black text-indigo-400 mt-1">92 / 100</div>
-                            </div>
-                        </div>
-                    </div>
-                `
+        // === 1. 结账浮层体系 ===
+        let currentOrder = { id: "", title: "", price: 0 };
+
+        function openCheckout(id, title, price) {
+            currentOrder = { id, title, price };
+            document.getElementById("checkout-title").innerText = title;
+            document.getElementById("checkout-id").innerText = "ID: " + id;
+            document.getElementById("checkout-price").innerText = "¥ " + price.toFixed(2);
+            switchChannel("wx");
+            document.getElementById("checkout-modal").classList.remove("hidden");
+        }
+
+        function closeCheckout() {
+            document.getElementById("checkout-modal").classList.add("hidden");
+        }
+
+        function switchChannel(type) {
+            const wxTab = document.getElementById("tab-wx");
+            const aliTab = document.getElementById("tab-ali");
+            const qrBox = document.getElementById("qr-box");
+            const qrTip = document.getElementById("qr-tip");
+
+            if (type === 'wx') {
+                wxTab.className = "bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs border border-indigo-400 flex items-center justify-center gap-1.5 transition";
+                aliTab.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-lg text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition";
+                qrBox.innerHTML = `
+                    <div class="text-4xl mb-1">🟢</div>
+                    <div class="text-xs font-bold text-slate-300">微信支付动态对账码</div>
+                    <div class="text-[10px] font-mono text-emerald-400 mt-1">自动防重付风控保护</div>
+                    <div class="text-[9px] text-slate-500 mt-2 font-mono">WeChat Pay Zero-Login</div>
+                `;
+                qrTip.innerText = "💡 请使用手机微信扫码 · 支付成功 3 秒内自动推流发授权证书";
+            } else {
+                aliTab.className = "bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs border border-indigo-400 flex items-center justify-center gap-1.5 transition";
+                wxTab.className = "bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-lg text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition";
+                qrBox.innerHTML = `
+                    <div class="text-4xl mb-1">🔵</div>
+                    <div class="text-xs font-bold text-slate-300">支付宝 / VISA 聚合对账码</div>
+                    <div class="text-[10px] font-mono text-indigo-400 mt-1">国外卡/花呗自适配通道</div>
+                    <div class="text-[9px] text-slate-500 mt-2 font-mono">Alipay & Credit Card</div>
+                `;
+                qrTip.innerText = "💡 使用支付宝或境外银行卡 · 无需验证个人名字，秒扫即开";
             }
-        ];
+        }
 
-        let currentSlideIdx = 0;
-
-        function renderSlide(idx) {
-            const viewport = document.getElementById("slide-viewport");
-            const data = slideData[idx];
+        // 模拟真实 Webhook 到账处理
+        function simulateWebhookPaid() {
+            const secretKey = "VIP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+            localStorage.setItem("EMPIRE_LICENSE_TOKEN", secretKey);
             
-            // 切换主题背景与页面内容
-            viewport.className = "p-8 aspect-video flex flex-col justify-between border-b border-slate-800 relative transition-all duration-300 " + data.theme;
-            document.getElementById("slide-num").innerText = data.num;
-            document.getElementById("slide-content").innerHTML = data.html;
-            document.getElementById("slide-indicator").innerText = "第 " + (idx + 1) + " / " + slideData.length + " 核心主题展示中";
+            // 更新当日常规营收展示
+            const bossRev = document.getElementById("boss-rev");
+            let revNum = parseFloat(bossRev.innerText.replace("¥", "").trim()) || 840;
+            revNum += currentOrder.price;
+            bossRev.innerText = "¥ " + revNum.toFixed(2);
+
+            closeCheckout();
+            alert("✅ 模拟 Webhook 到账成功！\n\n已向该浏览器写入永久许可鉴权证明：【 " + secretKey + " 】\n预签名下载链接解密完成，模板下载正在立刻拉起！");
+            checkVIP();
         }
 
-        function changeSlide(direction) {
-            currentSlideIdx = (currentSlideIdx + direction + slideData.length) % slideData.length;
-            renderSlide(currentSlideIdx);
-        }
-
-        function openPPTModal(startIdx = 0) {
-            currentSlideIdx = startIdx;
-            renderSlide(currentSlideIdx);
-            document.getElementById("ppt-modal").classList.remove("hidden");
-        }
-        function closePPTModal() {
-            document.getElementById("ppt-modal").classList.add("hidden");
-        }
-
-        // === 2. 上帝控制台与老板指令响应 ===
+        // === 2. 董事长决策命令台 ===
         function approveTemplate() {
-            alert("✅ 批准指示已直接送达到 Cloudflare 边缘！\n《2026 极简深灰发布会演示》将自动写入 Turso 数据库并通过首页上架展示！");
+            alert("🟢 上架决策已提交！Turso 数据库 status 改为 approved，公网商铺开始发售该医疗大模型 PPT。");
         }
         function vetoTemplate() {
-            alert("🔴 一票否决权已生效！\n当前模板已被自动剔除，对应的配色法则已列入系统底层「永久排斥向量库」！");
+            alert("🔴 否决执行！该模版已自选淘汰，配色向量已送入负面排斥库。");
         }
         function sendBossCommand() {
             const input = document.getElementById("boss-cmd");
@@ -417,32 +374,27 @@
             log.scrollTop = log.scrollHeight;
 
             setTimeout(() => {
-                log.innerHTML += '<div class="text-emerald-400 font-bold">🤖 [天网 AI]: "收到最高战略命令！已通过 Turso 数据库更新系统并调遣算力重修版式！"</div>';
+                log.innerHTML += '<div class="text-emerald-400 font-bold">🤖 [天网 AI]: "收到你的指示！正在调动 Turso 表格与 CSS 规则进行自动刷新！"</div>';
                 log.scrollTop = log.scrollHeight;
-            }, 600);
+            }, 500);
         }
 
-        // === 3. 基础交易鉴权 ===
         function activateVIP() {
             const secretKey = "VIP-2026-" + Math.random().toString(36).substring(2, 8).toUpperCase();
             localStorage.setItem("EMPIRE_LICENSE_TOKEN", secretKey);
-            alert("🔑 免注册终身授权已开通！您现在已获得全体模板无限次预签名下载链通行证。\n密钥: " + secretKey);
+            alert("🔑 免注册永久会员开通！全体下载权限激活。\n通关秘钥: " + secretKey);
             checkVIP();
         }
-        function instantBuy(id) {
-            alert("🚀 正在极速拉起免注册付款通道...\n对应商品 ID: " + id + "\n付款完成时，服务端自动回调写入授权权限！");
-        }
+
         function checkVIP() {
             const token = localStorage.getItem("EMPIRE_LICENSE_TOKEN");
             if (token) {
-                document.getElementById("vip-status").innerText = "🔑 终身会员: " + token;
+                document.getElementById("vip-status").innerText = "🔑 终身授权: " + token;
                 document.getElementById("vip-status").className = "text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/50 px-3 py-1 rounded-full";
             }
         }
-        window.onload = () => {
-            checkVIP();
-            renderSlide(0);
-        };
+
+        window.onload = checkVIP;
     </script>
 </body>
 </html>
