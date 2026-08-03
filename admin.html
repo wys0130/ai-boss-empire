@@ -3,77 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 董事长全自动 AI 驾驶舱 (Multi-File Architect V4)</title>
+    <title>ApexWork 董事长全自动 AI 驾驶舱 (Dual-Column V5)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body { -webkit-font-smoothing: antialiased; }</style>
+    <style>
+        body { -webkit-font-smoothing: antialiased; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4 font-sans">
 
-    <!-- 驾驶舱面板 -->
-    <div class="bg-slate-900 border-2 border-indigo-500/50 rounded-2xl max-w-xl w-full p-6 shadow-2xl">
-        
-        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <div class="flex items-center gap-2.5">
-                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-                <h1 class="font-bold font-mono text-base tracking-wide">APEXWORK MULTI-FILE CONSOLE V4</h1>
-            </div>
-            <button onclick="toggleConfig()" class="text-[11px] font-mono px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 rounded transition flex items-center gap-1">
-                🔑 密钥配置
+    <!-- 顶部导航条 -->
+    <header class="max-w-7xl w-full mx-auto bg-slate-900 border border-slate-800 rounded-xl px-5 py-3 mb-4 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h1 class="font-bold font-mono text-sm tracking-wider text-slate-100">APEXWORK AI CONSOLE V5 · 双栏记忆驾驶舱</h1>
+            <span class="text-[11px] font-mono px-2 py-0.5 bg-indigo-950 text-indigo-400 border border-indigo-800 rounded font-bold">MULTI-FILE AGENT</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded transition flex items-center gap-1.5">
+                <span>🔄 刷新上下文档案</span>
+            </button>
+            <button onclick="toggleConfig()" class="text-xs font-mono px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 rounded transition flex items-center gap-1.5">
+                <span>🔑 密钥配置</span>
             </button>
         </div>
+    </header>
 
-        <!-- 隐私密钥设置框 -->
-        <div id="configArea" class="hidden mb-4 p-4 bg-slate-950 border border-indigo-900/60 rounded-xl">
-            <div class="text-xs font-bold text-indigo-400 font-mono mb-2">⚡ 掌门人身份与密钥绑定 (仅保存在本地设备)</div>
-            <div class="space-y-2.5">
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1 font-mono">GitHub Token (ghp_开头的万能卡)</label>
-                    <input id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxx..." 
-                           class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-slate-400 mb-1 font-mono">DeepSeek API Key (sk-开头的算力卡)</label>
-                    <input id="dsKeyInput" type="password" placeholder="sk-xxxxxxxxxxx..." 
-                           class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500">
-                </div>
-                <button onclick="saveKeys()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">
-                    💾 保存并锁定在本机浏览器
-                </button>
+    <!-- 密钥配置弹窗区 -->
+    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-4 p-4 bg-slate-900 border border-indigo-800 rounded-xl shadow-2xl">
+        <div class="text-xs font-bold text-indigo-400 font-mono mb-3">⚡ 掌门人身份与密钥绑定 (保存在本机浏览器本地缓存)</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[11px] text-slate-400 mb-1 font-mono">GitHub Token (ghp_开头的万能卡)</label>
+                <input id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxx..." 
+                       class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500">
+            </div>
+            <div>
+                <label class="block text-[11px] text-slate-400 mb-1 font-mono">DeepSeek API Key (sk-开头的算力卡)</label>
+                <input id="dsKeyInput" type="password" placeholder="sk-xxxxxxxxxxx..." 
+                       class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500">
             </div>
         </div>
-
-        <p class="text-xs text-slate-300 leading-relaxed mb-4">
-            向 DeepSeek 架构级智能体下达指令。AI 将自动分析业务路由，<strong class="text-indigo-400">自动在对应目录下建立或读取 .html / .js / .json 文件</strong>，严格局部替换目标代码并锁死其余核心系统。
-        </p>
-
-        <!-- 指令输入框 -->
-        <div class="mb-4">
-            <label class="block text-xs font-bold text-slate-400 mb-1 font-mono">CHAIRMAN HIGHEST DIRECTIVE / 架构决策指令</label>
-            <textarea id="cmd" rows="4" 
-                      placeholder="例如：&#10;1. 将 PPT 数据源分离到 /templates/aerotech-2026.json 文件中；&#10;2. 在 /editor.html 创建稻壳儿风格编辑界面；&#10;3. 在 /js/export-service.js 中锁死 $9.99 结账与本地 XML 导出..." 
-                      class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
-        </div>
-
-        <!-- 触发执行按钮 -->
-        <button onclick="triggerAutonomousEvolution()" id="runBtn" 
-                class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-            <span>🚀 立即执行架构指令，启动 AI 多文件路由与自动建站</span>
+        <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">
+            💾 保存并锁定在本机浏览器
         </button>
-
-        <!-- 实时执行日志面板 -->
-        <div id="logArea" class="mt-4 hidden">
-            <div class="text-[11px] font-mono text-slate-400 mb-1">SYSTEM TERMINAL / 架构级操作控制台日志:</div>
-            <pre id="log" class="text-[11px] font-mono text-yellow-400 p-3.5 bg-slate-950 rounded-xl border border-slate-800 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto"></pre>
-        </div>
-
-        <!-- 快捷访问主站 -->
-        <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between items-center text-xs">
-            <span class="text-slate-500 font-mono">TARGET REPO: wys0130/ai-boss-empire</span>
-            <a id="liveLink" href="https://wys0130.github.io/ai-boss-empire/" target="_blank" class="text-indigo-400 hover:underline font-mono font-bold">
-                查看主站效果 →
-            </a>
-        </div>
     </div>
+
+    <!-- 核心工作台：双栏架构 (左边红框区：历史上下文 / 右边：决策与终端) -->
+    <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start overflow-hidden">
+        
+        <!-- 左侧栏 (占比 5/12) - 历史交流对话内容记录 (看上下文) -->
+        <aside class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col h-[650px] shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-indigo-400 font-mono text-sm">💬</span>
+                    <h2 class="text-xs font-bold font-mono tracking-wide text-slate-200">历史交流与记忆上下文档案</h2>
+                </div>
+                <span id="historyCount" class="text-[10px] font-mono bg-slate-800 px-2 py-0.5 rounded text-slate-400">0 RECORDS</span>
+            </div>
+            
+            <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                以下内容同步自 <code>MEMORY.md</code> 及本地对话数据库，提供 AI 演化上下文与历史指令溯源。
+            </p>
+
+            <!-- 历史对白卡片滚动列表 -->
+            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
+                <div class="text-center text-xs text-slate-500 py-10 font-mono">
+                    正在连接 GitHub 抓取历史对话上下文...
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右侧栏 (占比 7/12) - 决策发射台 + 终端日志 -->
+        <section class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col h-[650px] shadow-xl justify-between">
+            <div>
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                    <span class="text-xs font-bold font-mono text-indigo-400">CHAIRMAN HIGHEST DIRECTIVE / 架构决策指令</span>
+                    <span class="text-[11px] font-mono text-slate-500">TARGET: wys0130/ai-boss-empire</span>
+                </div>
+
+                <!-- 指令输入框 -->
+                <div class="mb-4">
+                    <textarea id="cmd" rows="4" 
+                              placeholder="输入架构改造指令，例如：&#10;1. 建立 /editor.html 稻壳儿风格白底编辑面板；&#10;2. 将 PPT 模版 JSON 分离至 /templates/aerotech-2026.json；&#10;3. 在 /js/export-service.js 完善支持苹果和PC端的导出..." 
+                              class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3.5 text-sm text-white font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
+                </div>
+
+                <!-- 触发执行按钮 -->
+                <button onclick="triggerAutonomousEvolution()" id="runBtn" 
+                        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+                    <span>🚀 立即执行架构指令，启动 AI 多文件路由与自动建站</span>
+                </button>
+            </div>
+
+            <!-- 实时终端日志 -->
+            <div class="flex-1 mt-4 flex flex-col min-h-0">
+                <div class="text-[11px] font-mono text-slate-400 mb-1.5">SYSTEM TERMINAL / 实时构建控制台:</div>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-400 p-3.5 bg-slate-950 rounded-xl border border-slate-800 whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 系统就绪。等待董事长下达指令...</pre>
+            </div>
+
+            <!-- 底部导航至新主站 -->
+            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
+                <span class="text-slate-500 font-mono">STATUS: AUTO MULTI-FILE ROUTER</span>
+                <a id="liveLink" href="https://wys0130.github.io/ai-boss-empire/" target="_blank" class="text-indigo-400 hover:underline font-mono font-bold">
+                    🔥 查看最新网站效果 (已破除缓存) →
+                </a>
+            </div>
+        </section>
+    </main>
 
     <script>
         const REPO = "wys0130/ai-boss-empire";
@@ -104,48 +143,76 @@
             localStorage.setItem("APEX_GH_TOKEN", gh);
             localStorage.setItem("APEX_DS_KEY", ds);
             toggleConfig();
-            alert("✅ 身份密钥已安全记忆至本机浏览器本地数据库！全网没有任何第三方可见。");
+            alert("✅ 身份密钥已安全记忆至本机浏览器本地数据库！");
+            loadHistoryFromMemory();
         }
 
         function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
         function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
         function appendLog(msg, color = "") {
-            const logArea = document.getElementById("logArea");
             const log = document.getElementById("log");
-            logArea.classList.remove("hidden");
-            if (color) log.className = `text-[11px] font-mono ${color} p-3.5 bg-slate-950 rounded-xl border border-slate-800 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto`;
-            log.innerText += `>> ${msg}\n`;
+            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-3.5 bg-slate-950 rounded-xl border border-slate-800 whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
+            log.innerText += `\n>> ${msg}`;
             log.scrollTop = log.scrollHeight;
         }
 
-        // RAG 记忆精简处理
+        // --- 核心升级：从 MEMORY.md 与本地会话解析并渲染左侧历史对话卡片 ---
+        async function loadHistoryFromMemory() {
+            const feed = document.getElementById("historyFeed");
+            try {
+                const keys = getKeys();
+                const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
+                const content = memFile.content || "";
+                
+                // 解析 EVO-RECORD 记录
+                const lines = content.split("\n").filter(l => l.includes("[EVO-RECORD]") || l.includes("- "));
+                const count = lines.length;
+                document.getElementById("historyCount").innerText = `${count} RECORDS`;
+
+                if (count === 0) {
+                    feed.innerHTML = `<div class="text-center text-xs text-slate-500 py-10 font-mono">暂无历史记录，请下达第一次指令。</div>`;
+                    return;
+                }
+
+                feed.innerHTML = "";
+                lines.reverse().forEach((line, idx) => {
+                    const cleanText = line.replace(/^- /, "").replace("[EVO-RECORD]:", "").trim();
+                    feed.innerHTML += `
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 hover:border-slate-700 transition">
+                            <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
+                                <span># ARCHIVE-${count - idx}</span>
+                                <span class="text-emerald-400">● VERIFIED</span>
+                            </div>
+                            <div class="text-xs text-slate-300 leading-relaxed font-mono">
+                                ${cleanText}
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                feed.innerHTML = `<div class="text-center text-xs text-rose-400 py-10 font-mono">加载上下文档案失败：请确保密钥正确。</div>`;
+            }
+        }
+
         function optimizeMemoryForPrompt(fullMemoryText) {
             const lines = fullMemoryText.split("\n").filter(l => l.trim() !== "");
             if (lines.length <= 18) return fullMemoryText;
-            return lines.slice(0, 12).join("\n") + "\n\n... [为节省 Token 算力，已按需过滤早期无效调试记录] ...\n\n【最新核心实战经历】:\n" + lines.slice(-5).join("\n");
+            return lines.slice(0, 12).join("\n") + "\n\n... [按需过滤冗余内容] ...\n\n【最新实战档案】:\n" + lines.slice(-5).join("\n");
         }
 
-        // 尝试拉取远程文件（如不存在说明 AI 需要在目标路径新建该文件）
         async function getGithubFileSafe(path, token) {
             const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
             const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
-            if (!res.ok) {
-                appendLog(`📁 检测到目标文件 [${path}] 不存在，AI 将在推送时自动新建并建立路径！`, "text-indigo-400");
-                return { content: "", sha: null };
-            }
+            if (!res.ok) return { content: "", sha: null };
             const data = await res.json();
             return { content: b64_to_utf8(data.content), sha: data.sha };
         }
 
-        // 自动往任意指定目录层级写文件（支持自动建夹）
         async function pushGithubFile(path, content, sha, message, token) {
             const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
-            const payload = {
-                message: message,
-                content: utf8_to_b64(content)
-            };
-            if (sha) payload.sha = sha; // 如无 sha 则为新建文件夹/新文件
+            const payload = { message: message, content: utf8_to_b64(content) };
+            if (sha) payload.sha = sha;
 
             const res = await fetch(url, {
                 method: "PUT",
@@ -156,54 +223,51 @@
                 },
                 body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error(`发布/新建 ${path} 失败: ` + res.statusText);
+            if (!res.ok) throw new Error(`提交 ${path} 失败: ` + res.statusText);
             return await res.json();
         }
 
-        // 核心智能体调度函数
         async function triggerAutonomousEvolution() {
             const btn = document.getElementById("runBtn");
             const cmdInput = document.getElementById("cmd");
-            const cmd = cmdInput.value || "构建大厂级 SaaS 多目录结构，分离 templates/aerotech-2026.json 模板与 js/editor-engine.js 编辑器交互";
+            const cmd = cmdInput.value || "建立多文件标准架构，分离 templates/aerotech-2026.json 模板数据与 js/editor-engine.js 编辑交互";
             
             btn.disabled = true;
-            btn.innerHTML = "<span>⚙️ 系统运转中 (AI 正在进行多文件路由与工程推理)...</span>";
-            document.getElementById("log").innerText = "";
+            btn.innerHTML = "<span>⚙️ 系统运转中 (正在进行多文件路由与代码推理)...</span>";
+            document.getElementById("log").innerText = ">> 开始执行任务...";
             
             try {
                 const keys = getKeys();
 
-                appendLog("正在连接 GitHub 提取 MEMORY.md 长期经验库...");
+                appendLog("提取 MEMORY.md 历史记忆上下文...");
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 const optimizedMemory = optimizeMemoryForPrompt(memoryFile.content || "[]");
                 
-                appendLog("⚡ 正在请求 DeepSeek V3 架构大脑进行『目标文件路由分析』与代码构建 (约需20秒)...", "text-yellow-400");
+                appendLog("⚡ 正在请求 DeepSeek V3 进行文件路径分析与增量重构 (约需20秒)...", "text-yellow-400");
                 
-                // 核心突破提示词：强逼 AI 返回目标操作文件路径（支持 .json, .js, .html, .css 等多路径）
                 const prompt = `你现在是 ApexWork 的高阶 SaaS 系统首席架构师。
 请根据既往记忆，执行董事长最新的架构改造或功能升级指令。
 要求：
-1. 彻底弃用将所有代码堆在单一 html 的落后做法。根据需求自主判断你当前要操作的文件路径 (TARGET_FILE_PATH)，例如：
-   - 业务页面可为 'index.html' 或 'editor.html'
-   - 数据文件必为 'templates/aerotech-2026.json'
-   - 交互引擎必为 'js/editor-engine.js' 或 'js/export-service.js'
-   - 样式约束必为 'css/style.css'
-2. 代码必须遵循增量原则：不可提炼或改动的核心部分直接锁死保留，严禁写死链接或空壳样式；
-3. 输出完整的目标文件更新后全量代码或新文件内容。
+1. 彻底弃用单一 html 堆砌做法。判断本任务的核心目标文件路径 (TARGET_FILE_PATH)，例如：
+   - 页面可为 'index.html' 或 'editor.html'
+   - 模板 JSON 数据必须为 'templates/aerotech-2026.json'
+   - JS 交互必为 'js/editor-engine.js' 或 'js/export-service.js'
+2. 代码遵循增量修改，不可改动的部分直接锁死，严禁空死链接或没有绑定事件的按键；
+3. 输出完整的对应目标文件新代码。
 
-【既往核心记忆库 MEMORY.md (精简版)】：
+【既往记忆上下文 MEMORY.md (精简版)】：
 ${optimizedMemory}
 
-【高层执行决策指令】：
+【高层决策指令】：
 "${cmd}"
 
-你必须严格按照以下分割标记输出响应，切勿附加任何对话闲聊：
+严格按照以下分割标记输出响应，切勿附加多余闲聊：
 ===NEW_MEMORY===
-- [EVO-RECORD]: <用1句话记载今天升级的技术规范与多文件分层逻辑>
+- [EVO-RECORD]: <用1句话提炼本次更新对系统架构与上下文的贡献>
 ===TARGET_FILE_PATH===
-<在此填写你要修改或创建的对应仓库相对路径，例如：templates/aerotech-2026.json 或 editor.html>
+<在此填写对应的目标仓库路径，如 templates/aerotech-2026.json 或 editor.html>
 ===FILE_CONTENT===
-<在此输出你要写入该对应目标文件内的真正可运行代码或严格 JSON 格式内容>`;
+<在此输出你要写入该对应文件内的可运行代码或完整 JSON 格式内容>`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
@@ -214,7 +278,7 @@ ${optimizedMemory}
                     body: JSON.stringify({
                         model: "deepseek-chat",
                         messages: [
-                            { role: "system", content: "你是一位崇尚模块化、动静分离、大厂极客规范的顶尖全栈架构师。" },
+                            { role: "system", content: "你是崇尚模块化、动静分离与大厂规范的顶尖全栈架构师。" },
                             { role: "user", content: prompt }
                         ],
                         temperature: 0.3
@@ -225,38 +289,38 @@ ${optimizedMemory}
                 const dsData = await dsRes.json();
                 const aiAnswer = dsData.choices[0].message.content;
 
-                appendLog("DeepSeek 架构设计完成！正在解析对应物理路由与代码包...");
+                appendLog("DeepSeek 架构构建完成！正在解析物理文件路由...");
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
                 const targetParts = aiAnswer.split("===TARGET_FILE_PATH===");
                 const contentParts = aiAnswer.split("===FILE_CONTENT===");
 
                 if (memParts.length < 2 || targetParts.length < 2 || contentParts.length < 2) {
-                    throw new Error("AI 返回指令标记不规范，未提取到合法文件路径，已启动自动防御机制拦截推版。");
+                    throw new Error("AI 返回标签格式不符，未提取到文件路径，安全策略拦截。");
                 }
 
                 const newMemoryLine = targetParts[0].replace("===NEW_MEMORY===", "").trim();
                 const targetFilePath = contentParts[0].replace("===TARGET_FILE_PATH===","").trim();
                 const newFileContent = contentParts[1].replace(/```[a-z]*/g, "").replace(/```/g, "").trim();
 
-                appendLog(`📍 [智能路由锁定]: AI 判断本任务目标操作路径为 =>【 ${targetFilePath} 】`, "text-indigo-300 font-bold");
+                appendLog(`📍 [智能路由锁定]: 操作路径 =>【 ${targetFilePath} 】`, "text-indigo-300 font-bold");
 
-                // 拉取目标文件的现有 SHA（如果已存在则覆盖更新，如不存在则为自动建立文件夹/创建新文件）
                 const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-
-                appendLog(`正在向 GitHub 仓库推送目标文件 [${targetFilePath}]，按需自动建立所属目录...`);
+                appendLog(`正在向 GitHub 推送文件 [${targetFilePath}]，按需建立所属文件夹...`);
                 await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 DeepSeek Architecture Update: ${targetFilePath}`, keys.gh);
 
-                appendLog(`正在提交新的系统记忆到 MEMORY.md...`);
+                appendLog(`正在保存新上下文档案到 MEMORY.md...`);
                 const updatedMemory = (memoryFile.content || "") + "\n" + newMemoryLine;
                 await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 AI Memory Update: ${newMemoryLine.slice(0, 35)}`, keys.gh);
 
-                appendLog(`✅ 全自动架构演变任务 100% 成功执行！[ ${targetFilePath} ] 已生成上线。`, "text-emerald-400 font-bold");
+                appendLog(`✅ 全自动多文件升级 100% 成功执行！[ ${targetFilePath} ] 已更新上线。`, "text-emerald-400 font-bold");
                 
-                // 历史归档与清理
-                appendLog(`📋 [历史指令归档]: "${cmd}"`, "text-indigo-300");
+                // 指令输入框归档并清空
                 cmdInput.value = "";
                 
-                // 链接自动刷新
+                // 实时更新左侧记忆卡片栏，呈现新对话历史
+                await loadHistoryFromMemory();
+
+                // 链接自动破除非存
                 const cacheBusterUrl = `https://wys0130.github.io/ai-boss-empire/?v=${Date.now()}`;
                 const liveLinkBtn = document.getElementById("liveLink");
                 liveLinkBtn.href = cacheBusterUrl;
@@ -269,6 +333,13 @@ ${optimizedMemory}
                 btn.innerHTML = "<span>🚀 立即执行架构指令，启动 AI 多文件路由与自动建站</span>";
             }
         }
+
+        // 首次打开自动载入历史上下文
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem("APEX_GH_TOKEN")) {
+                loadHistoryFromMemory();
+            }
+        });
     </script>
 </body>
 </html>
