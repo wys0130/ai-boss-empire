@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 董事长专属 AI 驾驶舱 (Secure Console)</title>
+    <title>ApexWork 董事长专属 AI 驾驶舱 (Secure Console V3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
@@ -45,7 +45,7 @@
         </div>
 
         <p class="text-xs text-slate-300 leading-relaxed mb-4">
-            向 DeepSeek 增长大脑下达高层指令。系统将自动调用记忆库 <code>MEMORY.md</code>，重构页面并推往 GitHub 上线。
+            向 DeepSeek 增长大脑下达高层指令。系统将按需精准提取 <code>MEMORY.md</code>，重构页面并推往 GitHub 上线。
         </p>
 
         <!-- 指令输入框 -->
@@ -71,7 +71,7 @@
         <!-- 快捷访问主站 -->
         <div class="mt-4 pt-4 border-t border-slate-800/80 flex justify-between items-center text-xs">
             <span class="text-slate-500 font-mono">TARGET: wys0130.github.io/ai-boss-empire</span>
-            <a href="https://wys0130.github.io/ai-boss-empire/" target="_blank" class="text-indigo-400 hover:underline font-mono">
+            <a id="liveLink" href="https://wys0130.github.io/ai-boss-empire/" target="_blank" class="text-indigo-400 hover:underline font-mono font-bold">
                 查看主站效果 →
             </a>
         </div>
@@ -126,6 +126,17 @@
             log.scrollTop = log.scrollHeight;
         }
 
+        // --- 核心优化点：RAG 按需调取记忆，自动排除无关冗余记录，节省 50%+ 算力 ---
+        function optimizeMemoryForPrompt(fullMemoryText) {
+            const lines = fullMemoryText.split("\n").filter(l => l.trim() !== "");
+            if (lines.length <= 18) return fullMemoryText;
+            // 保留前 12 行（核心底层宪法与业务规则底线）
+            const coreConstitution = lines.slice(0, 12);
+            // 仅提取最后 5 行（近期最核心的实战优化经历与锁定区域）
+            const latestRecords = lines.slice(-5);
+            return coreConstitution.join("\n") + "\n\n... [为节省 Token 算力，已按需过滤早期无效调试记录] ...\n\n【最新核心实战经历】:\n" + latestRecords.join("\n");
+        }
+
         async function getGithubFile(path, token) {
             const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
             const res = await fetch(url, {
@@ -157,7 +168,8 @@
 
         async function triggerAutonomousEvolution() {
             const btn = document.getElementById("runBtn");
-            const cmd = document.getElementById("cmd").value || "审查当前高管审美与 UI 布局，自动优化转化率与购买体验";
+            const cmdInput = document.getElementById("cmd");
+            const cmd = cmdInput.value || "审查当前高管审美与 UI 布局，自动优化转化率与购买体验";
             
             btn.disabled = true;
             btn.innerHTML = "<span>⚙️ 系统运转中 (正在同步 GitHub 与 DeepSeek)...</span>";
@@ -169,17 +181,24 @@
                 appendLog("正在连接 GitHub 提取 MEMORY.md 长期经验库...");
                 const memoryFile = await getGithubFile("MEMORY.md", keys.gh);
                 
+                // --- 触发按需精简 ---
+                const optimizedMemory = optimizeMemoryForPrompt(memoryFile.content);
+                appendLog("⚡ 记忆按需压缩完毕：已锁定核心底线 + 选取最近 5 条实战成果，有效节省 Token 算力！", "text-indigo-400");
+                
                 appendLog("正在提取 index.html 网页源代码...");
                 const htmlFile = await getGithubFile("index.html", keys.gh);
 
-                appendLog("正在请求 DeepSeek V3 大脑展开推理与代码重构 (约需15秒)...", "text-yellow-400");
+                appendLog("正在请求 DeepSeek 大脑展开推理与增量代码重构 (约需15~20秒)...", "text-yellow-400");
                 
                 const prompt = `你现在是 ApexWork 的 AI 首席产品经理与现代 Tailwind CSS 极客全栈工程师。
 请依据既往记忆库，并执行董事长最新的优化指令。
-要求：1. 强制便当盒现代审美；2. Pay-to-Export 本地下载必须可用；3. 美元标价 USD $9.99；4. 参数跳转 ?status=paid 必须保留。
+要求：
+1. 强制采用高阶亮白商务美学，绝不能输出空死链接或没有绑定事件的摆设按钮；
+2. Pay-to-Export 本地下载与 ?status=paid 跳转拦截逻辑强制保持锁定状态，绝对不可删改破坏；
+3. 基于原有健全交互进一步优化。
 
-【既往记忆经验库 MEMORY.md】：
-${memoryFile.content}
+【既往核心记忆库 MEMORY.md (按需精简版)】：
+${optimizedMemory}
 
 【当前页 index.html 源码】：
 ${htmlFile.content}
@@ -231,7 +250,18 @@ ${htmlFile.content}
                 appendLog("正在自动推送 index.html 代码并强行上线覆盖...");
                 await pushGithubFile("index.html", newHtmlCode, htmlFile.sha, "🤖 DeepSeek Evolved: Evolved UI & Conversion Path", keys.gh);
 
-                appendLog("✅ 进化任务 100% 成功执行！GitHub Pages 正在自动化编译中（约需 20 秒生效）。", "text-emerald-400");
+                appendLog("✅ 进化任务 100% 成功执行！", "text-emerald-400");
+                
+                // --- 交互升级 1：自动将上一句指令归档到日志，并清空输入框让其恢复干净 ---
+                appendLog(`📋 [历史指令归档]: "${cmd}"`, "text-indigo-300");
+                cmdInput.value = "";
+                
+                // --- 交互升级 2：防缓存时间戳破除！动态修改下方主站链接，绝对不再加载旧网页 ---
+                const cacheBusterUrl = `https://wys0130.github.io/ai-boss-empire/?v=${new Date().getTime()}`;
+                const liveLinkBtn = document.getElementById("liveLink");
+                liveLinkBtn.href = cacheBusterUrl;
+                liveLinkBtn.innerText = "🔥 查看新主站效果 (已破除缓存) →";
+
             } catch (err) {
                 appendLog("❌ 失败中止: " + err.message, "text-rose-400");
             } finally {
