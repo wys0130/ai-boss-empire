@@ -3,375 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 高阶智能 PPT 编辑商城 (Bento Pro V6)</title>
+    <title>ApexWork 智能企业办公套件商城 · PPT / EXCEL / WORD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
-        /* 幻灯片高阶立体阴影 */
-        .slide-shadow {
-            box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
-        }
-        /* 科技微光背景网格图案 */
-        .bg-grid-pattern {
-            background-image: radial-gradient(rgba(100, 116, 139, 0.18) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-        /* 自定义平滑滚动条 */
-        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
 
-    <!-- 顶层大厂品牌导览 -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <!-- 顶部导航条 -->
+    <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="bg-blue-600 text-white font-black font-mono text-xs px-2.5 py-1 rounded shadow-sm">APEXWORK</div>
-            <h1 class="font-bold text-sm text-slate-800">2026 AeroTech 全球创投战略与 ROI 路演套件 (15 SLIDES)</h1>
-            <span class="text-[11px] bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded font-bold">商业完整授权</span>
+            <div class="bg-blue-600 text-white font-black font-mono text-sm px-3 py-1 rounded shadow-sm">APEXWORK</div>
+            <span class="font-bold text-slate-800 tracking-wide">智能办公交付商城 (2026 RELEASE)</span>
         </div>
-        <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-500">全网通用授权价: <strong class="text-slate-900 font-mono text-sm">USD $9.99</strong></span>
-            <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-blue-600/20 transition flex items-center gap-1.5">
-                <span>⚡ 支付 $9.99 导出 15 页高阶路演成果</span>
-            </button>
+        <div class="flex items-center gap-6 text-xs font-medium text-slate-600">
+            <a href="#ppt-section" class="hover:text-blue-600 transition">PPT 路演战略</a>
+            <a href="#excel-section" class="hover:text-blue-600 transition">EXCEL 财务模型</a>
+            <a href="#word-section" class="hover:text-blue-600 transition">WORD 合规报告</a>
+            <span class="h-4 w-[1px] bg-slate-200"></span>
+            <span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded font-bold">已启用 AI 模版引擎</span>
         </div>
     </header>
 
-    <!-- 三栏核心编辑工作台 -->
-    <div class="flex-1 flex overflow-hidden">
-        
-        <!-- 左栏：15页缩略图页面导览 -->
-        <aside class="w-64 bg-white border-r border-slate-200/80 flex flex-col shrink-0">
-            <div class="p-3.5 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
-                <span>幻灯片导航列表</span>
-                <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">15 SLIDES</span>
-            </div>
-            <div id="thumbList" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scroll">
-                <!-- 原生 JS 实时渲染缩略图 -->
-            </div>
-        </aside>
-
-        <!-- 中间画布工作区域 (内部支持上下平滑滚动) -->
-        <main class="flex-1 bg-slate-100/80 flex flex-col items-center overflow-y-auto custom-scroll relative">
-            
-            <!-- 【重点解决痛点3】强力置顶悬浮编辑工具条 (Sticky Top Toolbar，下拉永不消失) -->
-            <div class="sticky top-4 z-40 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-5 py-2.5 shadow-xl flex items-center gap-5 text-xs font-medium text-slate-200 my-4">
-                <div class="flex items-center gap-1.5 text-indigo-400 font-mono text-[11px]">
-                    <span>🛠️</span>
-                    <span>EDITOR TOOLS:</span>
-                </div>
-                <button onclick="addBulletText()" class="hover:text-white hover:bg-slate-800 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
-                    <span>📄 追加说明条目</span>
-                </button>
-                <button onclick="toggleHighlightCard()" class="hover:text-white hover:bg-slate-800 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
-                    <span>📊 强调核心指标</span>
-                </button>
-                <div class="h-4 w-[1px] bg-slate-700"></div>
-                <span class="text-slate-400 text-[11px]">切换商业背景:</span>
-                <div class="flex items-center gap-2">
-                    <button onclick="changeTheme('grid-blue')" class="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-indigo-700 border-2 border-white shadow-sm" title="科技微光网格"></button>
-                    <button onclick="changeTheme('dark-emerald')" class="w-5 h-5 rounded-full bg-gradient-to-br from-slate-900 to-emerald-900 border-2 border-slate-400 shadow-sm" title="创投青影底纹"></button>
-                    <button onclick="changeTheme('slate-pro')" class="w-5 h-5 rounded-full bg-gradient-to-br from-slate-800 to-slate-950 border-2 border-slate-400 shadow-sm" title="高端深石墨"></button>
-                    <button onclick="changeTheme('amber-glow')" class="w-5 h-5 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-white shadow-sm" title="琥珀金致纹理"></button>
-                </div>
-            </div>
-
-            <!-- 【重点解决痛点2 & 1】带专业背景图形、且支持直接鼠标点击画布打字编辑的展示卡 -->
-            <div class="w-full max-w-5xl px-8 pb-12 flex flex-col items-center">
-                
-                <div id="slideCanvas" class="w-full aspect-[16/9] rounded-2xl border border-slate-200/80 slide-shadow p-12 flex flex-col justify-between transition-all duration-500 relative overflow-hidden group">
-                    <!-- JS 自动注入高阶矢量背景与双向编辑 DOM -->
-                </div>
-
-                <!-- 底部交互提醒与翻页栏 -->
-                <div class="flex items-center justify-between w-full max-w-4xl mt-6 text-xs text-slate-500">
-                    <span class="bg-blue-50 text-blue-600 border border-blue-200/60 px-3 py-1 rounded-full font-medium">
-                        💡 提示：鼠标直接点击上方幻灯片内的标题、文字或数值，即可实时在画布上编辑修改
-                    </span>
-                    <div class="flex items-center gap-3">
-                        <button onclick="prevSlide()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl shadow-sm font-bold transition">
-                            ← 上一页
-                        </button>
-                        <span id="pageCounter" class="font-mono font-bold text-slate-700 px-2">01 / 15</span>
-                        <button onclick="nextSlide()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl shadow-sm font-bold transition">
-                            下一页 →
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- 右侧属性设定与导出控制栏 -->
-        <aside class="w-80 bg-white border-l border-slate-200/80 p-5 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll">
-            <div>
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
-                    <span>参数双向联动区</span>
-                    <span class="text-blue-600 font-mono">LIVE BIND</span>
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">公司/产品品牌名称</label>
-                        <input id="bindBrand" type="text" value="AeroTech Global" 
-                               oninput="updateFromForm()" 
-                               class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">当前页面主标题</label>
-                        <input id="bindTitle" type="text" value="" 
-                               oninput="updateFromForm()" 
-                               class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">核心增长指标 (KPI)</label>
-                        <input id="bindKpi" type="text" value="+340% YoY" 
-                               oninput="updateFromForm()" 
-                               class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">页面详细要点与标语</label>
-                        <textarea id="bindSub" rows="4" 
-                                  oninput="updateFromForm()" 
-                                  class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white transition leading-relaxed"></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 收银卡 -->
-            <div class="bg-gradient-to-br from-slate-900 to-slate-950 text-white rounded-2xl p-4 mt-6 shadow-xl border border-slate-800">
-                <div class="flex justify-between items-center text-xs mb-2">
-                    <span class="font-bold text-slate-200">15页商用标准成果文件</span>
-                    <span class="font-black font-mono text-emerald-400 text-sm">$9.99</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mb-4 leading-relaxed">
-                    支付一键解锁本地源文件保存。完全适配苹果 iPhone、安卓移动设备及 PC 端格式。
+    <!-- 顶层英雄轮播展示区 (Hero Carousel) -->
+    <section class="hero-gradient text-white py-16 px-8 relative overflow-hidden">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
+            <div class="md:col-span-7 space-y-4">
+                <span class="text-xs font-mono bg-blue-500/20 border border-blue-400/40 text-blue-300 px-3 py-1 rounded-full uppercase">HOT RELEASE · 2026 创投旗舰款</span>
+                <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+                    AeroTech 2026 全球创投战略与 ROI 路演套件
+                </h1>
+                <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-xl">
+                    由 AI 自动监控全网创投路演趋势，深度魔改精炼而成。包含 15 页标准化大厂逻辑、多款可切换商业质感背景，支持浏览器一键编辑与导出。
                 </p>
-                <button onclick="exportPPT()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
-                    <span>💳 支付 $9.99 导出 15 页 PPT</span>
-                </button>
+                <div class="pt-4 flex items-center gap-4">
+                    <a href="editor.html?id=aerotech_2026" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
+                        <span>✨ 立即在编辑器中打开精修</span>
+                    </a>
+                    <span class="text-xs font-mono text-slate-400">授权售价: <strong class="text-white">$9.99</strong></span>
+                </div>
             </div>
-        </aside>
-    </div>
+            <!-- 轮播配图卡片 -->
+            <div class="md:col-span-5 bg-slate-800/80 border border-slate-700 p-4 rounded-2xl shadow-2xl relative group">
+                <div class="aspect-[16/9] bg-gradient-to-br from-blue-900 to-slate-900 rounded-xl p-6 flex flex-col justify-between border border-slate-700/60">
+                    <div class="flex justify-between items-center text-[10px] font-mono text-blue-400">
+                        <span>SLIDE PREVIEW · AI BG-ENGINE</span>
+                        <span>16:9 PRO</span>
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-white mb-1">AeroTech 创投战略设计</div>
+                        <div class="text-xs text-slate-400">多背景款型自由挂载 · Pay-to-Export $9.99</div>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <span class="text-2xl font-black text-emerald-400">+340% YoY</span>
+                        <span class="text-[10px] bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded">点击精修 →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- 真正打通画布内联点击打字 + 丰富商务背景的 JS 核心引擎 -->
-    <script>
-        const slidesData = [
-            { id: 1, title: "AeroTech 2026 全球智能商业战略", sub: "重塑高管创投视角 · 全渠道增长平衡对账书", kpi: "USD $24.8M", tag: "01. EXECUTIVE SUMMARY" },
-            { id: 2, title: "高管层管理概览 (C-Suite Overview)", sub: "聚焦企业级生产力降维打法，重塑核心工作流效率与合规标准", kpi: "98.4% Efficiency", tag: "02. STRATEGIC GOALS" },
-            { id: 3, title: "行业传统痛点分析 (Market Pain Points)", sub: "传统老旧软件维护费用超高、多设备导出错乱、商业化转化链路极长", kpi: "-45% Overhead", tag: "03. PROBLEM STATEMENT" },
-            { id: 4, title: "AI 驱动解决方案架构 (Our Solution)", sub: "便当盒式高阶 UI + 全自动脚本迭代 + 跨设备纯前端本地下载", kpi: "100% Native JS", tag: "04. SYSTEM ARCHITECTURE" },
-            { id: 5, title: "商业增长关键拐点 (Growth Inflection)", sub: "连续三季度复合增长率超预期，获欧美大厂决策层全面背书", kpi: "+340% YoY", tag: "05. GROWTH SCALE" },
-            { id: 6, title: "核心产品差异化分析 (Why ApexWork)", sub: "告别 90 年代老旧交互，采用 2026 视觉语义，大幅提升留存", kpi: "4.9/5 Rating", tag: "06. COMPETITIVE EDGE" },
-            { id: 7, title: "全渠道 ROI 监控模型 (ROI Dashboard)", sub: "实时追踪付费导出转化效率，精准平衡获客成本与终身价值", kpi: "3.2x LTV/CAC", tag: "07. FINANCIAL MODEL" },
-            { id: 8, title: "欧洲及北美 ATS 合规标准", sub: "通过极其严苛的企业级安全验证，确保数据本地运算不外泄", kpi: "SOC2 Compliance", tag: "08. GLOBAL SECURITY" },
-            { id: 9, title: "重点客户案例剖析 (Client Success)", sub: "财富 500 强企业真实使用反馈，采购效率提升 12 倍", kpi: "12x Speedup", tag: "09. CASE STUDIES" },
-            { id: 10, title: "2026 - 2028 产品迭代路线图", sub: "从静态模板向完全自主智能体进化，强化决策辅助能力", kpi: "Roadmap V3", tag: "10. FUTURE VISION" },
-            { id: 11, title: "核心创始与技术团队架构", sub: "拥有硅谷知名大厂及顶级高频交易系统研发经验", kpi: "15+ Yrs Exp", tag: "11. CORE TEAM" },
-            { id: 12, title: "全球化市场渗透策略", sub: "以欧洲为出发点，辐射跨国大中型企业办公套件市场", kpi: "42 Countries", tag: "12. MARKET EXPANSION" },
-            { id: 13, title: "潜在业务风险与应对模型", sub: "多层防刷预警机制、云端 Token 鉴权以及前端加密机制", kpi: "0 Breach", tag: "13. RISK MANAGEMENT" },
-            { id: 14, title: "投融资与财务预测对账表", sub: "未来 36 个月净现金流预期及估值敏感性对账分析", kpi: "USD $1.2B VAL", tag: "14. FINANCIAL FORECAST" },
-            { id: 15, title: "诚挚致谢与业务接洽 (Thank You)", sub: "立即扫码或点击链接回传定制，开启您的企业级商务升级", kpi: "APEXWORK.IO", tag: "15. CONCLUSION" }
-        ];
-
-        let currentSlideIdx = 0;
-        let currentTheme = 'grid-blue';
-
-        // 内置高阶商务幻灯片背景配置库
-        const themeConfigs = {
-            "grid-blue": {
-                bgClass: "bg-white bg-grid-pattern text-slate-900",
-                accentClass: "text-blue-600",
-                kpiBoxClass: "bg-blue-50/70 border-blue-200/80",
-                decoration: `<div class="absolute -right-24 -top-24 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>`
-            },
-            "dark-emerald": {
-                bgClass: "bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white",
-                accentClass: "text-emerald-400",
-                kpiBoxClass: "bg-slate-800/80 border-emerald-500/30",
-                decoration: `<div class="absolute right-0 bottom-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>`
-            },
-            "slate-pro": {
-                bgClass: "bg-gradient-to-br from-slate-800 to-slate-950 text-slate-100",
-                accentClass: "text-sky-400",
-                kpiBoxClass: "bg-slate-900/90 border-slate-700",
-                decoration: `<div class="absolute -left-20 -bottom-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>`
-            },
-            "amber-glow": {
-                bgClass: "bg-white bg-grid-pattern text-slate-900",
-                accentClass: "text-amber-600",
-                kpiBoxClass: "bg-amber-50/70 border-amber-200/80",
-                decoration: `<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>`
-            }
-        };
-
-        function renderAll() {
-            renderThumbnails();
-            renderMainSlide();
-            syncFormInputs();
-        }
-
-        function renderThumbnails() {
-            const list = document.getElementById("thumbList");
-            list.innerHTML = "";
-            slidesData.forEach((item, idx) => {
-                const isSelected = idx === currentSlideIdx;
-                const activeCls = isSelected 
-                    ? "border-blue-600 bg-blue-50/60 shadow-sm ring-1 ring-blue-600" 
-                    : "border-slate-200/80 bg-white hover:bg-slate-50/80";
-                list.innerHTML += `
-                    <div onclick="selectSlide(${idx})" class="p-3 border rounded-xl cursor-pointer transition ${activeCls}">
-                        <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
-                            <span>SLIDE ${idx + 1 < 10 ? '0' + (idx + 1) : idx + 1}</span>
-                            <span class="font-bold text-blue-600">${item.kpi}</span>
+    <!-- 三件套专区：PPT / EXCEL / WORD -->
+    <main class="max-w-6xl mx-auto w-full py-12 px-8 space-y-16">
+        
+        <!-- PPT 路演战略板块 -->
+        <section id="ppt-section">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-black text-slate-900">PPT 商业战略与路演套件</h2>
+                    <p class="text-xs text-slate-500">AI 精炼全网热点排版，提供多套可切换背景图样</p>
+                </div>
+                <span class="text-xs font-mono text-blue-600 font-bold">VIEW ALL PPTX (3) →</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- PPT 卡片 1 -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition group flex flex-col justify-between">
+                    <div class="aspect-[16/9] bg-gradient-to-br from-slate-900 to-blue-950 p-5 flex flex-col justify-between text-white border-b border-slate-100">
+                        <span class="text-[10px] font-mono bg-blue-600/40 w-fit px-2 py-0.5 rounded text-blue-200">15 SLIDES</span>
+                        <div class="font-bold text-base">AeroTech 2026 创投规划书</div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-sm text-slate-800 mb-1">AeroTech 全球战略与 ROI 计划</h3>
+                        <p class="text-xs text-slate-500 mb-4 line-clamp-2">内含完整大厂 15 页结构，集成 AI 自动魔改的 4 套商业背景底图。</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                            <span class="text-xs font-bold text-slate-900">$9.99</span>
+                            <a href="editor.html?id=aerotech_2026" class="text-xs bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white font-bold px-3 py-1.5 rounded-lg transition">进入编辑 →</a>
                         </div>
-                        <div class="text-xs font-bold text-slate-700 truncate">${item.title}</div>
                     </div>
-                `;
-            });
-            document.getElementById("pageCounter").innerText = `${currentSlideIdx + 1 < 10 ? '0' + (currentSlideIdx + 1) : currentSlideIdx + 1} / 15`;
-        }
-
-        // 渲染主画布：实现真正的 inline editing 交互 (contenteditable="true") 且配合商务底纹
-        function renderMainSlide() {
-            const item = slidesData[currentSlideIdx];
-            const canvas = document.getElementById("slideCanvas");
-            const brandName = document.getElementById("bindBrand").value || "AeroTech Global";
-            const cfg = themeConfigs[currentTheme] || themeConfigs["grid-blue"];
-
-            canvas.className = `w-full aspect-[16/9] rounded-2xl border border-slate-200/80 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${cfg.bgClass}`;
-
-            canvas.innerHTML = `
-                ${cfg.decoration}
-                
-                <!-- 顶端路演标记 -->
-                <div class="flex justify-between items-center border-b border-current/10 pb-4 z-10">
-                    <span class="text-xs font-bold tracking-widest opacity-60 font-mono">${brandName} · ROADSHOW DECK</span>
-                    <span class="text-xs font-mono font-bold px-2.5 py-1 bg-current/10 rounded opacity-80">${item.tag}</span>
                 </div>
-
-                <!-- 核心文字编辑区：开启 contenteditable="true" 真正允许光标直接插入画布敲字 -->
-                <div class="my-auto py-8 z-10">
-                    <h2 contenteditable="true" 
-                        onblur="updateFromCanvas('title', this.innerText)"
-                        class="text-4xl font-extrabold tracking-tight leading-tight mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500/40 rounded px-1 -mx-1 border-b border-transparent hover:border-current/20 transition">${item.title}</h2>
-                    <p contenteditable="true" 
-                       onblur="updateFromCanvas('sub', this.innerText)"
-                       class="text-base opacity-80 max-w-2xl leading-relaxed focus:outline-none focus:ring-2 focus:ring-blue-500/40 rounded px-1 -mx-1 border-b border-transparent hover:border-current/20 transition">${item.sub}</p>
-                </div>
-
-                <!-- 底部高质感数据卡 -->
-                <div class="grid grid-cols-2 gap-4 pt-6 border-t border-current/10 z-10">
-                    <div class="border rounded-xl p-4 transition ${cfg.kpiBoxClass}">
-                        <div class="text-[10px] font-bold opacity-60 uppercase tracking-wider mb-1">KEY KPI HIGHLIGHT (点击可修改)</div>
-                        <div contenteditable="true" 
-                             onblur="updateFromCanvas('kpi', this.innerText)"
-                             class="text-2xl font-black font-mono ${cfg.accentClass} focus:outline-none focus:ring-2 focus:ring-blue-500/40 rounded px-1 -mx-1">${item.kpi}</div>
+                <!-- PPT 卡片 2 -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div class="aspect-[16/9] bg-gradient-to-br from-slate-900 to-emerald-950 p-5 flex flex-col justify-between text-white border-b border-slate-100">
+                        <span class="text-[10px] font-mono bg-emerald-600/40 w-fit px-2 py-0.5 rounded text-emerald-200">20 SLIDES</span>
+                        <div class="font-bold text-base">SaaS 增长指标年度盘点</div>
                     </div>
-                    <div class="border border-current/10 rounded-xl p-4 flex items-center justify-between bg-current/5">
-                        <div>
-                            <div class="text-[10px] font-bold opacity-60 uppercase tracking-wider mb-1">SYSTEM WORKFLOW</div>
-                            <div class="text-xs font-bold opacity-90">高级路演排版 · Canvas Inline Edit</div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-sm text-slate-800 mb-1">企业级年度数据与 OKR 汇报</h3>
+                        <p class="text-xs text-slate-500 mb-4 line-clamp-2">专注中大型科技企业的年度经营复盘，支持多背景自由切调。</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                            <span class="text-xs font-bold text-slate-900">$9.99</span>
+                            <a href="editor.html?id=saas_okr_2026" class="text-xs bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white font-bold px-3 py-1.5 rounded-lg transition">进入编辑 →</a>
                         </div>
-                        <span class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
                     </div>
                 </div>
-            `;
-        }
+                <!-- PPT 卡片 3 -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div class="aspect-[16/9] bg-gradient-to-br from-slate-900 to-amber-950 p-5 flex flex-col justify-between text-white border-b border-slate-100">
+                        <span class="text-[10px] font-mono bg-amber-600/40 w-fit px-2 py-0.5 rounded text-amber-200">12 SLIDES</span>
+                        <div class="font-bold text-base">FinTech A轮融资计划书</div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="font-bold text-sm text-slate-800 mb-1">金融科技全渠道收益对账演讲</h3>
+                        <p class="text-xs text-slate-500 mb-4 line-clamp-2">欧美合规路演视角，内置金融专属金色质感底纹与报表。</p>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                            <span class="text-xs font-bold text-slate-900">$9.99</span>
+                            <a href="editor.html?id=fintech_2026" class="text-xs bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white font-bold px-3 py-1.5 rounded-lg transition">进入编辑 →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        // 画布直接打字修改时，同步回底层数组并更新右侧输入框
-        function updateFromCanvas(field, val) {
-            const cleanVal = val.trim();
-            slidesData[currentSlideIdx][field] = cleanVal;
-            syncFormInputs();
-            renderThumbnails();
-        }
+        <!-- EXCEL & WORD 专区 -->
+        <section id="excel-section" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">XLSX MODEL</span>
+                    <h3 class="font-black text-lg text-slate-900 mt-2">全渠道 ROI 动态自适应测算模型</h3>
+                    <p class="text-xs text-slate-500 mt-1">自动平衡获客成本(CAC)与终身价值(LTV)</p>
+                </div>
+                <a href="editor.html?id=excel_roi" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">查看说明 →</a>
+            </div>
+            <div id="word-section" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">DOCX STANDARD</span>
+                    <h3 class="font-black text-lg text-slate-900 mt-2">欧美企业级 ATS 智能排版合规报告</h3>
+                    <p class="text-xs text-slate-500 mt-1">杜绝跨操作系统乱码，双语兼容呈现</p>
+                </div>
+                <a href="editor.html?id=word_ats" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">查看说明 →</a>
+            </div>
+        </section>
 
-        // 右侧表单修改时，同步回主画布
-        function updateFromForm() {
-            slidesData[currentSlideIdx].title = document.getElementById("bindTitle").value;
-            slidesData[currentSlideIdx].sub = document.getElementById("bindSub").value;
-            slidesData[currentSlideIdx].kpi = document.getElementById("bindKpi").value;
-            renderThumbnails();
-            renderMainSlide();
-        }
+    </main>
 
-        function syncFormInputs() {
-            const item = slidesData[currentSlideIdx];
-            document.getElementById("bindTitle").value = item.title;
-            document.getElementById("bindSub").value = item.sub;
-            document.getElementById("bindKpi").value = item.kpi;
-        }
-
-        function selectSlide(idx) {
-            currentSlideIdx = idx;
-            renderAll();
-        }
-
-        function prevSlide() {
-            if (currentSlideIdx > 0) { currentSlideIdx--; renderAll(); }
-        }
-
-        function nextSlide() {
-            if (currentSlideIdx < slidesData.length - 1) { currentSlideIdx++; renderAll(); }
-        }
-
-        function changeTheme(themeKey) {
-            currentTheme = themeKey;
-            renderMainSlide();
-        }
-
-        function addBulletText() {
-            slidesData[currentSlideIdx].sub += " · [新增执行策略说明要点]";
-            syncFormInputs();
-            renderMainSlide();
-        }
-
-        function toggleHighlightCard() {
-            slidesData[currentSlideIdx].kpi = "★ " + slidesData[currentSlideIdx].kpi;
-            syncFormInputs();
-            renderMainSlide();
-            renderThumbnails();
-        }
-
-        function exportPPT() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPaid = urlParams.get('status') === 'paid' || localStorage.getItem('APEX_PAID_TOKEN') === 'true';
-
-            if (!isPaid) {
-                if (confirm("🔒 当前已启用 $9.99 商用路演导出授权。点击确定跳转收银页面解锁；若已完成交易请检查网址是否带有 ?status=paid。")) {
-                    window.open("https://wys0130.github.io/ai-boss-empire/?status=paid", "_self");
-                }
-                return;
-            }
-
-            localStorage.setItem('APEX_PAID_TOKEN', 'true');
-            
-            const payload = JSON.stringify({
-                project: document.getElementById("bindBrand").value,
-                exportTime: new Date().toISOString(),
-                totalSlides: slidesData.length,
-                slides: slidesData
-            }, null, 2);
-
-            const blob = new Blob([payload], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `AeroTech_2026_Roadshow_15Slides_${Date.now()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            alert("✅ 恭喜！你精修的 15 页商务路演 PPT 数据成果已直接下载到本地设备！");
-        }
-
-        window.onload = () => { renderAll(); };
-    </script>
+    <footer class="bg-white border-t border-slate-200 py-6 px-8 text-center text-xs text-slate-400">
+        APEXWORK · AI-POWERED ENTERPRISE STORE · AUTOMATED BUILD ENGINE 2026
+    </footer>
 </body>
 </html>
