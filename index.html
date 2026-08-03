@@ -177,8 +177,8 @@
                 <div class="flex items-center justify-between mt-2">
                     <span id="slide-counter" class="text-[10px] font-mono text-slate-400">01 / 15</span>
                     <div class="flex gap-1">
-                        <button onclick="switchSlide(currentSlide-1)" class="text-[10px] px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 text-slate-600">← 上一页</button>
-                        <button onclick="switchSlide(currentSlide+1)" class="text-[10px] px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 text-slate-600">下一页 →</button>
+                        <button onclick="prevSlide()" class="text-[10px] px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 text-slate-600">← 上一页</button>
+                        <button onclick="nextSlide()" class="text-[10px] px-2 py-1 bg-slate-100 rounded hover:bg-slate-200 text-slate-600">下一页 →</button>
                     </div>
                 </div>
             </div>
@@ -433,6 +433,25 @@
             { id: 15, title: "封底致谢", icon: "🤝", tag: "CLOSING" }
         ];
 
+        // ========== 15页真实演示数据 (slidesData) ==========
+        const slidesData = [
+            { id: 1, title: "2026 全球商业战略与 ROI 路演", subtitle: "AeroTech Global 创投计划书", content: "封面：AeroTech Global 2026 全球商业战略与 ROI 路演", kpi: "+340% YoY", author: "Dr. Marcus Vance (CEO)", tagline: "Standardizing Enterprise Productivity" },
+            { id: 2, title: "管理概览", subtitle: "Executive Summary", content: "管理层核心摘要：2026 年战略目标与关键举措", kpi: "+280%", author: "CFO Office", tagline: "Operational Excellence" },
+            { id: 3, title: "行业痛点", subtitle: "Market Pain Points", content: "传统企业效率瓶颈与数字化转型痛点分析", kpi: "78%", author: "Strategy Team", tagline: "Solving Real Problems" },
+            { id: 4, title: "AI 转型架构", subtitle: "AI Transformation Architecture", content: "AI 驱动的企业级系统架构与数据流设计", kpi: "3x", author: "CTO Office", tagline: "Intelligent Automation" },
+            { id: 5, title: "商业增长拐点", subtitle: "Growth Inflection Point", content: "2026 年关键增长拐点与市场机会窗口", kpi: "+340% YoY", author: "Growth Team", tagline: "Momentum & Scale" },
+            { id: 6, title: "核心竞品差异", subtitle: "Competitive Moat", content: "与主要竞品的差异化优势与护城河分析", kpi: "Top 3", author: "Product Team", tagline: "Unfair Advantage" },
+            { id: 7, title: "+340% KPI 看板", subtitle: "KPI Dashboard", content: "核心 KPI 实时看板：营收、用户、留存、转化率", kpi: "+340% YoY", author: "Data Team", tagline: "Metrics That Matter" },
+            { id: 8, title: "全渠道营收模型", subtitle: "Omnichannel Revenue Model", content: "全渠道营收构成与预测模型（线上+线下+渠道）", kpi: "$12M", author: "Finance Team", tagline: "Revenue Architecture" },
+            { id: 9, title: "核心用户画像", subtitle: "User Persona", content: "目标用户画像：企业决策者、运营负责人、技术高管", kpi: "3 Personas", author: "UX Research", tagline: "Customer-Centric" },
+            { id: 10, title: "产品里程碑", subtitle: "Product Milestones", content: "2026-2027 产品路线图与关键里程碑节点", kpi: "6 Phases", author: "PMO", tagline: "Roadmap Clarity" },
+            { id: 11, title: "团队架构", subtitle: "Team Structure", content: "核心团队架构与关键岗位配置", kpi: "12 Core", author: "HR & Ops", tagline: "Dream Team" },
+            { id: 12, title: "全球市场布局", subtitle: "Global Expansion", content: "全球市场进入策略与区域布局规划", kpi: "5 Regions", author: "International", tagline: "Think Global" },
+            { id: 13, title: "风险控制", subtitle: "Risk Management", content: "关键风险识别与应对策略矩阵", kpi: "Low Risk", author: "Risk Team", tagline: "Mitigate & Thrive" },
+            { id: 14, title: "投融资财务预测", subtitle: "Financial Forecast", content: "2026-2028 财务预测：收入、成本、利润、现金流", kpi: "$50M", author: "CFO Office", tagline: "Investor Ready" },
+            { id: 15, title: "封底致谢", subtitle: "Thank You", content: "感谢聆听，期待合作", kpi: "Let's Talk", author: "AeroTech Global", tagline: "Together We Grow" }
+        ];
+
         let currentSlide = 1;
         let currentTheme = 'blue';
         let currentLayout = 'standard';
@@ -451,93 +470,4 @@
             const nav = document.getElementById("slide-nav");
             nav.innerHTML = slideTemplates.map(s => `
                 <div class="slide-thumb rounded-lg p-2 cursor-pointer flex items-center gap-2 ${s.id === 1 ? 'active' : ''}" 
-                     onclick="switchSlide(${s.id})">
-                    <span class="text-sm">${s.icon}</span>
-                    <div class="flex-1">
-                        <div class="text-[11px] font-bold text-slate-700">${s.title}</div>
-                        <div class="text-[9px] font-mono text-slate-400">${s.tag}</div>
-                    </div>
-                    <span class="text-[9px] font-mono text-slate-400">${String(s.id).padStart(2, '0')}</span>
-                </div>
-            `).join("");
-        }
-
-        // ========== 切换幻灯片 ==========
-        function switchSlide(id) {
-            if (id < 1) id = 1;
-            if (id > 15) id = 15;
-            currentSlide = id;
-            document.querySelectorAll('.slide-thumb').forEach((el, i) => {
-                el.classList.toggle('active', i + 1 === id);
-            });
-            document.getElementById("slide-counter").innerText = String(id).padStart(2, '0') + " / 15";
-            renderPreview();
-        }
-
-        // ========== 获取当前定制参数 ==========
-        function getParams() {
-            return {
-                company: document.getElementById("edit-company").value || "AeroTech Global",
-                author: document.getElementById("edit-author").value || "Dr. Marcus Vance (CEO)",
-                kpi: document.getElementById("edit-kpi").value || "+340% YoY",
-                tagline: document.getElementById("edit-tagline").value || "Standardizing Enterprise Productivity",
-                subtitle: document.getElementById("edit-subtitle").value || "2026 Global Business Strategy & ROI Roadshow"
-            };
-        }
-
-        // ========== 主题切换 ==========
-        function switchTheme(theme) {
-            currentTheme = theme;
-            document.querySelectorAll('.color-dot').forEach(el => {
-                el.classList.toggle('active', el.classList.contains(`bg-${theme === 'blue' ? 'blue-600' : theme === 'gray' ? 'slate-500' : theme === 'black' ? 'slate-900' : 'orange-500'}`));
-            });
-            renderPreview();
-        }
-
-        // ========== 布局切换 ==========
-        function switchLayout() {
-            currentLayout = currentLayout === 'standard' ? 'compact' : 'standard';
-            renderPreview();
-        }
-
-        // ========== 添加文本块 ==========
-        function addTextBlock() {
-            const id = Date.now();
-            addedElements.push({ type: 'text', id, content: '新增文本块 - 点击编辑' });
-            renderPreview();
-        }
-
-        // ========== 添加 KPI 数据卡 ==========
-        function addKpiCard() {
-            const id = Date.now();
-            addedElements.push({ type: 'kpi', id, value: '+120%', label: '新指标' });
-            renderPreview();
-        }
-
-        // ========== 添加几何装饰 ==========
-        function addShape() {
-            const id = Date.now();
-            addedElements.push({ type: 'shape', id, shape: 'circle' });
-            renderPreview();
-        }
-
-        // ========== 渲染预览 ==========
-        function renderPreview() {
-            const p = getParams();
-            const canvas = document.getElementById("preview-canvas");
-            const theme = themeColors[currentTheme];
-            
-            const slideContent = {
-                1: `
-                    <div class="text-center space-y-4 p-8">
-                        <div class="text-[10px] font-mono ${theme.text} tracking-widest">2026 GLOBAL BUSINESS STRATEGY</div>
-                        <div class="text-3xl font-black text-slate-800 tracking-tight">${p.company}</div>
-                        <div class="text-sm text-slate-500 font-mono">${p.tagline}</div>
-                        <div class="w-24 h-0.5 ${theme.bgLight} mx-auto rounded"></div>
-                        <div class="text-[11px] text-slate-500 font-mono">${p.author}</div>
-                        <div class="text-[10px] text-slate-400">${p.subtitle}</div>
-                    </div>
-                `,
-                2: `
-                    <div class="space-y-3 p-6">
-                        <div class="text-[
+                     onclick="switchSlide(${s.id
