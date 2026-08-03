@@ -84,6 +84,13 @@
             background: #ffffff;
             box-shadow: 0 4px 24px rgba(0,0,0,0.06);
         }
+        .dynamic-element {
+            transition: all 0.3s ease;
+        }
+        .dynamic-element:hover {
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen relative pb-16">
@@ -467,7 +474,3 @@
 
         // ========== 初始化导航 ==========
         function initSlideNav() {
-            const nav = document.getElementById("slide-nav");
-            nav.innerHTML = slideTemplates.map(s => `
-                <div class="slide-thumb rounded-lg p-2 cursor-pointer flex items-center gap-2 ${s.id === 1 ? 'active' : ''}" 
-                     onclick="switchSlide(${s.id
