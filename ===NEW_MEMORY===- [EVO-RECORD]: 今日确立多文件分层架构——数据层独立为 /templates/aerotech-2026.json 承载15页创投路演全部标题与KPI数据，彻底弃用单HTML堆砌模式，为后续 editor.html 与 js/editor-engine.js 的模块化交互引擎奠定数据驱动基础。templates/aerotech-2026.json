@@ -1,0 +1,259 @@
+{
+  "meta": {
+    "templateId": "aerotech-2026",
+    "templateName": "AeroTech 2026 高阶创投路演",
+    "version": "1.0.0",
+    "lastModified": "2026-01-15T00:00:00Z",
+    "designLanguage": "亮白商务便当盒三栏工作台",
+    "priceUSD": 9.99,
+    "totalSlides": 15,
+    "aspectRatio": "16:9",
+    "fonts": {
+      "primary": "Inter",
+      "secondary": "Space Grotesk",
+      "fallback": ["system-ui", "sans-serif"]
+    },
+    "colorPalette": {
+      "background": "#FFFFFF",
+      "surface": "#F8FAFC",
+      "primary": "#0F172A",
+      "accent": "#3B82F6",
+      "accentSecondary": "#8B5CF6",
+      "textPrimary": "#0F172A",
+      "textSecondary": "#64748B",
+      "border": "#E2E8F0",
+      "success": "#10B981",
+      "warning": "#F59E0B"
+    }
+  },
+  "slides": [
+    {
+      "id": 1,
+      "layout": "cover",
+      "title": "AeroTech 2026",
+      "subtitle": "下一代航空引擎智能运维平台",
+      "tagline": "重新定义飞行安全与效率的边界",
+      "kpi": [],
+      "footerNote": "Confidential & Proprietary",
+      "cta": "投资演示 · 2026 Q1"
+    },
+    {
+      "id": 2,
+      "layout": "problem",
+      "title": "行业痛点：万亿市场的效率黑洞",
+      "subtitle": "传统航空运维面临三大致命挑战",
+      "kpi": [
+        { "label": "非计划停飞损失", "value": "$8.2B", "unit": "年/全球", "trend": "up", "note": "每起AOG事件平均损失$150K" },
+        { "label": "人工检测误差率", "value": "23%", "unit": "目视检查", "trend": "up", "note": "漏检率随疲劳指数上升" },
+        { "label": "运维数据利用率", "value": "7%", "unit": "已采集数据", "trend": "down", "note": "93%数据沉睡于黑匣子" }
+      ]
+    },
+    {
+      "id": 3,
+      "layout": "solution",
+      "title": "AeroTech 智能运维平台",
+      "subtitle": "AI 驱动的预测性维护与实时决策引擎",
+      "kpi": [
+        { "label": "故障预测准确率", "value": "94.7%", "unit": "提前48小时", "trend": "up" },
+        { "label": "运维成本降低", "value": "38%", "unit": "单机/年", "trend": "down" },
+        { "label": "检测效率提升", "value": "12x", "unit": "vs 人工", "trend": "up" }
+      ],
+      "features": [
+        "多模态传感器融合",
+        "数字孪生实时映射",
+        "AI 故障预测引擎",
+        "自动排程与备件优化"
+      ]
+    },
+    {
+      "id": 4,
+      "layout": "market",
+      "title": "市场机遇：万亿级蓝海赛道",
+      "subtitle": "航空MRO市场持续高速增长",
+      "kpi": [
+        { "label": "全球MRO市场规模", "value": "$93B", "unit": "2026E", "trend": "up", "note": "CAGR 4.2%" },
+        { "label": "目标可服务市场", "value": "$21B", "unit": "SAM", "trend": "up" },
+        { "label": "可获得市场", "value": "$6.8B", "unit": "SOM", "trend": "up", "note": "2029年目标" }
+      ]
+    },
+    {
+      "id": 5,
+      "layout": "product",
+      "title": "产品矩阵：三大核心模块",
+      "subtitle": "从数据采集到决策执行的全链路闭环",
+      "kpi": [
+        { "label": "边缘计算节点", "value": "500+", "unit": "传感器/架", "trend": "up" },
+        { "label": "实时数据处理", "value": "2.4TB", "unit": "/架/航班", "trend": "up" },
+        { "label": "模型推理延迟", "value": "<50ms", "unit": "边缘端", "trend": "down" }
+      ],
+      "modules": [
+        { "name": "AeroSense", "desc": "智能传感与边缘计算层", "icon": "radar" },
+        { "name": "AeroBrain", "desc": "AI 预测与决策引擎", "icon": "cpu" },
+        { "name": "AeroOps", "desc": "运维执行与优化平台", "icon": "settings" }
+      ]
+    },
+    {
+      "id": 6,
+      "layout": "technology",
+      "title": "技术壁垒：AI 引擎深度自研",
+      "subtitle": "三大核心技术构筑护城河",
+      "kpi": [
+        { "label": "模型训练数据", "value": "1.2B", "unit": "飞行小时", "trend": "up" },
+        { "label": "预测算法精度", "value": "94.7%", "unit": "AUC 0.97", "trend": "up" },
+        { "label": "专利/软著", "value": "47", "unit": "项", "trend": "up" }
+      ],
+      "techStack": [
+        "自研时序预测模型 AeroNet",
+        "数字孪生引擎 TwinEngine",
+        "联邦学习框架 FedAero",
+        "边缘推理优化 EdgeLite"
+      ]
+    },
+    {
+      "id": 7,
+      "layout": "traction",
+      "title": "商业进展：从0到1的验证",
+      "subtitle": "头部客户与关键里程碑",
+      "kpi": [
+        { "label": "签约客户", "value": "23", "unit": "家航司", "trend": "up" },
+        { "label": "付费机队", "value": "187", "unit": "架飞机", "trend": "up" },
+        { "label": "ARR", "value": "$4.2M", "unit": "年经常性收入", "trend": "up" }
+      ],
+      "milestones": [
+        { "date": "2024 Q3", "event": "首个试点航司上线" },
+        { "date": "2025 Q1", "event": "完成A轮融资 $12M" },
+        { "date": "2025 Q4", "event": "签约前10大航司中的5家" },
+        { "date": "2026 Q1", "event": "国际航线拓展启动" }
+      ]
+    },
+    {
+      "id": 8,
+      "layout": "competition",
+      "title": "竞争格局：代际优势明显",
+      "subtitle": "与传统MRO软件及通用AI平台对比",
+      "kpi": [
+        { "label": "预测准确率", "value": "94.7%", "unit": "AeroTech", "trend": "up", "note": "竞品平均 78%" },
+        { "label": "部署周期", "value": "6周", "unit": "vs 6-9月", "trend": "down" },
+        { "label": "ROI 回收期", "value": "4.2月", "unit": "客户平均", "trend": "down" }
+      ],
+      "competitors": [
+        { "name": "传统MRO软件", "weakness": "无预测能力，纯记录工具" },
+        { "name": "通用AI平台", "weakness": "缺乏航空领域知识与数据" },
+        { "name": "AeroTech", "strength": "航空垂直+AI原生+数据飞轮" }
+      ]
+    },
+    {
+      "id": 9,
+      "layout": "business",
+      "title": "商业模式：SaaS + 数据增值",
+      "subtitle": "多层级收入引擎",
+      "kpi": [
+        { "label": "客单价", "value": "$180K", "unit": "年/航司", "trend": "up" },
+        { "label": "毛利率", "value": "82%", "unit": "软件订阅", "trend": "up" },
+        { "label": "净收入留存率", "value": "128%", "unit": "NDR", "trend": "up" }
+      ],
+      "revenueStreams": [
+        { "name": "SaaS订阅", "desc": "按机队规模订阅", "weight": "68%" },
+        { "name": "数据服务", "desc": "脱敏数据洞察报告", "weight": "17%" },
+        { "name": "专业服务", "desc": "定制化部署与培训", "weight": "15%" }
+      ]
+    },
+    {
+      "id": 10,
+      "layout": "go-to-market",
+      "title": "市场策略：聚焦头部，辐射全球",
+      "subtitle": "三步走增长路径",
+      "kpi": [
+        { "label": "目标航司", "value": "50", "unit": "家/2027", "trend": "up" },
+        { "label": "覆盖机队", "value": "1200", "unit": "架/2027", "trend": "up" },
+        { "label": "全球市占率", "value": "8%", "unit": "SOM/2027", "trend": "up" }
+      ],
+      "phases": [
+        { "phase": "Phase 1", "desc": "深耕亚太头部航司", "timeline": "2026" },
+        { "phase": "Phase 2", "desc": "拓展中东与欧洲", "timeline": "2027" },
+        { "phase": "Phase 3", "desc": "北美市场全面进入", "timeline": "2028" }
+      ]
+    },
+    {
+      "id": 11,
+      "layout": "financials",
+      "title": "财务预测：高速增长路径",
+      "subtitle": "未来三年关键财务指标",
+      "kpi": [
+        { "label": "2026E ARR", "value": "$8.5M", "unit": "同比增长102%", "trend": "up" },
+        { "label": "2027E ARR", "value": "$21M", "unit": "同比增长147%", "trend": "up" },
+        { "label": "2028E ARR", "value": "$48M", "unit": "同比增长129%", "trend": "up" }
+      ],
+      "chartData": [
+        { "year": "2025A", "arr": 4.2, "grossMargin": 78 },
+        { "year": "2026E", "arr": 8.5, "grossMargin": 82 },
+        { "year": "2027E", "arr": 21.0, "grossMargin": 84 },
+        { "year": "2028E", "arr": 48.0, "grossMargin": 86 }
+      ]
+    },
+    {
+      "id": 12,
+      "layout": "team",
+      "title": "核心团队：航空+AI 黄金组合",
+      "subtitle": "平均15年行业深耕经验",
+      "kpi": [
+        { "label": "团队规模", "value": "38", "unit": "人", "trend": "up" },
+        { "label": "硕博占比", "value": "71%", "unit": "技术团队", "trend": "up" },
+        { "label": "行业经验", "value": "15+", "unit": "年平均", "trend": "up" }
+      ],
+      "members": [
+        { "name": "张伟", "role": "CEO", "bg": "前波音中国区技术总监" },
+        { "name": "李婷", "role": "CTO", "bg": "MIT AI博士，前DeepMind" },
+        { "name": "王强", "role": "CMO", "bg": "前SAP大中华区VP" },
+        { "name": "陈杰", "role": "CAIO", "bg": "前GE航空首席数据科学家" }
+      ]
+    },
+    {
+      "id": 13,
+      "layout": "vision",
+      "title": "未来愿景：零事故飞行时代",
+      "subtitle": "让每一次起降都安全、高效、智能",
+      "kpi": [
+        { "label": "愿景目标", "value": "零", "unit": "可预防事故", "trend": "up" },
+        { "label": "覆盖目标", "value": "10K", "unit": "架飞机/2030", "trend": "up" },
+        { "label": "生态目标", "value": "500+", "unit": "合作伙伴", "trend": "up" }
+      ],
+      "roadmap": [
+        { "year": "2026", "goal": "成为亚太首选智能运维平台" },
+        { "year": "2028", "goal": "全球TOP3航空AI平台" },
+        { "year": "2030", "goal": "定义零事故飞行行业标准" }
+      ]
+    },
+    {
+      "id": 14,
+      "layout": "investment",
+      "title": "融资计划：A+轮开放",
+      "subtitle": "携手共创航空智能化未来",
+      "kpi": [
+        { "label": "融资金额", "value": "$15M", "unit": "A+轮", "trend": "up" },
+        { "label": "出让股权", "value": "12%", "unit": "稀释后", "trend": "down" },
+        { "label": "资金用途", "value": "3年", "unit": "跑道", "trend": "up" }
+      ],
+      "useOfFunds": [
+        { "category": "研发投入", "percent": 45, "desc": "AI模型迭代与新产品线" },
+        { "category": "市场拓展", "percent": 30, "desc": "欧美市场进入与品牌建设" },
+        { "category": "团队扩充", "percent": 15, "desc": "高端人才引进" },
+        { "category": "运营储备", "percent": 10, "desc": "现金流安全垫" }
+      ]
+    },
+    {
+      "id": 15,
+      "layout": "closing",
+      "title": "加入我们，定义未来",
+      "subtitle": "AeroTech 2026 — 让飞行更智能",
+      "kpi": [],
+      "contact": {
+        "email": "ir@aerotech.ai",
+        "website": "www.aerotech.ai",
+        "address": "上海 · 北京 · 新加坡 · 西雅图"
+      },
+      "closingNote": "谢谢观看 · 期待与您携手",
+      "cta": "立即预约一对一深度交流"
+    }
+  ]
+}
