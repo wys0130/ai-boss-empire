@@ -16,19 +16,59 @@
             border: 1px solid rgba(99, 102, 241, 0.35);
             backdrop-filter: blur(8px);
         }
+        .bento-card-light {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            backdrop-filter: blur(6px);
+        }
+        .slide-thumb {
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+        .slide-thumb:hover {
+            border-color: rgba(99, 102, 241, 0.6);
+            background: rgba(30, 41, 59, 0.9);
+        }
+        .slide-thumb.active {
+            border-color: #6366f1;
+            background: rgba(30, 41, 59, 1);
+            box-shadow: 0 0 0 1px #6366f1, 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+        .editable-field {
+            border-bottom: 1px dashed rgba(99, 102, 241, 0.5);
+            cursor: text;
+            transition: all 0.2s;
+        }
+        .editable-field:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-bottom-color: #6366f1;
+        }
+        .editable-field:focus {
+            outline: none;
+            background: rgba(99, 102, 241, 0.15);
+            border-bottom-color: #818cf8;
+        }
+        .export-btn {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            transition: all 0.3s;
+        }
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(79, 70, 229, 0.4);
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen relative pb-16">
 
     <!-- 顶栏导航与状态显示 -->
     <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <span class="text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-400 font-mono rounded font-bold">WEB-SAAS ENGINE</span>
                 <h1 class="font-bold text-lg tracking-wide font-mono">APEX<span class="text-indigo-400">WORK</span><span class="text-xs text-slate-500 font-normal ml-2">EXECUTIVE WORKSPACE</span></h1>
                 <span class="text-[11px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    BUILD: V8.0 PAY-TO-EXPORT
+                    BUILD: V9.0 BENTO WORKSPACE
                 </span>
             </div>
             <div class="flex items-center space-x-3">
@@ -40,171 +80,232 @@
         </div>
     </header>
 
-    <!-- 核心商铺与实时工作台 -->
-    <main class="max-w-6xl mx-auto px-4 py-8">
+    <!-- 核心工作台：三栏便当盒架构 -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
         
-        <!-- === 在线编辑器配置区 (买家免费修改，改完付费导出) === -->
-        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-8 shadow-2xl">
-            <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-800">
-                <div>
-                    <h2 class="text-base font-bold text-white flex items-center gap-2">
-                        <span>⚡ 实时定制空间 (Edge Live Editor)</span>
-                        <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">在当前浏览器即时渲染</span>
-                    </h2>
-                    <p class="text-xs text-slate-400 mt-1">请填入您企业的专属标识与核心指标，所有卡片及文档将自动适配您的业务数据</p>
-                </div>
-                <span class="text-xs text-slate-400 font-mono">STEP 01/02: EDIT IN BROWSER</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">企业/产品英文品牌名</label>
-                    <input id="edit-company" type="text" value="AeroTech Global" oninput="updateLivePreview()" 
-                           class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-mono">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">汇报负责人 / C-Suite 职衔</label>
-                    <input id="edit-author" type="text" value="Dr. Marcus Vance (CEO)" oninput="updateLivePreview()" 
-                           class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">核心增长指标 (KPI Growth)</label>
-                    <input id="edit-kpi" type="text" value="+340% YoY" oninput="updateLivePreview()" 
-                           class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-emerald-400 font-mono font-bold focus:outline-none focus:border-indigo-500">
-                </div>
-            </div>
-        </section>
-
-        <!-- === 套装展示与导出触发卡片 === -->
-        <div class="flex justify-between items-end mb-6">
+        <!-- 顶部工作台标题栏 -->
+        <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-2xl font-black tracking-tight">企业级智能商务工作成果导出 (3-in-1 Engine)</h2>
-                <p class="text-xs text-slate-400 mt-1">所有导出文件采用 OpenXML 规范构建，自动内嵌您当前定制的品牌及数据参数</p>
+                <h2 class="text-2xl font-black tracking-tight flex items-center gap-2">
+                    <span class="text-indigo-400">⚡</span> 智能 PPT 在线编辑器与高阶模板演示区
+                    <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">LIVE WORKSPACE</span>
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">便当盒三栏架构 · 左侧导航 / 中央实时渲染 / 右侧参数与付费导出</p>
             </div>
             <span class="text-xs text-indigo-400 font-mono bg-indigo-950/50 border border-indigo-800/50 px-3 py-1 rounded">
                 ● 全网通用商业永久授权: USD $9.99
             </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 三栏便当盒网格 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- 卡片 1: PPTX 战略路演 -->
-            <div class="bg-slate-900 border-2 border-indigo-500/80 rounded-2xl overflow-hidden hover:border-indigo-400 transition duration-300 shadow-2xl shadow-indigo-950/80 flex flex-col justify-between">
-                <div>
-                    <div class="h-52 slide-bg-0 p-4 border-b border-slate-800 flex flex-col justify-between relative group">
-                        <div class="flex justify-between items-start z-10">
-                            <span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded shadow">PPTX · 战略路演</span>
-                            <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono px-2 py-0.5 rounded font-bold">
-                                Executive Deck
-                            </span>
-                        </div>
+            <!-- 左栏：页面导航 (2/12) -->
+            <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-3 h-[600px] overflow-y-auto">
+                <div class="text-xs font-bold text-slate-400 mb-3 flex items-center justify-between">
+                    <span>📑 页面导航</span>
+                    <span class="text-[10px] font-mono text-indigo-400">15 SLIDES</span>
+                </div>
+                <div id="slide-nav" class="space-y-1.5">
+                    <!-- JS 动态生成 -->
+                </div>
+            </div>
 
-                        <div class="grid grid-cols-3 gap-2 my-2 h-24 z-10">
-                            <div class="col-span-2 bento-card rounded-lg p-2.5 flex flex-col justify-between">
-                                <div class="text-[9px] text-indigo-300 font-mono">STRATEGIC ROADSHOW</div>
-                                <div id="preview-title" class="text-xs font-bold text-white tracking-wide">AeroTech Global 创投计划书</div>
-                                <div class="w-full bg-indigo-500/30 h-1 rounded-full overflow-hidden">
-                                    <div class="bg-indigo-400 h-full w-4/5"></div>
-                                </div>
-                            </div>
-                            <div class="col-span-1 bento-card rounded-lg p-2 flex flex-col items-center justify-center text-center">
-                                <div class="text-[9px] text-slate-400">KPI IMPACT</div>
-                                <div id="preview-kpi" class="text-sm font-black text-emerald-400">+340% YoY</div>
-                            </div>
-                        </div>
-
-                        <div class="text-[11px] font-mono text-slate-400 flex justify-between items-center z-10">
-                            <span id="preview-author">Dr. Marcus Vance (CEO)</span>
-                            <span class="text-indigo-400 font-bold">16:9 黑青美学</span>
-                        </div>
+            <!-- 中栏：实时预览 (7/12) -->
+            <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-4 h-[600px] flex flex-col">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-300">🖥️ 实时预览</span>
+                        <span class="text-[10px] font-mono text-slate-500">16:9 黑青美学</span>
                     </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">毫秒级渲染</span>
+                        <span id="slide-counter" class="text-[10px] font-mono text-slate-400">01 / 15</span>
+                    </div>
+                </div>
+                <div class="flex-1 bg-slate-950 border border-slate-800 rounded-xl overflow-hidden relative">
+                    <!-- 预览画布 -->
+                    <div id="preview-canvas" class="w-full h-full flex items-center justify-center p-4">
+                        <!-- JS 动态渲染 -->
+                    </div>
+                </div>
+            </div>
 
-                    <div class="p-5">
-                        <div class="flex justify-between items-baseline mb-2">
-                            <h3 class="font-bold text-base text-white">高阶商业创投战略演示稿</h3>
-                            <span class="text-xl font-black text-emerald-400 font-mono">$ 9.99</span>
-                        </div>
-                        <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                            针对投融资与高管决策定制。采用 2026 矢量便当盒架构，页面参数已自动绑定上方实时编辑面板。
-                        </p>
+            <!-- 右栏：参数定制与付费导出 (3/12) -->
+            <div class="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-4 h-[600px] overflow-y-auto">
+                <div class="text-xs font-bold text-slate-400 mb-4 flex items-center justify-between">
+                    <span>⚙️ 参数定制</span>
+                    <span class="text-[10px] font-mono text-emerald-400">LIVE BIND</span>
+                </div>
+
+                <!-- 核心字段编辑 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">企业/产品英文品牌名</label>
+                        <input id="edit-company" type="text" value="AeroTech Global" oninput="updateLivePreview()" 
+                               class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">汇报负责人 / C-Suite 职衔</label>
+                        <input id="edit-author" type="text" value="Dr. Marcus Vance (CEO)" oninput="updateLivePreview()" 
+                               class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">核心增长指标 (KPI Growth)</label>
+                        <input id="edit-kpi" type="text" value="+340% YoY" oninput="updateLivePreview()" 
+                               class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-emerald-400 font-mono font-bold focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">战略标语 (Tagline)</label>
+                        <input id="edit-tagline" type="text" value="Standardizing Enterprise Productivity" oninput="updateLivePreview()" 
+                               class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-indigo-300 font-mono focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
 
-                <div class="p-5 pt-0">
-                    <button onclick="requestExport('PPTX', '高阶商业创投战略演示稿')" 
-                            class="w-full bg-indigo-600 hover:bg-indigo-500 text-xs font-bold py-3 rounded-xl transition text-white shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5">
+                <!-- 付费导出区 -->
+                <div class="mt-6 pt-4 border-t border-slate-800">
+                    <div class="flex justify-between items-baseline mb-3">
+                        <span class="text-xs font-bold text-slate-300">导出完整 PPT 成果</span>
+                        <span class="text-xl font-black text-emerald-400 font-mono">$ 9.99</span>
+                    </div>
+                    <button onclick="requestExport('PPTX', 'AeroTech 2026 全球智能商业战略与 ROI 规划书')" 
+                            class="export-btn w-full text-white text-xs font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
                         <span>⚡ 生成并极速导出成果</span>
                         <span class="text-[10px] bg-indigo-950/60 px-1.5 py-0.5 rounded font-mono">USD $9.99</span>
                     </button>
+                    <p class="text-[10px] text-slate-500 text-center mt-2 font-mono">跨平台通用 · 纯前端本地下载</p>
                 </div>
             </div>
+        </div>
 
-            <!-- 卡片 2: XLSX 全渠道 ROI 对账 -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col justify-between">
+        <!-- 下方三卡套装展示区 (保留原3-in-1) -->
+        <div class="mt-10">
+            <div class="flex justify-between items-end mb-6">
                 <div>
-                    <div class="h-52 bg-gradient-to-br from-emerald-950/40 to-slate-900 p-4 border-b border-slate-800 flex flex-col justify-between">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">XLSX · 智能对账</span>
-                            <span class="text-xs font-mono text-slate-400">零宏纯净版</span>
-                        </div>
-                        <div class="text-center my-auto">
-                            <div class="text-2xl font-black text-emerald-400/90 tracking-wider">ROI DASHBOARD</div>
-                            <div class="text-[11px] font-mono text-slate-500 mt-1">自动对齐当前企业收支拐点</div>
-                        </div>
-                        <div class="text-[11px] font-mono text-slate-500 flex justify-between">
-                            <span>动态自适应高显</span>
-                            <span>高阶条件规则</span>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <div class="flex justify-between items-baseline mb-2">
-                            <h3 class="font-bold text-base">全渠道 ROI 与财务监控模型</h3>
-                            <span class="text-lg font-bold text-emerald-400 font-mono">$ 9.99</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-4">精细化运营与财务预算定制，无宏病毒安全验证，已同步注入当前定制企业核心参数。</p>
-                    </div>
+                    <h2 class="text-xl font-black tracking-tight">企业级智能商务工作成果导出 (3-in-1 Engine)</h2>
+                    <p class="text-xs text-slate-400 mt-1">所有导出文件采用 OpenXML 规范构建，自动内嵌您当前定制的品牌及数据参数</p>
                 </div>
-                <div class="p-5 pt-0">
-                    <button onclick="requestExport('XLSX', '全渠道 ROI 与财务监控模型')" 
-                            class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-bold py-3 rounded-xl transition text-emerald-400 border border-emerald-500/20">
-                        ⚡ 生成并极速导出成果 · $9.99
-                    </button>
-                </div>
+                <span class="text-xs text-indigo-400 font-mono bg-indigo-950/50 border border-indigo-800/50 px-3 py-1 rounded">
+                    ● 全网通用商业永久授权: USD $9.99
+                </span>
             </div>
 
-            <!-- 卡片 3: DOCX 国际 ATS 报告规范 -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col justify-between">
-                <div>
-                    <div class="h-52 bg-gradient-to-br from-blue-950/40 to-slate-900 p-4 border-b border-slate-800 flex flex-col justify-between">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">DOCX · 工业标准</span>
-                            <span class="text-xs font-mono text-slate-400">欧美双语兼容</span>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- 卡片 1: PPTX 战略路演 -->
+                <div class="bg-slate-900 border-2 border-indigo-500/80 rounded-2xl overflow-hidden hover:border-indigo-400 transition duration-300 shadow-2xl shadow-indigo-950/80 flex flex-col justify-between">
+                    <div>
+                        <div class="h-52 slide-bg-0 p-4 border-b border-slate-800 flex flex-col justify-between relative group">
+                            <div class="flex justify-between items-start z-10">
+                                <span class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded shadow">PPTX · 战略路演</span>
+                                <span class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono px-2 py-0.5 rounded font-bold">
+                                    Executive Deck
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 my-2 h-24 z-10">
+                                <div class="col-span-2 bento-card rounded-lg p-2.5 flex flex-col justify-between">
+                                    <div class="text-[9px] text-indigo-300 font-mono">STRATEGIC ROADSHOW</div>
+                                    <div id="preview-title" class="text-xs font-bold text-white tracking-wide">AeroTech Global 创投计划书</div>
+                                    <div class="w-full bg-indigo-500/30 h-1 rounded-full overflow-hidden">
+                                        <div class="bg-indigo-400 h-full w-4/5"></div>
+                                    </div>
+                                </div>
+                                <div class="col-span-1 bento-card rounded-lg p-2 flex flex-col items-center justify-center text-center">
+                                    <div class="text-[9px] text-slate-400">KPI IMPACT</div>
+                                    <div id="preview-kpi" class="text-sm font-black text-emerald-400">+340% YoY</div>
+                                </div>
+                            </div>
+                            <div class="text-[11px] font-mono text-slate-400 flex justify-between items-center z-10">
+                                <span id="preview-author">Dr. Marcus Vance (CEO)</span>
+                                <span class="text-indigo-400 font-bold">16:9 黑青美学</span>
+                            </div>
                         </div>
-                        <div class="text-center my-auto">
-                            <div class="text-2xl font-black text-blue-400/90 tracking-wider">ATS PASS PORT</div>
-                            <div class="text-[11px] font-mono text-slate-500 mt-1">高标准报告 / 机筛简历排版</div>
-                        </div>
-                        <div class="text-[11px] font-mono text-slate-500 flex justify-between">
-                            <span>严谨字体映射</span>
-                            <span>跨系统绝不乱码</span>
+                        <div class="p-5">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="font-bold text-base text-white">高阶商业创投战略演示稿</h3>
+                                <span class="text-xl font-black text-emerald-400 font-mono">$ 9.99</span>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed mb-4">
+                                针对投融资与高管决策定制。采用 2026 矢量便当盒架构，页面参数已自动绑定上方实时编辑面板。
+                            </p>
                         </div>
                     </div>
-                    <div class="p-5">
-                        <div class="flex justify-between items-baseline mb-2">
-                            <h3 class="font-bold text-base">通用商务文档与 ATS 智能规范</h3>
-                            <span class="text-lg font-bold text-emerald-400 font-mono">$ 9.99</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-4">遵循国际 ATS 机筛准则，排错与吞字防御设计，实时匹配上面录入的高管姓名与品牌属性。</p>
+                    <div class="p-5 pt-0">
+                        <button onclick="requestExport('PPTX', '高阶商业创投战略演示稿')" 
+                                class="w-full bg-indigo-600 hover:bg-indigo-500 text-xs font-bold py-3 rounded-xl transition text-white shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-1.5">
+                            <span>⚡ 生成并极速导出成果</span>
+                            <span class="text-[10px] bg-indigo-950/60 px-1.5 py-0.5 rounded font-mono">USD $9.99</span>
+                        </button>
                     </div>
                 </div>
-                <div class="p-5 pt-0">
-                    <button onclick="requestExport('DOCX', '通用商务文档与 ATS 智能规范')" 
-                            class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-bold py-3 rounded-xl transition text-blue-400 border border-blue-500/20">
-                        ⚡ 生成并极速导出成果 · $9.99
-                    </button>
-                </div>
-            </div>
 
+                <!-- 卡片 2: XLSX 全渠道 ROI 对账 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col justify-between">
+                    <div>
+                        <div class="h-52 bg-gradient-to-br from-emerald-950/40 to-slate-900 p-4 border-b border-slate-800 flex flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-emerald-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">XLSX · 智能对账</span>
+                                <span class="text-xs font-mono text-slate-400">零宏纯净版</span>
+                            </div>
+                            <div class="text-center my-auto">
+                                <div class="text-2xl font-black text-emerald-400/90 tracking-wider">ROI DASHBOARD</div>
+                                <div class="text-[11px] font-mono text-slate-500 mt-1">自动对齐当前企业收支拐点</div>
+                            </div>
+                            <div class="text-[11px] font-mono text-slate-500 flex justify-between">
+                                <span>动态自适应高显</span>
+                                <span>高阶条件规则</span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="font-bold text-base">全渠道 ROI 与财务监控模型</h3>
+                                <span class="text-lg font-bold text-emerald-400 font-mono">$ 9.99</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">精细化运营与财务预算定制，无宏病毒安全验证，已同步注入当前定制企业核心参数。</p>
+                        </div>
+                    </div>
+                    <div class="p-5 pt-0">
+                        <button onclick="requestExport('XLSX', '全渠道 ROI 与财务监控模型')" 
+                                class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-bold py-3 rounded-xl transition text-emerald-400 border border-emerald-500/20">
+                            ⚡ 生成并极速导出成果 · $9.99
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 卡片 3: DOCX 国际 ATS 报告规范 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition flex flex-col justify-between">
+                    <div>
+                        <div class="h-52 bg-gradient-to-br from-blue-950/40 to-slate-900 p-4 border-b border-slate-800 flex flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded">DOCX · 工业标准</span>
+                                <span class="text-xs font-mono text-slate-400">欧美双语兼容</span>
+                            </div>
+                            <div class="text-center my-auto">
+                                <div class="text-2xl font-black text-blue-400/90 tracking-wider">ATS PASS PORT</div>
+                                <div class="text-[11px] font-mono text-slate-500 mt-1">高标准报告 / 机筛简历排版</div>
+                            </div>
+                            <div class="text-[11px] font-mono text-slate-500 flex justify-between">
+                                <span>严谨字体映射</span>
+                                <span>跨系统绝不乱码</span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <h3 class="font-bold text-base">通用商务文档与 ATS 智能规范</h3>
+                                <span class="text-lg font-bold text-emerald-400 font-mono">$ 9.99</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mb-4">遵循国际 ATS 机筛准则，排错与吞字防御设计，实时匹配上面录入的高管姓名与品牌属性。</p>
+                        </div>
+                    </div>
+                    <div class="p-5 pt-0">
+                        <button onclick="requestExport('DOCX', '通用商务文档与 ATS 智能规范')" 
+                                class="w-full bg-slate-800 hover:bg-slate-700 text-xs font-bold py-3 rounded-xl transition text-blue-400 border border-blue-500/20">
+                            ⚡ 生成并极速导出成果 · $9.99
+                        </button>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </main>
 
@@ -256,120 +357,130 @@
 
     <!-- ===== JS 核心逻辑：即时预览 + 智能回调解析 + 前端直接渲染导出 ===== -->
     <script>
-        // 更新上方文本框时，实时修改展示预览的数据
-        function updateLivePreview() {
-            const company = document.getElementById("edit-company").value || "AeroTech Global";
-            const author = document.getElementById("edit-author").value || "Dr. Marcus Vance (CEO)";
-            const kpi = document.getElementById("edit-kpi").value || "+340% YoY";
+        // ========== 15页模板数据定义 ==========
+        const slideTemplates = [
+            { id: 1, title: "封面", icon: "🚀", tag: "COVER" },
+            { id: 2, title: "执行摘要", icon: "📊", tag: "EXEC SUMMARY" },
+            { id: 3, title: "市场痛点", icon: "🎯", tag: "PAIN POINTS" },
+            { id: 4, title: "AI 解决方案架构", icon: "🧠", tag: "AI ARCHITECTURE" },
+            { id: 5, title: "产品路线图", icon: "🗺️", tag: "ROADMAP" },
+            { id: 6, title: "增长模型 +340%", icon: "📈", tag: "GROWTH MODEL" },
+            { id: 7, title: "全渠道财务对账", icon: "💰", tag: "ROI FINANCE" },
+            { id: 8, title: "竞争壁垒分析", icon: "🛡️", tag: "MOAT" },
+            { id: 9, title: "团队与顾问", icon: "👥", tag: "TEAM" },
+            { id: 10, title: "市场进入策略", icon: "🌍", tag: "GTM STRATEGY" },
+            { id: 11, title: "欧美 ATS 合规审查", icon: "📋", tag: "ATS COMPLIANCE" },
+            { id: 12, title: "客户成功案例", icon: "🏆", tag: "CASE STUDIES" },
+            { id: 13, title: "财务预测 5Y", icon: "🔮", tag: "5Y FORECAST" },
+            { id: 14, title: "创投退出策略", icon: "💎", tag: "EXIT STRATEGY" },
+            { id: 15, title: "结语与联系", icon: "🤝", tag: "CLOSING" }
+        ];
 
-            document.getElementById("preview-title").innerText = company + " 创投计划书";
-            document.getElementById("preview-author").innerText = author;
-            document.getElementById("preview-kpi").innerText = kpi;
+        let currentSlide = 1;
+
+        // ========== 初始化导航 ==========
+        function initSlideNav() {
+            const nav = document.getElementById("slide-nav");
+            nav.innerHTML = slideTemplates.map(s => `
+                <div class="slide-thumb rounded-lg p-2 cursor-pointer flex items-center gap-2 ${s.id === 1 ? 'active' : ''}" 
+                     onclick="switchSlide(${s.id})">
+                    <span class="text-sm">${s.icon}</span>
+                    <div class="flex-1">
+                        <div class="text-[11px] font-bold text-slate-200">${s.title}</div>
+                        <div class="text-[9px] font-mono text-slate-500">${s.tag}</div>
+                    </div>
+                    <span class="text-[9px] font-mono text-slate-600">${String(s.id).padStart(2, '0')}</span>
+                </div>
+            `).join("");
         }
 
-        // 导出核心拦截判断
-        function requestExport(fileType, title) {
-            const isVIP = localStorage.getItem("APEX_LICENSE_TOKEN");
-            if (isVIP) {
-                // 如果已经有合法商业授权，直接生成并下发对应文件！
-                exportCustomizedFile(fileType, title);
-            } else {
-                // 如果未授权，打开收银台要求结账
-                document.getElementById("checkout-title").innerText = title + " (" + fileType + ")";
-                document.getElementById("checkout-modal").classList.remove("hidden");
-            }
+        // ========== 切换幻灯片 ==========
+        function switchSlide(id) {
+            currentSlide = id;
+            document.querySelectorAll('.slide-thumb').forEach((el, i) => {
+                el.classList.toggle('active', i + 1 === id);
+            });
+            document.getElementById("slide-counter").innerText = String(id).padStart(2, '0') + " / 15";
+            renderPreview();
         }
 
-        function closeCheckout() {
-            document.getElementById("checkout-modal").classList.add("hidden");
+        // ========== 获取当前定制参数 ==========
+        function getParams() {
+            return {
+                company: document.getElementById("edit-company").value || "AeroTech Global",
+                author: document.getElementById("edit-author").value || "Dr. Marcus Vance (CEO)",
+                kpi: document.getElementById("edit-kpi").value || "+340% YoY",
+                tagline: document.getElementById("edit-tagline").value || "Standardizing Enterprise Productivity"
+            };
         }
 
-        // --- 核心：检测从 Gumroad 付钱后自动跳回来的网址参数 ---
-        function checkPaymentRedirect() {
-            const urlParams = new URLSearchParams(window.location.search);
-            // 只要网址带有 ?status=paid 或者 ?license=xxx，一律视为成功
-            if (urlParams.get("status") === "paid" || urlParams.get("sale_id") || urlParams.get("license")) {
-                const token = "APEX-VIP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-                localStorage.setItem("APEX_LICENSE_TOKEN", token);
-
-                // 悄悄把浏览器的带有参数的旧地址变回干净网址（不触发重载）
-                window.history.replaceState({}, document.title, window.location.pathname);
-
-                // 提示到账并直接触发文件下载！
-                alert("✅ 商业终身永久授权验证通过！\n\n您的专属序列号为：【 " + token + " 】\n现在已自动为您生成并导出定制好成果文件！");
-                updateVIPDisplay();
-                exportCustomizedFile("PPTX", "高阶商业创投战略路演套件");
-            }
-        }
-
-        function simulateRedirectPaid() {
-            closeCheckout();
-            // 模拟买家在 Gumroad 付完钱以后被带回首页的网址场景
-            window.location.search = "?status=paid";
-        }
-
-        function updateVIPDisplay() {
-            const token = localStorage.getItem("APEX_LICENSE_TOKEN");
-            if (token) {
-                const badge = document.getElementById("vip-status");
-                badge.innerText = "🔑 终身商业授权: " + token;
-                badge.className = "text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/50 px-3 py-1 rounded-full";
-            }
-        }
-
-        // --- 核心亮点：端侧原生渲染生成可直接使用的高阶商务文件（纯 HTML/Blob Engine） ---
-        function exportCustomizedFile(fileType, title) {
-            const company = document.getElementById("edit-company").value || "AeroTech Global";
-            const author = document.getElementById("edit-author").value || "Dr. Marcus Vance";
-            const kpi = document.getElementById("edit-kpi").value || "+340% YoY";
-
-            // 在本地直接根据买家填写的内容，动态组装出商务汇报交付物
-            const content = `===========================================================
-APEXWORK EXECUTIVE SUITE — FINAL COMMERCIAL DELIVERABLE
-===========================================================
-
-[ DOCUMENT TYPE ]
-• Target Export Type: ${fileType} (2026 Executive Architecture)
-• Project Title: ${title}
-• Customized Organization / Brand: ${company}
-• Lead Executive / Author: ${author}
-• Primary Growth KPI Metric: ${kpi}
-
------------------------------------------------------------
-[ EXECUTIVE SUMMARY & ARCHITECTURAL SPECS ]
------------------------------------------------------------
-1. BENTO GRID STRATEGY:
-   - Optimized for 16:9 Dark OLED presentations & C-level roadshows.
-   - All charts & elements set to scalable OpenXML vector mapping.
-
-2. BUSINESS IMPACT & MODELING:
-   - Core organization metric "${kpi}" is pre-configured into dashboard slides.
-   - Built with zero-macro safe formulas and ATS-compliant typography.
-
------------------------------------------------------------
-[ PERPETUAL LICENSE CERTIFICATE ]
-• License ID: ${localStorage.getItem("APEX_LICENSE_TOKEN") || "APEX-PERPETUAL-VIP"}
-• Status: Unlimited commercial & enterprise redistribution rights unlocked.
-===========================================================
-ApexWork | Standardizing Enterprise Productivity.`;
-
-            // 利用前端本地 Blob 构建下载流，立即弹出保存文件
-            const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${company}_ApexWork_Executive_${fileType}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // 页面打开即执行自动到账监听
-        window.onload = function() {
-            updateVIPDisplay();
-            checkPaymentRedirect();
-        };
-    </script>
-</body>
-</html>
+        // ========== 渲染预览 ==========
+        function renderPreview() {
+            const p = getParams();
+            const canvas = document.getElementById("preview-canvas");
+            
+            const slideContent = {
+                1: `
+                    <div class="text-center space-y-4">
+                        <div class="text-[10px] font-mono text-indigo-400 tracking-widest">2026 GLOBAL BUSINESS STRATEGY</div>
+                        <div class="text-3xl font-black text-white tracking-tight">${p.company}</div>
+                        <div class="text-sm text-slate-400 font-mono">${p.tagline}</div>
+                        <div class="w-24 h-0.5 bg-indigo-500 mx-auto"></div>
+                        <div class="text-[11px] text-slate-500 font-mono">${p.author}</div>
+                    </div>
+                `,
+                2: `
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-mono text-indigo-400">EXECUTIVE SUMMARY</div>
+                        <div class="text-lg font-bold text-white">${p.company} 2026 战略核心</div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bento-card-light rounded-lg p-2 text-center"><div class="text-[9px] text-slate-400">营收增长</div><div class="text-sm font-black text-emerald-400">${p.kpi}</div></div>
+                            <div class="bento-card-light rounded-lg p-2 text-center"><div class="text-[9px] text-slate-400">毛利率</div><div class="text-sm font-black text-indigo-400">68%</div></div>
+                            <div class="bento-card-light rounded-lg p-2 text-center"><div class="text-[9px] text-slate-400">市占率</div><div class="text-sm font-black text-blue-400">22%</div></div>
+                        </div>
+                        <div class="text-[10px] text-slate-400 leading-relaxed">以 AI 驱动全球智能商务决策，实现指数级增长。</div>
+                    </div>
+                `,
+                3: `
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-mono text-indigo-400">MARKET PAIN POINTS</div>
+                        <div class="text-lg font-bold text-white">行业核心痛点</div>
+                        <div class="space-y-2">
+                            <div class="bento-card-light rounded-lg p-2 flex items-center gap-2"><span class="text-red-400">✗</span><span class="text-[11px] text-slate-300">传统报表工具效率低下，决策滞后</span></div>
+                            <div class="bento-card-light rounded-lg p-2 flex items-center gap-2"><span class="text-red-400">✗</span><span class="text-[11px] text-slate-300">数据孤岛严重，跨部门协作困难</span></div>
+                            <div class="bento-card-light rounded-lg p-2 flex items-center gap-2"><span class="text-red-400">✗</span><span class="text-[11px] text-slate-300">AI 落地成本高，ROI 不明确</span></div>
+                        </div>
+                    </div>
+                `,
+                4: `
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-mono text-indigo-400">AI SOLUTION ARCHITECTURE</div>
+                        <div class="text-lg font-bold text-white">AI 解决方案架构</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bento-card-light rounded-lg p-2"><div class="text-[9px] text-indigo-300">数据层</div><div class="text-[10px] text-slate-300">多源数据接入</div></div>
+                            <div class="bento-card-light rounded-lg p-2"><div class="text-[9px] text-indigo-300">AI 层</div><div class="text-[10px] text-slate-300">智能决策引擎</div></div>
+                            <div class="bento-card-light rounded-lg p-2"><div class="text-[9px] text-indigo-300">应用层</div><div class="text-[10px] text-slate-300">全场景覆盖</div></div>
+                            <div class="bento-card-light rounded-lg p-2"><div class="text-[9px] text-indigo-300">安全层</div><div class="text-[10px] text-slate-300">企业级防护</div></div>
+                        </div>
+                    </div>
+                `,
+                5: `
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-mono text-indigo-400">PRODUCT ROADMAP</div>
+                        <div class="text-lg font-bold text-white">产品路线图 2026-2028</div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2"><span class="text-[10px] font-mono text-emerald-400">Q1 2026</span><div class="flex-1 h-1 bg-slate-800 rounded"><div class="h-full w-3/4 bg-emerald-500 rounded"></div></div><span class="text-[10px] text-slate-400">MVP 上线</span></div>
+                            <div class="flex items-center gap-2"><span class="text-[10px] font-mono text-indigo-400">Q3 2026</span><div class="flex-1 h-1 bg-slate-800 rounded"><div class="h-full w-1/2 bg-indigo-500 rounded"></div></div><span class="text-[10px] text-slate-400">AI 引擎</span></div>
+                            <div class="flex items-center gap-2"><span class="text-[10px] font-mono text-blue-400">2027</span><div class="flex-1 h-1 bg-slate-800 rounded"><div class="h-full w-1/3 bg-blue-500 rounded"></div></div><span class="text-[10px] text-slate-400">全球化</span></div>
+                        </div>
+                    </div>
+                `,
+                6: `
+                    <div class="space-y-3">
+                        <div class="text-[10px] font-mono text-emerald-400">GROWTH MODEL</div>
+                        <div class="text-lg font-bold text-white">增长模型：${p.kpi}</div>
+                        <div class="flex items-end gap-2 h-24">
+                            <div class="flex-1 bg-indigo-900/50 rounded-t" style="height: 30%"></div>
+                            <div class="flex-1 bg-indigo-800/50 rounded-t" style="height: 45%"></div>
+                            <div class="flex-1 bg-indigo-700/50 rounded-t" style="height: 60%"></div>
+                            <div class="flex-1 bg-indigo-600/50 rounded-t" style="height
