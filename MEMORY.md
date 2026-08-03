@@ -1,0 +1,12 @@
+# APEXWORK AUTONOMOUS MEMORY LEDGER
+# 本文件由 AI 自主更新，记录历史进化经验、教训与技术底线
+
+## [CORE SYSTEM CONSTITUTION | 绝对不可破坏的底线]
+1. **视觉美学底线：** 强制遵守 2026 现代便当盒 (Bento Grid) 布局、高对比度黑青/深邃黑紫视觉，绝对禁止使用 90 年代老旧表格布局或高饱和度刺眼色块。
+2. **技术架构底线：** 保持单文件 `index.html` + Tailwind CSS CDN 原生响应式架构。绝对禁止引入重量级框架导致加载慢。
+3. **SaaS 商业逻辑：** 核心模式为 "Pay-to-Export (免费在线改，付费导出)"。全站统一价格标识为 USD $9.99，核心结账/发货回调参数为 `?status=paid`。
+
+## [EVOLUTION LOG & LEARNED LESSONS | 实践进化记忆]
+- [INIT]: 初始化系统。已建立基础 3-in-1 (PPTX/XLSX/DOCX) 商务成果在线定制与导出模组。
+- [PM-RULE-01]: 用户在手机端滑动时需保持行动按钮 (CTA) 始终悬浮可点，提高转化率。
+- [GEEK-RULE-01]: 必须保证所有函数为原生 JS (Vanilla JS)，无需后端接口即可在客户端浏览器内存直接导出生成定制文件。
