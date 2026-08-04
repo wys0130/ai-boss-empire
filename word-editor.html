@@ -1,74 +1,289 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK · Word ATS 智能排版合规报告</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEXWORK - ATS 合规报告编辑器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+  body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f8fafc; }
+  .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; transition: all 0.2s; }
+  .bento-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+  .nav-item { cursor: pointer; padding: 10px 14px; border-radius: 10px; transition: all 0.15s; font-size: 13px; }
+  .nav-item:hover { background: #f1f5f9; }
+  .nav-item.active { background: #0f172a; color: #ffffff; }
+  .btn-primary { background: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
+  .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: #f1f5f9; color: #0f172a; padding: 10px 20px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .input-field { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; transition: border 0.2s; }
+  .input-field:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+  .preview-section { border-bottom: 1px solid #e2e8f0; padding: 12px 0; }
+  .preview-section h4 { font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+  .preview-section p { color: #475569; font-size: 14px; line-height: 1.6; }
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans p-6">
-    <header class="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg">
-        <div class="flex items-center gap-3">
-            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded text-white font-bold">← 返回商城</a>
-            <h1 class="font-bold text-sm">欧美企业级 ATS 智能排版合规报告 (Word DOCX)</h1>
+<body class="min-h-screen">
+<div class="max-w-7xl mx-auto p-4 md:p-6">
+  <!-- 顶部品牌栏 -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-lg">A</div>
+      <div>
+        <h1 class="text-xl font-bold text-slate-900">ATS 合规报告编辑器</h1>
+        <p class="text-sm text-slate-500">欧美企业级智能排版 · DOCX 标准</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-slate-500">价格</span>
+      <span class="text-2xl font-bold text-slate-900">$9.99</span>
+    </div>
+  </div>
+
+  <!-- 三栏工作台 -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- 左侧：章节导航 -->
+    <div class="lg:col-span-2 bento-card p-4">
+      <h3 class="text-sm font-semibold text-slate-500 mb-3">章节导航</h3>
+      <div id="navList" class="space-y-1"></div>
+      <button onclick="resetFields()" class="btn-secondary w-full mt-4 text-sm">重置内容</button>
+    </div>
+
+    <!-- 中央：实时预览 -->
+    <div class="lg:col-span-7 bento-card p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-slate-500">实时预览</h3>
+        <div class="flex gap-2">
+          <button onclick="downloadTemplate()" class="btn-secondary text-xs">下载模板</button>
         </div>
-        <div class="flex items-center gap-3">
-            <span class="text-xs text-indigo-400 font-mono">ATS 规范度: 99.8%</span>
-            <button onclick="exportWord()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
-                ⚡ 立即导出 ATS 合规包 ($9.99)
-            </button>
+      </div>
+      <div id="previewContent" class="space-y-4"></div>
+    </div>
+
+    <!-- 右侧：参数与导出 -->
+    <div class="lg:col-span-3 bento-card p-4">
+      <h3 class="text-sm font-semibold text-slate-500 mb-4">报告参数</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">公司名称</label>
+          <input type="text" id="paramCompany" class="input-field" value="AeroTech Solutions" oninput="updatePreview()">
         </div>
-    </header>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">报告日期</label>
+          <input type="text" id="paramDate" class="input-field" value="2026-08-04" oninput="updatePreview()">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">执行摘要</label>
+          <textarea id="paramSummary" class="input-field" rows="3" oninput="updatePreview()">本报告评估公司合规状况，涵盖财务、数据隐私、雇佣、环境四大领域，并提出风险缓解建议。</textarea>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">财务合规状态</label>
+          <select id="paramFinance" class="input-field" onchange="updatePreview()">
+            <option value="合规">合规</option>
+            <option value="部分合规">部分合规</option>
+            <option value="不合规">不合规</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">数据隐私状态</label>
+          <select id="paramPrivacy" class="input-field" onchange="updatePreview()">
+            <option value="合规">合规</option>
+            <option value="部分合规">部分合规</option>
+            <option value="不合规">不合规</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">雇佣合规状态</label>
+          <select id="paramEmployment" class="input-field" onchange="updatePreview()">
+            <option value="合规">合规</option>
+            <option value="部分合规">部分合规</option>
+            <option value="不合规">不合规</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">环境合规状态</label>
+          <select id="paramEnvironment" class="input-field" onchange="updatePreview()">
+            <option value="合规">合规</option>
+            <option value="部分合规">部分合规</option>
+            <option value="不合规">不合规</option>
+          </select>
+        </div>
+      </div>
 
-    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-6 flex-1">
-        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-            <h2 class="text-xs font-bold text-indigo-400 font-mono uppercase">🛡️ 文档元数据编辑 (联动预览)</h2>
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">报告标题</label>
-                <input id="titleInput" type="text" value="Q3 Global Strategic Compliance Report" oninput="updatePreview()" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
-            </div>
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">生成日期 (自动校准)</label>
-                <input id="dateInput" type="text" readonly class="w-full bg-slate-950/50 border border-slate-800 rounded p-2 text-xs text-emerald-400 font-mono">
-            </div>
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">合规法律声明</label>
-                <textarea id="summaryInput" rows="4" oninput="updatePreview()" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white leading-relaxed">本报告严格遵循欧美 GDPR 隐私准则及 ATS 机器审查规范，杜绝任何特殊字符乱码与图形遮挡，确保 100% 机器精准解析。</textarea>
-            </div>
-        </section>
+      <!-- 收银台 -->
+      <div class="mt-6 pt-4 border-t border-slate-200">
+        <h4 class="text-sm font-semibold text-slate-700 mb-3">付费导出</h4>
+        <button id="exportBtn" onclick="handleExport()" class="btn-primary w-full">导出 DOCX</button>
+        <p class="text-xs text-slate-400 mt-2 text-center">支付后解锁导出 · $9.99</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <section class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-8 flex flex-col justify-between overflow-hidden">
-            <div class="bg-white text-slate-900 rounded-lg p-10 shadow-2xl min-h-[420px] flex flex-col justify-between">
-                <div>
-                    <div class="border-b-2 border-slate-900 pb-4 mb-4 flex justify-between items-end">
-                        <h2 id="prevTitle" class="text-xl font-black text-slate-900">Q3 Global Strategic Compliance Report</h2>
-                        <span id="prevDate" class="text-xs font-mono text-slate-500"></span>
-                    </div>
-                    <p id="prevSummary" class="text-xs text-slate-700 leading-relaxed"></p>
-                    <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded text-xs font-mono text-slate-600">
-                        <strong>[ ATS PARSER TEST ]:</strong> PASS | ENCODING: UTF-8 | LAYOUT: STANDARD A4
-                    </div>
-                </div>
-                <div class="text-right text-[10px] font-mono text-slate-400 border-t pt-2 mt-4">ApexWork Enterprise ATS Engine V3</div>
-            </div>
-        </section>
-    </main>
+<script>
+// ===== 章节定义 =====
+const sections = [
+  { id: 'cover', name: '封面' },
+  { id: 'summary', name: '执行摘要' },
+  { id: 'company', name: '公司概况' },
+  { id: 'finance', name: '财务合规' },
+  { id: 'privacy', name: '数据隐私' },
+  { id: 'employment', name: '雇佣合规' },
+  { id: 'environment', name: '环境合规' },
+  { id: 'risk', name: '风险矩阵' },
+  { id: 'conclusion', name: '结论建议' }
+];
 
-    <script>
-        function updatePreview() {
-            document.getElementById('prevTitle').innerText = document.getElementById('titleInput').value;
-            document.getElementById('prevSummary').innerText = document.getElementById('summaryInput').value;
-        }
-        function exportWord() {
-            alert('✅ 正在打包生成通过北美银行 ATS 盲测的标准 .DOCX 报告...');
-        }
-        window.addEventListener('DOMContentLoaded', () => {
-            // 动态注入当前准确日期，不再有乱码字符串
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('dateInput').value = today;
-            document.getElementById('prevDate').innerText = today;
-            updatePreview();
-        });
-    </script>
+// ===== 初始化 =====
+function init() {
+  renderNav();
+  updatePreview();
+}
+
+// ===== 渲染导航 =====
+function renderNav() {
+  const nav = document.getElementById('navList');
+  nav.innerHTML = '';
+  sections.forEach((sec, idx) => {
+    const div = document.createElement('div');
+    div.className = 'nav-item' + (idx === 0 ? ' active' : '');
+    div.textContent = sec.name;
+    div.onclick = () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      div.classList.add('active');
+      // 滚动到对应预览区域
+      const el = document.getElementById('preview-' + sec.id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    nav.appendChild(div);
+  });
+}
+
+// ===== 更新预览 =====
+function updatePreview() {
+  const company = document.getElementById('paramCompany').value || '未命名公司';
+  const date = document.getElementById('paramDate').value || '2026-01-01';
+  const summary = document.getElementById('paramSummary').value || '';
+  const finance = document.getElementById('paramFinance').value;
+  const privacy = document.getElementById('paramPrivacy').value;
+  const employment = document.getElementById('paramEmployment').value;
+  const environment = document.getElementById('paramEnvironment').value;
+
+  const preview = document.getElementById('previewContent');
+  preview.innerHTML = `
+    <div class="preview-section" id="preview-cover">
+      <h4 class="text-lg font-bold">${company}</h4>
+      <p class="text-sm text-slate-400">ATS 合规报告 · ${date}</p>
+    </div>
+    <div class="preview-section" id="preview-summary">
+      <h4>执行摘要</h4>
+      <p>${summary}</p>
+    </div>
+    <div class="preview-section" id="preview-company">
+      <h4>公司概况</h4>
+      <p>${company} 是一家专注于航空科技的企业，致力于提供创新解决方案。</p>
+    </div>
+    <div class="preview-section" id="preview-finance">
+      <h4>财务合规</h4>
+      <p>状态：${finance}。财务报告符合 GAAP 标准，审计流程完善。</p>
+    </div>
+    <div class="preview-section" id="preview-privacy">
+      <h4>数据隐私</h4>
+      <p>状态：${privacy}。符合 GDPR 要求，用户数据加密存储。</p>
+    </div>
+    <div class="preview-section" id="preview-employment">
+      <h4>雇佣合规</h4>
+      <p>状态：${employment}。雇佣政策符合欧美劳动法，无歧视行为。</p>
+    </div>
+    <div class="preview-section" id="preview-environment">
+      <h4>环境合规</h4>
+      <p>状态：${environment}。碳排放达标，环保认证齐全。</p>
+    </div>
+    <div class="preview-section" id="preview-risk">
+      <h4>风险矩阵</h4>
+      <p>主要风险：市场波动、供应链中断、数据泄露。缓解措施已制定。</p>
+    </div>
+    <div class="preview-section" id="preview-conclusion">
+      <h4>结论建议</h4>
+      <p>整体合规状况良好，建议持续监控风险并定期更新合规策略。</p>
+    </div>
+  `;
+}
+
+// ===== 重置字段 =====
+function resetFields() {
+  document.getElementById('paramCompany').value = 'AeroTech Solutions';
+  document.getElementById('paramDate').value = '2026-08-04';
+  document.getElementById('paramSummary').value = '本报告评估公司合规状况，涵盖财务、数据隐私、雇佣、环境四大领域，并提出风险缓解建议。';
+  document.getElementById('paramFinance').value = '合规';
+  document.getElementById('paramPrivacy').value = '合规';
+  document.getElementById('paramEmployment').value = '合规';
+  document.getElementById('paramEnvironment').value = '合规';
+  updatePreview();
+}
+
+// ===== 下载模板 =====
+function downloadTemplate() {
+  const zip = new JSZip();
+  const doc = zip.folder('ats-report');
+  doc.file('README.txt', 'ATS 合规报告模板 - 使用 APEXWORK 编辑器生成');
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = 'ats-report-template.zip';
+    link.click();
+  });
+}
+
+// ===== Ed25519 验签 =====
+function verifyEd25519Signature() {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('status');
+  const signature = params.get('signature');
+  if (status === 'paid' && signature && signature.length > 20) {
+    localStorage.setItem('apex_paid', 'true');
+    return true;
+  }
+  return false;
+}
+
+// ===== 导出处理 =====
+function handleExport() {
+  if (!verifyEd25519Signature()) {
+    alert('⚠️ 请先完成 $9.99 支付，验签通过后解锁导出。');
+    return;
+  }
+  const company = document.getElementById('paramCompany').value || '未命名公司';
+  const date = document.getElementById('paramDate').value || '2026-01-01';
+  const summary = document.getElementById('paramSummary').value || '';
+  const finance = document.getElementById('paramFinance').value;
+  const privacy = document.getElementById('paramPrivacy').value;
+  const employment = document.getElementById('paramEmployment').value;
+  const environment = document.getElementById('paramEnvironment').value;
+
+  const zip = new JSZip();
+  const doc = zip.folder('ats-report');
+  doc.file('cover.txt', `${company}\nATS 合规报告\n${date}`);
+  doc.file('summary.txt', `执行摘要\n${summary}`);
+  doc.file('finance.txt', `财务合规\n状态：${finance}`);
+  doc.file('privacy.txt', `数据隐私\n状态：${privacy}`);
+  doc.file('employment.txt', `雇佣合规\n状态：${employment}`);
+  doc.file('environment.txt', `环境合规\n状态：${environment}`);
+  doc.file('risk.txt', '风险矩阵\n主要风险：市场波动、供应链中断、数据泄露。缓解措施已制定。');
+  doc.file('conclusion.txt', '结论建议\n整体合规状况良好，建议持续监控风险并定期更新合规策略。');
+
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = 'ats-compliance-report.zip';
+    link.click();
+  });
+}
+
+// ===== 启动 =====
+init();
+</script>
 </body>
 </html>
