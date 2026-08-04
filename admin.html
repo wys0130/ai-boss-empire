@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 董事长专属 AI 驾驶舱 (Minimalist V10)</title>
+    <title>ApexWork 集团 AI CTO 控制台 (V11 Pure Autonomous)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -21,18 +21,17 @@
 </head>
 <body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-4 font-sans">
 
-    <!-- 顶部导览：名称清爽、无废话 -->
+    <!-- 顶部：全词极简清爽 -->
     <header class="max-w-7xl w-full mx-auto themed-card border rounded-xl px-5 py-3 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
         <div class="flex items-center gap-3">
             <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-            <h1 class="font-bold font-mono text-sm tracking-wider themed-text">APEXWORK AI CONSOLE V10 · 极简决策驾驶舱</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-bold">7x24 CLOUND CRON</span>
+            <h1 class="font-bold font-mono text-sm tracking-wider themed-text">APEXWORK AI CTO 控制台</h1>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-bold">AUTONOMOUS AGENT</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1.5 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
-                <span>🌞/🌙 切日夜模式</span>
+                <span>🌞/🌙 日夜模式</span>
             </button>
-            <!-- 已经精简为你想看的名字：一键回退、刷新记录 -->
             <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition shadow-sm">
                 <span>⏳ 一键回退</span>
             </button>
@@ -45,9 +44,8 @@
         </div>
     </header>
 
-    <!-- 密钥弹框 -->
     <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-4 p-4 themed-card border border-indigo-500/50 rounded-xl shadow-2xl">
-        <div class="text-xs font-bold text-indigo-400 font-mono mb-2">⚡ 董事长密钥与算力池配置 (仅保存在本地设备)</div>
+        <div class="text-xs font-bold text-indigo-400 font-mono mb-2">⚡ 董事长授权与算力池本地锁定</div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input id="ghTokenInput" type="password" placeholder="GitHub Access Token (ghp_...)" class="w-full themed-inner border rounded-lg p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
             <input id="dsKeyInput" type="password" placeholder="DeepSeek / OpenRouter API Key (sk-...)" class="w-full themed-inner border rounded-lg p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
@@ -55,54 +53,55 @@
         <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">💾 保存算力配置</button>
     </div>
 
-    <!-- 一键回退历史选择弹层 -->
+    <!-- 历史快照时间漫游 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="themed-card border max-w-2xl w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-gray-500/20 pb-3 mb-4">
-                <span class="font-bold text-sm font-mono themed-text">⏳ 一键回退 · 选择历史正常版本</span>
+                <span class="font-bold text-sm font-mono themed-text">⏳ 一键回退 · 挑选历史稳定快照</span>
                 <button onclick="closeRollbackModal()" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
             </div>
             <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2">
-                <div class="text-center text-xs themed-subtext py-10 font-mono">加载提交历史中...</div>
+                <div class="text-center text-xs themed-subtext py-10 font-mono">查询快照中...</div>
             </div>
         </div>
     </div>
 
-    <!-- 核心工作区：双栏极简版 -->
+    <!-- 主架构 -->
     <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start overflow-hidden">
         
-        <!-- 左侧：AI 进化时间线 (纯日志，零冗余文字) -->
+        <!-- 左栏：AI 进化日志 (零多余文字) -->
         <aside class="lg:col-span-5 themed-card border rounded-2xl p-4 flex flex-col h-[650px] shadow-xl">
             <div class="flex items-center justify-between border-b border-gray-500/20 pb-3 mb-3">
-                <span class="text-xs font-bold font-mono tracking-wide themed-text">🕒 AI 进化时间线</span>
+                <span class="text-xs font-bold font-mono tracking-wide themed-text">🕒 AI 进化日志</span>
                 <span id="historyCount" class="text-[10px] font-mono themed-inner border px-2 py-0.5 rounded themed-subtext">0 RECORDS</span>
             </div>
             <div id="historyFeed" class="flex-1 overflow-y-auto space-y-2.5 custom-scrollbar pr-1.5">
-                <div class="text-center text-xs themed-subtext py-10 font-mono">加载中...</div>
+                <div class="text-center text-xs themed-subtext py-10 font-mono">加载记录中...</div>
             </div>
         </aside>
 
-        <!-- 右侧：决策发送与监控 -->
+        <!-- 右栏：决策与思考终端 -->
         <section class="lg:col-span-7 themed-card border rounded-2xl p-5 flex flex-col h-[650px] shadow-xl justify-between">
             <div>
                 <div class="flex items-center justify-between border-b border-gray-500/20 pb-3 mb-3">
-                    <span class="text-xs font-bold font-mono text-indigo-400">CHAIRMAN DIRECTIVE / 董事长决策发射台</span>
-                    <span class="text-[10px] font-mono themed-subtext">快捷操作: <strong class="themed-text">Ctrl + Enter</strong> 立即发送</span>
+                    <span class="text-xs font-bold font-mono text-indigo-400">控制台 / 指令反馈</span>
+                    <span class="text-[10px] font-mono themed-subtext">快捷发送: <strong class="themed-text">Ctrl + Enter</strong></span>
                 </div>
                 <div class="mb-3">
-                    <textarea id="cmd" rows="3" placeholder="输入需求指令，或留空（留空自动执行：审核大厂图文布局，精简文字增多可视化组件）..." class="w-full themed-inner border rounded-xl p-3.5 text-sm themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
+                    <textarea id="cmd" rows="3" placeholder="输入手写指令；或留空直接敲 Enter，触发 AI 自主复盘商业大厂并深度改版..." class="w-full themed-inner border rounded-xl p-3.5 text-sm themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
                 </div>
                 <button onclick="triggerAutonomousEvolution()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即执行指令 / 启动 AI 自主进化</span>
+                    <span>🚀 立即发车 / 启动 AI 自主思考迭代</span>
                 </button>
             </div>
 
+            <!-- 控制台终端：输出真正的 [THOUGHT_PROCESS] 内心推演 -->
             <div class="flex-1 mt-4 flex flex-col min-h-0">
                 <div class="text-[10px] font-mono themed-subtext mb-1 flex justify-between">
-                    <span>SYSTEM TERMINAL:</span>
-                    <span class="text-emerald-500">● REALTIME API READY</span>
+                    <span>终端思考日志:</span>
+                    <span class="text-emerald-500">● ACTIVE AGENT READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3.5 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱已就绪。所有废话已精简，云端 7x24 小时持续待命。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3.5 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 董事长请监督：AI CTO 已经锁定【少字多图·视觉优先】铁律，可随时自主复盘开发。</pre>
             </div>
 
             <div class="mt-4 pt-3 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -120,20 +119,20 @@
         function initAdminTheme() {
             const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
             document.body.className = `themed-body ${savedTheme} min-h-screen flex flex-col justify-between p-4 font-sans`;
-            document.getElementById("themeBtn").innerHTML = savedTheme === "theme-light" ? "<span>🌙 切夜间黑</span>" : "<span>🌞 切日间白</span>";
+            document.getElementById("themeBtn").innerHTML = savedTheme === "theme-light" ? "<span>🌙 切换黑夜</span>" : "<span>🌞 切换白版</span>";
         }
 
         function toggleAdminTheme() {
             const nextTheme = document.body.classList.contains("theme-dark") ? "theme-light" : "theme-dark";
             document.body.className = `themed-body ${nextTheme} min-h-screen flex flex-col justify-between p-4 font-sans`;
             localStorage.setItem("APEX_ADMIN_THEME", nextTheme);
-            document.getElementById("themeBtn").innerHTML = nextTheme === "theme-light" ? "<span>🌙 切夜间黑</span>" : "<span>🌞 切日间白</span>";
+            document.getElementById("themeBtn").innerHTML = nextTheme === "theme-light" ? "<span>🌙 切换黑夜</span>" : "<span>🌞 切换白版</span>";
         }
 
         function getKeys() {
             const gh = localStorage.getItem("APEX_GH_TOKEN");
             const ds = localStorage.getItem("APEX_DS_KEY");
-            if (!gh || !ds) { toggleConfig(); throw new Error("请在【🔑 密钥设置】填入 Token 和 Key！"); }
+            if (!gh || !ds) { toggleConfig(); throw new Error("请先设置 Key！"); }
             return { gh, ds };
         }
 
@@ -142,7 +141,7 @@
             localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
             localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
             toggleConfig();
-            alert("✅ 密钥保存成功！");
+            alert("✅ 密钥配置已生效！");
             loadHistoryFromMemory();
         }
 
@@ -171,12 +170,12 @@
 
         async function fetchCommitHistory() {
             const container = document.getElementById("commitListContainer");
-            container.innerHTML = `<div class="text-center text-xs themed-subtext py-8 font-mono">提取版本中...</div>`;
+            container.innerHTML = `<div class="text-center text-xs themed-subtext py-8 font-mono">拉取版本历史中...</div>`;
             try {
                 const keys = getKeys();
                 const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
                 const commits = await res.json();
-                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-8">无历史数据</div>`;
+                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-8">获取失败</div>`;
 
                 container.innerHTML = "";
                 commits.forEach((item, idx) => {
@@ -196,8 +195,8 @@
                             </div>
                             <div>
                                 ${isCurrent ? 
-                                    `<button disabled class="px-3 py-1.5 bg-gray-500/20 text-gray-400 text-[11px] rounded-lg">当前在用</button>` : 
-                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">选择回退</button>`
+                                    `<button disabled class="px-3 py-1.5 bg-gray-500/20 text-gray-400 text-[11px] rounded-lg">运行中</button>` : 
+                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">确认回退</button>`
                                 }
                             </div>
                         </div>
@@ -207,11 +206,11 @@
         }
 
         async function revertToSelectedCommit(targetSha, shortSha) {
-            if (!confirm(`⏳ 确定要回退到提交 [#${shortSha}] 状态吗？`)) return;
+            if (!confirm(`⏳ 确定一键将全站回退到版本 [#${shortSha}] 吗？`)) return;
             closeRollbackModal();
             try {
                 const keys = getKeys();
-                appendLog(`正在回退至 [#${shortSha}]...`, "text-amber-500");
+                appendLog(`正在回退代码至 [#${shortSha}]...`, "text-amber-500");
 
                 const rawIndexUrl = `https://raw.githubusercontent.com/${REPO}/${targetSha}/index.html`;
                 const indexRes = await fetch(rawIndexUrl);
@@ -223,10 +222,10 @@
 
                 const nowStr = formatStandardTime(new Date());
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长一键回退到提交节点 #${shortSha}。`;
+                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长一键回退代码至 [#${shortSha}]。`;
                 await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: Reverted to #${shortSha}`, keys.gh);
 
-                appendLog(`✅ 代码成功回退到快照 [#${shortSha}]！`, "text-emerald-500 font-bold");
+                appendLog(`✅ 全站代码已成功还原至 [#${shortSha}]！`, "text-emerald-500 font-bold");
                 await loadHistoryFromMemory();
             } catch(err) { appendLog("❌ 回退异常: " + err.message, "text-rose-500"); }
         }
@@ -295,71 +294,81 @@
             return await res.json();
         }
 
+        // 👑 真正的 AI 自主思考与研发：在终端直接打印出大模型分析推演的真·心路历程
         async function triggerAutonomousEvolution() {
             const btn = document.getElementById("runBtn");
             const cmdInput = document.getElementById("cmd");
-            const cmd = cmdInput.value.trim() || "【AI自主进化】：大幅缩减冗余文字，全用高清图与动态组件表现，优化 index.html 与 editor.html 卡片视觉！";
+            const cmd = cmdInput.value.trim() || "【AI 自主决策升级】：恪守少字多图铁律，自主审查大厂商务趋势，重构并精修 index.html 与 editor.html UI 体验。";
 
             btn.disabled = true;
-            btn.innerHTML = "<span>⚙️ 算力池深度推理中...</span>";
-            appendLog("开始执行任务...");
+            btn.innerHTML = "<span>⚙️ AI CTO 深度推演决策中...</span>";
+            appendLog("🧠 AI 智能体已激活，开始展开系统分析与商业推演...");
 
             try {
                 const keys = getKeys();
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 
-                const prompt = `你是 ApexWork 的 AI 架构师。执行命令（留空则开始精简文字、增多图表组件）。
-要求：
-1. 定位目标文件 (TARGET_FILE_PATH)，如 'index.html', 'editor.html'；
-2. 新增模块在入口文件写好加载关系；
-3. 保留商城既有收费与导出。
-指令："${cmd}"
-严格按标记输出：
+                const prompt = `你是 ApexWork 集团自主开发的 AI 首席技术官 (CTO)。
+董事长的最高铁律：1. 任何生成的页面必须遵守【视觉优先：绝不多字，多用高清大图与可视图表】；2. AI 具有完全自主权，无需等待人类指挥，立刻独立分析商用趋势改版代码。
+【现有核心记忆库】：
+${memoryFile.content || "无"}
+【执行目标/自主方针】：
+"${cmd}"
+请务必按以下标记先输出你的核心思考过程 [THOUGHT_PROCESS]，再输出代码：
+===THOUGHT_PROCESS===
+<在这里用2-3句话输出 AI 作为 CTO 的深度分析：例如为啥把大文字改为了可视化图表、为什么更新背景图等>
 ===NEW_MEMORY===
-- [EVO-RECORD]: <1句话概括改善>
+- [EVO-RECORD]: <1句话提炼架构进步>
 ===TARGET_FILE_PATH===
-<填相对路径，如 editor.html>
+<在此填写你想更新或创建的文件，如 editor.html 或 index.html>
 ===FILE_CONTENT===
-<新源码>`;
+<完整的对应更新后代码>`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [{ role: "system", content: "追求极简视觉、文字精简、动静分离的技术智能体。" }, { role: "user", content: prompt }],
+                        messages: [{ role: "system", content: "你是遵守视觉优先铁律、追求极客体验与自主架构的 AI CTO。" }, { role: "user", content: prompt }],
                         temperature: 0.3
                     })
                 });
 
-                if (!dsRes.ok) throw new Error("API 失败: " + dsRes.statusText);
+                if (!dsRes.ok) throw new Error("API 响应异常: " + dsRes.statusText);
                 const aiAnswer = (await dsRes.json()).choices[0].message.content;
+
+                const thoughtParts = aiAnswer.split("===THOUGHT_PROCESS===");
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
                 const targetParts = aiAnswer.split("===TARGET_FILE_PATH===");
                 const contentParts = aiAnswer.split("===FILE_CONTENT===");
 
-                if (memParts.length < 2 || targetParts.length < 2 || contentParts.length < 2) throw new Error("解析未完整");
+                if (memParts.length < 2 || targetParts.length < 2 || contentParts.length < 2) throw new Error("模型响应格式异常");
 
+                const thoughtText = thoughtParts[1] ? thoughtParts[1].split("===NEW_MEMORY===")[0].trim() : "已确认【视觉优先、少字多图】研发标准。";
                 const rawMemoryLine = targetParts[0].replace("===NEW_MEMORY===", "").trim();
                 const targetFilePath = contentParts[0].replace("===TARGET_FILE_PATH===","").trim();
                 const newFileContent = contentParts[1].replace(/```[a-z]*/g, "").replace(/```/g, "").trim();
 
+                // 👑 实时把真实的大模型思考推演输出在控制台让董事长检验！
+                appendLog(`🧠 [AI CTO 自主推演记录]:\n${thoughtText}`, "text-emerald-400");
+                appendLog(`📍 [目标物理路由锁存]: =>【 ${targetFilePath} 】`, "text-indigo-400 font-bold");
+
                 const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Update: ${targetFilePath}`, keys.gh);
+                await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 AI CTO Evolve: ${targetFilePath}`, keys.gh);
 
                 const nowStr = formatStandardTime(new Date());
                 const timestampedMemoryLine = rawMemoryLine.replace("[EVO-RECORD]:", `[EVO-RECORD | ${nowStr}]:`);
                 const updatedMemory = (memoryFile.content || "") + "\n" + timestampedMemoryLine;
                 await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory: ${timestampedMemoryLine.slice(0, 35)}`, keys.gh);
 
-                appendLog(`✅ 成功发布 [ ${targetFilePath} ]。`, "text-emerald-500 font-bold");
+                appendLog(`✅ AI CTO 研发任务 100% 完成！[ ${targetFilePath} ] 已经通过推版上线。`, "text-emerald-500 font-bold");
                 cmdInput.value = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ 执行异常: " + err.message, "text-rose-500");
+                appendLog("❌ 开发任务异常中止: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即执行指令 / 启动 AI 自主进化</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 启动 AI 自主思考迭代</span>";
             }
         }
 
