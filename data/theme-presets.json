@@ -1,0 +1,30 @@
+{
+  "tech": {
+    "name": "赛博科技实景",
+    "bgUrl": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1280&q=75&fm=webp",
+    "overlay": "linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.75) 100%)",
+    "textColor": "text-white",
+    "kpiColor": "text-emerald-400"
+  },
+  "finance": {
+    "name": "金融楼宇实景",
+    "bgUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1280&q=75&fm=webp",
+    "overlay": "linear-gradient(135deg, rgba(10, 15, 30, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%)",
+    "textColor": "text-white",
+    "kpiColor": "text-amber-400"
+  },
+  "team": {
+    "name": "商务协作实景",
+    "bgUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1280&q=75&fm=webp",
+    "overlay": "linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.92) 100%)",
+    "textColor": "text-white",
+    "kpiColor": "text-indigo-400"
+  },
+  "mesh": {
+    "name": "极简翡翠光斑",
+    "bgUrl": "",
+    "overlay": "radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.25) 0%, transparent 45%), radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.25) 0%, transparent 45%), linear-gradient(135deg, #0f172a 0%, #020617 100%)",
+    "textColor": "text-white",
+    "kpiColor": "text-emerald-400"
+  }
+}
