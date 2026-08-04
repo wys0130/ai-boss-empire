@@ -1,32 +1,10 @@
 {
   "version": "2026.08.RELEASE",
   "pages": [
-    {
-      "id": "home",
-      "filename": "index.html",
-      "title": "智能办公交付商城",
-      "type": "portal"
-    },
-    {
-      "id": "ppt-editor",
-      "filename": "editor.html",
-      "title": "PPT 路演战略编辑器",
-      "type": "editor",
-      "price": "$9.99"
-    },
-    {
-      "id": "excel-editor",
-      "filename": "excel-editor.html",
-      "title": "Excel 财务自适应测算模型",
-      "type": "editor",
-      "price": "$9.99"
-    },
-    {
-      "id": "word-editor",
-      "filename": "word-editor.html",
-      "title": "Word 欧美企业级 ATS 合规报告",
-      "type": "editor",
-      "price": "$9.99"
-    }
+    { "id": "portal", "filename": "index.html", "title": "商城主页" },
+    { "id": "ppt", "filename": "editor.html", "title": "PPT 路演战略编辑器" },
+    { "id": "excel", "filename": "excel-editor.html", "title": "Excel 财务模型工作台" },
+    { "id": "word", "filename": "word-editor.html", "title": "Word ATS 合规报告编辑器" },
+    { "id": "admin", "filename": "admin.html", "title": "AI 驾驶舱" }
   ]
 }
