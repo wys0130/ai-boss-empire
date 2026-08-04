@@ -159,22 +159,21 @@ const sections = [
 let currentSection = 0;
 
 const PAY_CONFIG = {
-  china: {
-    name: "爱发电 (Afdian) 安全直付",
-    price: "￥69.00 <span class='text-xs font-normal text-slate-400'>/ 一次性</span>",
-    modalPrice: "￥69.00 RMB",
-    // 备注：等待面包多 API 审核通过、拿到 token 后放开下行：
-    // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-    url: "https://afdian.net/a/APEXWORK" // 换成爱发电通道
-  },
-  overseas: {
-    name: "海外快捷商用收银",
-    price: "$9.99 <span class='text-xs font-normal text-slate-400'>/ 一次性</span>",
-    modalPrice: "$9.99 USD",
-    // 备注：等待面包多 API 审核通过、拿到 token 后放开下行：
-    // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-    url: "https://afdian.net/a/APEXWORK"
-  }
+      china: {
+        name: "爱发电 (Afdian) 极速直付",
+        price: "￥27.00 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
+        modalPrice: "￥27.00 RMB",
+        // // 面包多保留注释，审核通过后可随时放开：
+        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 1. 换成 .com  2. 换成你的真实ID/方案链接
+      },
+      overseas: {
+        name: "海外快捷商用收银",
+        price: "$9.99 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
+        modalPrice: "$9.99 USD",
+        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
+      }
 };
 let currentRegion = 'overseas';
 
