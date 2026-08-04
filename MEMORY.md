@@ -27,3 +27,4 @@
 - [EVO-RECORD]: 确立"亮白商务便当盒三栏工作台"核心范式——左侧15页缩略导航、中央高交互画布+功能组件工具栏、右侧参数绑定与USD $9.99付费导出收银台，以纯前端Blob构造完整15页PPTX交付包并守卫?status=paid回调，彻底弃用深色极客风。
 - [EVO-RECORD]: 今日确立多文件分层架构——数据层独立为 /templates/aerotech-2026.json 承载15页创投路演全部标题与KPI数据，彻底弃用单HTML堆砌模式，为后续 editor.html 与 js/editor-engine.js 的模块化交互引擎奠定数据驱动基础。
 - [EVO-RECORD]: 今日确立多文件分层架构——数据层独立为 /templates/aerotech-2026.json 承载15页创投路演全部标题与KPI数据，彻底弃用单HTML堆砌模式，为后续 editor.html 与 js/editor-engine.js 的模块化交互引擎奠定数据驱动基础。
+- [EVO-RECORD | 2026-08-04 09:49]: 重构双页面为极简视觉流，以高清图+动态组件替代冗余文字，保留商城收费与导出逻辑
