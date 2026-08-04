@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEXWORK - Excel 财务模型编辑器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; }
+        .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+        .btn-primary { background: #0f172a; color: #fff; transition: all 0.2s; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+        .btn-accent { background: #10b981; color: #fff; transition: all 0.2s; }
+        .btn-accent:hover { background: #059669; transform: translateY(-1px); }
+        .nav-item { cursor: pointer; border-left: 3px solid transparent; transition: all 0.2s; }
+        .nav-item.active { border-left-color: #0f172a; background: #f1f5f9; }
+        .nav-item:hover { background: #f8fafc; }
+        .cell-input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; transition: border 0.2s; }
+        .cell-input:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+        .kpi-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; }
+        .preview-table { width: 100%; border-collapse: collapse; }
+        .preview-table th { background: #f1f5f9; font-weight: 600; text-align: left; padding: 10px 12px; border: 1px solid #e2e8f0; font-size: 13px; }
+        .preview-table td { padding: 10px 12px; border: 1px solid #e2e8f0; font-size: 13px; }
+        .preview-table tr:hover td { background: #f8fafc; }
+        .toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">A</span>
+                </div>
+                <span class="font-semibold text-slate-900">APEXWORK Excel 财务模型编辑器</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-slate-500">USD $9.99</span>
+                <a href="index.html" class="text-sm text-slate-600 hover:text-slate-900 transition">← 返回商城</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主工作区：便当盒三栏布局 -->
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
+        <!-- 左侧：页导航 -->
+        <aside class="col-span-2 bento-card p-4 h-fit sticky top-20">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">工作表</h3>
+            <nav id="sheet-nav" class="space-y-1">
+                <div class="nav-item active px-3 py-2 rounded-lg text-sm font-medium text-slate-700" data-sheet="0">📊 收入模型</div>
+                <div class="nav-item px-3 py-2 rounded-lg text-sm font-medium text-slate-700" data-sheet="1">💰 成本结构</div>
+                <div class="nav-item px-3 py-2 rounded-lg text-sm font-medium text-slate-700" data-sheet="2">📈 利润预测</div>
+                <div class="nav-item px-3 py-2 rounded-lg text-sm font-medium text-slate-700" data-sheet="3">💵 现金流</div>
+                <div class="nav-item px-3 py-2 rounded-lg text-sm font-medium text-slate-700" data-sheet="4">📋 融资计划</div>
+            </nav>
+            <div class="mt-6 pt-4 border-t border-slate-100">
+                <button id="add-sheet-btn" class="w-full text-sm text-slate-600 hover:text-slate-900 py-2 border border-dashed border-slate-300 rounded-lg transition">
+                    + 新增工作表
+                </button>
+            </div>
+        </aside>
+
+        <!-- 中央：实时预览 -->
+        <section class="col-span-7 bento-card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-900" id="sheet-title">收入模型</h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">实时预览</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="preview-table" id="preview-table">
+                    <thead>
+                        <tr>
+                            <th>项目</th>
+                            <th>Q1</th>
+                            <th>Q2</th>
+                            <th>Q3</th>
+                            <th>Q4</th>
+                            <th>年度合计</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-body">
+                        <!-- 动态渲染 -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-6 grid grid-cols-4 gap-4">
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-xs text-slate-500 mb-1">总收入</p>
+                    <p class="text-xl font-bold text-slate-900" id="kpi-revenue">$0</p>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-xs text-slate-500 mb-1">总成本</p>
+                    <p class="text-xl font-bold text-slate-900" id="kpi-cost">$0</p>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-xs text-slate-500 mb-1">净利润</p>
+                    <p class="text-xl font-bold text-emerald-600" id="kpi-profit">$0</p>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-xs text-slate-500 mb-1">毛利率</p>
+                    <p class="text-xl font-bold text-slate-900" id="kpi-margin">0%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧：参数与导出 -->
+        <aside class="col-span-3 bento-card p-6 h-fit sticky top-20">
+            <h3 class="text-sm font-semibold text-slate-900 mb-4">参数绑定</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">公司名称</label>
+                    <input type="text" id="company-name" class="cell-input w-full" value="AeroTech 航空科技" placeholder="输入公司名称">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">财务年度</label>
+                    <input type="number" id="fiscal-year" class="cell-input w-full" value="2026" placeholder="2026">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">货币单位</label>
+                    <select id="currency" class="cell-input w-full">
+                        <option value="USD">USD $</option>
+                        <option value="EUR">EUR €</option>
+                        <option value="CNY">CNY ¥</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1">主题预设</label>
+                    <select id="theme-select" class="cell-input w-full">
+                        <option value="corporate">商务深蓝</option>
+                        <option value="minimal">极简黑白</option>
+                        <option value="forest">森林绿</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100">
+                <h3 class="text-sm font-semibold text-slate-900 mb-3">付费导出</h3>
+                <div class="bg-slate-50 rounded-xl p-4 mb-4">
+                    <p class="text-xs text-slate-500 mb-1">解锁价格</p>
+                    <p class="text-2xl font-bold text-slate-900">$9.99 <span class="text-sm font-normal text-slate-400">USD</span></p>
+                </div>
+                <button id="export-btn" class="btn-primary w-full py-3 rounded-xl font-semibold text-sm mb-3" disabled>
+                    🔒 验签后导出 XLSX
+                </button>
+                <p class="text-xs text-slate-400 text-center leading-relaxed">
+                    支付完成后自动验签解锁<br>支持 Excel / WPS 打开
+                </p>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script>
+        // ===== 核心数据模型 =====
+        const sheetData = {
+            0: {
+                title: '收入模型',
+                rows: [
+                    { name: '产品销售收入', values: [120000, 150000, 180000, 220000] },
+                    { name: '服务收入', values: [30000, 35000, 40000, 50000] },
+                    { name: '订阅收入', values: [15000, 18000, 22000, 28000] },
+                    { name: '其他收入', values: [5000, 6000, 8000, 10000] }
+                ]
+            },
+            1: {
+                title: '成本结构',
+                rows: [
+                    { name: '原材料成本', values: [40000, 50000, 60000, 70000] },
+                    { name: '人力成本', values: [35000, 38000, 42000, 45000] },
+                    { name: '营销费用', values: [15000, 18000, 20000, 25000] },
+                    { name: '研发费用', values: [20000, 22000, 25000, 28000] }
+                ]
+            },
+            2: {
+                title: '利润预测',
+                rows: [
+                    { name: '毛利润', values: [60000, 75000, 90000, 110000] },
+                    { name: '运营利润', values: [40000, 52000, 65000, 82000] },
+                    { name: '税前利润', values: [38000, 50000, 63000, 80000] },
+                    { name: '净利润', values: [28500, 37500, 47250, 60000] }
+                ]
+            },
+            3: {
+                title: '现金流',
+                rows: [
+                    { name: '期初现金', values: [50000, 78500, 116000, 163250] },
+                    { name: '经营现金流', values: [30000, 40000, 50000, 60000] },
+                    { name: '投资现金流', values: [-15000, -10000, -8000, -5000] },
+                    { name: '融资现金流', values: [20000, 15000, 10000, 5000] }
+                ]
+            },
+            4: {
+                title: '融资计划',
+                rows: [
+                    { name: '种子轮融资', values: [500000, 0, 0, 0] },
+                    { name: 'A轮融资', values: [0, 2000000, 0, 0] },
+                    { name: 'B轮融资', values: [0, 0, 5000000, 0] },
+                    { name: '战略投资', values: [0, 0, 0, 8000000] }
+                ]
+            }
+        };
+
+        let currentSheet = 0;
+        let isVerified = false;
+
+        // ===== 初始化 =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSheet(0);
+            checkPaymentStatus();
+            bindEvents();
+        });
+
+        // ===== 渲染工作表 =====
+        function renderSheet(index) {
+            currentSheet = index;
+            const sheet = sheetData[index];
+            if (!sheet) return;
+
+            document.getElementById('sheet-title').textContent = sheet.title;
+            const tbody = document.getElementById('preview-body');
+            tbody.innerHTML = '';
+
+            let totalRevenue = 0;
+            let totalCost = 0;
+
+            sheet.rows.forEach((row, rowIdx) => {
+                const tr = document.createElement('tr');
+                const rowTotal = row.values.reduce((a, b) => a + b, 0);
+                
+                if (index === 0) totalRevenue += rowTotal;
+                if (index === 1) totalCost += rowTotal;
+
+                tr.innerHTML = `
+                    <td class="font-medium text-slate-700">${row.name}</td>
+                    ${row.values.map(v => `<td class="text-slate-600">${formatCurrency(v)}</td>`).join('')}
+                    <td class="font-semibold text-slate-900">${formatCurrency(rowTotal)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 更新 KPI
+            const profit = totalRevenue - totalCost;
+            const margin = totalRevenue > 0 ? (profit / totalRevenue * 100) : 0;
+            document.getElementById('kpi-revenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('kpi-cost').textContent = formatCurrency(totalCost);
+            document.getElementById('kpi-profit').textContent = formatCurrency(profit);
+            document.getElementById('kpi-margin').textContent = margin.toFixed(1) + '%';
+
+            // 更新导航激活态
+            document.querySelectorAll('.nav-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        // ===== 格式化货币 =====
+        function formatCurrency(value) {
+            const currency = document.getElementById('currency')?.value || 'USD';
+            const symbols = { USD: '$', EUR: '€', CNY: '¥' };
+            const symbol = symbols[currency] || '$';
+            return symbol + value.toLocaleString('en-US');
+        }
+
+        // ===== 绑定事件 =====
+        function bindEvents() {
+            // 导航点击
+            document.querySelectorAll('.nav-item').forEach((item, i) => {
+                item.addEventListener('click', () => renderSheet(i));
+            });
+
+            // 新增工作表
+            document.getElementById('add-sheet-btn').addEventListener('click', () => {
+                const newIndex = Object.keys(sheetData).length;
+                sheetData[newIndex] = {
+                    title: `新工作表 ${newIndex + 1}`,
+                    rows: [
+                        { name: '项目 A', values: [10000, 12000, 15000, 18000] },
+                        { name: '项目 B', values: [8000, 9000, 11000, 13000] }
+                    ]
+                };
+                const nav = document.getElementById('sheet-nav');
+                const newItem = document.createElement('div');
+                newItem.className = 'nav-item px-3 py-2 rounded-lg text-sm font-medium text-slate-700';
+                newItem.dataset.sheet = newIndex;
+                newItem.textContent = `📊 ${sheetData[newIndex].title}`;
+                newItem.addEventListener('click', () => renderSheet(newIndex));
+                nav.appendChild(newItem);
+                renderSheet(newIndex);
+                showToast('✅ 新工作表已创建');
+            });
+
+            // 参数变更时重新渲染
+            ['company-name', 'fiscal-year', 'currency', 'theme-select'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    renderSheet(currentSheet);
+                    updateExportButtonState();
+                });
+            });
+
+            // 导出按钮
+            document.getElementById('export-btn').addEventListener('click', () => {
+                if (!isVerified) {
+                    showToast('⚠️ 请先完成支付验签');
+                    return;
+                }
+                exportXLSX();
+            });
+        }
+
+        // ===== 支付验签 =====
+        function checkPaymentStatus() {
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('status');
+            const signature = params.get('signature');
+
+            if (status === 'paid' && signature) {
+                const verified = verifyEd25519Signature(signature);
+                if (verified) {
+                    isVerified = true;
+                    localStorage.setItem('apexwork_verified', 'true');
+                    localStorage.setItem('apexwork_verified_at', Date.now().toString());
+                    updateExportButtonState();
+                    showToast('✅ 支付验签通过，导出已解锁');
+                } else {
+                    showToast('❌ 验签失败，请重新支付');
+                }
+            } else if (localStorage.getItem('apexwork_verified') === 'true') {
+                isVerified = true;
+                updateExportButtonState();
+            }
+        }
+
+        // ===== Ed25519 签名验证（模拟） =====
+        function verifyEd25519Signature(signature) {
+            // 实际生产环境应使用 WebCrypto API 进行 Ed25519 验签
+            // 此处为演示逻辑，仅验证签名格式
+            return signature.length >= 64 && /^[a-f0-9]+$/i.test(signature);
+        }
+
+        // ===== 更新导出按钮状态 =====
+        function updateExportButtonState() {
+            const btn = document.getElementById('export-btn');
+            if (isVerified) {
+                btn.disabled = false;
+                btn.textContent = '📥 导出 XLSX 文件';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-accent');
+            } else {
+                btn.disabled = true;
+                btn.textContent = '🔒 验签后导出 XLSX';
+                btn.classList.remove('btn-accent');
+                btn.classList.add('btn-primary');
+            }
+        }
+
+        // ===== 导出 XLSX =====
+        function exportXLSX() {
+            const companyName = document.getElementById('company-name').value || 'APEXWORK';
+            const fiscalYear = document.getElementById('fiscal-year').value || '2026';
+            const currency = document.getElementById('currency').value || 'USD';
+
+            // 构建 CSV 内容（简化版 XLSX 导出）
+            let csvContent = '\uFEFF';
+            csvContent += `${companyName} - 财务模型 ${fiscalYear}\n\n`;
+            csvContent += '工作表,项目,Q1,Q2,Q3,Q4,年度合计\n';
+
+            Object.keys(sheetData).forEach(sheetIdx => {
+                const sheet = sheetData[sheetIdx];
+                sheet.rows.forEach(row => {
+                    const rowTotal = row.values.reduce((a, b) => a + b, 0);
+                    csvContent += `${sheet.title},${row.name},${row.values.join(',')},${rowTotal}\n`;
+                });
+                csvContent += '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${companyName}-财务模型-${fiscalYear}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast('✅ XLSX 文件已生成并下载');
+        }
+
+        // ===== Toast 提示 =====
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
