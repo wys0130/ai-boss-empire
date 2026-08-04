@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V27 @补全下拉框 + 双击编辑词条)</title>
+    <title>ApexWork AI 驾驶舱 (V28 一键回退 + @无残留补全)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -18,7 +18,7 @@
         .themed-text { color: var(--text-main); }
         .themed-subtext { color: var(--text-sub); }
 
-        /* 👑 胶囊 Token 样式（支持双击交互） */
+        /* 胶囊 Token 样式（支持双击编辑） */
         .dept-token {
             display: inline-flex;
             align-items: center;
@@ -37,7 +37,7 @@
         }
         .dept-token:hover { background: rgba(99, 102, 241, 0.4); }
 
-        /* 👑 @ 补全下拉菜单样式 */
+        /* @ 补全下拉菜单样式 */
         #mentionDropdown {
             position: absolute;
             z-index: 100;
@@ -68,15 +68,16 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V27 @补全下拉框 + 双击编辑</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V28 一键回退 + @无残留</span>
             <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
                 <span>🌞/🌙 换黑白</span>
             </button>
+            <!-- 👑 修改文案：干净清爽的“一键回退” -->
             <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition shadow-sm">
-                <span>⏳ 真·一键回退</span>
+                <span>⏳ 一键回退</span>
             </button>
             <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition">
                 <span>🔄 刷新记事</span>
@@ -97,11 +98,11 @@
         <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">💾 保存授权</button>
     </div>
 
-    <!-- 真·全库回退弹窗 -->
+    <!-- 一键回退弹窗 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="themed-card border max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-3">
-                <span class="font-bold text-sm font-mono themed-text">⏳ 选择历史好版本进行真·全库回退</span>
+                <span class="font-bold text-sm font-mono themed-text">⏳ 选择历史好版本还原</span>
                 <button onclick="closeRollbackModal()" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
             </div>
             <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2">
@@ -178,10 +179,8 @@
         <!-- 右栏：董事长控制指令台 -->
         <section class="lg:col-span-7 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl justify-between relative">
             
-            <!-- 👑 @ 补全下拉菜单容器 -->
-            <div id="mentionDropdown" class="themed-card border shadow-2xl">
-                <!-- 动态填充部门选项 -->
-            </div>
+            <!-- @ 补全下拉菜单容器 -->
+            <div id="mentionDropdown" class="themed-card border shadow-2xl"></div>
 
             <div>
                 <!-- BUG 报警与 QA 闭环栏 -->
@@ -206,7 +205,7 @@
                 </div>
 
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 蜂群智能协同 (V27 引擎)</span>
+                    <span>🚀 立即发车 / 蜂群智能协同 (V28 引擎)</span>
                 </button>
             </div>
 
@@ -216,7 +215,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V27 在线。输入框已完美支持键盘 @ 悬浮菜单联想与胶囊双击编辑。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V28 在线。输入框已完美修复 @ 菜单联想选择后的字符残留问题。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -293,7 +292,6 @@
             document.getElementById("rollbackModal").classList.add("hidden");
         }
 
-        // 创建胶囊 DOM 元素（支持双击编辑词条）
         function createDeptTokenElement(deptName) {
             const tokenSpan = document.createElement("span");
             tokenSpan.className = "dept-token";
@@ -301,7 +299,6 @@
             tokenSpan.setAttribute("data-dept", deptName);
             tokenSpan.innerText = `@【${deptName}】`;
 
-            // 👑 杀手级体验：双击胶囊直接弹出 prompt 修改绑定的部门词条
             tokenSpan.addEventListener("dblclick", (e) => {
                 e.stopPropagation();
                 const newDept = prompt("修改关联的主责部门名称：", deptName);
@@ -356,32 +353,27 @@
             loadHistoryFromMemory();
         }
 
-        // 👑 智能 @ 补全菜单与 Backspace 整体删除引擎
         document.addEventListener("DOMContentLoaded", () => {
             const cmdBox = document.getElementById("cmd");
             const dropdown = document.getElementById("mentionDropdown");
 
             if (cmdBox && dropdown) {
-                // 监听输入，实现键入 @ 弹出菜单
                 cmdBox.addEventListener("input", function(e) {
                     const selection = window.getSelection();
                     if (!selection.rangeCount) return;
                     const textContent = selection.anchorNode.textContent || "";
                     const cursorOffset = selection.anchorOffset;
 
-                    // 检查光标前是不是 @
                     const textBeforeCursor = textContent.slice(0, cursorOffset);
                     const match = textBeforeCursor.match(/@([^\s@]*)$/);
 
                     if (match) {
-                        const query = match[1];
-                        showMentionDropdown(query);
+                        showMentionDropdown(match[1]);
                     } else {
                         hideMentionDropdown();
                     }
                 });
 
-                // 监听键盘 Backspace 整体删除语块
                 cmdBox.addEventListener("keydown", function(e) {
                     if (e.key === "Backspace") {
                         const selection = window.getSelection();
@@ -396,7 +388,7 @@
 
                             if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains("dept-token")) {
                                 e.preventDefault();
-                                prevNode.remove(); // 瞬间整体抹除
+                                prevNode.remove();
                             }
                         }
                     } else if (e.key === "Escape") {
@@ -424,7 +416,6 @@
                 dropdown.appendChild(item);
             });
 
-            // 定位到光标附近
             dropdown.style.display = "block";
             dropdown.style.bottom = "110px";
             dropdown.style.left = "20px";
@@ -435,6 +426,7 @@
             if (dropdown) dropdown.style.display = "none";
         }
 
+        // 👑 彻底修复：使用原生 Range.deleteContents() 完美消除 @xxx 输入痕迹，零残留
         function selectMentionDept(deptName) {
             hideMentionDropdown();
             const cmdBox = document.getElementById("cmd");
@@ -449,14 +441,13 @@
                     const text = textNode.textContent;
                     const atIdx = text.lastIndexOf("@", range.startOffset);
                     if (atIdx !== -1) {
-                        // 抹除刚才打出来的 @xxx 文字
-                        textNode.textContent = text.slice(0, atIdx) + text.slice(range.startOffset);
+                        // 利用选区精准圈住 @ 字符到光标处，并从 DOM 树中干净抹除
                         range.setStart(textNode, atIdx);
-                        range.setEnd(textNode, atIdx);
+                        range.deleteContents();
                     }
                 }
 
-                // 插入胶囊
+                // 在干净的选区后直接嵌入胶囊
                 const tokenSpan = createDeptTokenElement(deptName);
                 range.insertNode(tokenSpan);
                 const spaceNode = document.createTextNode(" ");
@@ -466,7 +457,7 @@
                 selection.removeAllRanges();
                 selection.addRange(range);
             }
-            appendLog(`✨ 通过智能 @ 菜单成功选定【${deptName}】。`, "text-indigo-400");
+            appendLog(`✨ 已选定【${deptName}】，无残留嵌入成功。`, "text-indigo-400");
         }
 
         function getRealStandardTime() {
@@ -514,7 +505,7 @@
                             <div>
                                 ${isCurrent ? 
                                     `<button disabled class="px-3 py-1 bg-gray-500/20 text-gray-400 text-[11px] rounded-lg">当前运行</button>` : 
-                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">真·全库回退</button>`
+                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">选择回滚</button>`
                                 }
                             </div>
                         </div>
@@ -563,9 +554,9 @@
                 const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长执行真·全库回退，整仓完美还原至快照 #${shortSha}。`;
                 await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: True Rollback to #${shortSha}`, keys.gh);
 
-                appendLog(`✅ 真·全库回退成功！整座仓库已完美复原至 [#${shortSha}]。`, "text-emerald-500 font-bold");
+                appendLog(`✅ 一键回退成功！整座仓库已完美复原至 [#${shortSha}]。`, "text-emerald-500 font-bold");
                 await loadHistoryFromMemory();
-            } catch(err) { appendLog("❌ 全库回退异常: " + err.message, "text-rose-500"); }
+            } catch(err) { appendLog("❌ 一键回退异常: " + err.message, "text-rose-500"); }
         }
 
         async function loadHistoryFromMemory() {
@@ -816,7 +807,7 @@ ${memoryFile.content || "无"}
                 appendLog("❌ 协同会商异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V27 引擎)</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V28 引擎)</span>";
             }
         }
 
