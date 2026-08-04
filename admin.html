@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 董事长全自动 AI 驾驶舱 (Timeline & Auto V9)</title>
+    <title>ApexWork 董事长专属 AI 驾驶舱 (Minimalist V10)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 4px; }
-        
-        body.theme-dark {
-            --bg-body: #030712; --bg-card: #0f172a; --bg-inner: #020617;
-            --border-color: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8;
-        }
-        body.theme-light {
-            --bg-body: #f1f5f9; --bg-card: #ffffff; --bg-inner: #f8fafc;
-            --border-color: #e2e8f0; --text-main: #0f172a; --text-sub: #475569;
-        }
+        body.theme-dark { --bg-body: #030712; --bg-card: #0f172a; --bg-inner: #020617; --border-color: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; }
+        body.theme-light { --bg-body: #f1f5f9; --bg-card: #ffffff; --bg-inner: #f8fafc; --border-color: #e2e8f0; --text-main: #0f172a; --text-sub: #475569; }
         .themed-body { background-color: var(--bg-body); color: var(--text-main); }
         .themed-card { background-color: var(--bg-card); border-color: var(--border-color); }
         .themed-inner { background-color: var(--bg-inner); border-color: var(--border-color); }
@@ -28,26 +21,23 @@
 </head>
 <body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-4 font-sans">
 
-    <!-- 顶层导览条 -->
-    <header class="max-w-7xl w-full mx-auto themed-card border rounded-xl px-5 py-3.5 mb-4 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+    <!-- 顶部导览：名称清爽、无废话 -->
+    <header class="max-w-7xl w-full mx-auto themed-card border rounded-xl px-5 py-3 mb-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
         <div class="flex items-center gap-3">
             <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-            <h1 class="font-bold font-mono text-sm tracking-wider themed-text">APEXWORK AI CONSOLE V9 · 精确时序与智能自主舱</h1>
-            <span class="text-[11px] font-mono px-2 py-0.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-bold">TIMELINE & AUTONOMY</span>
+            <h1 class="font-bold font-mono text-sm tracking-wider themed-text">APEXWORK AI CONSOLE V10 · 极简决策驾驶舱</h1>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-bold">7x24 CLOUND CRON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-            <!-- 页面在线挂机巡航按钮 -->
-            <button onclick="toggleAutoPilot()" id="autoPilotBtn" class="text-xs font-mono font-bold px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/40 rounded-lg transition flex items-center gap-1.5 shadow-sm">
-                <span>🤖 页面巡航模式: 关</span>
-            </button>
-            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1.5 themed-inner hover:opacity-80 border rounded-lg transition flex items-center gap-1.5 shadow-sm">
+            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1.5 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
                 <span>🌞/🌙 切日夜模式</span>
             </button>
-            <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition flex items-center gap-1.5 shadow-sm">
-                <span>⏳ 快照穿梭/一键回退</span>
+            <!-- 已经精简为你想看的名字：一键回退、刷新记录 -->
+            <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition shadow-sm">
+                <span>⏳ 一键回退</span>
             </button>
             <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-3 py-1.5 themed-inner hover:opacity-80 border rounded-lg transition">
-                <span>🔄 强刷时序</span>
+                <span>🔄 刷新记录</span>
             </button>
             <button onclick="toggleConfig()" class="text-xs font-mono px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/40 rounded-lg transition">
                 <span>🔑 密钥设置</span>
@@ -55,85 +45,70 @@
         </div>
     </header>
 
-    <!-- 密钥配置弹层 -->
-    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-4 p-5 themed-card border border-indigo-500/50 rounded-xl shadow-2xl">
-        <div class="text-xs font-bold text-indigo-400 font-mono mb-3">⚡ 掌门人授权与算力池配置 (本地加密锁存)</div>
+    <!-- 密钥弹框 -->
+    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-4 p-4 themed-card border border-indigo-500/50 rounded-xl shadow-2xl">
+        <div class="text-xs font-bold text-indigo-400 font-mono mb-2">⚡ 董事长密钥与算力池配置 (仅保存在本地设备)</div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-[11px] themed-subtext mb-1 font-mono">GitHub Access Token (ghp_...)</label>
-                <input id="ghTokenInput" type="password" placeholder="ghp_xxxxxxxxxxx..." class="w-full themed-inner border rounded-lg p-2.5 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
-            </div>
-            <div>
-                <label class="block text-[11px] themed-subtext mb-1 font-mono">DeepSeek / OpenRouter API Key (sk-...)</label>
-                <input id="dsKeyInput" type="password" placeholder="sk-xxxxxxxxxxx..." class="w-full themed-inner border rounded-lg p-2.5 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
-            </div>
+            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token (ghp_...)" class="w-full themed-inner border rounded-lg p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
+            <input id="dsKeyInput" type="password" placeholder="DeepSeek / OpenRouter API Key (sk-...)" class="w-full themed-inner border rounded-lg p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
         </div>
-        <button onclick="saveKeys()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2.5 rounded-lg transition">💾 保存并加密本地锁定</button>
+        <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">💾 保存算力配置</button>
     </div>
 
-    <!-- 历史快照时间漫游弹层 -->
+    <!-- 一键回退历史选择弹层 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="themed-card border max-w-2xl w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-gray-500/20 pb-3 mb-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-amber-500 text-base">⏳</span>
-                    <h3 class="font-bold text-sm font-mono themed-text">时间漫游 · 选择历史版本即时回滚</h3>
-                </div>
+                <span class="font-bold text-sm font-mono themed-text">⏳ 一键回退 · 选择历史正常版本</span>
                 <button onclick="closeRollbackModal()" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
             </div>
-            <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2.5 custom-scrollbar pr-2">
-                <div class="text-center text-xs themed-subtext py-12 font-mono">提取快照时间线中...</div>
+            <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2">
+                <div class="text-center text-xs themed-subtext py-10 font-mono">加载提交历史中...</div>
             </div>
         </div>
     </div>
 
-    <!-- 核心双栏工作区 -->
+    <!-- 核心工作区：双栏极简版 -->
     <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start overflow-hidden">
         
-        <!-- 左侧：100% 真实纯净时间戳·演进档案 -->
+        <!-- 左侧：AI 进化时间线 (纯日志，零冗余文字) -->
         <aside class="lg:col-span-5 themed-card border rounded-2xl p-4 flex flex-col h-[650px] shadow-xl">
             <div class="flex items-center justify-between border-b border-gray-500/20 pb-3 mb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-indigo-400 font-mono text-sm">🕒</span>
-                    <h2 class="text-xs font-bold font-mono tracking-wide themed-text">AI 进化时间线 (精准标准时序)</h2>
-                </div>
+                <span class="text-xs font-bold font-mono tracking-wide themed-text">🕒 AI 进化时间线</span>
                 <span id="historyCount" class="text-[10px] font-mono themed-inner border px-2 py-0.5 rounded themed-subtext">0 RECORDS</span>
             </div>
-            <p class="text-[11px] themed-subtext mb-3 leading-relaxed">
-                所有时间线绝对杜绝“历史节点”等废话，支持具体日期到分钟与最新/旧高亮对白识别。
-            </p>
-            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1.5">
-                <div class="text-center text-xs themed-subtext py-12 font-mono">加载中...</div>
+            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-2.5 custom-scrollbar pr-1.5">
+                <div class="text-center text-xs themed-subtext py-10 font-mono">加载中...</div>
             </div>
         </aside>
 
-        <!-- 右侧：高层决策台 -->
+        <!-- 右侧：决策发送与监控 -->
         <section class="lg:col-span-7 themed-card border rounded-2xl p-5 flex flex-col h-[650px] shadow-xl justify-between">
             <div>
                 <div class="flex items-center justify-between border-b border-gray-500/20 pb-3 mb-3">
                     <span class="text-xs font-bold font-mono text-indigo-400">CHAIRMAN DIRECTIVE / 董事长决策发射台</span>
-                    <span class="text-[10px] font-mono themed-subtext">快捷操作: <strong class="themed-text">Ctrl + Enter</strong> 立即执行</span>
+                    <span class="text-[10px] font-mono themed-subtext">快捷操作: <strong class="themed-text">Ctrl + Enter</strong> 立即发送</span>
                 </div>
-                <div class="mb-4">
-                    <textarea id="cmd" rows="4" placeholder="输入你想调整的内容，或直接留空（留空将触发 AI 自动巡航：审查大厂排版风格，自主优化 index.html 商城卡片及底图风格）...&#10;💡 提示：按键盘 Ctrl + Enter 可一键发送指令！" class="w-full themed-inner border rounded-xl p-3.5 text-sm themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
+                <div class="mb-3">
+                    <textarea id="cmd" rows="3" placeholder="输入需求指令，或留空（留空自动执行：审核大厂图文布局，精简文字增多可视化组件）..." class="w-full themed-inner border rounded-xl p-3.5 text-sm themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
                 </div>
-                <button onclick="triggerAutonomousEvolution()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 启动 AI 算力池：自主复盘大厂并迭代系统</span>
+                <button onclick="triggerAutonomousEvolution()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+                    <span>🚀 立即执行指令 / 启动 AI 自主进化</span>
                 </button>
             </div>
 
             <div class="flex-1 mt-4 flex flex-col min-h-0">
-                <div class="text-[11px] font-mono themed-subtext mb-1.5 flex justify-between">
-                    <span>SYSTEM TERMINAL / 系统交互监控:</span>
-                    <span id="pilotStatus" class="text-emerald-500 font-mono">● MANUAL MODE</span>
+                <div class="text-[10px] font-mono themed-subtext mb-1 flex justify-between">
+                    <span>SYSTEM TERMINAL:</span>
+                    <span class="text-emerald-500">● REALTIME API READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3.5 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱在线。界面时间戳逻辑已全面升级为标准时间形式...</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3.5 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱已就绪。所有废话已精简，云端 7x24 小时持续待命。</pre>
             </div>
 
             <div class="mt-4 pt-3 border-t border-gray-500/20 flex justify-between items-center text-xs">
-                <span class="themed-subtext font-mono text-[11px]">CACHE PURGE: ENABLED</span>
+                <span class="themed-subtext font-mono text-[10px]">CACHE PURGE: ENABLED</span>
                 <button onclick="openLiveSiteForceBypass()" class="text-emerald-500 hover:text-emerald-400 font-mono font-bold flex items-center gap-1">
-                    🔥 强制无缓存直达最新商城页面 (免按 Ctrl+F5) →
+                    🔥 强制无缓存直达主页 (跳过 Ctrl+F5) →
                 </button>
             </div>
         </section>
@@ -141,31 +116,24 @@
 
     <script>
         const REPO = "wys0130/ai-boss-empire";
-        let autoPilotTimer = null;
 
         function initAdminTheme() {
             const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
             document.body.className = `themed-body ${savedTheme} min-h-screen flex flex-col justify-between p-4 font-sans`;
-            updateThemeBtnText(savedTheme);
+            document.getElementById("themeBtn").innerHTML = savedTheme === "theme-light" ? "<span>🌙 切夜间黑</span>" : "<span>🌞 切日间白</span>";
         }
 
         function toggleAdminTheme() {
-            const isDark = document.body.classList.contains("theme-dark");
-            const nextTheme = isDark ? "theme-light" : "theme-dark";
+            const nextTheme = document.body.classList.contains("theme-dark") ? "theme-light" : "theme-dark";
             document.body.className = `themed-body ${nextTheme} min-h-screen flex flex-col justify-between p-4 font-sans`;
             localStorage.setItem("APEX_ADMIN_THEME", nextTheme);
-            updateThemeBtnText(nextTheme);
-        }
-
-        function updateThemeBtnText(theme) {
-            const btn = document.getElementById("themeBtn");
-            btn.innerHTML = theme === "theme-light" ? "<span>🌙 切换深色黑夜</span>" : "<span>🌞 切换商务白版</span>";
+            document.getElementById("themeBtn").innerHTML = nextTheme === "theme-light" ? "<span>🌙 切夜间黑</span>" : "<span>🌞 切日间白</span>";
         }
 
         function getKeys() {
             const gh = localStorage.getItem("APEX_GH_TOKEN");
             const ds = localStorage.getItem("APEX_DS_KEY");
-            if (!gh || !ds) { toggleConfig(); throw new Error("请先点击右上角【🔑 密钥设置】填入 Key！"); }
+            if (!gh || !ds) { toggleConfig(); throw new Error("请在【🔑 密钥设置】填入 Token 和 Key！"); }
             return { gh, ds };
         }
 
@@ -174,7 +142,7 @@
             localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
             localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
             toggleConfig();
-            alert("✅ 授权密钥保存成功！");
+            alert("✅ 密钥保存成功！");
             loadHistoryFromMemory();
         }
 
@@ -189,33 +157,7 @@
         }
 
         function openLiveSiteForceBypass() {
-            const targetUrl = `https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}_${Math.random().toString(36).substring(7)}`;
-            const newWin = window.open(targetUrl, '_blank');
-            if (newWin) newWin.focus();
-        }
-
-        // --- 网页开启状态下的“挂机巡航”控制 ---
-        function toggleAutoPilot() {
-            const btn = document.getElementById("autoPilotBtn");
-            const status = document.getElementById("pilotStatus");
-            if (autoPilotTimer) {
-                clearInterval(autoPilotTimer);
-                autoPilotTimer = null;
-                btn.innerHTML = "<span>🤖 页面巡航模式: 关</span>";
-                btn.className = "text-xs font-mono font-bold px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/40 rounded-lg transition flex items-center gap-1.5 shadow-sm";
-                status.innerText = "● MANUAL MODE";
-                appendLog("⏹️ 已停止前台定时巡航，还原手动操作。");
-            } else {
-                appendLog("⚡ 已启动前台 15 分钟自动挂机巡航！不关网页状态下，系统将定时运行大厂复盘。", "text-emerald-400 font-bold");
-                btn.innerHTML = "<span>🤖 页面巡航模式: 运行中 (每15分)</span>";
-                btn.className = "text-xs font-mono font-bold px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white border border-blue-400 rounded-lg transition flex items-center gap-1.5 shadow-md animate-pulse";
-                status.innerText = "● ACTIVE AUTO-PILOT (15M)";
-                
-                autoPilotTimer = setInterval(() => {
-                    appendLog("🤖 巡航触发：开始进行自检及模板排版检查...");
-                    triggerAutonomousEvolution(true);
-                }, 15 * 60 * 1000);
-            }
+            window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}_${Math.random().toString(36).substring(7)}`, '_blank');
         }
 
         function openRollbackModal() {
@@ -229,12 +171,12 @@
 
         async function fetchCommitHistory() {
             const container = document.getElementById("commitListContainer");
-            container.innerHTML = `<div class="text-center text-xs themed-subtext py-10 font-mono">查询版本快照中...</div>`;
+            container.innerHTML = `<div class="text-center text-xs themed-subtext py-8 font-mono">提取版本中...</div>`;
             try {
                 const keys = getKeys();
                 const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
                 const commits = await res.json();
-                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-10">获取提交记录失败</div>`;
+                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-8">无历史数据</div>`;
 
                 container.innerHTML = "";
                 commits.forEach((item, idx) => {
@@ -248,45 +190,45 @@
                                 <div class="flex items-center gap-2 mb-1">
                                     <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                                     <span class="text-[10px] themed-subtext font-mono">${timeStr}</span>
-                                    ${isCurrent ? '<span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">目前状态</span>' : ''}
+                                    ${isCurrent ? '<span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">运行中</span>' : ''}
                                 </div>
                                 <div class="text-xs themed-text font-mono truncate">${item.commit.message}</div>
                             </div>
                             <div>
                                 ${isCurrent ? 
-                                    `<button disabled class="px-3 py-1.5 bg-gray-500/20 text-gray-400 text-[11px] rounded-lg">当前在运行</button>` : 
-                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">选此版本回退</button>`
+                                    `<button disabled class="px-3 py-1.5 bg-gray-500/20 text-gray-400 text-[11px] rounded-lg">当前在用</button>` : 
+                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">选择回退</button>`
                                 }
                             </div>
                         </div>
                     `;
                 });
-            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-10">拉取异常：${err.message}</div>`; }
+            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-8">异常：${err.message}</div>`; }
         }
 
         async function revertToSelectedCommit(targetSha, shortSha) {
-            if (!confirm(`⏳ 确定要将全站回退到历史提交 [#${shortSha}] 状态吗？`)) return;
+            if (!confirm(`⏳ 确定要回退到提交 [#${shortSha}] 状态吗？`)) return;
             closeRollbackModal();
             try {
                 const keys = getKeys();
-                appendLog(`正在回溯至 [#${shortSha}] 的快照代码...`, "text-amber-500");
+                appendLog(`正在回退至 [#${shortSha}]...`, "text-amber-500");
 
                 const rawIndexUrl = `https://raw.githubusercontent.com/${REPO}/${targetSha}/index.html`;
                 const indexRes = await fetch(rawIndexUrl);
                 if (indexRes.ok) {
                     const prevCode = await indexRes.text();
                     const currentFile = await getGithubFileSafe("index.html", keys.gh);
-                    await pushGithubFile("index.html", prevCode, currentFile.sha, `⏳ TIME-TRAVEL: Reverted to snapshot #${shortSha}`, keys.gh);
+                    await pushGithubFile("index.html", prevCode, currentFile.sha, `⏳ TIME-TRAVEL: Restored to #${shortSha}`, keys.gh);
                 }
 
                 const nowStr = formatStandardTime(new Date());
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长执行历史漫游，回退到提交节点 #${shortSha}。`;
+                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长一键回退到提交节点 #${shortSha}。`;
                 await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: Reverted to #${shortSha}`, keys.gh);
 
-                appendLog(`✅ 时间穿梭完成！代码已恢复为快照 [#${shortSha}]。`, "text-emerald-500 font-bold");
+                appendLog(`✅ 代码成功回退到快照 [#${shortSha}]！`, "text-emerald-500 font-bold");
                 await loadHistoryFromMemory();
-            } catch(err) { appendLog("❌ 穿梭异常: " + err.message, "text-rose-500"); }
+            } catch(err) { appendLog("❌ 回退异常: " + err.message, "text-rose-500"); }
         }
 
         function formatStandardTime(dateObj) {
@@ -298,7 +240,6 @@
             return `${y}-${m}-${d} ${hh}:${mm}`;
         }
 
-        // --- 👑 核心升级：终极时间戳智能提取与折算补偿（彻底杜绝无时间、假文字） ---
         async function loadHistoryFromMemory() {
             const feed = document.getElementById("historyFeed");
             try {
@@ -308,171 +249,125 @@
                 document.getElementById("historyCount").innerText = `${lines.length} RECORDS`;
 
                 if (lines.length === 0) {
-                    feed.innerHTML = `<div class="text-center text-xs themed-subtext py-10 font-mono">暂无对白记录，请下发第一次指令</div>`;
+                    feed.innerHTML = `<div class="text-center text-xs themed-subtext py-10 font-mono">暂无记录</div>`;
                     return;
                 }
 
                 feed.innerHTML = "";
-                // 倒叙，保证 index 0 绝对最新
                 lines.reverse().forEach((line, idx) => {
                     const isLatest = idx === 0;
-                    const isVeto = line.includes("[VETO-RECORD");
-                    
-                    // 1. 尝试直接从文本段正则中匹配 YYYY-MM-DD HH:mm 格式
                     const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})/);
-                    let timeStr = "";
-
-                    if (exactDateMatch) {
-                        timeStr = exactDateMatch[1];
-                    } else {
-                        // 2. 如果是旧数据根本没有带标准时间，智能按照时序生成真实的折算日期时间，绝对不再输出“历史演变节点”！
-                        const fallbackTime = new Date(Date.now() - (idx * 180 * 60 * 1000));
-                        timeStr = formatStandardTime(fallbackTime);
-                    }
-
-                    let cleanText = line.replace(/^- /, "")
-                                        .replace(/\[EVO-RECORD[^\]]*\]:/, "")
-                                        .replace(/\[VETO-RECORD[^\]]*\]:/, "")
-                                        .trim();
+                    const timeStr = exactDateMatch ? exactDateMatch[1] : formatStandardTime(new Date(Date.now() - (idx * 180 * 60 * 1000)));
+                    let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
 
                     let cardBorder = isLatest ? "border-emerald-500/60 themed-inner shadow-md ring-1 ring-emerald-500/20" : "border-gray-500/20 themed-inner opacity-75";
-                    let badge = isLatest 
-                        ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded text-[10px] font-bold animate-pulse">🔥 最新决策 (LATEST)</span>`
-                        : (isVeto ? `<span class="text-rose-400 font-mono text-[10px]">● 漫游/回滚 (RESTORED)</span>` : `<span class="themed-subtext font-mono text-[10px]">🕒 历史归档 (ARCHIVE)</span>`);
+                    let badge = isLatest ? `<span class="text-emerald-400 text-[10px] font-bold">🔥 LATEST</span>` : `<span class="themed-subtext text-[10px]">🕒 ARCHIVE</span>`;
 
                     feed.innerHTML += `
-                        <div class="border rounded-xl p-3.5 transition ${cardBorder}">
-                            <div class="flex items-center justify-between text-[10px] font-mono themed-subtext mb-1.5 border-b border-gray-500/20 pb-1">
+                        <div class="border rounded-xl p-3 transition ${cardBorder}">
+                            <div class="flex items-center justify-between text-[10px] font-mono themed-subtext mb-1 border-b border-gray-500/20 pb-1">
                                 <span class="themed-text font-bold">⏱️ ${timeStr}</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="themed-subtext">#${lines.length - idx}</span>
-                                    ${badge}
-                                </div>
+                                <div class="flex items-center gap-2"><span>#${lines.length - idx}</span>${badge}</div>
                             </div>
                             <div class="text-xs ${isLatest ? 'themed-text font-medium' : 'themed-subtext'} leading-relaxed font-mono">${cleanText}</div>
                         </div>
                     `;
                 });
-            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-10">拉取历史时序出错，请检查 Key 配置。</div>`; }
+            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-10">拉取时序异常</div>`; }
         }
 
         async function getGithubFileSafe(path, token) {
-            const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
-            const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
             if (!res.ok) return { content: "", sha: null };
             const data = await res.json();
             return { content: b64_to_utf8(data.content), sha: data.sha };
         }
 
         async function pushGithubFile(path, content, sha, message, token) {
-            const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
             const payload = { message: message, content: utf8_to_b64(content) };
             if (sha) payload.sha = sha;
-            const res = await fetch(url, {
+            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error(`提交 ${path} 失败`);
+            if (!res.ok) throw new Error(`推送 ${path} 失败`);
             return await res.json();
         }
 
-        async function triggerAutonomousEvolution(isAuto = false) {
+        async function triggerAutonomousEvolution() {
             const btn = document.getElementById("runBtn");
             const cmdInput = document.getElementById("cmd");
-            const userCmd = cmdInput.value.trim();
-            const cmd = userCmd || "【AI自主巡航挂机模式】：审查大厂高阶商城与编辑器趋势，针对轮播图、三件套卡片与 AI 底图库展开降维修缮！";
+            const cmd = cmdInput.value.trim() || "【AI自主进化】：大幅缩减冗余文字，全用高清图与动态组件表现，优化 index.html 与 editor.html 卡片视觉！";
 
             btn.disabled = true;
-            btn.innerHTML = "<span>⚙️ 算力池深度推理中 (多模型决策串联处理)...</span>";
-            document.getElementById("log").innerText = ">> 启动自动架构路由...";
+            btn.innerHTML = "<span>⚙️ 算力池深度推理中...</span>";
+            appendLog("开始执行任务...");
 
             try {
                 const keys = getKeys();
-                appendLog("提取云端学习档案库...");
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-
-                appendLog("⚡ 正在请求 DeepSeek V3 算力大脑进行增量代码排查...", "text-yellow-500");
                 
-                const prompt = `你现在是 ApexWork 的 AI 首席架构师。
-执行董事长的任务（如留空则开始自主进化建站）。
+                const prompt = `你是 ApexWork 的 AI 架构师。执行命令（留空则开始精简文字、增多图表组件）。
 要求：
-1. 自动定位核心操作文件 (TARGET_FILE_PATH)，如 'index.html', 'editor.html', 'templates/aerotech-2026.json', 'js/editor-engine.js'；
-2. 新增模块必须自动在 index.html 或 editor.html 内绑定引用依赖；
-3. 保留原有商用路演支付与完整导出功能。
-
-【往期记忆】：
-${memoryFile.content || "无"}
-
-【指令】：
-"${cmd}"
-
-严格按以下标记结构作答：
+1. 定位目标文件 (TARGET_FILE_PATH)，如 'index.html', 'editor.html'；
+2. 新增模块在入口文件写好加载关系；
+3. 保留商城既有收费与导出。
+指令："${cmd}"
+严格按标记输出：
 ===NEW_MEMORY===
-- [EVO-RECORD]: <一句话概括本次对网页或功能的改进>
+- [EVO-RECORD]: <1句话概括改善>
 ===TARGET_FILE_PATH===
-<填写更新的相对文件名，例如：index.html>
+<填相对路径，如 editor.html>
 ===FILE_CONTENT===
-<输出完整的 HTML/JS/JSON 代码>`;
+<新源码>`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [
-                            { role: "system", content: "你是一位精通现代大厂排版、极客体验与高可维护性的全栈技术智能体。" },
-                            { role: "user", content: prompt }
-                        ],
+                        messages: [{ role: "system", content: "追求极简视觉、文字精简、动静分离的技术智能体。" }, { role: "user", content: prompt }],
                         temperature: 0.3
                     })
                 });
 
-                if (!dsRes.ok) throw new Error("API 响应失败: " + dsRes.statusText);
-                const dsData = await dsRes.json();
-                const aiAnswer = dsData.choices[0].message.content;
-
+                if (!dsRes.ok) throw new Error("API 失败: " + dsRes.statusText);
+                const aiAnswer = (await dsRes.json()).choices[0].message.content;
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
                 const targetParts = aiAnswer.split("===TARGET_FILE_PATH===");
                 const contentParts = aiAnswer.split("===FILE_CONTENT===");
 
-                if (memParts.length < 2 || targetParts.length < 2 || contentParts.length < 2) throw new Error("AI 协议解析未完整");
+                if (memParts.length < 2 || targetParts.length < 2 || contentParts.length < 2) throw new Error("解析未完整");
 
                 const rawMemoryLine = targetParts[0].replace("===NEW_MEMORY===", "").trim();
                 const targetFilePath = contentParts[0].replace("===TARGET_FILE_PATH===","").trim();
                 const newFileContent = contentParts[1].replace(/```[a-z]*/g, "").replace(/```/g, "").trim();
 
-                appendLog(`📍 [目标路由锁定]: 正在写回物理代码 =>【 ${targetFilePath} 】`, "text-indigo-400 font-bold");
-
                 const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Autonomous Update: ${targetFilePath}`, keys.gh);
+                await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Update: ${targetFilePath}`, keys.gh);
 
                 const nowStr = formatStandardTime(new Date());
                 const timestampedMemoryLine = rawMemoryLine.replace("[EVO-RECORD]:", `[EVO-RECORD | ${nowStr}]:`);
-
                 const updatedMemory = (memoryFile.content || "") + "\n" + timestampedMemoryLine;
-                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory Update: ${timestampedMemoryLine.slice(0, 35)}`, keys.gh);
+                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory: ${timestampedMemoryLine.slice(0, 35)}`, keys.gh);
 
-                appendLog(`✅ 任务 100% 顺利生效！[ ${targetFilePath} ] 已成功推送。`, "text-emerald-500 font-bold");
-                if (!isAuto) cmdInput.value = "";
+                appendLog(`✅ 成功发布 [ ${targetFilePath} ]。`, "text-emerald-500 font-bold");
+                cmdInput.value = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ 执行未完成: " + err.message, "text-rose-500");
+                appendLog("❌ 执行异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 启动 AI 算力池：自主复盘大厂并精修全站</span>";
+                btn.innerHTML = "<span>🚀 立即执行指令 / 启动 AI 自主进化</span>";
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             initAdminTheme();
             if (localStorage.getItem("APEX_GH_TOKEN")) loadHistoryFromMemory();
-
             document.getElementById("cmd").addEventListener("keydown", function(e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                    e.preventDefault();
-                    triggerAutonomousEvolution();
-                }
+                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); triggerAutonomousEvolution(); }
             });
         });
     </script>
