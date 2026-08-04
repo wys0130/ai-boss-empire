@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 可视化路演精修区</title>
+    <title>ApexWork 视觉演示精修区 (V15 Edge-Native Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
         .slide-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        /* 背景图全部加上了 WebP 边缘降维请求参数 (w=1280&q=75&fm=webp)，做到极速秒开 */
         .bg-photo-tech {
-            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.75) 100%), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80');
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.75) 100%), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1280&q=75&fm=webp');
             background-size: cover; background-position: center;
         }
         .bg-photo-finance {
-            background-image: linear-gradient(135deg, rgba(10, 15, 30, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80');
+            background-image: linear-gradient(135deg, rgba(10, 15, 30, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1280&q=75&fm=webp');
             background-size: cover; background-position: center;
         }
         .bg-photo-team {
-            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.92) 100%), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80');
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.92) 100%), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1280&q=75&fm=webp');
             background-size: cover; background-position: center;
         }
         .bg-style-mesh {
@@ -32,29 +33,29 @@
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- 顶部导览：极致精简名称 -->
+    <!-- 顶部导览：名称极其精炼 -->
     <header class="bg-slate-900 border-b border-slate-800 px-6 py-2.5 flex items-center justify-between z-50 shrink-0 shadow-md">
         <div class="flex items-center gap-3">
-            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded transition font-bold">← 主页面</a>
+            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded transition font-bold">← 主网页</a>
             <span class="h-4 w-[1px] bg-slate-800"></span>
             <h1 class="font-bold text-sm text-slate-200">AeroTech 创投版</h1>
             <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">15 SLIDES</span>
         </div>
         <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-400">授权价: <strong class="text-white font-mono text-sm">$9.99</strong></span>
+            <span class="text-xs text-slate-400">商用授权价: <strong class="text-white font-mono text-sm">$9.99</strong></span>
             <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5">
-                <span>⚡ 支付 $9.99 导出</span>
+                <span>⚡ 支付 $9.99 导出包</span>
             </button>
         </div>
     </header>
 
-    <!-- 三栏布局：全方位精减废字 -->
+    <!-- 三栏结构 -->
     <div class="flex-1 flex overflow-hidden">
         
-        <!-- 左侧导航：缩化标题名称，突出 KPI 核心 -->
+        <!-- 左侧缩略列表 -->
         <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
             <div class="p-3 border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
-                <span>页面导览</span>
+                <span>幻灯片页面</span>
                 <span class="font-mono bg-slate-800 px-2 py-0.5 rounded text-slate-400">15 P</span>
             </div>
             <div id="thumbList" class="flex-1 overflow-y-auto p-2.5 space-y-2 custom-scroll"></div>
@@ -63,29 +64,34 @@
         <!-- 中间：画布工作台 -->
         <main class="flex-1 bg-slate-950 flex flex-col items-center justify-between p-6 overflow-hidden relative">
             
-            <!-- 视觉工具栏：用最短单词替代长句 -->
-            <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-4 py-2 shadow-2xl flex items-center gap-3 text-xs font-medium text-slate-200 shrink-0">
-                <span class="text-indigo-400 font-mono text-[11px] font-bold">TOOLS:</span>
-                <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded transition border border-slate-700 text-[11px]">
-                    ⚡ 图表进阶
-                </button>
-                <div class="h-4 w-[1px] bg-slate-800"></div>
-                <span class="text-slate-400 text-[11px]">背景:</span>
+            <!-- 👑 【对齐 WPS/Office 核心视觉扩展】6大高阶组件排版条 -->
+            <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-4 py-1.5 shadow-2xl flex flex-wrap items-center gap-2.5 text-xs font-medium text-slate-200 shrink-0 max-w-4xl w-full justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-indigo-400 font-mono text-[10px] font-bold">TOOLS:</span>
+                    <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换图表展示形态">
+                        📊 进度/环形卡
+                    </button>
+                    <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换居中或两侧排版">
+                        📐 布局重排
+                    </button>
+                </div>
+                <div class="h-3.5 w-[1px] bg-slate-800"></div>
                 <div class="flex items-center gap-1.5">
-                    <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1. 科技</button>
-                    <button onclick="changeBackground('finance')" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2. 金融</button>
-                    <button onclick="changeBackground('team')" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">3. 团队</button>
-                    <button onclick="changeBackground('mesh')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">4. 极简</button>
+                    <span class="text-slate-400 text-[10px]">背景极速加载(WebP):</span>
+                    <button onclick="changeBackground('tech')" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1.科技</button>
+                    <button onclick="changeBackground('finance')" class="px-2 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2.金融</button>
+                    <button onclick="changeBackground('team')" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">3.团队</button>
+                    <button onclick="changeBackground('mesh')" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">4.极简</button>
                 </div>
             </div>
 
-            <!-- 主画布展示：极度留白、突显指标和图表，不堆文字 -->
+            <!-- 主展示卡片：对齐文本排版（优先单行、折行绝对居中、文字极少） -->
             <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech my-auto"></div>
 
-            <!-- 翻页指示：保留完整贴心提示 -->
+            <!-- 底部工具指导条 -->
             <div class="flex items-center justify-between w-full max-w-4xl text-xs text-slate-400 shrink-0">
                 <span class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-300">
-                    💡 提示：文字已极度瘦身！可直接点击幻灯片内的任意标题或数值在画布内实时编辑
+                    💡 提示：优先单行展示！如果文字过多折行，系统将100%绝对居中排版
                 </span>
                 <div class="flex items-center gap-3">
                     <button onclick="prevSlide()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg font-bold transition">← 上页</button>
@@ -95,11 +101,11 @@
             </div>
         </main>
 
-        <!-- 右栏：参数配置栏文字极致短词化 -->
+        <!-- 右侧：短小精干参数控制 -->
         <aside class="w-80 bg-slate-900 border-l border-slate-800 p-5 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll">
             <div class="space-y-3.5">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
-                    <span>参数双向联动</span>
+                    <span>参数实时双向渲染</span>
                     <span class="text-blue-400 font-mono">LIVE</span>
                 </div>
                 <div>
@@ -107,7 +113,7 @@
                     <input id="bindBrand" type="text" value="AeroTech" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1">页面大标语</label>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1">当前主标语 (简炼展现)</label>
                     <input id="bindTitle" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
                 </div>
                 <div>
@@ -115,7 +121,7 @@
                     <input id="bindKpi" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1">指标标语 (限一句短句)</label>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1">指标标语 (限一句短语)</label>
                     <textarea id="bindSub" rows="2" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white leading-relaxed"></textarea>
                 </div>
             </div>
@@ -126,34 +132,34 @@
                     <span class="text-emerald-400 font-mono font-bold text-sm">$9.99</span>
                 </div>
                 <button onclick="exportPPT()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-lg shadow-blue-600/30">
-                    💳 $9.99 立即下载成果
+                    💳 $9.99 立即导出成果
                 </button>
             </div>
         </aside>
     </div>
 
     <script>
-        // 极短、利落化缩略文字体系
         const slidesData = [
-            { id: 1, title: "AeroTech 2026 全球创投战略", sub: "破除低效传统冗言，全视效表达", kpi: "+340%", label: "营收同比飙升", progress: 85, tag: "01. COVER" },
-            { id: 2, title: "高管层工作流演化概览", sub: "生产力跨越式升级，取代老旧文档", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
-            { id: 3, title: "传统痛点：高开销与错乱", sub: "旧软件排版混乱、授权极其昂贵", kpi: "-45%", label: "维护开销缩减", progress: 70, tag: "03. PAIN" },
-            { id: 4, title: "AI 高清实景解决方案架构", sub: "卡片图解 + SVG 进度表 + 多端兼容", kpi: "12x", label: "路演转化提速", progress: 90, tag: "04. ARCH" },
-            { id: 5, title: "商业增长指数与关键拐点", sub: "欧美多家顶尖对冲基金决策背书", kpi: "$24.8M", label: "签约净值", progress: 88, tag: "05. SCALE" },
-            { id: 6, title: "竞争优势：选择我们的理由", sub: "去除冗余文字，升级沉浸式视效", kpi: "4.9/5", label: "全球满意度", progress: 95, tag: "06. EDGE" },
-            { id: 7, title: "获客 ROI 动态对账模型", sub: "获客成本 CAC 与 LTV 黄金增益比", kpi: "3.2x", label: "LTV/CAC 比", progress: 80, tag: "07. ROI" },
-            { id: 8, title: "双语 ATS 合规审查体系", sub: "银行级加密，符合北美及欧洲标准", kpi: "100%", label: "安全合规通过率", progress: 100, tag: "08. ATS" },
-            { id: 9, title: "世界 500 强真实客户落地", sub: "全球整车厂与科技巨头联合实战", kpi: "24,000+", label: "付费终端数", progress: 92, tag: "09. CASE" },
-            { id: 10, title: "2026 - 2028 演进规划图", sub: "自导演进智能体，强化商业决策", kpi: "V3 PRO", label: "自主进化架构", progress: 75, tag: "10. MAP" },
-            { id: 11, title: "核心创始及顶级技术团队", sub: "核心人员来自顶级科技公司", kpi: "15+ Yrs", label: "核心系统经验", progress: 85, tag: "11. TEAM" },
-            { id: 12, title: "全球销售网络与覆盖区域", sub: "欧洲起步，辐射北美及亚洲主要区域", kpi: "42 国", label: "落地服务网络", progress: 80, tag: "12. GLOBAL" },
-            { id: 13, title: "系统稳定与防劫持安全体系", sub: "全平台本地生成，机密不泄露", kpi: "0 事故", label: "历史泄露率", progress: 100, tag: "13. SECURE" },
-            { id: 14, title: "未来 36 个月预期与对账", sub: "盈亏平衡分析与估值扩容分析", kpi: "$1.2B", label: "预期商业估值", progress: 90, tag: "14. FORECAST" },
-            { id: 15, title: "重构企业级路演生产力", sub: "立即获取商用授权，携手智能进化", kpi: "APEX.IO", tag: "15. END", label: "授权访问入口", progress: 95 }
+            { id: 1, title: "AeroTech 2026 创投战略", sub: "破除冗陈言辞，高清视效展现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
+            { id: 2, title: "高管层工作流管理升级", sub: "企业级高效进化，彻底革新办公效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
+            { id: 3, title: "传统痛点：高维费与易错乱", sub: "旧软件排版混乱、商业授权高昂", kpi: "-45%", label: "低效团队开销缩减", progress: 70, tag: "03. PAIN" },
+            { id: 4, title: "AI 高清实景极速排版架构", sub: "卡片图解 + SVG 进度表 + 边缘 WebP 加载", kpi: "12x", label: "路演签约转化加速", progress: 90, tag: "04. ARCH" },
+            { id: 5, title: "商业增长指数与核心拐点", sub: "欧美多家顶尖对冲基金决策一致背书", kpi: "$24.8M", label: "季度新签合额", progress: 88, tag: "05. SCALE" },
+            { id: 6, title: "竞争优势：选择我们的理由", sub: "去除冗余段落，打造高对比沉浸式体验", kpi: "4.9/5", label: "全球商务高管评价", progress: 95, tag: "06. EDGE" },
+            { id: 7, title: "全渠道 ROI 动态测算模型", sub: "获客成本 CAC 与 LTV 黄金回报比率", kpi: "3.2x", label: "LTV/CAC 增长比", progress: 80, tag: "07. ROI" },
+            { id: 8, title: "欧美双语 ATS 合规体系", sub: "银行级加密，通过欧美合规规范", kpi: "100%", label: "数据安全与合规率", progress: 100, tag: "08. ATS" },
+            { id: 9, title: "世界 500 强真实企业落地", sub: "跨国车企与头部科技公司实战验证", kpi: "24,000+", label: "付费活跃终端数", progress: 92, tag: "09. CASE" },
+            { id: 10, title: "2026 - 2028 路线演变规划", sub: "自导演进智能体，强化决策能力", kpi: "V3 PRO", label: "下一代演进系统", progress: 75, tag: "10. MAP" },
+            { id: 11, title: "核心创始与技术领领团队", sub: "核心人员拥有硅谷科技名企研发背景", kpi: "15+ Yrs", label: "核心系统开发经验", progress: 85, tag: "11. TEAM" },
+            { id: 12, title: "全球销售网络与覆盖地图", sub: "欧洲出发，辐射北美及亚洲商业中心", kpi: "42 国", label: "落地商业服务网络", progress: 80, tag: "12. GLOBAL" },
+            { id: 13, title: "系统稳健与防劫持安全体系", sub: "平台完全本地渲染，核心商业机密零外泄", kpi: "0 事故", label: "历史资产安全记录", progress: 100, tag: "13. SECURE" },
+            { id: 14, title: "未来 36 个月预期对账图", sub: "盈亏平衡分析与长期估值扩张预测", kpi: "$1.2B", label: "预期目标公司估值", progress: 90, tag: "14. FORECAST" },
+            { id: 15, title: "重构企业级路演演示效率", sub: "立即对接业务接口，开启智能新纪元", kpi: "APEX.IO", tag: "15. END", label: "业务接入唯一门户", progress: 95 }
         ];
 
         let currentSlideIdx = 0;
         let currentBgStyle = 'tech';
+        let currentLayoutAlign = 'center'; // 默认为对齐中心居中
 
         const bgStyles = {
             "tech": "bg-photo-tech text-white",
@@ -194,23 +200,36 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / 15`;
         }
 
+        // 👑 渲染画布：绝对处理【不换行优先、必须换行绝对居中】与多组件支持
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
             const brand = document.getElementById("bindBrand").value || "AeroTech";
             const bgCls = bgStyles[currentBgStyle] || bgStyles["tech"];
+            const alignCls = currentLayoutAlign === 'center' ? "text-center items-center" : "text-left items-start";
 
             canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls} my-auto`;
             
             canvas.innerHTML = `
+                <!-- 顶牌 -->
                 <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10">
                     <span class="text-xs font-bold font-mono tracking-widest text-slate-300">${brand} · DECK</span>
                     <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag}</span>
                 </div>
-                <div class="my-auto py-4 z-10 max-w-3xl">
-                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md">${item.title}</h2>
-                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm">${item.sub}</p>
+
+                <!-- 中心大标题区：开启 flex 弹性中线 + 折行必定绝对中心排列 -->
+                <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
+                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" 
+                        class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full ${currentLayoutAlign === 'center' ? 'text-center' : 'text-left'}">
+                        ${item.title}
+                    </h2>
+                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" 
+                       class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl ${currentLayoutAlign === 'center' ? 'text-center' : 'text-left'}">
+                       ${item.sub}
+                    </p>
                 </div>
+
+                <!-- 底部：SVG 图表与核心 KPI 卡片区 -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center">
                     <div class="md:col-span-5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
@@ -231,6 +250,7 @@
 
         function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
         function toggleVisualChart() { slidesData[currentSlideIdx].progress = slidesData[currentSlideIdx].progress < 90 ? 98 : 65; renderMainSlide(); }
+        function toggleLayoutAlign() { currentLayoutAlign = currentLayoutAlign === 'center' ? 'left' : 'center'; renderMainSlide(); }
         function selectSlide(idx) { currentSlideIdx = idx; renderAll(); }
         function prevSlide() { if(currentSlideIdx > 0) { currentSlideIdx--; renderAll(); } }
         function nextSlide() { if(currentSlideIdx < slidesData.length-1) { currentSlideIdx++; renderAll(); } }
@@ -255,7 +275,7 @@
         function exportPPT() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('status') !== 'paid' && localStorage.getItem('APEX_PAID_TOKEN') !== 'true') {
-                if (confirm("🔒 点击确定跳转至 $9.99 商业授权收银页解锁下载；若已付款请检查网址中带有 ?status=paid。")) {
+                if (confirm("🔒 点击确定跳转至 $9.99 商业授权收银页解锁；若已付款请确认网址带有 ?status=paid。")) {
                     window.open("index.html?status=paid", "_self");
                 }
                 return;
