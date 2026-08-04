@@ -166,20 +166,17 @@ function initFinanceData() {
   }
 }
 
-// 侧边栏表单输入联动重算
 function updateROI() {
   const investment = parseFloat(document.getElementById('initialInvestment').value) || 0;
   const growth = parseFloat(document.getElementById('growthRate').value) || 0;
   const fixed = parseFloat(document.getElementById('fixedCost').value) || 0;
   const varRate = parseFloat(document.getElementById('variableCostRate').value) || 0;
 
-  // 仅在非直接直编状态下通过公式刷新全盘
-  const current = financeData[currentMonth];
-  current.cost = fixed + current.revenue * varRate/100;
-  current.profit = current.revenue - current.cost;
-
   let totalRevenue = 0, totalCost = 0;
   for (let i = 0; i < 12; i++) {
+    const revenue = 12000 * Math.pow(1 + growth/100, i);
+    const cost = fixed + revenue * varRate/100;
+    financeData[i] = { revenue, cost, profit: revenue - cost };
     totalRevenue += financeData[i].revenue;
     totalCost += financeData[i].cost;
   }
@@ -195,10 +192,9 @@ function updateROI() {
   document.getElementById('kpiROI').textContent = roi.toFixed(1) + '%';
   document.getElementById('kpiPayback').textContent = payback.toFixed(1) + ' 月';
 
-  renderTable();
+  renderTable(true);
 }
 
-// 👑 核心亮点：直接在中间表格里点字修改，瞬间反哺数据并重算
 function updateCellFromTable(field, rawText) {
   const val = parseFloat(rawText.replace(/[^0-9.-]/g, "")) || 0;
   const cur = financeData[currentMonth];
@@ -209,7 +205,6 @@ function updateCellFromTable(field, rawText) {
   }
   cur.profit = cur.revenue - cur.cost;
   
-  // 重新计算整年统计与 KPIs
   let totalRev = 0, totalCost = 0;
   financeData.forEach(m => { totalRev += m.revenue; totalCost += m.cost; });
   const totalProfit = totalRev - totalCost;
@@ -219,11 +214,10 @@ function updateCellFromTable(field, rawText) {
   document.getElementById('kpiNetMargin').textContent = (totalRev > 0 ? (totalProfit/totalRev)*100 : 0).toFixed(1) + '%';
   document.getElementById('kpiROI').textContent = (investment > 0 ? (totalProfit/investment)*100 : 0).toFixed(1) + '%';
   document.getElementById('kpiPayback').textContent = (totalProfit > 0 ? (investment/(totalProfit/12)) : 99).toFixed(1) + ' 月';
-
-  renderTable(false); // 保持光标不强制重绘整个 DOM 干扰输入
+  
+  renderTable(false);
 }
 
-// 渲染表格（支持 contenteditable 直编）
 function renderTable(rebuildHtml = true) {
   const thMonth = document.getElementById('thMonth');
   thMonth.textContent = months[currentMonth];
