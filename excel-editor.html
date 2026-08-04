@@ -43,8 +43,7 @@
           <span class="text-xs font-mono text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-bold">
               实时计算中
           </span>
-          <!-- 统一改为触发支付网关跳转 -->
-          <button onclick="handleSmartExport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
+          <button onclick="openCheckoutModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
               立即解锁 .XLSX ($9.99)
           </button>
       </div>
@@ -139,13 +138,52 @@
         </div>
         <p class="text-xs text-slate-300 mb-2" id="payDesc">智能匹配支付通道</p>
         <p class="text-2xl font-bold mb-3" id="payPrice">$9.99 <span class="text-xs font-normal text-slate-400">/ 一次性</span></p>
-        <button id="smartExportBtn" onclick="handleSmartExport()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-md flex items-center justify-center gap-1">
-            <span>加载支付网关...</span>
+        <button onclick="openCheckoutModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg text-xs transition shadow-md flex items-center justify-center gap-1">
+            <span>立即解锁完整文件</span>
         </button>
-        <div class="text-[10px] text-slate-400 mt-2 text-center font-mono" id="payTip">国内支持微信/支付宝，海外支持卡与Apple Pay</div>
+        <div class="text-[10px] text-slate-400 mt-2 text-center font-mono" id="payTip">免注册账号 · 支持扫码与 Apple Pay</div>
       </div>
     </aside>
   </div>
+</div>
+
+<!-- 👑 V30 极速核单免注册直付弹窗 -->
+<div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-slate-900">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span class="font-bold text-base">极速付款与核对订单</span>
+            </div>
+            <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
+        </div>
+
+        <div class="space-y-3 mb-6 text-sm">
+            <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">授权作品</span>
+                <span class="font-semibold text-slate-800">APEXWORK Excel 12个月财务模型</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">应付总额</span>
+                <span class="font-black text-lg text-blue-600" id="modalPriceText">￥69.00</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-100">
+                <span class="text-slate-500">支付渠道</span>
+                <span class="font-semibold text-slate-800" id="modalChannelText">微信支付 / 支付宝 扫码直付</span>
+            </div>
+            <div class="flex justify-between py-1">
+                <span class="text-slate-500">购买流程</span>
+                <span class="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    ✅ 免账号注册 · 付款即锁存解锁
+                </span>
+            </div>
+        </div>
+
+        <button onclick="handleSmartExport()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-blue-500/20">
+            确认信息无误，立即直达付款 →
+        </button>
+        <p class="text-[11px] text-slate-400 text-center mt-3">提示：付款页面无需输入手机号注册，扫码后极速搞定</p>
+    </div>
 </div>
 
 <script>
@@ -158,12 +196,16 @@ const PAY_CONFIG = {
     china: {
         name: "国内安全支付",
         price: "￥69 / 次",
+        modalPrice: "￥69.00 RMB",
+        modalChannel: "微信 / 支付宝 极速扫码",
         url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
         tip: "通过面包多安全支付，支持微信与支付宝"
     },
     overseas: {
         name: "海外快捷支付",
         price: "$9.99 / 次",
+        modalPrice: "$9.99 USD",
+        modalChannel: "Apple Pay / 信用卡 极速直付",
         url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
         tip: "无需注册，支持主流信用卡及 Apple Pay"
     }
@@ -185,19 +227,27 @@ async function detectUserRegion() {
     updatePayUI();
 }
 
-// 修复语法报错，确保正常显示
 function updatePayUI() {
     const config = PAY_CONFIG[currentRegion];
     document.getElementById('payPrice').innerHTML = config.price;
     document.getElementById('payDesc').textContent = config.name;
     document.getElementById('payTip').textContent = config.tip;
     document.getElementById('regionSwitchBtn').textContent = currentRegion === 'china' ? '🇨🇳 国内版 (点此切换海外)' : '🌍 海外版 (点此切换国内)';
-    document.getElementById('smartExportBtn').innerHTML = `⚡ 立即通过 ${currentRegion === 'china' ? '面包多' : '快捷网关'} 支付解锁`;
+    document.getElementById('modalPriceText').textContent = config.modalPrice;
+    document.getElementById('modalChannelText').textContent = config.modalChannel;
 }
 
 function togglePayRegion() {
     currentRegion = currentRegion === 'china' ? 'overseas' : 'china';
     updatePayUI();
+}
+
+function openCheckoutModal() {
+    document.getElementById('checkoutModal').classList.remove('hidden');
+}
+
+function closeCheckoutModal() {
+    document.getElementById('checkoutModal').classList.add('hidden');
 }
 
 function handleSmartExport() {
