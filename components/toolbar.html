@@ -1,0 +1,20 @@
+<!-- 顶层高阶视觉组件工具条 -->
+<div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-4 py-1.5 shadow-2xl flex flex-wrap items-center gap-2.5 text-xs font-medium text-slate-200 shrink-0 max-w-4xl w-full justify-between">
+    <div class="flex items-center gap-2">
+        <span class="text-indigo-400 font-mono text-[10px] font-bold">TOOLS:</span>
+        <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换图表展示形态">
+            📊 进度/环形卡
+        </button>
+        <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换居中或两侧排版">
+            📐 布局重排
+        </button>
+    </div>
+    <div class="h-3.5 w-[1px] bg-slate-800"></div>
+    <div class="flex items-center gap-1.5">
+        <span class="text-slate-400 text-[10px]">边缘加速背景(WebP):</span>
+        <button onclick="changeBackground('tech')" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1.科技</button>
+        <button onclick="changeBackground('finance')" class="px-2 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2.金融</button>
+        <button onclick="changeBackground('team')" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">3.团队</button>
+        <button onclick="changeBackground('mesh')" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">4.极简</button>
+    </div>
+</div>
