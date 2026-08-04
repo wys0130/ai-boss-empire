@@ -260,8 +260,18 @@
             loadHistoryFromMemory();
         }
 
+        // ==========================================
+        // 👑 1. 升级版防重复派单锁：已经解决的，绝不重复派单！
+        // ==========================================
         function autoFixPaymentBug() {
-            document.getElementById("cmd").value = "【🐞缺陷反馈与QA质检部 + 工程部协作】：一键检查并独立修正 excel-editor.html 与 word-editor.html 真实业务逻辑，保证正常链接与没有 404！";
+            const banner = document.getElementById("bugAlertBanner");
+            // 如果系统状态已显示绿色通过，当场拦截，不重复发单
+            if (banner && banner.getAttribute("data-status") === "green") {
+                alert("✅ 当前系统 CI 流水线已经全部绿色通过，历史缺陷已完全自愈，无需重复派单！");
+                return;
+            }
+
+            document.getElementById("cmd").value = "【🐞缺陷与QA质检部 + 工程部协作】：自查可能导致 404 的文件名丢失或语法错误，确保 index.html, editor.html, excel-editor.html, word-editor.html 正常运行。";
             triggerSwarmAutonomousAction();
         }
 
@@ -450,6 +460,9 @@
             } catch (e) { return "无法获取构建异常堆栈"; }
         }
 
+        // ==========================================
+        // 👑 2. QA 持续集成自愈监工：绿色即隐藏红框，告别重复派单
+        // ==========================================
         async function startQAGuardLoop() {
             async function loopTask() {
                 if (isAutoHealing) return;
@@ -462,15 +475,36 @@
                     return;
                 }
 
+                const banner = document.getElementById("bugAlertBanner");
+                const statusBadge = document.getElementById("qaStatusBadge");
+
+                // 👑 分支 A：如果 CI 流水线成功 (Success) ➔ 报警框变绿，屏蔽派单按钮！
                 if (latestRun.conclusion === "success") {
-                    const statusBadge = document.getElementById("qaStatusBadge");
                     if (statusBadge) statusBadge.innerHTML = `✅ QA GREEN (#${latestRun.run_number})`;
+                    if (banner) {
+                        banner.setAttribute("data-status", "green");
+                        banner.className = "mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2.5 flex items-center justify-between text-xs font-mono";
+                        banner.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <span class="text-emerald-400 font-bold">✅ [QA 自动检查]:</span>
+                                <span class="text-emerald-300">最新构建 #$${latestRun.run_number} 已全量绿色通过，全站 0 死链 / 0 缺陷。</span>
+                            </div>
+                            <span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>
+                        `;
+                    }
                     return;
                 }
 
-                // 👑 若捕获到流水线爆红 ➔ 触发【缺陷与QA质检部】闭环自发单！
+                // 👑 分支 B：如果流水线失败了 (Failure) ➔ 报警框飘红，仅触发一次自愈修复！
                 if (latestRun.conclusion === "failure") {
+                    if (banner && banner.getAttribute("data-status") === "healing-" + latestRun.run_number) {
+                        // 防止同一个失败流水线重复无限发送
+                        return;
+                    }
+
                     isAutoHealing = true;
+                    if (banner) banner.setAttribute("data-status", "healing-" + latestRun.run_number);
+
                     appendLog(`❌ [QA 警报触发]：检测到发布流水线 [#${latestRun.run_number}] 拦截报红！正在调取具体日志...`, "text-rose-500 font-bold");
                     
                     const errDetail = await fetchRunErrorLogs(latestRun.id);
@@ -478,11 +512,11 @@
                     
                     const fixCommand = `【🐞缺陷与QA质检部 + 工程部自愈指令】：
 监控捕获最新 Actions 构建报错："${errDetail}"。
-请立即解决可能导致 404 的文件名丢失或语法错误，确保 index.html, editor.html, excel-editor.html, word-editor.html 全部物理存在。
-必须同时输出正确的 ===FILE: 文件名=== 块以消除该 CI 构建报错！`;
+请立即解决导致编译失败的问题（严格确保 index.html, editor.html, excel-editor.html, word-editor.html 4个关键文件存在且无语法报错）。
+输出正确的 ===FILE: 报错文件名=== 代码块！`;
 
                     document.getElementById("cmd").value = fixCommand;
-                    appendLog("🚀 [QA 唤醒蜂群]：错误指令已喂回中枢，正在自动重构新修复代码...", "text-amber-400 font-bold");
+                    appendLog("🚀 [QA 唤醒蜂群]：错误已提交至中枢，自动重构新修复代码...", "text-amber-400 font-bold");
                     
                     try {
                         await triggerSwarmAutonomousAction();
