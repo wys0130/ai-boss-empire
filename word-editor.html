@@ -40,8 +40,9 @@
       <span class="text-xs font-mono bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold">
         ATS 智能排版
       </span>
-      <button onclick="handleExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
-        ⚡ 立即导出 DOCX ($9.99)
+      <!-- 统一改为触发支付网关跳转 -->
+      <button onclick="handleSmartExport()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
+        立即解锁 DOCX ($9.99)
       </button>
     </div>
   </header>
@@ -73,7 +74,6 @@
       </div>
     </main>
 
-    <!-- 智能全球支付侧边栏 -->
     <aside class="lg:col-span-3 bento-card p-6">
       <h2 class="text-lg font-semibold text-slate-900 mb-4">内容编辑</h2>
       <div class="space-y-4 mb-6">
@@ -87,7 +87,6 @@
         </div>
       </div>
 
-      <!-- 智能支付网关组件 -->
       <div class="p-4 bg-slate-900 rounded-xl text-white shadow-lg">
         <div class="flex justify-between items-center mb-2">
             <h3 class="font-semibold text-sm">付费导出</h3>
@@ -120,7 +119,6 @@ const sections = [
 ];
 let currentSection = 0;
 
-// 全球支付智能网关配置（已填入你的面包多真实链接）
 const PAY_CONFIG = {
     china: {
         name: "国内安全支付",
@@ -167,8 +165,7 @@ function togglePayRegion() {
 }
 
 function handleSmartExport() {
-    const targetUrl = PAY_CONFIG[currentRegion].url;
-    window.location.href = targetUrl;
+    window.location.href = PAY_CONFIG[currentRegion].url;
 }
 
 function selectSection(index) {
@@ -225,11 +222,17 @@ function exportDOCX() {
   });
 }
 
+// 升级版：加入企业级专业间距、行距与主题配色调性的 OpenXML 生成引擎
 function generateDocumentXML() {
   let body = '';
-  sections.forEach((sec) => {
-    body += `<w:p><w:pPr><w:rPr><w:b/><w:sz w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>${sec.title}</w:t></w:r></w:p>`;
-    body += `<w:p><w:r><w:t>${sec.content.replace(/\n/g, '</w:t></w:r></w:p><w:p><w:r><w:t>')}</w:t></w:r></w:p>`;
+  sections.forEach((sec, index) => {
+    // 标题样式：加粗、深蓝色调(#1E293B)、段后间距
+    body += `<w:p><w:pPr><w:spacing w:before="240" w:after="120"/><w:rPr><w:b/><w:color w:val="1E293B"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="1E293B"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>${sec.title}</w:t></w:r></w:p>`;
+    // 正文样式：规范行距1.3倍、段前缩进、深灰色文字(#334155)
+    const paragraphs = sec.content.split('\n');
+    paragraphs.forEach(pText => {
+      body += `<w:p><w:pPr><w:spacing w:line="312" w:lineRule="auto" w:after="100"/><w:rPr><w:color w:val="334155"/><w:sz w:val="21"/><w:szCs w:val="21"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="334155"/><w:sz w:val="21"/><w:szCs w:val="21"/></w:rPr><w:t>${pText}</w:t></w:r></w:p>`;
+    });
   });
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
   <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
