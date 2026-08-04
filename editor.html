@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V17 WPS-Aligned Multi-Deck Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 👑 引入 APEXWORK 零注册 Ed25519 本地锁存与回跳鉴权 -->
     <script src="components/zero-auth.js"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
@@ -148,14 +147,13 @@
     </div>
 
     <script>
-        // 👑 商业授权与支付渠道配置（爱发电为主，面包多以注释完整保留，待 API 审核通过后随时放开）
+        // 👑 支付渠道配置（爱发电为主，面包多备注保留待通过后放开）
         const PPT_PAY_CONFIG = {
-            // 备注：等待面包多 API 审核通过并绑定后解开下行注释：
+            // 备注：等待面包多 API 审核通过并绑定后放开下行：
             // mbdUrl: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
             afdianUrl: "https://afdian.net/a/APEXWORK"
         };
 
-        // 👑 国际化大厂模组池：全量保留 3 套路演完整配置，无截断、无删减
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech",
@@ -369,25 +367,18 @@
             document.getElementById("bindKpi").value = item.kpi;
         }
 
-        // 👑 授权导出函数：优先验证 zero-auth 商用签名证书；未付费则跳转爱发电鉴权
+        // 👑 升级导出函数：使用 zero-auth 鉴权；未付费立即引导爱发电（面包多备注保留）
         function exportPPT() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isPaid = (window.ApexAuth && window.ApexAuth.isPaidUser()) || 
-                           urlParams.get('status') === 'paid' || 
-                           urlParams.get('paid') === 'true' || 
-                           localStorage.getItem('APEX_PAID_TOKEN') === 'true';
-
-            if (!isPaid) {
-                if (confirm("🔒 该可视化 PPT 路演套件需商业授权。\n点击【确定】跳转至爱发电 (Afdian) 极速直付页；无需账号注册，扫码付完凭回跳即可永久解锁下载权限！")) {
+            if (window.ApexAuth && window.ApexAuth.isPaidUser()) {
+                const blob = new Blob([JSON.stringify({brand: document.getElementById("bindBrand").value, slides: slidesData}, null, 2)], {type: "application/json"});
+                const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+                a.download = `${currentDeckKey}_Visual_Deck_${Date.now()}.json`;
+                document.body.appendChild(a); a.click();
+            } else {
+                if (confirm("🔒 该可视化 PPT 路演套件需商业授权。\n点击【确定】跳转至爱发电 (Afdian) 极速直付页；无需账号注册，扫码后将凭回跳自动解锁全部下载权限！")) {
                     window.location.href = PPT_PAY_CONFIG.afdianUrl;
                 }
-                return;
             }
-            localStorage.setItem('APEX_PAID_TOKEN', 'true');
-            const blob = new Blob([JSON.stringify({brand: document.getElementById("bindBrand").value, slides: slidesData}, null, 2)], {type: "application/json"});
-            const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-            a.download = `${currentDeckKey}_Visual_Deck_${Date.now()}.json`;
-            document.body.appendChild(a); a.click();
         }
 
         window.onload = () => { loadDeckByRouter(); };
