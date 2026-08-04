@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V28 一键回退 + @无残留补全)</title>
+    <title>ApexWork AI 驾驶舱 (V29 @无残留终极版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -18,7 +18,7 @@
         .themed-text { color: var(--text-main); }
         .themed-subtext { color: var(--text-sub); }
 
-        /* 胶囊 Token 样式（支持双击编辑） */
+        /* 胶囊 Token 样式 */
         .dept-token {
             display: inline-flex;
             align-items: center;
@@ -68,14 +68,13 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V28 一键回退 + @无残留</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V29 @零残留补全</span>
             <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
                 <span>🌞/🌙 换黑白</span>
             </button>
-            <!-- 👑 修改文案：干净清爽的“一键回退” -->
             <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition shadow-sm">
                 <span>⏳ 一键回退</span>
             </button>
@@ -205,7 +204,7 @@
                 </div>
 
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 蜂群智能协同 (V28 引擎)</span>
+                    <span>🚀 立即发车 / 蜂群智能协同 (V29 引擎)</span>
                 </button>
             </div>
 
@@ -215,7 +214,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V28 在线。输入框已完美修复 @ 菜单联想选择后的字符残留问题。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V29 在线。已完美解决 @ 下拉选择后的字符残留问题。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -412,7 +411,11 @@
                 const item = document.createElement("div");
                 item.className = "mention-item themed-text border-b border-gray-500/10 flex items-center justify-between";
                 item.innerHTML = `<span>@${dept}</span><span class="text-[9px] themed-subtext">主责部门</span>`;
-                item.onclick = () => selectMentionDept(dept);
+                // 👑 重点升级：onmousedown 配合 preventDefault 防止失去焦点导致字符漏删！
+                item.onmousedown = (e) => {
+                    e.preventDefault();
+                    selectMentionDept(dept);
+                };
                 dropdown.appendChild(item);
             });
 
@@ -426,7 +429,7 @@
             if (dropdown) dropdown.style.display = "none";
         }
 
-        // 👑 彻底修复：使用原生 Range.deleteContents() 完美消除 @xxx 输入痕迹，零残留
+        // 👑 重点升级：使用 Range 同时覆盖 @ 字符和已输入的关键词，彻底销毁，零残留！
         function selectMentionDept(deptName) {
             hideMentionDropdown();
             const cmdBox = document.getElementById("cmd");
@@ -439,15 +442,17 @@
                 
                 if (textNode.nodeType === Node.TEXT_NODE) {
                     const text = textNode.textContent;
-                    const atIdx = text.lastIndexOf("@", range.startOffset);
+                    const cursorOffset = range.startOffset;
+                    const atIdx = text.lastIndexOf("@", cursorOffset);
                     if (atIdx !== -1) {
-                        // 利用选区精准圈住 @ 字符到光标处，并从 DOM 树中干净抹除
+                        // 覆盖从 @ 到光标结束的位置，全部彻底剔除！
                         range.setStart(textNode, atIdx);
+                        range.setEnd(textNode, cursorOffset);
                         range.deleteContents();
                     }
                 }
 
-                // 在干净的选区后直接嵌入胶囊
+                // 嵌入词条胶囊
                 const tokenSpan = createDeptTokenElement(deptName);
                 range.insertNode(tokenSpan);
                 const spaceNode = document.createTextNode(" ");
@@ -807,7 +812,7 @@ ${memoryFile.content || "无"}
                 appendLog("❌ 协同会商异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V28 引擎)</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V29 引擎)</span>";
             }
         }
 
