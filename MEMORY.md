@@ -28,3 +28,11 @@
 - [EVO-RECORD]: 今日确立多文件分层架构——数据层独立为 /templates/aerotech-2026.json 承载15页创投路演全部标题与KPI数据，彻底弃用单HTML堆砌模式，为后续 editor.html 与 js/editor-engine.js 的模块化交互引擎奠定数据驱动基础。
 - [EVO-RECORD]: 今日确立多文件分层架构——数据层独立为 /templates/aerotech-2026.json 承载15页创投路演全部标题与KPI数据，彻底弃用单HTML堆砌模式，为后续 editor.html 与 js/editor-engine.js 的模块化交互引擎奠定数据驱动基础。
 - [EVO-RECORD | 2026-08-04 09:49]: 重构双页面为极简视觉流，以高清图+动态组件替代冗余文字，保留商城收费与导出逻辑
+===SWARM_LOG===
+【🐞缺陷反馈部】扫描全站支付链路，发现 `editor.html` 与 `index.html` 中收银台仅模拟 `?status=paid` 回调，未对接真实支付网关签名验证，存在“假支付”漏洞。
+【📈销售转化部】确认需接入 Stripe Payment Links 或 LemonSqueezy 标准回调，以 `?status=paid&signature=...` 形式回传，前端用 Ed25519 公钥验签，验签通过才解锁导出。
+【🛠️工程部】已在 `editor.html` 中植入 `verifyEd25519Signature()` 原生 JS 函数，并改造收银台按钮：未验签通过时导出按钮置灰，验签通过后写入 `localStorage` 并激活 Blob 导出。同时保留 `?status=paid` 兼容旧链接，但强制要求 `signature` 参数存在。
+【⚖️质量审核部】确认改动未破坏现有便当盒布局与 15 页导航，所有按钮均有原生 JS 响应，无死链。
+
+
+- [EVO-RECORD | 2026-08-04 11:59]: 【🐞缺陷反馈部】【🛠️工程部】为 editor.html 接入 Ed25519 签名验签支付闭环，未验签禁止导出，杜绝假支付，保留旧回调兼容。
