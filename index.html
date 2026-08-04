@@ -139,5 +139,25 @@
         APEXWORK · AI-POWERED ENTERPRISE STORE · VISUAL ENGINE 2026
     </footer>
 
+    <!-- 👑 极客自检引擎：检查目标文件是否存在，拦截 404 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const links = document.querySelectorAll('a[href$=".html"]');
+            links.forEach(link => {
+                link.addEventListener('click', async (e) => {
+                    const target = link.getAttribute('href');
+                    if (target && target !== 'index.html' && !target.startsWith('http')) {
+                        try {
+                            const res = await fetch(target, { method: 'HEAD' });
+                            if (res.status === 404) {
+                                e.preventDefault();
+                                alert(`【极客质检拦截】：页面 [ ${target} ] 尚未在 GitHub 远端生效或被误删，已自动阻止进入 404！`);
+                            }
+                        } catch (err) { /* 忽略跨域或本地调试错误 */ }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
