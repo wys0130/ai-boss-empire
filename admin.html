@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V22 Multi-File Swarm Engine)</title>
+    <title>ApexWork AI 驾驶舱 (V23 QA-Integrated Swarm Engine)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -26,7 +26,8 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V22 MULTI-FILE</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V23 QA-INTEGRATED</span>
+            <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
@@ -67,7 +68,7 @@
         </div>
     </div>
 
-    <!-- 9 大部门按键 -->
+    <!-- 9 大部门按键 (👑 第二部门升级为：缺陷与QA质检部) -->
     <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
         <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5 text-xs font-mono">
             <div class="flex items-center gap-2">
@@ -84,8 +85,8 @@
                 <div class="text-[9px] text-gray-400 truncate mt-0.5">工单调度分发</div>
             </button>
             <button onclick="inspectDept('缺陷反馈部', this)" class="dept-btn themed-inner border border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-rose-400 group-hover:underline">🐞 缺陷反馈部</div>
-                <div class="text-[9px] text-rose-300 truncate mt-0.5">盯支付接口/BUG</div>
+                <div class="text-[11px] font-bold text-rose-400 group-hover:underline">🐞 缺陷与QA质检部</div>
+                <div class="text-[9px] text-rose-300 truncate mt-0.5">BUG/自动自愈闭环</div>
             </button>
             <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
                 <div class="text-[11px] font-bold text-amber-400 group-hover:underline">🔧 主动产品部</div>
@@ -135,11 +136,11 @@
         <!-- 右栏：董事长控制指令台 -->
         <section class="lg:col-span-7 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl justify-between">
             <div>
-                <!-- BUG 报警栏 -->
+                <!-- BUG 报警与 QA 闭环栏 -->
                 <div id="bugAlertBanner" class="mb-2.5 bg-rose-500/10 border border-rose-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono">
                     <div class="flex items-center gap-1.5">
-                        <span class="text-rose-500 font-bold">🐞 [缺陷部报告]:</span>
-                        <span class="text-rose-300">系统已升级至 V22，全面支持多文件并列生成与闭环写库。</span>
+                        <span class="text-rose-500 font-bold">🐞 [缺陷与QA质检报告]:</span>
+                        <span class="text-rose-300">系统升级 V23，已打通 QA 流水线报错 ➔ AI 自动生成自改闭环。</span>
                     </div>
                     <button onclick="autoFixPaymentBug()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded text-[11px] transition">
                         ⚡ 派单解决
@@ -154,7 +155,7 @@
                     <textarea id="cmd" rows="2" placeholder="输入指示；或留空直接 Enter（触发蜂群全自动自查/重构多文件/修死链与按键功能）..." class="w-full themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
                 </div>
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 唤醒蜂群自驱建设 (V22 多文件引擎)</span>
+                    <span>🚀 立即发车 / 唤醒蜂群自驱建设 (V23 QA 闭环引擎)</span>
                 </button>
             </div>
 
@@ -164,7 +165,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V22 在线。已破除单文件写入限制，支持 ===FILE: filepath=== 多文件原子并发写库。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V23 在线。已合并【缺陷与QA质检部】，自动捕获 CI 红条并闭环写库。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -176,9 +177,12 @@
         </section>
     </main>
 
+    <!-- 👑 终极极客引擎：包含真实系统时钟强制校准 + QA自愈巡检 + 多文件原子推送 -->
     <script>
         const REPO = "wys0130/ai-boss-empire";
         let activeFilterDept = "";
+        let qaMonitorInterval = null;
+        let isAutoHealing = false;
 
         function initAdminTheme() {
             const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
@@ -207,6 +211,7 @@
             toggleConfig();
             alert("✅ 密钥生效!");
             loadHistoryFromMemory();
+            startQAGuardLoop();
         }
 
         function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
@@ -256,8 +261,30 @@
         }
 
         function autoFixPaymentBug() {
-            document.getElementById("cmd").value = "【🐞缺陷反馈部+工程部协作】：一键修复并独立落地 excel-editor.html 与 word-editor.html 真实业务逻辑！";
+            document.getElementById("cmd").value = "【🐞缺陷反馈与QA质检部 + 工程部协作】：一键检查并独立修正 excel-editor.html 与 word-editor.html 真实业务逻辑，保证正常链接与没有 404！";
             triggerSwarmAutonomousAction();
+        }
+
+        // ==========================================
+        // 👑 1. 彻底杀死 AI 脑补时间：提交前强制注入当前电脑本地标准时间
+        // ==========================================
+        function getRealStandardTime() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            const ss = String(d.getSeconds()).padStart(2, '0');
+            return `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
+        }
+
+        // 强行把大模型产出的任何伪造时钟串替换为本地电脑真实时间
+        function stripAndEnforceRealTime(memoryLine) {
+            const realTimeStr = getRealStandardTime();
+            // 清除旧的 [EVO-RECORD | xxxx-xx-xx xx:xx:xx] 或 [EVO-RECORD]:
+            let cleaned = memoryLine.replace(/\[EVO-RECORD[^\]]*\]:/, "").trim();
+            return `- [EVO-RECORD | ${realTimeStr}]: ${cleaned}`;
         }
 
         async function fetchCommitHistory() {
@@ -312,7 +339,7 @@
                     await pushGithubFile("index.html", prevCode, currentFile.sha, `⏳ VETO: Reverted to #${shortSha}`, keys.gh);
                 }
 
-                const nowStr = formatStandardTime(new Date());
+                const nowStr = getRealStandardTime();
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长行使否决权，还原快照 #${shortSha}。`;
                 await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: Reverted to #${shortSha}`, keys.gh);
@@ -320,19 +347,6 @@
                 appendLog(`✅ 快照覆盖成功！已回滚至 [#${shortSha}]。`, "text-emerald-500 font-bold");
                 await loadHistoryFromMemory();
             } catch(err) { appendLog("❌ 否决异常: " + err.message, "text-rose-500"); }
-        }
-
-        // ==========================================
-        // 👑 1. 真实本地时钟标准解析：不再出现倒推时间与时钟错乱
-        // ==========================================
-        function formatStandardTime(dateObj = new Date()) {
-            const y = dateObj.getFullYear();
-            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const d = String(dateObj.getDate()).padStart(2, '0');
-            const hh = String(dateObj.getHours()).padStart(2, '0');
-            const mm = String(dateObj.getMinutes()).padStart(2, '0');
-            const ss = String(dateObj.getSeconds()).padStart(2, '0');
-            return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
         }
 
         async function loadHistoryFromMemory() {
@@ -357,8 +371,9 @@
                 feed.innerHTML = "";
                 lines.reverse().forEach((line, idx) => {
                     const isLatest = idx === 0;
-                    const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})/);
-                    const timeStr = exactDateMatch ? exactDateMatch[1] : formatStandardTime(new Date());
+                    // 精确抓取记录里的有效时间
+                    const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
+                    const timeStr = exactDateMatch ? exactDateMatch[1] : "已记录";
                     let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
 
                     let cardBorder = isLatest ? "border-emerald-500/60 themed-inner shadow-md ring-1 ring-emerald-500/20" : "border-gray-500/20 themed-inner opacity-75";
@@ -405,15 +420,98 @@
             return await res.json();
         }
 
-        // 👑 【V22 终极核心】多文件原子解析与并发写库
+        // ==========================================
+        // 👑 2. 缺陷与QA质检部：无头持续集成自愈监工 (CI Auto-Heal Loop)
+        // ==========================================
+        async function checkLatestQARun() {
+            try {
+                const keys = getKeys();
+                const url = `https://api.github.com/repos/${REPO}/actions/runs?per_page=1`;
+                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data.workflow_runs && data.workflow_runs[0] ? data.workflow_runs[0] : null;
+            } catch (e) { return null; }
+        }
+
+        async function fetchRunErrorLogs(runId) {
+            try {
+                const keys = getKeys();
+                const url = `https://api.github.com/repos/${REPO}/actions/runs/${runId}/jobs`;
+                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
+                const data = await res.json();
+                if (!data.jobs || data.jobs.length === 0) return "流水线异常退出";
+                
+                const failedJob = data.jobs.find(j => j.conclusion === "failure");
+                if (!failedJob) return "持续集成未通过";
+                
+                const failedStep = failedJob.steps.find(s => s.conclusion === "failure");
+                return `[作业: ${failedJob.name}] 失败步骤 -> ${failedStep ? failedStep.name : '物理链接或语法校验异常'}`;
+            } catch (e) { return "无法获取构建异常堆栈"; }
+        }
+
+        async function startQAGuardLoop() {
+            async function loopTask() {
+                if (isAutoHealing) return;
+                
+                const latestRun = await checkLatestQARun();
+                if (!latestRun) return;
+
+                if (latestRun.status !== "completed") {
+                    appendLog(`⏳ [QA 状态] 当前部署流水线 [#${latestRun.run_number}] 仍在构建扫描中...`, "text-yellow-500");
+                    return;
+                }
+
+                if (latestRun.conclusion === "success") {
+                    const statusBadge = document.getElementById("qaStatusBadge");
+                    if (statusBadge) statusBadge.innerHTML = `✅ QA GREEN (#${latestRun.run_number})`;
+                    return;
+                }
+
+                // 👑 若捕获到流水线爆红 ➔ 触发【缺陷与QA质检部】闭环自发单！
+                if (latestRun.conclusion === "failure") {
+                    isAutoHealing = true;
+                    appendLog(`❌ [QA 警报触发]：检测到发布流水线 [#${latestRun.run_number}] 拦截报红！正在调取具体日志...`, "text-rose-500 font-bold");
+                    
+                    const errDetail = await fetchRunErrorLogs(latestRun.id);
+                    appendLog(`🐞 [缺陷与QA质检部介入]：${errDetail}`, "text-rose-400");
+                    
+                    const fixCommand = `【🐞缺陷与QA质检部 + 工程部自愈指令】：
+监控捕获最新 Actions 构建报错："${errDetail}"。
+请立即解决可能导致 404 的文件名丢失或语法错误，确保 index.html, editor.html, excel-editor.html, word-editor.html 全部物理存在。
+必须同时输出正确的 ===FILE: 文件名=== 块以消除该 CI 构建报错！`;
+
+                    document.getElementById("cmd").value = fixCommand;
+                    appendLog("🚀 [QA 唤醒蜂群]：错误指令已喂回中枢，正在自动重构新修复代码...", "text-amber-400 font-bold");
+                    
+                    try {
+                        await triggerSwarmAutonomousAction();
+                        appendLog("🛠️ [修复推送完成]：代码已强制推往远端，等待 GitHub 下轮编译验证！", "text-emerald-400");
+                    } catch (healErr) {
+                        appendLog("❌ [自愈执行异常]：" + healErr.message, "text-rose-500");
+                    } finally {
+                        isAutoHealing = false;
+                    }
+                }
+            }
+
+            loopTask();
+            if (!qaMonitorInterval) {
+                qaMonitorInterval = setInterval(loopTask, 30000);
+            }
+        }
+
+        // ==========================================
+        // 👑 3. 终极多文件引擎 (支持文件分割、写库与时间强制校准)
+        // ==========================================
         async function triggerSwarmAutonomousAction() {
             const btn = document.getElementById("runBtn");
             const cmdInput = document.getElementById("cmd");
-            const cmd = cmdInput.value.trim() || "【缺陷反馈部+工程部协作】：请一次性生成并修复 excel-editor.html 与 word-editor.html 真实业务逻辑，确保原生 JS 响应。";
+            const cmd = cmdInput.value.trim() || "【缺陷与QA质检部+工程部协作】：一键检查并独立修正 excel-editor.html 与 word-editor.html 真实业务逻辑，保证无死链！";
 
             btn.disabled = true;
             btn.innerHTML = "<span>⚙️ 9 大智能部门多文件协同建设中...</span>";
-            appendLog("🧠 [大脑中枢 V22 启动]：准备多文件原子并发写库管道...");
+            appendLog("🧠 [大脑中枢 V23 启动]：准备多文件原子并发写库管道...");
 
             try {
                 const keys = getKeys();
@@ -426,7 +524,7 @@
                 const treeSummary = repoTree.length > 0 ? repoTree.join("\n") : "index.html\neditor.html\nadmin.html\nMEMORY.md";
                 appendLog(`📁 [实时项目树检索成功]，发单中...`);
 
-                const prompt = `你是 APEXWORK 智能体蜂群中枢（V22 多文件控制引擎）。
+                const prompt = `你是 APEXWORK 智能体蜂群中枢（V23 多文件控制引擎）。
 项目现有物理文件树：
 ${treeSummary}
 
@@ -439,7 +537,7 @@ ${memoryFile.content || "无"}
 【极重要规范】：
 1. 你的回答必须使用 ===SWARM_LOG=== 开始写协作战报，用 ===NEW_MEMORY=== 提炼一条记忆；
 2. 严禁把代码覆盖错文件！要写 Excel 必须写在 ===FILE: excel-editor.html=== 之下；要写 Word 必须写在 ===FILE: word-editor.html=== 之下。你可以同时输出一个或多个 ===FILE: 文件名=== 块！
-3. 所有 HTML 页面绝不允许只有视觉空壳！必须在页尾自带完整的原生 <script>，实现真实的动态数值计算、输入框事件联动、默认当期标准时间显示（禁止把年份月份写成死乱码）！
+3. 所有 HTML 页面绝不允许只有视觉空壳！必须在页尾自带完整的原生 <script>，实现真实的动态数值计算与点击交互！
 
 格式结构标准样例：
 ===SWARM_LOG===
@@ -474,7 +572,7 @@ ${memoryFile.content || "无"}
 
                 appendLog(`🤖 [各部行动直报]:\n${swarmLogText}`, "text-emerald-400 font-bold");
 
-                // 👑 使用正则表达式匹配所有的 ===FILE: xxx.html=== 代码块，并发写入远端！
+                // 使用正则表达式匹配所有的 ===FILE: xxx.html=== 代码块，并发写入远端！
                 const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
                 let match;
                 let filesWritten = 0;
@@ -488,7 +586,7 @@ ${memoryFile.content || "无"}
 
                     appendLog(`📍 [目标对齐落盘]: =>【 ${targetFilePath} 】...`, "text-indigo-400 font-bold");
                     const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Swarm V22: ${targetFilePath}`, keys.gh);
+                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Swarm V23: ${targetFilePath}`, keys.gh);
                     appendLog(`✅ 文件 [ ${targetFilePath} ] 物理覆盖成功！`, "text-emerald-500");
                     filesWritten++;
                 }
@@ -497,110 +595,19 @@ ${memoryFile.content || "无"}
                     throw new Error("模型响应中未找到标准 ===FILE: filename=== 代码块！");
                 }
 
-                // 写入 MEMORY 记忆
-                const nowStr = formatStandardTime(new Date());
-                const timestampedMemoryLine = rawMemoryLine.replace("[EVO-RECORD]:", `[EVO-RECORD | ${nowStr}]:`);
-                const updatedMemory = (memoryFile.content || "") + "\n" + timestampedMemoryLine;
-                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory: ${timestampedMemoryLine.slice(0, 35)}`, keys.gh);
+                // 👑 彻底杀死时间幻觉：将新记忆的时间强硬覆盖为当前本地标准时间！
+                const cleanTimestampedLine = stripAndEnforceRealTime(rawMemoryLine);
+                const updatedMemory = (memoryFile.content || "") + "\n" + cleanTimestampedLine;
+                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory: ${cleanTimestampedLine.slice(0, 35)}`, keys.gh);
 
                 appendLog(`🏆 协同大功告成！本次并发落地 ${filesWritten} 个物理文件，AI 闭环自演进完成。`, "text-emerald-400 font-black");
                 cmdInput.value = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ V22 协同执行出现异常: " + err.message, "text-rose-500");
+                appendLog("❌ V23 协同执行出现异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 唤醒蜂群自驱建设 (V22 多文件引擎)</span>";
-            }
-        }
-
-        // ==========================================
-        // 👑 2. 核心大招：QA 监工自愈闭环 (Auto-Heal Closed Loop)
-        // ==========================================
-        let qaMonitorInterval = null;
-        let isAutoHealing = false;
-
-        async function checkLatestQARun() {
-            try {
-                const keys = getKeys();
-                const url = `https://api.github.com/repos/${REPO}/actions/runs?per_page=1`;
-                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
-                if (!res.ok) return null;
-                const data = await res.json();
-                return data.workflow_runs && data.workflow_runs[0] ? data.workflow_runs[0] : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        async function fetchRunErrorLogs(runId) {
-            try {
-                const keys = getKeys();
-                const url = `https://api.github.com/repos/${REPO}/actions/runs/${runId}/jobs`;
-                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
-                const data = await res.json();
-                if (!data.jobs || data.jobs.length === 0) return "流水线异常退出";
-                
-                const failedJob = data.jobs.find(j => j.conclusion === "failure");
-                if (!failedJob) return "持续集成未通过";
-                
-                const failedStep = failedJob.steps.find(s => s.conclusion === "failure");
-                return `[作业: ${failedJob.name}] 失败步骤 -> ${failedStep ? failedStep.name : '物理链接或语法校验异常'}`;
-            } catch (e) {
-                return "无法获取构建异常堆栈";
-            }
-        }
-
-        async function startQAGuardLoop() {
-            appendLog("🛡️ [QA 监工总管在线]：正在实时监控 GitHub Actions 流水线通过状态...", "text-indigo-400 font-bold");
-            
-            async function loopTask() {
-                if (isAutoHealing) return;
-                
-                const latestRun = await checkLatestQARun();
-                if (!latestRun) return;
-
-                if (latestRun.status !== "completed") {
-                    appendLog(`⏳ [QA 状态] 当前部署流水线 [#${latestRun.run_number}] 仍在构建扫描中...`, "text-yellow-500");
-                    return;
-                }
-
-                if (latestRun.conclusion === "success") {
-                    const statusBadge = document.getElementById("qaStatusBadge");
-                    if (statusBadge) statusBadge.innerHTML = `<span class="text-emerald-400 font-bold">✅ QA GREEN (#${latestRun.run_number})</span>`;
-                    return;
-                }
-
-                // 👑 如果流水线失败了（Failure）——立即自动触发 AI 纠错闭环！
-                if (latestRun.conclusion === "failure") {
-                    isAutoHealing = true;
-                    appendLog(`❌ [QA 警报触发]：检测到发布流水线 [#${latestRun.run_number}] 拦截报红！正在调取具体日志...`, "text-rose-500 font-bold");
-                    
-                    const errDetail = await fetchRunErrorLogs(latestRun.id);
-                    appendLog(`🐞 [异常堆栈获取]：${errDetail}`, "text-rose-400");
-                    
-                    const fixCommand = `【审核质量部 + 施工工程部极客自愈紧急单】：
-自动监工系统捕获到最新 GitHub Actions 流水线报错："${errDetail}"。
-请立即自查可能导致 404 的文件名（严格遵守 index.html, editor.html, excel-editor.html, word-editor.html 的物理落地标准）以及 JS 语法报错。
-必须输出经过彻底修正的 ===FILE: 报错文件名=== 代码块，彻底消灭 CI 构建红条！`;
-
-                    document.getElementById("cmd").value = fixCommand;
-                    appendLog("🚀 [QA 唤醒蜂群]：已把编译错误反喂给大模型，正在静默生成新修复代码...", "text-amber-400 font-bold");
-                    
-                    try {
-                        await triggerSwarmAutonomousAction();
-                        appendLog("🛠️ [修复推送完成]：新代码已推往 GitHub，等待下次流水线执行转绿！", "text-emerald-400");
-                    } catch (healErr) {
-                        appendLog("❌ [自愈重试异常]：" + healErr.message, "text-rose-500");
-                    } finally {
-                        isAutoHealing = false;
-                    }
-                }
-            }
-
-            loopTask();
-            if (!qaMonitorInterval) {
-                qaMonitorInterval = setInterval(loopTask, 30000);
+                btn.innerHTML = "<span>🚀 立即发车 / 唤醒蜂群自驱建设 (V23 QA 闭环引擎)</span>";
             }
         }
 
@@ -608,7 +615,7 @@ ${memoryFile.content || "无"}
             initAdminTheme();
             if (localStorage.getItem("APEX_GH_TOKEN")) {
                 loadHistoryFromMemory();
-                // 👑 页面已授权成功，主动开启 30 秒无人工 QA 巡检与闭环自愈
+                // 页面打开成功后，立刻开启动态持续 QA 巡检与闭环自解
                 startQAGuardLoop();
             }
             document.getElementById("cmd").addEventListener("keydown", function(e) {
