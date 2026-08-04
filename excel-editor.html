@@ -29,18 +29,30 @@
 <body class="min-h-screen">
 <div class="max-w-7xl mx-auto p-4 lg:p-8">
   <!-- 顶部导航 -->
-  <header class="flex items-center justify-between mb-8">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-        <span class="text-white font-bold text-lg">A</span>
-      </div>
-      <div>
-        <h1 class="text-xl font-bold text-slate-900">Excel 财务模型编辑器</h1>
-        <p class="text-sm text-slate-500">12 个月滚动预测 · ROI 自动计算 · $9.99 付费导出</p>
-      </div>
-    </div>
-    <a href="index.html" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium">← 返回商城</a>
-  </header>
+  <!-- 👑 标准化 SaaS 导航栏：返回永远在最左侧，导出在最右侧 -->
+    <header class="flex justify-between items-center bg-white border-b border-slate-200 px-6 py-3 shadow-sm sticky top-0 z-50">
+        <!-- 左侧：返回按钮 + 页面主标题 (统一肌肉记忆) -->
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition border border-slate-300">
+                ← 返回商城
+            </a>
+            <span class="h-4 w-[1px] bg-slate-200"></span>
+            <div>
+                <h1 class="font-bold text-sm text-slate-800">Excel 财务模型编辑器</h1>
+                <p class="text-[10px] font-mono text-slate-400">12 个月滚动预测 · ROI 自动计算 · $9.99 付费导出</p>
+            </div>
+        </div>
+
+        <!-- 右侧：实时计算指示牌 + 付费收银导出 -->
+        <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-bold">
+                ● 实时计算中
+            </span>
+            <button onclick="exportExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
+                ⚡ 立即导出 .XLSX 测算表 ($9.99)
+            </button>
+        </div>
+    </header>
 
   <!-- 三栏工作台 -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
