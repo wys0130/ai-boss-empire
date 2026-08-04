@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEXWORK · Excel 全量矩阵直编财务模型 (WYSIWYG Pro)</title>
+<title>APEXWORK · Excel 财务模型编辑器</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -21,7 +21,6 @@
   .table-header { background: #f8fafc; font-weight: 600; text-align: center; }
   .month-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
   .month-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; white-space: nowrap; }
-  /* 👑 所见即所得直编高亮样式 */
   .editable-cell { background: rgba(16, 185, 129, 0.06); color: #047857; font-weight: 700; cursor: text; transition: background 0.2s; }
   .editable-cell:hover { background: rgba(16, 185, 129, 0.15); outline: 1px dashed #10b981; }
   .editable-cell:focus { outline: 2px solid #10b981; background: #ffffff; }
@@ -29,7 +28,6 @@
 </head>
 <body class="min-h-screen">
 <div class="max-w-7xl mx-auto p-4 lg:p-8">
-  <!-- 顶部导航：对齐左侧返回，右侧导出 -->
   <header class="flex justify-between items-center bg-white border-b border-slate-200 px-6 py-3 shadow-sm sticky top-0 z-50 mb-6 -mx-4 -mt-4 lg:-mx-8 lg:-mt-8">
       <div class="flex items-center gap-3">
           <a href="index.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition border border-slate-300">
@@ -38,24 +36,22 @@
           <span class="h-4 w-[1px] bg-slate-200"></span>
           <div>
               <h1 class="font-bold text-sm text-slate-800">Excel 财务模型编辑器</h1>
-              <p class="text-[10px] font-mono text-slate-400">12 个月矩阵全量直编 · 动态汇总 · $9.99 导出</p>
+              <p class="text-[10px] font-mono text-slate-400">12 个月滚动预测</p>
           </div>
       </div>
       <div class="flex items-center gap-3">
           <span class="text-xs font-mono text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-bold">
-              ● 全矩阵实时计算中
+              实时计算中
           </span>
           <button onclick="handleExport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
-              ⚡ 立即导出 .XLSX 测算表 ($9.99)
+              立即导出 .XLSX ($9.99)
           </button>
       </div>
   </header>
 
-  <!-- 三栏工作台 -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- 左侧：月份导航 -->
     <aside class="lg:col-span-2 bento-card p-4">
-      <h2 class="text-sm font-semibold text-slate-700 mb-4">📊 月份焦点导航</h2>
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">月份导航</h2>
       <div class="month-nav lg:flex-col lg:overflow-visible">
         <button class="month-btn nav-item active" data-month="0" onclick="selectMonth(0)">1月</button>
         <button class="month-btn nav-item" data-month="1" onclick="selectMonth(1)">2月</button>
@@ -70,17 +66,12 @@
         <button class="month-btn nav-item" data-month="10" onclick="selectMonth(10)">11月</button>
         <button class="month-btn nav-item" data-month="11" onclick="selectMonth(11)">12月</button>
       </div>
-      <div class="mt-6 p-4 bg-slate-50 rounded-lg">
-        <p class="text-xs text-slate-600 font-medium">💡 极客直编提示</p>
-        <p class="text-xs text-slate-500 mt-1">不仅当前焦点月份可改，连同右侧的 **Q1 汇总** 与 **全年总计** 单元格全部支持原地双击敲字直编！</p>
-      </div>
     </aside>
 
-    <!-- 中央：全矩阵可编辑预览 -->
     <main class="lg:col-span-7 bento-card p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-slate-900">📈 财务预测矩阵 (全量直编)</h2>
-        <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-bold">WYSIWYG 全局激活</span>
+        <h2 class="text-lg font-semibold text-slate-900">财务预测矩阵</h2>
+        <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-bold">WYSIWYG 激活</span>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm" id="financeTable">
@@ -88,16 +79,15 @@
             <tr>
               <th class="table-header">项目</th>
               <th class="table-header" id="thMonth">1月</th>
-              <th class="table-header">Q1 汇总 (可直编)</th>
-              <th class="table-header">全年总计 (可直编)</th>
+              <th class="table-header">Q1 汇总</th>
+              <th class="table-header">全年总计</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <!-- 动态生成 -->
           </tbody>
         </table>
       </div>
-      <!-- KPI 卡片 -->
+
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
         <div class="kpi-card p-4 bg-slate-50 rounded-lg">
           <p class="text-xs text-slate-500">毛利率</p>
@@ -118,9 +108,8 @@
       </div>
     </main>
 
-    <!-- 右侧：参数与导出 -->
     <aside class="lg:col-span-3 bento-card p-6">
-      <h2 class="text-lg font-semibold text-slate-900 mb-4">⚙️ 参数设置</h2>
+      <h2 class="text-lg font-semibold text-slate-900 mb-4">参数设置</h2>
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">初始投资 ($)</label>
@@ -140,13 +129,11 @@
         </div>
       </div>
 
-      <!-- 收银台 -->
       <div class="mt-8 p-4 bg-slate-900 rounded-xl text-white shadow-lg">
-        <h3 class="font-semibold mb-2">💳 付费导出</h3>
+        <h3 class="font-semibold mb-2">付费导出</h3>
         <p class="text-sm text-slate-300 mb-4">解锁 XLSX 完整交付包</p>
         <p class="text-3xl font-bold mb-4">$9.99 <span class="text-sm font-normal text-slate-400">/ 一次性</span></p>
-        <button id="exportBtn" class="btn-primary w-full py-3 rounded-lg font-semibold" onclick="handleExport()">🔒 验签后导出</button>
-        <p class="text-xs text-slate-400 mt-3 text-center">支付回调 ?status=paid&signature=...</p>
+        <button id="exportBtn" class="btn-primary w-full py-3 rounded-lg font-semibold" onclick="handleExport()">验签后导出</button>
       </div>
     </aside>
   </div>
@@ -156,7 +143,6 @@
 const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 let currentMonth = 0;
 let financeData = [];
-// 额外支持 Q1 与全年汇总的手工直编覆盖偏移量
 let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
 
 function initFinanceData() {
@@ -181,15 +167,12 @@ function updateROI() {
     financeData[i] = { revenue, cost, profit: revenue - cost };
   }
 
-  // 重置手工覆盖以跟随公式联动
   manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
   recomputeKPIsAndRender();
 }
 
-// 👑 核心组件直编监听：不管是当前月、Q1还是全年，点哪里改哪里！
 function updateCellFromTable(field, scope, rawText) {
   const val = parseFloat(rawText.replace(/[^0-9.-]/g, "")) || 0;
-  
   if (scope === 'month') {
     const cur = financeData[currentMonth];
     if (field === 'revenue') cur.revenue = val;
@@ -202,7 +185,6 @@ function updateCellFromTable(field, scope, rawText) {
     if (field === 'revenue') manualOverrides.yearRev = val;
     if (field === 'cost') manualOverrides.yearCost = val;
   }
-
   recomputeKPIsAndRender(false);
 }
 
@@ -263,7 +245,7 @@ function renderTable(rebuildHtml = true) {
         <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('cost', 'year', this.textContent)">$${yearCost.toFixed(0)}</td>
       </tr>
       <tr class="bg-slate-50">
-        <td class="table-cell font-medium text-left text-slate-900 font-bold">利润 (自动核算)</td>
+        <td class="table-cell font-medium text-left text-slate-900 font-bold">利润</td>
         <td class="table-cell font-semibold text-slate-900" id="cellCurProfit">$${current.profit.toFixed(0)}</td>
         <td class="table-cell font-semibold text-slate-900" id="cellQ1Profit">$${q1Profit.toFixed(0)}</td>
         <td class="table-cell font-semibold text-slate-900" id="cellYearProfit">$${yearProfit.toFixed(0)}</td>
@@ -297,7 +279,7 @@ function verifyEd25519Signature() {
 
 function handleExport() {
   if (!verifyEd25519Signature()) {
-    alert('⚠️ 未检测到有效支付签名。请完成 $9.99 支付后重试。');
+    alert('未检测到有效支付签名。请完成 $9.99 支付后重试。');
     return;
   }
   exportXLSX();
@@ -312,7 +294,7 @@ function exportXLSX() {
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, ws, '财务预测');
   XLSX.writeFile(wb, 'APEXWORK-Financial-Model.xlsx');
-  alert('✅ XLSX 已生成，感谢购买！');
+  alert('XLSX 已生成，感谢购买！');
 }
 
 initFinanceData();
