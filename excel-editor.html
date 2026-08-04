@@ -108,9 +108,10 @@
       </div>
     </main>
 
+    <!-- 智能全球支付侧边栏 -->
     <aside class="lg:col-span-3 bento-card p-6">
       <h2 class="text-lg font-semibold text-slate-900 mb-4">参数设置</h2>
-      <div class="space-y-4">
+      <div class="space-y-4 mb-6">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">初始投资 ($)</label>
           <input type="number" id="initialInvestment" class="input-field w-full" value="50000" oninput="updateROI()">
@@ -129,11 +130,20 @@
         </div>
       </div>
 
-      <div class="mt-8 p-4 bg-slate-900 rounded-xl text-white shadow-lg">
-        <h3 class="font-semibold mb-2">付费导出</h3>
-        <p class="text-sm text-slate-300 mb-4">解锁 XLSX 完整交付包</p>
-        <p class="text-3xl font-bold mb-4">$9.99 <span class="text-sm font-normal text-slate-400">/ 一次性</span></p>
-        <button id="exportBtn" class="btn-primary w-full py-3 rounded-lg font-semibold" onclick="handleExport()">验签后导出</button>
+      <!-- 智能支付网关组件 -->
+      <div class="p-4 bg-slate-900 rounded-xl text-white shadow-lg">
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold text-sm">付费导出</h3>
+            <button onclick="togglePayRegion()" id="regionSwitchBtn" class="text-[10px] bg-slate-800 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded font-mono hover:bg-slate-700 transition">
+                检测地区...
+            </button>
+        </div>
+        <p class="text-xs text-slate-300 mb-2" id="payDesc">智能匹配支付通道</p>
+        <p class="text-2xl font-bold mb-3" id="payPrice">$9.99 <span class="text-xs font-normal text-slate-400">/ 一次性</span></p>
+        <button id="smartExportBtn" onclick="handleSmartExport()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-md flex items-center justify-center gap-1">
+            <span>加载支付网关...</span>
+        </button>
+        <div class="text-[10px] text-slate-400 mt-2 text-center font-mono" id="payTip">国内支持微信/支付宝，海外支持卡与Apple Pay</div>
       </div>
     </aside>
   </div>
@@ -144,6 +154,58 @@ const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','
 let currentMonth = 0;
 let financeData = [];
 let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
+
+// 全球支付智能网关配置（已填入你的面包多真实链接）
+const PAY_CONFIG = {
+    china: {
+        name: "国内安全支付",
+        price: "￥69 / 次",
+        url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+        tip: "通过面包多安全支付，支持微信与支付宝"
+    },
+    overseas: {
+        name: "海外快捷支付",
+        price: "$9.99 / 次",
+        url: "https://mbd.pub/o/bread/YZaUmJlpbQ==", // 暂时双向指向面包多，海外可后续替换为Stripe
+        tip: "无需注册，支持主流信用卡及 Apple Pay"
+    }
+};
+let currentRegion = 'overseas';
+
+async function detectUserRegion() {
+    try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        if (data.country_code === 'CN') {
+            currentRegion = 'china';
+        } else {
+            currentRegion = 'overseas';
+        }
+    } catch (e) {
+        currentRegion = 'overseas';
+    }
+    updatePayUI();
+}
+
+function updatePayUI() {
+    const config = PAY_CONFIG[currentRegion];
+    document.getElementById('payPrice').innerHTML = config.price;
+    document.getElementById('payDesctextContent'] = config.name;
+    document.getElementById('payTip').textContent = config.tip;
+    document.getElementById('regionSwitchBtn').textContent = currentRegion === 'china' ? '🇨🇳 国内版 (点此切换海外)' : '🌍 海外版 (点此切换国内)';
+    document.getElementById('smartExportBtn').innerHTML = `⚡ 立即通过 ${currentRegion === 'china' ? '面包多' : '快捷网关'} 支付解锁`;
+}
+
+function togglePayRegion() {
+    currentRegion = currentRegion === 'china' ? 'overseas' : 'china';
+    updatePayUI();
+}
+
+function handleSmartExport() {
+    // 验签通过或者直接跳转面包多收银台
+    const targetUrl = PAY_CONFIG[currentRegion].url;
+    window.location.href = targetUrl;
+}
 
 function initFinanceData() {
   financeData = [];
@@ -266,26 +328,7 @@ function selectMonth(index) {
   renderTable(true);
 }
 
-function verifyEd25519Signature() {
-  const params = new URLSearchParams(window.location.search);
-  const status = params.get('status');
-  const signature = params.get('signature');
-  if (status === 'paid' && signature && signature.length > 20) {
-    localStorage.setItem('apex_paid', 'true');
-    return true;
-  }
-  return localStorage.getItem('apex_paid') === 'true';
-}
-
 function handleExport() {
-  if (!verifyEd25519Signature()) {
-    alert('未检测到有效支付签名。请完成 $9.99 支付后重试。');
-    return;
-  }
-  exportXLSX();
-}
-
-function exportXLSX() {
   const wb = XLSX.utils.book_new();
   const data = [['月份', '收入', '成本', '利润']];
   financeData.forEach((m, i) => {
@@ -294,11 +337,12 @@ function exportXLSX() {
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, ws, '财务预测');
   XLSX.writeFile(wb, 'APEXWORK-Financial-Model.xlsx');
-  alert('XLSX 已生成，感谢购买！');
+  alert('XLSX 已生成！');
 }
 
 initFinanceData();
 recomputeKPIsAndRender(true);
+detectUserRegion();
 </script>
 </body>
 </html>
