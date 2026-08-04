@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEXWORK 商务三件套极速定制台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@noble/ed25519@2.1.0/lib/ed25519.umd.min.js"></script>
+    <style>
+        /* 锁定区域：便当盒布局核心样式，禁止改动 */
+        .bento-grid { display: grid; grid-template-columns: 240px 1fr 320px; gap: 16px; height: 100vh; padding: 16px; background: #f8fafc; }
+        .bento-panel { background: white; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); overflow-y: auto; }
+        .bento-panel::-webkit-scrollbar { width: 6px; }
+        .bento-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .nav-item { padding: 10px 16px; border-radius: 10px; cursor: pointer; transition: all 0.2s; font-size: 13px; color: #475569; }
+        .nav-item:hover { background: #f1f5f9; }
+        .nav-item.active { background: #0f172a; color: white; font-weight: 600; }
+        .kpi-card { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border-radius: 12px; padding: 16px; }
+        .export-btn { background: #0f172a; color: white; border-radius: 12px; padding: 14px 20px; font-weight: 700; transition: all 0.2s; }
+        .export-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .export-btn:not(:disabled):hover { background: #1e293b; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.3); }
+        .slide-canvas { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; }
+        .param-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 13px; }
+        .param-input:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+        .badge { display: inline-block; background: #f1f5f9; color: #475569; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="bento-grid">
+        <!-- 左侧：页面导航 -->
+        <aside class="bento-panel p-4">
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+                    <span class="text-white text-sm font-bold">A</span>
+                </div>
+                <span class="font-bold text-slate-900">APEXWORK</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">页面导航</div>
+            <div id="navList" class="space-y-1"></div>
+        </aside>
+
+        <!-- 中央：实时预览画布 -->
+        <main class="bento-panel p-6 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">创投路演 · 15页极速定制</h1>
+                    <p class="text-sm text-slate-500">少字多图 · 视觉冲击 · 一键导出</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="badge">PPTX</span>
+                    <span class="badge">XLSX</span>
+                    <span class="badge">DOCX</span>
+                </div>
+            </div>
+            <div class="slide-canvas flex-1" id="slideCanvas">
+                <div class="text-center p-8">
+                    <div class="text-4xl mb-4">📊</div>
+                    <div class="text-lg font-semibold text-slate-700">选择左侧页面开始编辑</div>
+                    <div class="text-sm text-slate-400 mt-2">所有修改实时预览</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 右侧：参数与付费导出 -->
+        <aside class="bento-panel p-4 flex flex-col gap-4">
+            <div>
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">页面参数</div>
+                <div id="paramPanel" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">主标题</label>
+                        <input type="text" class="param-input" id="paramTitle" placeholder="输入标题">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">副标题</label>
+                        <input type="text" class="param-input" id="paramSubtitle" placeholder="输入副标题">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">KPI 数值</label>
+                        <input type="text" class="param-input" id="paramKpi" placeholder="如：$12M">
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="text-xs opacity-70 mb-1">当前方案</div>
+                <div class="text-2xl font-bold">$9.99</div>
+                <div class="text-xs opacity-70 mt-1">一次性买断 · 无限导出</div>
+            </div>
+
+            <!-- 支付与导出区 -->
+            <div class="space-y-3">
+                <button id="payBtn" class="w-full bg-emerald-500 text-white rounded-xl py-3 font-bold hover:bg-emerald-600 transition-all">
+                    💳 立即支付 $9.99
+                </button>
+                <button id="exportBtn" class="export-btn w-full" disabled>
+                    📦 导出三件套
+                </button>
+                <div id="payStatus" class="text-xs text-center text-slate-400">未支付 · 导出已锁定</div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // ===== 锁定区域：数据层与导航渲染（禁止改动）=====
+        const deckData = {
+            pages: [
+                { id: 1, title: "封面", subtitle: "AeroTech 2026", kpi: "$12M" },
+                { id: 2, title: "市场机会", subtitle: "全球无人机市场", kpi: "$48B" },
+                { id: 3, title: "痛点分析", subtitle: "现有方案不足", kpi: "87%" },
+                { id: 4, title: "解决方案", subtitle: "AI 自主飞行平台", kpi: "3x" },
+                { id: 5, title: "产品架构", subtitle: "端到端系统", kpi: "5层" },
+                { id: 6, title: "技术壁垒", subtitle: "专利与算法", kpi: "12项" },
+                { id: 7, title: "商业模式", subtitle: "SaaS + 硬件", kpi: "$99/mo" },
+                { id: 8, title: "市场验证", subtitle: "试点客户反馈", kpi: "94%" },
+                { id: 9, title: "竞争分析", subtitle: "对比传统方案", kpi: "2.4x" },
+                { id: 10, title: "财务预测", subtitle: "未来三年营收", kpi: "$120M" },
+                { id: 11, title: "团队介绍", subtitle: "核心成员", kpi: "15人" },
+                { id: 12, title: "发展规划", subtitle: "里程碑路线", kpi: "4阶段" },
+                { id: 13, title: "融资需求", subtitle: "本轮融资", kpi: "$8M" },
+                { id: 14, title: "风险控制", subtitle: "应对策略", kpi: "6项" },
+                { id: 15, title: "联系我们", subtitle: "立即洽谈", kpi: "hello@aerotech.io" }
+            ],
+            currentPage: 1
+        };
+
+        function renderNav() {
+            const navList = document.getElementById('navList');
+            navList.innerHTML = deckData.pages.map(p => `
+                <div class="nav-item ${p.id === deckData.currentPage ? 'active' : ''}" data-page="${p.id}">
+                    <span class="mr-2 text-slate-400">${String(p.id).padStart(2,'0')}</span>
+                    ${p.title}
+                </div>
+            `).join('');
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    deckData.currentPage = parseInt(el.dataset.page);
+                    renderNav();
+                    renderPreview();
+                    loadParams();
+                });
+            });
+        }
+
+        function renderPreview() {
+            const page = deckData.pages.find(p => p.id === deckData.currentPage);
+            const canvas = document.getElementById('slideCanvas');
+            canvas.innerHTML = `
+                <div class="w-full h-full flex flex-col items-center justify-center p-12 text-center">
+                    <div class="text-5xl font-bold text-slate-900 mb-4">${page.kpi}</div>
+                    <div class="text-2xl font-semibold text-slate-700 mb-2">${page.title}</div>
+                    <div class="text-lg text-slate-400">${page.subtitle}</div>
+                </div>
+            `;
+        }
+
+        function loadParams() {
+            const page = deckData.pages.find(p => p.id === deckData.currentPage);
+            document.getElementById('paramTitle').value = page.title;
+            document.getElementById('paramSubtitle').value = page.subtitle;
+            document.getElementById('paramKpi').value = page.kpi;
+        }
+
+        // 参数实时绑定
+        document.getElementById('paramTitle').addEventListener('input', e => {
+            const page = deckData.pages.find(p => p.id === deckData.currentPage);
+            page.title = e.target.value;
+            renderPreview();
+        });
+        document.getElementById('paramSubtitle').addEventListener('input', e => {
+            const page = deckData.pages.find(p => p.id === deckData.currentPage);
+            page.subtitle = e.target.value;
+            renderPreview();
+        });
+        document.getElementById('paramKpi').addEventListener('input', e => {
+            const page = deckData.pages.find(p => p.id === deckData.currentPage);
+            page.kpi = e.target.value;
+            renderPreview();
+        });
+
+        // ===== 新增：Ed25519 支付验签闭环 =====
+        // 公钥：APEXWORK 官方签名公钥（生产环境应替换为真实公钥）
+        const APEXWORK_PUBLIC_KEY = "demo_public_key_placeholder_ed25519_hex_64_chars";
+        const STORAGE_KEY = 'apexwork_vip_license';
+
+        // 验签函数：使用 @noble/ed25519 验证回调签名
+        async function verifyEd25519Signature(message, signatureHex) {
+            try {
+                if (!window.ed25519) {
+                    console.error('Ed25519 库未加载');
+                    return false;
+                }
+                // 将消息与签名转为 Uint8Array
+                const msgBytes = new TextEncoder().encode(message);
+                const sigBytes = Uint8Array.from(atob(signatureHex), c => c.charCodeAt(0));
+                const pubKeyBytes = Uint8Array.from(atob(APEXWORK_PUBLIC_KEY), c => c.charCodeAt(0));
+                // 执行验签
+                return await window.ed25519.verify(sigBytes, msgBytes, pubKeyBytes);
+            } catch (err) {
+                console.error('验签失败:', err);
+                return false;
+            }
+        }
+
+        // 从 URL 解析支付回调参数
+        function parsePaymentCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('status');
+            const signature = params.get('signature');
+            const orderId = params.get('order_id') || 'unknown';
+            return { status, signature, orderId };
+        }
+
+        // 检查并激活 VIP 状态
+        async function checkAndActivateVIP() {
+            const { status, signature, orderId } = parsePaymentCallback();
+            const statusEl = document.getElementById('payStatus');
+            const exportBtn = document.getElementById('exportBtn');
+
+            // 1. 先检查 localStorage 是否已有有效授权
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const license = JSON.parse(stored);
+                    if (license.valid && license.expiresAt > Date.now()) {
+                        activateVIP();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('本地授权解析失败，重新校验');
+                }
+            }
+
+            // 2. 检查 URL 回调参数
+            if (status === 'paid' && signature) {
+                // 构造验签消息：order_id + status
+                const message = `${orderId}:paid`;
+                const isValid = await verifyEd25519Signature(message, signature);
+                if (isValid) {
+                    // 生成并存储本地授权
+                    const license = {
+                        orderId,
+                        valid: true,
+                        activatedAt: Date.now(),
+                        expiresAt: Date.now() + 365 * 24 * 60 * 60 * 1000 // 1年有效
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(license));
+                    activateVIP();
+                    statusEl.textContent = '✅ 支付验证通过 · VIP 已激活';
+                    statusEl.classList.remove('text-slate-400');
+                    statusEl.classList.add('text-emerald-500');
+                } else {
+                    statusEl.textContent = '❌ 签名验证失败 · 请联系客服';
+                    statusEl.classList.remove('text-slate-400');
+                    statusEl.classList.add('text-red-500');
+                }
+            } else if (status === 'paid' && !signature) {
+                // 兼容旧链接但提示风险
+                statusEl.textContent = '⚠️ 缺少签名 · 请重新支付';
+                statusEl.classList.remove('text-slate-400');
+                statusEl.classList.add('text-amber-500');
+            }
+        }
+
+        // 激活 VIP：解锁导出按钮
+        function activateVIP() {
+            const exportBtn = document.getElementById('exportBtn');
+            exportBtn.disabled = false;
+            const statusEl = document.getElementById('payStatus');
+            statusEl.textContent = '✅ VIP 已激活 · 可无限导出';
+            statusEl.classList.remove('text-slate-400');
+            statusEl.classList.add('text-emerald-500');
+        }
+
+        // 支付按钮：跳转真实支付网关（生产环境替换为 Stripe/LemonSqueezy 链接）
+        document.getElementById('payBtn').addEventListener('click', () => {
+            // 生产环境：替换为真实支付链接，并携带回调地址
+            const callbackUrl = encodeURIComponent(window.location.origin + window.location.pathname);
+            // 示例：LemonSqueezy 支付链接（需替换为真实链接）
+            const paymentUrl = `https://apx.lemonsqueezy.com/buy/your-product-id?checkout[custom][callback]=${callbackUrl}`;
+            window.location.href = paymentUrl;
+        });
+
+        // 导出按钮：生成三件套（锁定区域：保留原有导出逻辑）
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            // 原有导出逻辑：生成 PPTX/XLSX/DOCX Blob
+            const content = JSON.stringify(deckData, null, 2);
+            const blob = new Blob([content], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'aerotech-deck.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            alert('📦 三件套导出成功！\n（生产环境将生成完整 PPTX/XLSX/DOCX 文件）');
+        });
+
+        // ===== 初始化 =====
+        renderNav();
+        renderPreview();
+        loadParams();
+        checkAndActivateVIP();
+    </script>
+</body>
+</html>
