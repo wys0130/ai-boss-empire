@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 高阶路演 PPT 编辑器 (Visual-First V10)</title>
+    <title>ApexWork 高阶可视化 PPT 编辑器 (V11 Pinned Layout)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
-        .slide-shadow {
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        }
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #0f172a; }
+        .slide-shadow { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        
-        /* 高清实景商业大图库 (已配合深色奢华遮罩) */
         .bg-photo-tech {
             background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.75) 100%), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80');
             background-size: cover; background-position: center;
@@ -34,28 +30,28 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- 顶部导航 bar -->
-    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
+    <!-- 顶部导航 -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between z-50 shrink-0 shadow-md">
         <div class="flex items-center gap-3">
-            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition font-bold">← 返回商城首页</a>
+            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition font-bold">← 返回主商城</a>
             <span class="h-4 w-[1px] bg-slate-800"></span>
-            <h1 class="font-bold text-sm text-slate-200">2026 AeroTech 创投旗舰路演套件 · 视觉增强图解版</h1>
-            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">VISUAL PRO V10</span>
+            <h1 class="font-bold text-sm text-slate-200">2026 AeroTech 创投图解套件 (视觉增强)</h1>
+            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">PINNED CANVAS V11</span>
         </div>
         <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-400">商用完整授权: <strong class="text-white font-mono text-sm">USD $9.99</strong></span>
-            <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center gap-1.5">
-                <span>⚡ 支付 $9.99 导出完整成果</span>
+            <span class="text-xs text-slate-400">商用授权: <strong class="text-white font-mono text-sm">USD $9.99</strong></span>
+            <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-lg transition flex items-center gap-1.5">
+                <span>⚡ 支付 $9.99 导出成果</span>
             </button>
         </div>
     </header>
 
-    <!-- 主工作区 -->
+    <!-- 主工作台：固定总高 100vh，左右独立滑动，中间主画布绝不滑走 -->
     <div class="flex-1 flex overflow-hidden">
         
-        <!-- 左侧：缩略图导航 -->
+        <!-- 左栏：缩略图上下滑动 -->
         <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
             <div class="p-3.5 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
                 <span>幻灯片页面列表</span>
@@ -64,17 +60,17 @@
             <div id="thumbList" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scroll"></div>
         </aside>
 
-        <!-- 中间：画布展示区 + 置顶视觉工具条 -->
-        <main class="flex-1 bg-slate-950 flex flex-col items-center overflow-y-auto custom-scroll relative">
+        <!-- 中间画布工作区：绝对禁止全局溢出，工具栏和幻灯片永久居中锁死在视口！ -->
+        <main class="flex-1 bg-slate-950 flex flex-col items-center justify-between p-6 overflow-hidden relative">
             
-            <!-- 工具条：支持挑选商业高清大图与图表样式 -->
-            <div class="sticky top-4 z-40 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-5 py-2.5 shadow-2xl flex items-center gap-4 text-xs font-medium text-slate-200 my-4">
+            <!-- 视觉切换工具栏：永远在正上方可点击 -->
+            <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-5 py-2.5 shadow-2xl flex items-center gap-4 text-xs font-medium text-slate-200 shrink-0">
                 <span class="text-indigo-400 font-mono text-[11px] font-bold">🛠️ VISUAL TOOLS:</span>
                 <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg transition border border-slate-700">
-                    📊 强化数据图表进度条
+                    📊 强化 SVG 图表进度条
                 </button>
                 <div class="h-4 w-[1px] bg-slate-800"></div>
-                <span class="text-slate-400 text-[11px]">🌌 切换 AI 背景视觉图:</span>
+                <span class="text-slate-400 text-[11px]">🌌 切换 AI 背景实景:</span>
                 <div class="flex items-center gap-1.5">
                     <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1. 赛博AI实景</button>
                     <button onclick="changeBackground('finance')" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2. 金融楼宇实景</button>
@@ -83,30 +79,29 @@
                 </div>
             </div>
 
-            <!-- 主画布展示卡：高清大图 + SVG进度条 + 少字多图结构 -->
-            <div class="w-full max-w-5xl px-8 pb-12 flex flex-col items-center">
-                <div id="slideCanvas" class="w-full aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech">
-                    <!-- JS 自动注入“高清图 + 图表进度条”页面内容 -->
-                </div>
+            <!-- 幻灯片画布卡片：文字极少，突出配图与可视化进度指标 -->
+            <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech my-auto">
+                <!-- JS 自动注入“高清图 + 图表进度条”页面内容 -->
+            </div>
 
-                <div class="flex items-center justify-between w-full max-w-4xl mt-6 text-xs text-slate-400">
-                    <span class="bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl text-slate-300">
-                        💡 提示：已缩减枯燥文字！直接点击幻灯片内的卡片文字或百分比数值即可编辑
-                    </span>
-                    <div class="flex items-center gap-3">
-                        <button onclick="prevSlide()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl font-bold transition">← 上一页</button>
-                        <span id="pageCounter" class="font-mono font-bold text-slate-300 px-2">01 / 15</span>
-                        <button onclick="nextSlide()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl font-bold transition">下一页 →</button>
-                    </div>
+            <!-- 底部翻页和操作提示条：锁在页面底端 -->
+            <div class="flex items-center justify-between w-full max-w-4xl text-xs text-slate-400 shrink-0">
+                <span class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-slate-300">
+                    💡 提示：文字已大幅缩减！直接点击上方文字或百分比数值即可修改
+                </span>
+                <div class="flex items-center gap-3">
+                    <button onclick="prevSlide()" class="px-4 py-1.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl font-bold transition">← 上一页</button>
+                    <span id="pageCounter" class="font-mono font-bold text-slate-300 px-2">01 / 15</span>
+                    <button onclick="nextSlide()" class="px-4 py-1.5 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl font-bold transition">下一页 →</button>
                 </div>
             </div>
         </main>
 
-        <!-- 右侧：参数与数据直接同步栏 -->
+        <!-- 右侧：参数输入栏上下滑动 -->
         <aside class="w-80 bg-slate-900 border-l border-slate-800 p-5 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll">
             <div class="space-y-4">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
-                    <span>图文参数实时双向渲染</span>
+                    <span>图文参数双向渲染</span>
                     <span class="text-blue-400 font-mono">LIVE SYNC</span>
                 </div>
                 <div>
@@ -114,53 +109,48 @@
                     <input id="bindBrand" type="text" value="AeroTech Global" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">当前主标题 (精简标语)</label>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">当前主标题 (大字展示)</label>
                     <input id="bindTitle" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">关键数据指标 (KPI)</label>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">重点指标 (KPI)</label>
                     <input id="bindKpi" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1">要点卡片说明 (杜绝冗长段落)</label>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">卡片精简说明 (杜绝长文)</label>
                     <textarea id="bindSub" rows="3" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white leading-relaxed"></textarea>
                 </div>
             </div>
 
-            <!-- 收银台区域 -->
             <div class="bg-gradient-to-br from-slate-950 to-blue-950 border border-blue-500/30 rounded-2xl p-4 mt-6 shadow-xl">
                 <div class="flex justify-between items-center text-xs mb-2">
-                    <span class="font-bold text-slate-200">15页高清图解商用包</span>
+                    <span class="font-bold text-slate-200">15页高清实景包</span>
                     <span class="text-emerald-400 font-mono font-bold text-sm">$9.99</span>
                 </div>
-                <p class="text-[11px] text-slate-400 mb-4 leading-relaxed">
-                    包含高清商业实景原图与可视化数据进度条，导出后完全兼容所有手机与 PC。
-                </p>
                 <button onclick="exportPPT()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-blue-600/30">
-                    💳 支付 $9.99 一键下载图文工程包
+                    💳 支付 $9.99 一键下载
                 </button>
             </div>
         </aside>
     </div>
 
-    <!-- 视觉增强引擎 JS -->
     <script>
         const slidesData = [
-            { id: 1, title: "AeroTech 2026 全球智能战略", sub: "创投视角 · 破除低效传统冗长说明", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. EXECUTIVE COVER" },
-            { id: 2, title: "高管层工作流管理概览", sub: "企业生产力跨步进化，彻底取代 90 年代老旧文书套件", kpi: "98.4%", label: "流程自动化达成率", progress: 98, tag: "02. STRATEGIC GOALS" },
-            { id: 3, title: "传统痛点：极高维护与导出错乱", sub: "旧软件排版混乱、授权极其昂贵，阻碍跨国业务扩展", kpi: "-45%", label: "团队无效维护开销缩减", progress: 70, tag: "03. PAIN POINTS" },
-            { id: 4, title: "AI 高清视觉解决方案架构", sub: "全栈卡片化图解 + SVG 自适应数据条 + 一键移动端兼容", kpi: "12x", label: "项目路演成交提速", progress: 90, tag: "04. ARCHITECTURE" },
-            { id: 5, title: "商业增长指数与关键拐点", sub: "获欧美多家顶尖对冲基金及上市公司采购决策背书", kpi: "USD $24.8M", label: "上一季度新签约总净值", progress: 88, tag: "05. FINANCIAL PERFORMANCE" },
-            { id: 6, title: "核心竞争力：为什么选择我们", sub: "杜绝无效段落文字，把枯燥的商业报告化为画报级体验", kpi: "4.9/5", label: "全球商务高管评价", progress: 95, tag: "06. ADVANTAGE" },
-            { id: 7, title: "全渠道获客 ROI 对账模型", sub: "获客成本 CAC 与终身客单价值 LTV 黄金比率演示", kpi: "3.2x", label: "LTV/CAC 回报率", progress: 80, tag: "07. ROI DASHBOARD" },
-            { id: 8, title: "欧美双语 ATS 合规审查体系", sub: "银行级加密安全验证，符合欧洲 GDPR 及北美标准", kpi: "100%", label: "合规审查与数据安全通过率", progress: 100, tag: "08. COMPLIANCE" },
-            { id: 9, title: "世界 500 强实际落地案例", sub: "跨国整车厂与科技巨头联合实施方案报告书", kpi: "24,000+", label: "全球活跃付费订阅终端", progress: 92, tag: "09. SUCCESS CASE" },
-            { id: 10, title: "2026 - 2028 产品规划演进图", sub: "自主演化智能体深度整合，持续升级商务效率", kpi: "Roadmap V3", label: "新一代自主演进架构", progress: 75, tag: "10. ROADMAP" },
-            { id: 11, title: "核心创始及顶级架构师团队", sub: "核心人员来自顶级科技大厂及量化交易平台", kpi: "15+ Yrs", label: "高并发与 UI 设计核心经验", progress: 85, tag: "11. LEADERSHIP" },
-            { id: 12, title: "全球业务销售地图与覆盖", sub: "欧洲起步，辐射北美及亚洲主要金融中心", kpi: "42 Countries", label: "直接落地业务网络", progress: 80, tag: "12. GLOBAL MARKET" },
-            { id: 13, title: "系统稳定与防劫持安全体系", sub: "全平台本地生成，保障商业核心机密不外漏云端", kpi: "0 Breach", label: "历史核心资产安全零泄露", progress: 100, tag: "13. SECURITY" },
-            { id: 14, title: "未来 36 个月现金流与预期", sub: "盈亏平衡敏感性对账与利润率长期扩容分析", kpi: "USD $1.2B", label: "预期商业模型估值", progress: 90, tag: "14. FORECAST" },
-            { id: 15, title: "携手进化，重构企业演示生产力", sub: "立即开启您的企业级商务升级，获取终身授权", kpi: "APEXWORK.IO", tag: "15. CONCLUSION", label: "企业合作唯一接入门户", progress: 95 }
+            { id: 1, title: "AeroTech 2026 全球智能战略", sub: "创投图解版 · 破除低效文字堆砌", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. EXECUTIVE COVER" },
+            { id: 2, title: "高管层工作流管理概览", sub: "生产力跨步进化，全面取代 90 年代传统文档", kpi: "98.4%", label: "流程自动化达成率", progress: 98, tag: "02. STRATEGIC GOALS" },
+            { id: 3, title: "传统痛点：极高维护与导出错乱", sub: "旧排版混乱、授权极其昂贵，阻碍业务拓展", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN POINTS" },
+            { id: 4, title: "AI 高清视觉解决方案架构", sub: "卡片化图解 + SVG 数据进度表 + 全平台兼容", kpi: "12x", label: "项目路演成交提速", progress: 90, tag: "04. ARCHITECTURE" },
+            { id: 5, title: "商业增长指数与关键拐点", sub: "获欧美多家顶尖对冲基金及上市公司背书", kpi: "USD $24.8M", label: "新签约总净额", progress: 88, tag: "05. PERFORMANCE" },
+            { id: 6, title: "核心竞争力：为什么选择我们", sub: "杜绝冗长段落，把商业汇报变为视觉体验", kpi: "4.9/5", label: "全球高管满意度", progress: 95, tag: "06. ADVANTAGE" },
+            { id: 7, title: "全渠道获客 ROI 对账模型", sub: "获客成本 CAC 与终身价值 LTV 黄金比率", kpi: "3.2x", label: "LTV/CAC 增长比", progress: 80, tag: "07. ROI DASHBOARD" },
+            { id: 8, title: "双语 ATS 合规审查体系", sub: "银行级加密，符合欧洲 GDPR 及北美规范", kpi: "100%", label: "合规与数据安全通过率", progress: 100, tag: "08. COMPLIANCE" },
+            { id: 9, title: "世界 500 强实际落地案例", sub: "全球整车厂与科技巨头联合落地实施", kpi: "24,000+", label: "活跃付费订阅终端", progress: 92, tag: "09. SUCCESS CASE" },
+            { id: 10, title: "2026 - 2028 产品演进规划", sub: "智能体深度整合，持续提升执行效率", kpi: "Roadmap V3", label: "自导演进架构", progress: 75, tag: "10. ROADMAP" },
+            { id: 11, title: "核心创始与技术架构师团队", sub: "团队来自顶级科技公司及核心量化平台", kpi: "15+ Yrs", label: "核心系统研发经验", progress: 85, tag: "11. LEADERSHIP" },
+            { id: 12, title: "全球业务销售地图与覆盖", sub: "以欧洲为核心，覆盖北美及亚洲重要市场", kpi: "42 Countries", label: "商业服务覆盖区域", progress: 80, tag: "12. GLOBAL MARKET" },
+            { id: 13, title: "高可用与防劫持安全体系", sub: "全平台本地生成，保障商业核心资产不外泄", kpi: "0 Breach", label: "历史安全数据泄露率", progress: 100, tag: "13. SECURITY" },
+            { id: 14, title: "未来 36 个月预期与对账", sub: "盈亏平衡敏感性测算与长期估值扩容分析", kpi: "USD $1.2B", label: "目标商业模型估值", progress: 90, tag: "14. FORECAST" },
+            { id: 15, title: "重构企业路演生产力", sub: "立即扫码或对接业务，获取商务授权", kpi: "APEXWORK.IO", tag: "15. CONCLUSION", label: "企业接入门户", progress: 95 }
         ];
 
         let currentSlideIdx = 0;
@@ -197,78 +187,57 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / 15`;
         }
 
-        // 渲染主展示卡：高清大图背景 + 视觉 KPI 数据卡片 + SVG 可视化进度表
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
             const brand = document.getElementById("bindBrand").value || "AeroTech Global";
             const bgCls = bgStyles[currentBgStyle] || bgStyles["tech"];
 
-            canvas.className = `w-full aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls}`;
+            canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls} my-auto`;
             
             canvas.innerHTML = `
-                <!-- 顶栏牌子 -->
-                <div class="flex justify-between items-center border-b border-white/10 pb-4 z-10">
-                    <span class="text-xs font-bold font-mono tracking-widest text-slate-300">${brand} · EXECUTIVE ROADSHOW</span>
+                <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10">
+                    <span class="text-xs font-bold font-mono tracking-widest text-slate-300">${brand} · ROADSHOW DECK</span>
                     <span class="text-xs font-mono font-bold px-3 py-1 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag}</span>
                 </div>
-
-                <!-- 中心高视觉冲击力文字区 (大幅减字，讲究留白) -->
-                <div class="my-auto py-6 z-10 max-w-3xl">
-                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" class="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-4 drop-shadow-md">${item.title}</h2>
-                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" class="text-base text-slate-300 leading-relaxed font-medium drop-shadow-sm">${item.sub}</p>
+                <div class="my-auto py-4 z-10 max-w-3xl">
+                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md">${item.title}</h2>
+                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm">${item.sub}</p>
                 </div>
-
-                <!-- 底部：SVG 图表进度条 + 可视化数据卡 (真正拒绝全是废话的白框) -->
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 pt-6 border-t border-white/10 z-10 items-center">
-                    
-                    <!-- KPI 重点卡 -->
-                    <div class="md:col-span-5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center">
+                    <div class="md:col-span-5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-3.5 shadow-lg">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerText)" class="text-3xl font-black font-mono text-emerald-400 drop-shadow-sm">${item.kpi}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerText)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm">${item.kpi}</div>
                     </div>
-
-                    <!-- SVG 可视化能量表 / 进度条图例 -->
-                    <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-center">
+                    <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3.5 flex flex-col justify-center">
                         <div class="flex justify-between items-center text-xs font-mono mb-2">
-                            <span class="text-slate-300 font-bold">● TARGET KPI COMPLETIOM</span>
+                            <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
                             <span class="text-blue-400 font-bold">${item.progress}% METRIC</span>
                         </div>
-                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
                             <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${item.progress}%"></div>
                         </div>
                     </div>
-
                 </div>
             `;
         }
 
-        function changeBackground(styleKey) {
-            currentBgStyle = styleKey;
-            renderMainSlide();
-        }
-
-        function toggleVisualChart() {
-            slidesData[currentSlideIdx].progress = slidesData[currentSlideIdx].progress < 90 ? 98 : 65;
-            renderMainSlide();
-        }
-
+        function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
+        function toggleVisualChart() { slidesData[currentSlideIdx].progress = slidesData[currentSlideIdx].progress < 90 ? 98 : 65; renderMainSlide(); }
         function selectSlide(idx) { currentSlideIdx = idx; renderAll(); }
         function prevSlide() { if(currentSlideIdx > 0) { currentSlideIdx--; renderAll(); } }
         function nextSlide() { if(currentSlideIdx < slidesData.length-1) { currentSlideIdx++; renderAll(); } }
 
         function updateFromCanvas(field, val) {
             slidesData[currentSlideIdx][field] = val.trim();
-            syncFormInputs();
-            renderThumbnails();
+            syncFormInputs(); renderThumbnails();
         }
 
         function updateFromForm() {
             slidesData[currentSlideIdx].title = document.getElementById("bindTitle").value;
             slidesData[currentSlideIdx].sub = document.getElementById("bindSub").value;
             slidesData[currentSlideIdx].kpi = document.getElementById("bindKpi").value;
-            renderThumbnails();
-            renderMainSlide();
+            renderThumbnails(); renderMainSlide();
         }
 
         function syncFormInputs() {
@@ -281,7 +250,7 @@
         function exportPPT() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('status') !== 'paid' && localStorage.getItem('APEX_PAID_TOKEN') !== 'true') {
-                if (confirm("🔒 点击确定跳转至 USD $9.99 商业结账页面解锁；若已付款请确认网址带有 ?status=paid 参数。")) {
+                if (confirm("🔒 点击确定跳转 USD $9.99 收银页面解锁下载权限；若已完成付款请核对网址携带 ?status=paid。")) {
                     window.open("index.html?status=paid", "_self");
                 }
                 return;
