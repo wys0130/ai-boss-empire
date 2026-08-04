@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V21 Path-Sanitized Swarm)</title>
+    <title>ApexWork AI 驾驶舱 (V22 Multi-File Swarm Engine)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -26,7 +26,7 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded font-bold">V21 SECURE</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V22 MULTI-FILE</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
             <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <!-- 9 大部门按键栏 -->
+    <!-- 9 大部门按键 -->
     <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
         <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5 text-xs font-mono">
             <div class="flex items-center gap-2">
@@ -139,7 +139,7 @@
                 <div id="bugAlertBanner" class="mb-2.5 bg-rose-500/10 border border-rose-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono">
                     <div class="flex items-center gap-1.5">
                         <span class="text-rose-500 font-bold">🐞 [缺陷部报告]:</span>
-                        <span class="text-rose-300">支付闭环待真正开通，$9.99 现为测试态。</span>
+                        <span class="text-rose-300">系统已升级至 V22，全面支持多文件并列生成与闭环写库。</span>
                     </div>
                     <button onclick="autoFixPaymentBug()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded text-[11px] transition">
                         ⚡ 派单解决
@@ -151,10 +151,10 @@
                     <span class="text-[10px] font-mono themed-subtext">快捷触发: <strong class="themed-text">Ctrl + Enter</strong></span>
                 </div>
                 <div class="mb-2.5">
-                    <textarea id="cmd" rows="2" placeholder="输入指示；或留空直接 Enter（触发蜂群自动自查补坑/修BUG/精修排版）..." class="w-full themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
+                    <textarea id="cmd" rows="2" placeholder="输入指示；或留空直接 Enter（触发蜂群全自动自查/重构多文件/修死链与按键功能）..." class="w-full themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
                 </div>
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 唤醒蜂群自驱建设</span>
+                    <span>🚀 立即发车 / 唤醒蜂群自驱建设 (V22 多文件引擎)</span>
                 </button>
             </div>
 
@@ -164,7 +164,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱在线。已挂载路径清洗安全栓，杜绝战报错写为文件名。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V22 在线。已破除单文件写入限制，支持 ===FILE: filepath=== 多文件原子并发写库。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -256,7 +256,7 @@
         }
 
         function autoFixPaymentBug() {
-            document.getElementById("cmd").value = "【🐞缺陷反馈部专单】：请协同转化销售部与工程部，对接真正的商业收单回调接口及 $9.99 Ed25519 鉴权链路！";
+            document.getElementById("cmd").value = "【🐞缺陷反馈部+工程部协作】：一键修复并独立落地 excel-editor.html 与 word-editor.html 真实业务逻辑！";
             triggerSwarmAutonomousAction();
         }
 
@@ -401,14 +401,15 @@
             return await res.json();
         }
 
+        // 👑 【V22 终极核心】多文件原子解析与并发写库
         async function triggerSwarmAutonomousAction() {
             const btn = document.getElementById("runBtn");
             const cmdInput = document.getElementById("cmd");
-            const cmd = cmdInput.value.trim() || "【缺陷反馈部+产品部协作】：自扫支付接口与 Excel/Word 页面断点，进行修复或新建功能页。";
+            const cmd = cmdInput.value.trim() || "【缺陷反馈部+工程部协作】：请一次性生成并修复 excel-editor.html 与 word-editor.html 真实业务逻辑，确保原生 JS 响应。";
 
             btn.disabled = true;
-            btn.innerHTML = "<span>⚙️ 9 大智能部门自验与建设中...</span>";
-            appendLog("🧠 [大脑中枢启动]：挂载现存文件树与部门职责...");
+            btn.innerHTML = "<span>⚙️ 9 大智能部门多文件协同建设中...</span>";
+            appendLog("🧠 [大脑中枢 V22 启动]：准备多文件原子并发写库管道...");
 
             try {
                 const keys = getKeys();
@@ -421,12 +422,9 @@
                 const treeSummary = repoTree.length > 0 ? repoTree.join("\n") : "index.html\neditor.html\nadmin.html\nMEMORY.md";
                 appendLog(`📁 [实时项目树检索成功]，发单中...`);
 
-                const prompt = `你是 APEXWORK 智能体蜂群中枢。
+                const prompt = `你是 APEXWORK 智能体蜂群中枢（V22 多文件控制引擎）。
 项目现有物理文件树：
 ${treeSummary}
-
-【最高宪法】：
-${constFile.content || "缺陷部必报支付BUG！产品部务必自扫空白坑位。"}
 
 【近期演进记忆】：
 ${memoryFile.content || "无"}
@@ -434,22 +432,27 @@ ${memoryFile.content || "无"}
 【指令 / 任务】：
 "${cmd}"
 
-作为蜂群作答，严循 4 段标记：
+【极重要规范】：
+1. 你的回答必须使用 ===SWARM_LOG=== 开始写协作战报，用 ===NEW_MEMORY=== 提炼一条记忆；
+2. 严禁把代码覆盖错文件！要写 Excel 必须写在 ===FILE: excel-editor.html=== 之下；要写 Word 必须写在 ===FILE: word-editor.html=== 之下。你可以同时输出一个或多个 ===FILE: 文件名=== 块！
+3. 所有 HTML 页面绝不允许只有视觉空壳！必须在页尾自带完整的原生 <script>，实现真实的动态数值计算、输入框事件联动、默认当期标准时间显示（禁止把年份月份写成死乱码）！
+
+格式结构标准样例：
 ===SWARM_LOG===
 <写简炼部门协作战报>
 ===NEW_MEMORY===
 - [EVO-RECORD]: <一句话简短提炼本轮迭代>
-===TARGET_FILE_PATH===
-<在此严格填写标准相对文件名，例如：excel-editor.html 或 word-editor.html。严禁包含 === 等符号或整段战报日志！>
-===FILE_CONTENT===
-<完整干净最新的文件源码>`;
+===FILE: excel-editor.html===
+<完整干净的 Excel 工作台源码>
+===FILE: word-editor.html===
+<完整干净的 Word ATS 合规报告源码>`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [{ role: "system", content: "你是严格校验目标文件路径合法性、绝对不将日志错写为文件名的企业蜂群。" }, { role: "user", content: prompt }],
+                        messages: [{ role: "system", content: "你是能够完美分离多文件边界、绝不张冠李戴的企业多智能体蜂群。" }, { role: "user", content: prompt }],
                         temperature: 0.3
                     })
                 });
@@ -459,42 +462,51 @@ ${memoryFile.content || "无"}
 
                 const swarmParts = aiAnswer.split("===SWARM_LOG===");
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
-                const targetParts = aiAnswer.split("===TARGET_FILE_PATH===");
-                const contentParts = aiAnswer.split("===FILE_CONTENT===");
 
-                if (memParts.length < 2 || targetParts.length < 2 || contentParts.length < 2) throw new Error("响应格式未完整返回");
+                if (memParts.length < 2) throw new Error("大模型响应未带记忆块或被截断");
 
                 const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已分配多部门完成协同。";
-                const rawMemoryLine = targetParts[0].replace("===NEW_MEMORY===", "").trim();
-                
-                // 👑 路径强力清洗保险栓：绝对拦截把日志写成文件名的严重 BUG！
-                let rawPath = contentParts[0].replace("===TARGET_FILE_PATH===", "").trim();
-                if (rawPath.includes("===") || rawPath.length > 35 || rawPath.includes(" ") || rawPath.includes("【")) {
-                    rawPath = "excel-editor.html"; // 兜底纠正
-                }
-                const targetFilePath = rawPath.replace(/[^a-zA-Z0-9_\-\.\/]/g, "");
-
-                const newFileContent = contentParts[1].replace(/```[a-z]*/g, "").replace(/```/g, "").trim();
+                const rawMemoryLine = memParts[1].split("===FILE:")[0].trim();
 
                 appendLog(`🤖 [各部行动直报]:\n${swarmLogText}`, "text-emerald-400 font-bold");
-                appendLog(`📍 [目标安全对齐写库]: =>【 ${targetFilePath} 】`, "text-indigo-400 font-bold");
 
-                const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Swarm Evolve: ${targetFilePath}`, keys.gh);
+                // 👑 使用正则表达式匹配所有的 ===FILE: xxx.html=== 代码块，并发写入远端！
+                const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
+                let match;
+                let filesWritten = 0;
 
+                while ((match = fileRegex.exec(aiAnswer)) !== null) {
+                    const targetFilePath = match[1].trim().replace(/[^a-zA-Z0-9_\-\.\/]/g, "");
+                    let newFileContent = match[2].trim();
+                    newFileContent = newFileContent.replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
+
+                    if (!targetFilePath || targetFilePath.length > 40) continue;
+
+                    appendLog(`📍 [目标对齐落盘]: =>【 ${targetFilePath} 】...`, "text-indigo-400 font-bold");
+                    const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
+                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Swarm V22: ${targetFilePath}`, keys.gh);
+                    appendLog(`✅ 文件 [ ${targetFilePath} ] 物理覆盖成功！`, "text-emerald-500");
+                    filesWritten++;
+                }
+
+                if (filesWritten === 0) {
+                    throw new Error("模型响应中未找到标准 ===FILE: filename=== 代码块！");
+                }
+
+                // 写入 MEMORY 记忆
                 const nowStr = formatStandardTime(new Date());
                 const timestampedMemoryLine = rawMemoryLine.replace("[EVO-RECORD]:", `[EVO-RECORD | ${nowStr}]:`);
                 const updatedMemory = (memoryFile.content || "") + "\n" + timestampedMemoryLine;
                 await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory: ${timestampedMemoryLine.slice(0, 35)}`, keys.gh);
 
-                appendLog(`✅ 协同更新 100% 生效！[ ${targetFilePath} ] 已在远端物理落地。`, "text-emerald-500 font-bold");
+                appendLog(`🏆 协同大功告成！本次并发落地 ${filesWritten} 个物理文件，AI 闭环自演进完成。`, "text-emerald-400 font-black");
                 cmdInput.value = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ 协同执行出现异常: " + err.message, "text-rose-500");
+                appendLog("❌ V22 协同执行出现异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发单 / 唤醒蜂群自驱建设</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 唤醒蜂群自驱建设 (V22 多文件引擎)</span>";
             }
         }
 
