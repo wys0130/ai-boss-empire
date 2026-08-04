@@ -3,153 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 智能企业办公套件商城 · PPT / EXCEL / WORD</title>
+    <title>APEXWORK 智能办公交付商城 (2026 RELEASE)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
-        .hero-gradient { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between font-sans">
 
-    <!-- 顶部导航条 -->
+    <!-- 顶部导航栏 -->
     <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div class="flex items-center gap-3">
-            <div class="bg-blue-600 text-white font-black font-mono text-sm px-3 py-1 rounded shadow-sm">APEXWORK</div>
-            <span class="font-bold text-slate-800 tracking-wide">智能办公交付商城 (2026 RELEASE)</span>
+            <span class="bg-blue-600 text-white font-mono text-xs px-2.5 py-1 rounded-lg font-bold shadow-md">APEXWORK</span>
+            <h1 class="font-bold text-sm tracking-wide text-slate-800">智能办公交付商城 (2026 RELEASE)</h1>
         </div>
         <div class="flex items-center gap-6 text-xs font-medium text-slate-600">
             <a href="#ppt-section" class="hover:text-blue-600 transition">PPT 路演战略</a>
-            <a href="#excel-section" class="hover:text-blue-600 transition">EXCEL 财务模型</a>
-            <a href="#word-section" class="hover:text-blue-600 transition">WORD 合规报告</a>
+            <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600">EXCEL 财务模型</a>
+            <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600">WORD 合规报告</a>
             <span class="h-4 w-[1px] bg-slate-200"></span>
-            <span class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded font-bold">AI 视觉引擎全自动运营</span>
+            <a href="admin.html" class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 px-3 py-1 rounded-lg font-bold hover:bg-emerald-500/20 transition">🤖 AI 视觉引擎全自动运营</a>
         </div>
     </header>
 
-    <!-- 顶层英雄轮播展示区 (Hero Carousel) -->
-    <section class="hero-gradient text-white py-16 px-8 relative overflow-hidden">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
-            <div class="md:col-span-7 space-y-4">
-                <span class="text-xs font-mono bg-blue-500/20 border border-blue-400/40 text-blue-300 px-3 py-1 rounded-full uppercase">HOT RELEASE · 视觉图解旗舰款</span>
-                <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight">
-                    AeroTech 2026 全球创投战略与 ROI 路演套件
-                </h1>
-                <p class="text-slate-300 text-sm md:text-base leading-relaxed max-w-xl">
-                    少字多图 · 可视化图表。集成 15 页高阶商业排版、自适应 SVG 进度条及实景商务配图，一键精修导出。
-                </p>
-                <div class="pt-4 flex items-center gap-4">
-                    <a href="editor.html?id=aerotech_2026" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
-                        <span>✨ 立即进入图文可视化精修</span>
-                    </a>
-                    <span class="text-xs font-mono text-slate-400">商用授权价: <strong class="text-white font-bold">$9.99</strong></span>
-                </div>
-            </div>
-            <!-- 轮播可视化预览卡片 -->
-            <div class="md:col-span-5 bg-slate-800/80 border border-slate-700 p-4 rounded-2xl shadow-2xl relative group">
-                <div class="aspect-[16/9] bg-gradient-to-br from-blue-900 to-slate-900 rounded-xl p-6 flex flex-col justify-between border border-slate-700/60">
-                    <div class="flex justify-between items-center text-[10px] font-mono text-blue-400">
-                        <span>VISUAL ENGINE · 16:9 PRO</span>
-                        <span>LIVE PREVIEW</span>
-                    </div>
-                    <div>
-                        <div class="text-xl font-bold text-white mb-1">AeroTech 创投图表路演</div>
-                        <div class="text-xs text-slate-400">无冗长废话 · 可视化指标 · $9.99 一键导出</div>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <span class="text-2xl font-black text-emerald-400">+340% YoY</span>
-                        <span class="text-[10px] bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded">打开编辑器 →</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 三件套专区：PPT / EXCEL / WORD -->
-    <main class="max-w-6xl mx-auto w-full py-12 px-8 space-y-16">
+    <!-- 主体内容区：商务三件套直达 -->
+    <main class="max-w-7xl mx-auto w-full px-8 py-10 space-y-12">
         
-        <!-- PPT 路演战略板块 -->
+        <!-- 顶部英雄横幅 -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-2xl p-8 text-white shadow-xl flex justify-between items-center">
+            <div>
+                <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">ENTERPRISE SWARM ACTIVE</span>
+                <h2 class="text-2xl font-black tracking-tight mt-2">破除低效传统冗长，全视觉商业交付新纪元</h2>
+                <p class="text-xs text-slate-300 mt-1">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，全系列智能体蜂群自驱运营。</p>
+            </div>
+            <a href="admin.html" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-5 py-3 rounded-xl shadow-lg transition shrink-0 flex items-center gap-2">
+                <span>⚡ 进入 AI 董事长驾驶舱</span>
+            </a>
+        </div>
+
+        <!-- 第一板块：PPT 路演套件 -->
         <section id="ppt-section">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-xl font-black text-slate-900">PPT 可视化路演战略套件</h2>
+                    <h3 class="text-lg font-bold text-slate-900">PPT 可视化路演战略套件</h3>
                     <p class="text-xs text-slate-500">视觉至上 · 大图表表现 · 告别枯燥段落</p>
                 </div>
                 <span class="text-xs font-mono text-blue-600 font-bold">VIEW ALL PPTX (3) →</span>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- PPT 卡片 1 -->
-                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition group flex flex-col justify-between">
-                    <div class="aspect-[16/9] bg-gradient-to-br from-slate-900 to-blue-950 p-5 flex flex-col justify-between text-white border-b border-slate-100">
-                        <span class="text-[10px] font-mono bg-blue-600/40 w-fit px-2 py-0.5 rounded text-blue-200">15 SLIDES</span>
-                        <div class="font-bold text-base">AeroTech 创投规划书</div>
+                <!-- 卡片 1 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between">
+                    <div>
+                        <span class="bg-blue-500/10 text-blue-600 border border-blue-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES</span>
+                        <h4 class="text-base font-bold text-slate-900 mt-3">AeroTech 创投规划书</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
                     </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-sm text-slate-800 mb-1">全球创投与 ROI 数据计划</h3>
-                        <p class="text-xs text-slate-500 mb-4 line-clamp-2">大图标 · SVG 进度指标 · 高精实景背景图。</p>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                            <span class="text-xs font-bold text-slate-900 font-mono">$9.99</span>
-                            <a href="editor.html?id=aerotech_2026" class="text-xs bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white font-bold px-3 py-1.5 rounded-lg transition">进入可视化修改 →</a>
-                        </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+                        <a href="editor.html" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition">进入可视化修改 →</a>
                     </div>
                 </div>
-                <!-- PPT 卡片 2 -->
-                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                    <div class="aspect-[16/9] bg-gradient-to-br from-slate-900 to-emerald-950 p-5 flex flex-col justify-between text-white border-b border-slate-100">
-                        <span class="text-[10px] font-mono bg-emerald-600/40 w-fit px-2 py-0.5 rounded text-emerald-200">20 SLIDES</span>
-                        <div class="font-bold text-base">SaaS 增长指标盘点</div>
+
+                <!-- 卡片 2 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between">
+                    <div>
+                        <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES</span>
+                        <h4 class="text-base font-bold text-slate-900 mt-3">SaaS 增长指标盘点</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
                     </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-sm text-slate-800 mb-1">企业级 OKR 可视化对账</h3>
-                        <p class="text-xs text-slate-500 mb-4 line-clamp-2">聚焦经营数据图表展示，支持动态底文一键调色。</p>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                            <span class="text-xs font-bold text-slate-900 font-mono">$9.99</span>
-                            <a href="editor.html?id=saas_okr_2026" class="text-xs bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white font-bold px-3 py-1.5 rounded-lg transition">进入可视化修改 →</a>
-                        </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+                        <a href="editor.html" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition">进入可视化修改 →</a>
                     </div>
                 </div>
-                <!-- PPT 卡片 3 -->
-                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                    <div class="aspect-[16/9] bg-gradient-to-br from-slate-900 to-amber-950 p-5 flex flex-col justify-between text-white border-b border-slate-100">
-                        <span class="text-[10px] font-mono bg-amber-600/40 w-fit px-2 py-0.5 rounded text-amber-200">12 SLIDES</span>
-                        <div class="font-bold text-base">FinTech A轮融资方案</div>
+
+                <!-- 卡片 3 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between">
+                    <div>
+                        <span class="bg-amber-500/10 text-amber-600 border border-amber-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES</span>
+                        <h4 class="text-base font-bold text-slate-900 mt-3">FinTech A 轮融资方案</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
                     </div>
-                    <div class="p-5">
-                        <h3 class="font-bold text-sm text-slate-800 mb-1">金融全渠道图解计划书</h3>
-                        <p class="text-xs text-slate-500 mb-4 line-clamp-2">高端金色光斑纹理，专属金融报表与可视化对比条。</p>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-                            <span class="text-xs font-bold text-slate-900 font-mono">$9.99</span>
-                            <a href="editor.html?id=fintech_2026" class="text-xs bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white font-bold px-3 py-1.5 rounded-lg transition">进入可视化修改 →</a>
-                        </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+                        <a href="editor.html" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition">进入可视化修改 →</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- EXCEL & WORD 专区 -->
-        <section id="excel-section" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
+        <!-- 第二板块：EXCEL 与 WORD 专业三件套联动 -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
                 <div>
-                    <span class="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">XLSX MODEL</span>
-                    <h3 class="font-black text-lg text-slate-900 mt-2">全渠道 ROI 动态自适应测算模型</h3>
-                    <p class="text-xs text-slate-500 mt-1">智能对比获客成本(CAC)与终身客单价值(LTV)</p>
+                    <h3 class="text-lg font-bold text-slate-900">商务核心：EXCEL 模型与 WORD 合规</h3>
+                    <p class="text-xs text-slate-500">满足欧美融资及财务测算全部硬核标准</p>
                 </div>
-                <a href="editor.html?id=excel_roi" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">查看模型 →</a>
             </div>
-            <div id="word-section" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">DOCX STANDARD</span>
-                    <h3 class="font-black text-lg text-slate-900 mt-2">欧美企业级 ATS 智能排版合规报告</h3>
-                    <p class="text-xs text-slate-500 mt-1">杜绝跨操作系统乱码，双语规范呈现</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Excel 模块卡片：直达 excel-editor.html -->
+                <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30">
+                    <div>
+                        <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL</span>
+                        <h4 class="text-base font-bold text-slate-900 mt-3">全渠道 ROI 动态自适应测算模型</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+                        <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 测算模型 →</a>
+                    </div>
                 </div>
-                <a href="editor.html?id=word_ats" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">查看文档 →</a>
+
+                <!-- Word 模块卡片：直达 word-editor.html -->
+                <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30">
+                    <div>
+                        <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD</span>
+                        <h4 class="text-base font-bold text-slate-900 mt-3">欧美企业级 ATS 智能排版合规报告</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+                        <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 合规精修 →</a>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-white border-t border-slate-200 py-6 px-8 text-center text-xs text-slate-400">
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 font-mono">
         APEXWORK · AI-POWERED ENTERPRISE STORE · VISUAL ENGINE 2026
     </footer>
+
 </body>
 </html>
