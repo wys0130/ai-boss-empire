@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V26 多部门 Token 语块协同引擎)</title>
+    <title>ApexWork AI 驾驶舱 (V27 @补全下拉框 + 双击编辑词条)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -18,20 +18,46 @@
         .themed-text { color: var(--text-main); }
         .themed-subtext { color: var(--text-sub); }
 
-        /* 👑 Token 语块胶囊样式 */
+        /* 👑 胶囊 Token 样式（支持双击交互） */
         .dept-token {
             display: inline-flex;
             align-items: center;
-            background: rgba(99, 102, 241, 0.2);
+            background: rgba(99, 102, 241, 0.25);
             color: #818cf8;
-            border: 1px solid rgba(99, 102, 241, 0.4);
+            border: 1px solid rgba(99, 102, 241, 0.5);
             padding: 2px 8px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: bold;
             margin: 0 3px;
+            cursor: pointer;
             user-select: none;
             white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .dept-token:hover { background: rgba(99, 102, 241, 0.4); }
+
+        /* 👑 @ 补全下拉菜单样式 */
+        #mentionDropdown {
+            position: absolute;
+            z-index: 100;
+            display: none;
+            width: 200px;
+            max-height: 220px;
+            overflow-y: auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .mention-item {
+            padding: 8px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: monospace;
+            transition: background 0.15s;
+        }
+        .mention-item:hover, .mention-item.selected {
+            background: rgba(99, 102, 241, 0.3);
+            color: #ffffff;
         }
     </style>
 </head>
@@ -42,7 +68,7 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V26 多部门 Token 语块协同</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V27 @补全下拉框 + 双击编辑</span>
             <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -84,11 +110,11 @@
         </div>
     </div>
 
-    <!-- 9 大部门按键：点击后支持连续追加 @ 语块 -->
+    <!-- 9 大部门按键 -->
     <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
         <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5 text-xs font-mono">
             <div class="flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (点击可连续追加多个 @ 语块进行多部门协同会商):</span>
+                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (点击生成 Token 胶囊，键盘输入 @ 自动弹出悬浮选择菜单):</span>
                 <span id="activeDeptLabel" class="text-indigo-400 font-bold">[当前视图: 全体部门]</span>
             </div>
             <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-0.5 rounded transition">
@@ -150,31 +176,37 @@
         </aside>
 
         <!-- 右栏：董事长控制指令台 -->
-        <section class="lg:col-span-7 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl justify-between">
+        <section class="lg:col-span-7 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl justify-between relative">
+            
+            <!-- 👑 @ 补全下拉菜单容器 -->
+            <div id="mentionDropdown" class="themed-card border shadow-2xl">
+                <!-- 动态填充部门选项 -->
+            </div>
+
             <div>
                 <!-- BUG 报警与 QA 闭环栏 -->
                 <div id="bugAlertBanner" class="mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono" data-status="green">
                     <div class="flex items-center gap-2">
                         <span class="text-emerald-400 font-bold">✅ [QA 自动化检查]:</span>
-                        <span class="text-emerald-300">系统运行平稳，全站无 404 死链，多部门 Token 协同引擎在线。</span>
+                        <span class="text-emerald-300">系统运行平稳，全站无 404 死链，智能 @ 补全引擎已激活。</span>
                     </div>
                     <span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>
                 </div>
 
                 <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
-                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台 (支持多部门 Token 胶囊连续 @ 与独立语块点删)</span>
+                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台 (双击胶囊可修改部门；键盘敲 @ 弹出智能补全)</span>
                     <span class="text-[10px] font-mono themed-subtext">快捷触发: <strong class="themed-text">Ctrl + Enter</strong></span>
                 </div>
                 
-                <!-- 👑 富文本 Token 语块输入框 -->
-                <div class="mb-2.5">
+                <!-- 富文本 Token 输入框 -->
+                <div class="mb-2.5 relative">
                     <div id="cmd" contenteditable="true" 
                          class="w-full h-24 themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner overflow-y-auto custom-scrollbar"
-                         placeholder="在此输入指示；或点击上方部门按钮连续追加 @ 语块..."></div>
+                         placeholder="在此输入指令；输入 @ 自动选择部门，或双击胶囊修改词条..."></div>
                 </div>
 
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 多部门 Token 协同群聊 (V26 引擎)</span>
+                    <span>🚀 立即发车 / 蜂群智能协同 (V27 引擎)</span>
                 </button>
             </div>
 
@@ -184,7 +216,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V26 在线。输入框支持点选多部门生成胶囊 Token，按 Backspace 会将整个部门语块作为整体抹除。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V27 在线。输入框已完美支持键盘 @ 悬浮菜单联想与胶囊双击编辑。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -202,6 +234,11 @@
         let activeFilterDept = "";
         let qaMonitorInterval = null;
         let isAutoHealing = false;
+
+        const allDeptNames = [
+            "大脑中枢", "缺陷与QA质检部", "主动产品部", "施工工程部", 
+            "视觉策划部", "审核质量部", "转化销售部", "推广营销部", "国际法务部"
+        ];
 
         function initAdminTheme() {
             const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
@@ -256,7 +293,28 @@
             document.getElementById("rollbackModal").classList.add("hidden");
         }
 
-        // 👑 连续追加 Token 语块交互核心逻辑
+        // 创建胶囊 DOM 元素（支持双击编辑词条）
+        function createDeptTokenElement(deptName) {
+            const tokenSpan = document.createElement("span");
+            tokenSpan.className = "dept-token";
+            tokenSpan.contentEditable = "false";
+            tokenSpan.setAttribute("data-dept", deptName);
+            tokenSpan.innerText = `@【${deptName}】`;
+
+            // 👑 杀手级体验：双击胶囊直接弹出 prompt 修改绑定的部门词条
+            tokenSpan.addEventListener("dblclick", (e) => {
+                e.stopPropagation();
+                const newDept = prompt("修改关联的主责部门名称：", deptName);
+                if (newDept && newDept.trim()) {
+                    tokenSpan.setAttribute("data-dept", newDept.trim());
+                    tokenSpan.innerText = `@【${newDept.trim()}】`;
+                    appendLog(`✏️ 已将词条胶囊修改为【${newDept.trim()}】`, "text-indigo-400");
+                }
+            });
+
+            return tokenSpan;
+        }
+
         function inspectDept(deptName, btnEl) {
             activeFilterDept = deptName;
             document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-500/10"));
@@ -267,25 +325,14 @@
             const cmdBox = document.getElementById("cmd");
             cmdBox.focus();
 
-            // 创建不可分割的胶囊 DOM 元素 (Token Pill)
-            const tokenSpan = document.createElement("span");
-            tokenSpan.className = "dept-token";
-            tokenSpan.contentEditable = "false"; // 设为不可独立编辑，确保整体视为一个语块
-            tokenSpan.setAttribute("data-dept", deptName);
-            tokenSpan.innerText = `@【${deptName}】`;
-
-            // 在光标处或末尾插入胶囊，并带一个空格方便接着打字
+            const tokenSpan = createDeptTokenElement(deptName);
             const selection = window.getSelection();
             if (selection.rangeCount > 0 && cmdBox.contains(selection.anchorNode)) {
                 const range = selection.getRangeAt(0);
                 range.collapse(true);
                 range.insertNode(tokenSpan);
-                
-                // 插入一个跟随的空白文本节点，方便用户直接输入后续文字
                 const spaceNode = document.createTextNode(" ");
                 tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
-                
-                // 移动光标到空格后
                 range.setStartAfter(spaceNode);
                 range.setEndAfter(spaceNode);
                 selection.removeAllRanges();
@@ -293,11 +340,10 @@
             } else {
                 cmdBox.appendChild(tokenSpan);
                 cmdBox.appendChild(document.createTextNode(" "));
-                // 滚动到底部
                 cmdBox.scrollTop = cmdBox.scrollHeight;
             }
 
-            appendLog(`🎯 董事长已在控制台追加【${deptName}】协同语块。`, "text-indigo-400 font-bold");
+            appendLog(`🎯 董事长已追加【${deptName}】协同语块。`, "text-indigo-400 font-bold");
             loadHistoryFromMemory();
         }
 
@@ -310,16 +356,37 @@
             loadHistoryFromMemory();
         }
 
-        // 👑 监听键盘：实现“按 Backspace 时，如果光标紧挨着 Token 语块，则整块抹除”
+        // 👑 智能 @ 补全菜单与 Backspace 整体删除引擎
         document.addEventListener("DOMContentLoaded", () => {
             const cmdBox = document.getElementById("cmd");
-            if (cmdBox) {
+            const dropdown = document.getElementById("mentionDropdown");
+
+            if (cmdBox && dropdown) {
+                // 监听输入，实现键入 @ 弹出菜单
+                cmdBox.addEventListener("input", function(e) {
+                    const selection = window.getSelection();
+                    if (!selection.rangeCount) return;
+                    const textContent = selection.anchorNode.textContent || "";
+                    const cursorOffset = selection.anchorOffset;
+
+                    // 检查光标前是不是 @
+                    const textBeforeCursor = textContent.slice(0, cursorOffset);
+                    const match = textBeforeCursor.match(/@([^\s@]*)$/);
+
+                    if (match) {
+                        const query = match[1];
+                        showMentionDropdown(query);
+                    } else {
+                        hideMentionDropdown();
+                    }
+                });
+
+                // 监听键盘 Backspace 整体删除语块
                 cmdBox.addEventListener("keydown", function(e) {
                     if (e.key === "Backspace") {
                         const selection = window.getSelection();
                         if (selection.rangeCount > 0) {
                             const range = selection.getRangeAt(0);
-                            // 检查光标前一个节点是不是 dept-token 胶囊
                             let prevNode = range.startContainer;
                             if (prevNode.nodeType === Node.TEXT_NODE && range.startOffset === 0) {
                                 prevNode = prevNode.previousSibling;
@@ -329,13 +396,78 @@
 
                             if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains("dept-token")) {
                                 e.preventDefault();
-                                prevNode.remove(); // 瞬间整块抹除语块！
+                                prevNode.remove(); // 瞬间整体抹除
                             }
                         }
+                    } else if (e.key === "Escape") {
+                        hideMentionDropdown();
                     }
                 });
             }
         });
+
+        function showMentionDropdown(query) {
+            const dropdown = document.getElementById("mentionDropdown");
+            const filtered = allDeptNames.filter(d => d.includes(query));
+
+            if (filtered.length === 0) {
+                hideMentionDropdown();
+                return;
+            }
+
+            dropdown.innerHTML = "";
+            filtered.forEach(dept => {
+                const item = document.createElement("div");
+                item.className = "mention-item themed-text border-b border-gray-500/10 flex items-center justify-between";
+                item.innerHTML = `<span>@${dept}</span><span class="text-[9px] themed-subtext">主责部门</span>`;
+                item.onclick = () => selectMentionDept(dept);
+                dropdown.appendChild(item);
+            });
+
+            // 定位到光标附近
+            dropdown.style.display = "block";
+            dropdown.style.bottom = "110px";
+            dropdown.style.left = "20px";
+        }
+
+        function hideMentionDropdown() {
+            const dropdown = document.getElementById("mentionDropdown");
+            if (dropdown) dropdown.style.display = "none";
+        }
+
+        function selectMentionDept(deptName) {
+            hideMentionDropdown();
+            const cmdBox = document.getElementById("cmd");
+            cmdBox.focus();
+
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const textNode = range.startContainer;
+                
+                if (textNode.nodeType === Node.TEXT_NODE) {
+                    const text = textNode.textContent;
+                    const atIdx = text.lastIndexOf("@", range.startOffset);
+                    if (atIdx !== -1) {
+                        // 抹除刚才打出来的 @xxx 文字
+                        textNode.textContent = text.slice(0, atIdx) + text.slice(range.startOffset);
+                        range.setStart(textNode, atIdx);
+                        range.setEnd(textNode, atIdx);
+                    }
+                }
+
+                // 插入胶囊
+                const tokenSpan = createDeptTokenElement(deptName);
+                range.insertNode(tokenSpan);
+                const spaceNode = document.createTextNode(" ");
+                tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
+                range.setStartAfter(spaceNode);
+                range.setEndAfter(spaceNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+            appendLog(`✨ 通过智能 @ 菜单成功选定【${deptName}】。`, "text-indigo-400");
+        }
 
         function getRealStandardTime() {
             const d = new Date();
@@ -569,7 +701,9 @@
                     isAutoHealing = true;
                     const errDetail = await fetchRunErrorLogs(latestRun.id);
                     const cmdBox = document.getElementById("cmd");
-                    cmdBox.innerHTML = `<span class="dept-token" contenteditable="false" data-dept="缺陷与QA质检部">@【缺陷与QA质检部】</span> 紧急自愈：流水线报警 "${errDetail}"。`;
+                    cmdBox.innerHTML = "";
+                    cmdBox.appendChild(createDeptTokenElement("缺陷与QA质检部"));
+                    cmdBox.appendChild(document.createTextNode(` 紧急自愈：流水线报警 "${errDetail}"。`));
                     try {
                         await triggerSwarmAutonomousAction();
                     } finally {
@@ -581,12 +715,10 @@
             if (!qaMonitorInterval) qaMonitorInterval = setInterval(loopTask, 30000);
         }
 
-        // 👑 多部门协同发车引擎：提取输入框中的所有 Token 胶囊，解析出参与会商的多部门
         async function triggerSwarmAutonomousAction() {
             const btn = document.getElementById("runBtn");
             const cmdBox = document.getElementById("cmd");
             
-            // 从富文本框中提取所有被 @ 的部门胶囊
             const tokenElements = cmdBox.querySelectorAll(".dept-token");
             let targetDepts = [];
             tokenElements.forEach(el => {
@@ -594,7 +726,6 @@
                 if (dept && !targetDepts.includes(dept)) targetDepts.push(dept);
             });
 
-            // 如果没点胶囊，默认取当前过滤部门或大脑中枢
             if (targetDepts.length === 0) {
                 targetDepts = [activeFilterDept || "大脑中枢"];
             }
@@ -685,7 +816,7 @@ ${memoryFile.content || "无"}
                 appendLog("❌ 协同会商异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V26 引擎)</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V27 引擎)</span>";
             }
         }
 
