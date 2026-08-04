@@ -364,26 +364,49 @@
             try {
                 const keys = getKeys();
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                let lines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
+                let allLines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
                 
+                // 👑 极致精准过滤：如果董事长点击了某个专属部门
+                let lines = allLines;
                 if (activeFilterDept) {
-                    const filtered = lines.filter(l => l.includes(activeFilterDept));
-                    if (filtered.length > 0) lines = filtered;
+                    // 定义每个部门的核心语义词库，实现战报与部门精准对齐
+                    const deptKeywords = {
+                        "大脑中枢": ["中枢", "调度", "发单", "总控", "V22", "V23"],
+                        "缺陷与QA质检部": ["缺陷", "QA", "修复", "404", "报错", "自愈", "闭环", "编译", "流转", "拦截"],
+                        "主动产品部": ["产品", "规划", "盲排", "补坑", "需求", "架构"],
+                        "施工工程部": ["工程", "重写", "落地", "代码", "JS", "HTML", "脚本", "推送", "同步", "原子"],
+                        "视觉策划部": ["视觉", "排版", "UI", "背景", "大图", "配色", "高精", "磨砂", "样式"],
+                        "审核质量部": ["质量", "审核", "门槛", "85分", "规范", "合规"],
+                        "转化销售部": ["销售", "转化", "$9.99", "授权", "支付", "收银", "ROI", "订单"],
+                        "推广营销部": ["营销", "推广", "海外", "公域", "流量", "曝光"],
+                        "国际法务部": ["法务", "ATS", "GDPR", "隐私", "安全", "加密", "验签"]
+                    };
+
+                    const keywords = deptKeywords[activeFilterDept] || [activeFilterDept];
+
+                    // 筛选出真正包含该部门名称 或 包含其职能关键字的战报
+                    lines = allLines.filter(line => {
+                        return line.includes(activeFilterDept) || keywords.some(kw => line.includes(kw));
+                    });
                 }
 
                 document.getElementById("historyCount").innerText = `${lines.length} RECORDS`;
 
                 if (lines.length === 0) {
-                    feed.innerHTML = `<div class="text-center text-xs themed-subtext py-10 font-mono">未检索到【${activeFilterDept || '全体'}】的相关战报</div>`;
+                    feed.innerHTML = `
+                        <div class="themed-inner border rounded-xl p-6 text-center space-y-2">
+                            <div class="text-xs text-indigo-400 font-bold">🔍 【${activeFilterDept}】当前暂无独立战报</div>
+                            <div class="text-[11px] themed-subtext">该部门近期未产生单独工单。您可以随时在右侧向其派发专属任务！</div>
+                        </div>
+                    `;
                     return;
                 }
 
                 feed.innerHTML = "";
                 lines.reverse().forEach((line, idx) => {
                     const isLatest = idx === 0;
-                    // 精确抓取记录里的有效时间
                     const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
-                    const timeStr = exactDateMatch ? exactDateMatch[1] : "已记录";
+                    const timeStr = exactDateMatch ? exactDateMatch[1] : "实时归档";
                     let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
 
                     let cardBorder = isLatest ? "border-emerald-500/60 themed-inner shadow-md ring-1 ring-emerald-500/20" : "border-gray-500/20 themed-inner opacity-75";
