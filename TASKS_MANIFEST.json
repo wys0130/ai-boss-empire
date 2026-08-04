@@ -1,0 +1,92 @@
+{
+  "project_name": "APEXWORK ENTERPRISE SUITE STORE",
+  "updated_at": "2026-08-04",
+  "summary": {
+    "total_tasks": 10,
+    "completed": 5,
+    "in_progress": 2,
+    "todo": 3
+  },
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "商城主门户页面 (index.html) 可视化排版与 1 秒响应",
+      "status": "DONE",
+      "department": "施工工程部 & 视觉策划部",
+      "revenue_impact": "HIGH",
+      "notes": "已去除枯燥大段文本，接入数据 KPI 卡片与极简展示卡"
+    },
+    {
+      "id": "TASK-002",
+      "title": "PPT 演示可视化精修页面 (editor.html) V16 构建",
+      "status": "DONE",
+      "department": "施工工程部",
+      "revenue_impact": "HIGH",
+      "notes": "已实现少字多图、折行居中，增加对齐WPS的 6 大排版操作条"
+    },
+    {
+      "id": "TASK-003",
+      "title": "Edge-Native WebP 边缘图像降维机制引入",
+      "status": "DONE",
+      "department": "施工工程部 & 视觉策划部",
+      "revenue_impact": "MEDIUM",
+      "notes": "实景图片请求自动带 w=1280&q=75&fm=webp，解决多图卡顿问题"
+    },
+    {
+      "id": "TASK-004",
+      "title": "多层架构地图 (PROJECT_MAP.json) 与按需读取落地",
+      "status": "DONE",
+      "department": "大脑中枢",
+      "revenue_impact": "HIGH",
+      "notes": "明确声明式数据 (/data/) 与局部页面模版 (/components/) 路由"
+    },
+    {
+      "id": "TASK-005",
+      "title": "85分多模态大模型视觉量化门槛与单幅文字极审",
+      "status": "DONE",
+      "department": "审核质量部",
+      "revenue_impact": "HIGH",
+      "notes": "低于 85 分设计与大量废话的布局自动废单"
+    },
+    {
+      "id": "TASK-006",
+      "title": "建立独立智能体目录 (/agents/) 拆分部门提示词与业务",
+      "status": "IN_PROGRESS",
+      "department": "大脑中枢 & 主动产品部",
+      "revenue_impact": "HIGH",
+      "notes": "彻底告别单文件混写，使 AI 各职能互相独立、可以并发协作"
+    },
+    {
+      "id": "TASK-007",
+      "title": "解决支付闭环模拟状态，真正打通 $9.99 结账与 Ed25519 签名",
+      "status": "IN_PROGRESS",
+      "department": "缺陷反馈部 & 转化销售部",
+      "revenue_impact": "CRITICAL",
+      "notes": "BUG 缺陷反馈部已亮红灯预警，正对接真正商用网关与 VIP 权限下发"
+    },
+    {
+      "id": "TASK-008",
+      "title": "Excel 财务模型线真实编辑功能建立 (excel-editor.html)",
+      "status": "TODO",
+      "department": "主动产品部 & 施工工程部",
+      "revenue_impact": "HIGH",
+      "notes": "目前主页仅有介绍入口，待建设带 ROI 与公式测算表的专用功能页"
+    },
+    {
+      "id": "TASK-009",
+      "title": "Word 智能排版合规文档专用页建立 (word-editor.html)",
+      "status": "TODO",
+      "department": "主动产品部 & 施工工程部",
+      "revenue_impact": "HIGH",
+      "notes": "目前主页仅有卡片，待开辟欧美 ATS 合规双语实际展示编辑器"
+    },
+    {
+      "id": "TASK-010",
+      "title": "海外自动引流与出海适配 (i18n / Reddit / Pinterest 推广)",
+      "status": "TODO",
+      "department": "推广营销部 & 国际本地化部",
+      "revenue_impact": "HIGH",
+      "notes": "依赖支付上线后自动开跑全网引流文案"
+    }
+  ]
+}
