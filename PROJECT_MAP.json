@@ -1,7 +1,7 @@
 {
   "project_name": "APEXWORK ENTERPRISE SUITE STORE",
-  "version": "2026.8.0",
-  "architecture_style": "Declarative Data-Driven Component Routing + Edge-Native",
+  "version": "2026.8.5",
+  "architecture_style": "Multi-Agent Swarm + Declarative Routing + Edge-Native",
   "manifest": {
     "core_portals": {
       "index.html": {
@@ -9,43 +9,56 @@
         "description": "包含创投三件套展示、可视化营销卡片与核心路演引流"
       },
       "editor.html": {
-        "role": "在线可视化演示精修区",
+        "role": "在线可视化演示精修区 (PPT)",
         "description": "仅保存外壳与路由控制，数据依赖 /data/，视图依赖 /components/"
       },
       "admin.html": {
-        "role": "董事长驾驶舱 & AI CTO 控制台",
-        "description": "具备本地密钥管理、一键快照回退、GitHub 真实文件树感知与系统终端"
+        "role": "董事长驾驶舱 & 9大智能体控制台",
+        "description": "具备本地密钥管理、一键快照否决回退、9大部门战报过滤与 BUG 监控"
+      },
+      "word-editor.html": {
+        "role": "ATS 合规文档精修区 (Word)",
+        "description": "多语言合规排版与结构化预览"
+      },
+      "excel-editor.html": {
+        "role": "全渠道 ROI 测算模型区 (Excel)",
+        "description": "动态自适应测算模型与公式内核"
       }
+    },
+    "agents_layer": {
+      "agents/orchestrator.md": "大脑中枢：全局工单派发与路由",
+      "agents/bug-monitor.md": "缺陷反馈部：死盯支付链路与报错",
+      "agents/product-pm.md": "主动产品部：自扫盲区与主动填坑",
+      "agents/frontend-dev.md": "施工工程部：1秒响应极速前端落地",
+      "agents/ui-designer.md": "视觉策划部：少字多图与折行绝对居中",
+      "agents/qa-auditor.md": "审核质量部：85分多模态大模型硬审",
+      "agents/sales-growth.md": "转化销售部：$9.99营收绩效与RLFF",
+      "agents/marketing.md": "推广营销部：海外公域全自动搬砖",
+      "agents/legal-compliance.md": "国际法务部：ATS/GDPR零注册合规"
     },
     "data_layer": {
       "data/aerotech-deck.json": {
         "role": "声明式演示数据库",
-        "description": "存放 15 页 PPT 的标语、KPI 进度条参数与卡片短语，文案运营仅修改此文件"
+        "description": "存放 15 页 PPT 的标语、KPI 进度条参数与卡片短语"
       },
       "data/theme-presets.json": {
         "role": "边缘视觉图库配置",
-        "description": "封装所有 WebP 边缘降维背景图 URL 与遮罩渐变色，视觉配置仅修改此文件"
+        "description": "封装所有 WebP 边缘降维背景图 URL 与遮罩渐变色"
       }
     },
     "component_layer": {
       "components/toolbar.html": {
         "role": "顶部可视化操作条组件",
-        "description": "负责 6 大大厂排版功能：图表变换、绝对居中/左齐对界、主题颜色与 WebP 图库切换"
+        "description": "负责图表变换、绝对居中对界、主题颜色与 WebP 切换"
       },
       "components/slide-card.html": {
         "role": "幻灯片卡片渲染模板",
-        "description": "提供 SVG 能量条与 KPI 重点展示的 DOM 外壳，通过 {{KEY}} 变量动态挂载"
+        "description": "提供 SVG 能量条与 KPI 重点展示的 DOM 外壳"
       }
     },
     "governance_and_memory": {
-      "AI-EMPIRE-CONSTITUTION.md": {
-        "role": "最高工程宪法",
-        "description": "永久硬编码 Edge-Native、RAG 按需检索、视觉优先与商业收款底线"
-      },
-      "MEMORY.md": {
-        "role": "AI 经验进化与避坑黑名单",
-        "description": "以秒级时序记载最近 5 次升级与董事长 VETO 否决记录，自动修剪历史"
-      }
+      "AI-EMPIRE-CONSTITUTION.md": "最高天网宪法 (V5.0 搞钱核心与蜂群纪律)",
+      "MEMORY.md": "多智能体时序演进日志与末位淘汰存档"
     }
   }
 }
