@@ -47,10 +47,10 @@
                 <h2 class="text-2xl font-black tracking-tight mt-2">破除低效传统冗长，全视觉商业交付新纪元</h2>
                 <p class="text-xs text-slate-300 mt-1">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
             </div>
-            <!-- 买家专属行动按键：直达核心套餐 -->
-            <a href="#ppt-section" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center gap-2">
-                <span>⚡ 浏览商用套件包 ($9.99)</span>
-            </a>
+            <!-- 👑 修复：改为点击触发全站三件套商用授权包收银页面 -->
+            <button onclick="openBundleCheckout()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center gap-2">
+                <span>⚡ 立即解锁商用三件套包 ($9.99 / ￥69)</span>
+            </button>
         </div>
 
         <!-- 第一板块：PPT 路演套件 (已绑定专属路由参数 ?deck=xxx) -->
@@ -150,10 +150,38 @@
         APEXWORK · AI-POWERED ENTERPRISE STORE · VISUAL ENGINE 2026
     </footer>
 
-    <!-- 👑 极客 RBAC 鉴权与隐形门脚本：三权分立与防 404 自护 -->
+    <!-- 👑 极客 RBAC 鉴权、支付配置与隐形门脚本：三权分立与防 404 自护 -->
     <script>
         let logoClickCount = 0;
         let clickTimer = null;
+
+        // 👑 全局通用支付配置（使用 afdian.com 域名；面包多完整注释保留待后续审核通过使用）
+        const PAY_CONFIG = {
+            china: {
+                name: "爱发电 (Afdian) 极速直付",
+                price: "￥27.00 / 全站三件套",
+                // // 面包多备用通道（审核通过并配置 API 后解开注释即可）：
+                // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+                url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 请将此处替换为你正确的爱发电主页或方案直链
+            },
+            overseas: {
+                name: "海外快捷商用收银",
+                price: "$9.99 / 全站三件套",
+                // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+                url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
+            }
+        };
+
+        // 👑 主页商用套件包唤醒与跳转收银
+        window.openBundleCheckout = function() {
+            if (window.ApexAuth && typeof window.ApexAuth.isPaidUser === "function" && window.ApexAuth.isPaidUser()) {
+                alert("🎉 您已持有合法商用签名证书，无需重复购买！直接点击下方任意组件即可解锁畅用。");
+                return;
+            }
+            if (confirm("⚡ 确认前往【爱发电 (Afdian)】极速直付页？\n\n支付后凭回跳即可自动生成设备证书，免注册解锁 PPT/Excel/Word 全站商用三件套！")) {
+                window.location.href = PAY_CONFIG.china.url;
+            }
+        };
 
         // 1. 识别并初始化当前用户的角色视图
         function initRoleBasedView() {
