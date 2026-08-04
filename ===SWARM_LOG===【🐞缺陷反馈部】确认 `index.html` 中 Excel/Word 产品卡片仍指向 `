@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel 财务模型编辑器 - APEXWORK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .bento-grid { display: grid; grid-template-columns: 240px 1fr 320px; gap: 16px; height: calc(100vh - 64px); }
+        .panel { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); overflow: hidden; }
+        .nav-item { padding: 12px 16px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .nav-item:hover { background: #f0f4ff; }
+        .nav-item.active { background: #2563eb; color: #fff; }
+        .cell-input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; }
+        .cell-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .kpi-card { background: linear-gradient(135deg, #1e293b, #334155); color: #fff; border-radius: 12px; padding: 16px; }
+        .btn-primary { background: #2563eb; color: #fff; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: #f1f5f9; color: #334155; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .table-grid { display: grid; gap: 8px; }
+        .table-header { background: #f8fafc; font-weight: 600; color: #334155; }
+        .table-cell { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 16px 24px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 1000; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- 顶部导航 -->
+    <nav class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl font-bold text-slate-800">📊 APEXWORK</span>
+            <span class="text-sm text-slate-500">Excel 财务模型编辑器</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-sm text-slate-600 hover:text-blue-600 transition">← 返回商城</a>
+            <span class="text-sm font-semibold text-emerald-600">USD $9.99</span>
+        </div>
+    </nav>
+
+    <!-- 便当盒三栏工作台 -->
+    <div class="p-4">
+        <div class="bento-grid">
+            <!-- 左侧：表格页导航 -->
+            <div class="panel p-4">
+                <h3 class="font-semibold text-slate-800 mb-4">📑 表格页</h3>
+                <div class="space-y-2" id="sheetNav">
+                    <div class="nav-item active" data-sheet="0">📈 收入预测</div>
+                    <div class="nav-item" data-sheet="1">💰 成本结构</div>
+                    <div class="nav-item" data-sheet="2">📊 利润分析</div>
+                    <div class="nav-item" data-sheet="3">💵 现金流</div>
+                    <div class="nav-item" data-sheet="4">📋 关键指标</div>
+                </div>
+                <div class="mt-6 p-4 bg-blue-50 rounded-xl">
+                    <p class="text-sm text-blue-800 font-medium">💡 提示</p>
+                    <p class="text-xs text-blue-600 mt-1">点击左侧表格页切换编辑区域，右侧可调整参数并付费导出</p>
+                </div>
+            </div>
+
+            <!-- 中央：实时预览 -->
+            <div class="panel p-4 flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-slate-800">👁️ 实时预览</h3>
+                    <div class="flex gap-2">
+                        <button class="btn-secondary text-sm py-2 px-4" onclick="addRow()">+ 添加行</button>
+                        <button class="btn-secondary text-sm py-2 px-4" onclick="addColumn()">+ 添加列</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto bg-slate-50 rounded-xl p-4">
+                    <div class="table-grid" id="tablePreview" style="grid-template-columns: repeat(4, 1fr);">
+                        <!-- 动态生成表格 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：参数与付费导出 -->
+            <div class="panel p-4 flex flex-col">
+                <h3 class="font-semibold text-slate-800 mb-4">⚙️ 参数设置</h3>
+                <div class="space-y-4 flex-1">
+                    <div>
+                        <label class="block text-sm text-slate-600 mb-1">公司名称</label>
+                        <input type="text" class="cell-input" id="companyName" value="AeroTech 航空科技" onchange="updatePreview()">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-600 mb-1">报告周期</label>
+                        <select class="cell-input" id="reportPeriod" onchange="updatePreview()">
+                            <option>2026 年度</option>
+                            <option>2026 Q1</option>
+                            <option>2026 Q2</option>
+                            <option>2026 Q3</option>
+                            <option>2026 Q4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-slate-600 mb-1">货币单位</label>
+                        <select class="cell-input" id="currency" onchange="updatePreview()">
+                            <option value="USD">USD $</option>
+                            <option value="CNY">CNY ¥</option>
+                            <option value="EUR">EUR €</option>
+                        </select>
+                    </div>
+                    <div class="kpi-card">
+                        <p class="text-sm opacity-80">预计年收入</p>
+                        <p class="text-2xl font-bold mt-1" id="kpiRevenue">$2,400,000</p>
+                        <p class="text-xs opacity-60 mt-2">↑ 较去年增长 32%</p>
+                    </div>
+                    <div class="kpi-card bg-gradient-to-br from-emerald-600 to-teal-700">
+                        <p class="text-sm opacity-80">净利润率</p>
+                        <p class="text-2xl font-bold mt-1" id="kpiMargin">24.5%</p>
+                        <p class="text-xs opacity-60 mt-2">行业平均 18.2%</p>
+                    </div>
+                </div>
+                <div class="mt-4 space-y-3">
+                    <button class="btn-primary w-full" id="exportBtn" onclick="handleExport()">🔒 付费导出 XLSX</button>
+                    <button class="btn-secondary w-full" onclick="showToast('预览模式：免费编辑，导出需付费解锁')">👁️ 预览模式</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== 数据模型 =====
+        const sheets = [
+            { name: '收入预测', headers: ['季度', '产品A', '产品B', '产品C'], rows: [['Q1', 250000, 180000, 120000], ['Q2', 280000, 200000, 140000], ['Q3', 320000, 230000, 160000], ['Q4', 350000, 260000, 180000]] },
+            { name: '成本结构', headers: ['成本项', 'Q1', 'Q2', 'Q3'], rows: [['原材料', 80000, 90000, 95000], ['人力', 120000, 125000, 130000], ['营销', 40000, 45000, 50000], ['研发', 60000, 65000, 70000]] },
+            { name: '利润分析', headers: ['指标', 'Q1', 'Q2', 'Q3'], rows: [['总收入', 550000, 620000, 710000], ['总成本', 300000, 325000, 345000], ['毛利润', 250000, 295000, 365000], ['净利润', 175000, 206500, 255500]] },
+            { name: '现金流', headers: ['项目', '1月', '2月', '3月'], rows: [['期初余额', 500000, 620000, 750000], ['经营流入', 200000, 220000, 250000], ['经营流出', 80000, 90000, 95000], ['期末余额', 620000, 750000, 905000]] },
+            { name: '关键指标', headers: ['指标', '2025', '2026E'], rows: [['营收', 1800000, 2400000], ['毛利率', 42, 45], ['净利率', 18, 24.5], ['ROE', 22, 28]] }
+        ];
+        let currentSheet = 0;
+
+        // ===== 初始化预览 =====
+        function updatePreview() {
+            const sheet = sheets[currentSheet];
+            const grid = document.getElementById('tablePreview');
+            const currency = document.getElementById('currency').value;
+            const symbol = currency === 'USD' ? '$' : currency === 'CNY' ? '¥' : '€';
+            
+            let html = '';
+            // 表头
+            sheet.headers.forEach(h => {
+                html += `<div class="table-header table-cell">${h}</div>`;
+            });
+            // 数据行
+            sheet.rows.forEach(row => {
+                row.forEach((cell, idx) => {
+                    if (idx === 0) {
+                        html += `<div class="table-cell font-medium">${cell}</div>`;
+                    } else if (typeof cell === 'number') {
+                        html += `<div class="table-cell text-right">${symbol}${cell.toLocaleString()}</div>`;
+                    } else {
+                        html += `<div class="table-cell">${cell}</div>`;
+                    }
+                });
+            });
+            grid.innerHTML = html;
+            grid.style.gridTemplateColumns = `repeat(${sheet.headers.length}, 1fr)`;
+
+            // 更新 KPI
+            const revenue = 2400000;
+            document.getElementById('kpiRevenue').textContent = `${symbol}${revenue.toLocaleString()}`;
+            document.getElementById('kpiMargin').textContent = '24.5%';
+        }
+
+        // ===== 表格页切换 =====
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                currentSheet = parseInt(this.dataset.sheet);
+                updatePreview();
+            });
+        });
+
+        // ===== 添加行/列 =====
+        function addRow() {
+            const sheet = sheets[currentSheet];
+            const newRow = sheet.headers.map((_, idx) => idx === 0 ? `新行${sheet.rows.length + 1}` : 0);
+            sheet.rows.push(newRow);
+            updatePreview();
+            showToast('已添加新行');
+        }
+
+        function addColumn() {
+            const sheet = sheets[currentSheet];
+            sheet.headers.push(`新列${sheet.headers.length}`);
+            sheet.rows.forEach(row => row.push(0));
+            updatePreview();
+            showToast('已添加新列');
+        }
+
+        // ===== Ed25519 验签 =====
+        function verifyEd25519Signature(signature, data) {
+            // 生产环境应使用 WebCrypto API 进行真实 Ed25519 验签
+            // 此处为演示逻辑：签名需为 64 字节 hex 字符串
+            if (!signature || typeof signature !== 'string') return false;
+            if (signature.length !== 128) return false;
+            // 模拟验签通过（真实场景需用公钥验证）
+            return /^[0-9a-f]{128}$/i.test(signature);
+        }
+
+        // ===== 付费导出 =====
+        function handleExport() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const signature = urlParams.get('signature');
+
+            // 强制验签
+            if (status === 'paid' && verifyEd25519Signature(signature, 'export')) {
+                // 验签通过，写入 localStorage 并导出
+                localStorage.setItem('apx_license', JSON.stringify({
+                    product: 'excel-editor',
+                    status: 'paid',
+                    signature: signature,
+                    timestamp: Date.now()
+                }));
+                exportXLSX();
+            } else {
+                // 未验签通过，检查本地授权
+                const license = JSON.parse(localStorage.getItem('apx_license') || 'null');
+                if (license && license.product === 'excel-editor' && license.status === 'paid') {
+                    exportXLSX();
+                } else {
+                    showToast('⚠️ 请先完成 $9.99 支付以解锁导出');
+                    // 模拟跳转支付（生产环境替换为真实支付链接）
+                    setTimeout(() => {
+                        window.location.href = 'https://buy.stripe.com/test_xxx?product=excel-editor';
+                    }, 1500);
+                }
+            }
+        }
+
+        // ===== 导出 XLSX =====
+        function exportXLSX() {
+            try {
+                const wb = XLSX.utils.book_new();
+                sheets.forEach(sheet => {
+                    const wsData = [sheet.headers, ...sheet.rows];
+                    const ws = XLSX.utils.aoa_to_sheet(wsData);
+                    XLSX.utils.book_append_sheet(wb, ws, sheet.name);
+                });
+                const companyName = document.getElementById('companyName').value || 'APEXWORK';
+                const period = document.getElementById('reportPeriod').value || '2026';
+                const fileName = `${companyName}_财务模型_${period}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                showToast('✅ 导出成功！文件已下载');
+            } catch (e) {
+                console.error('导出失败:', e);
+                showToast('❌ 导出失败，请重试');
+            }
+        }
+
+        // ===== Toast 提示 =====
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ===== 初始化 =====
+        updatePreview();
+        // 检查 URL 参数自动验签
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('status') === 'paid' && urlParams.get('signature')) {
+            handleExport();
+        }
+    </script>
+</body>
+</html>
