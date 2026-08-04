@@ -3,142 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork PPT 在线编辑器 · 带 AI 热点背景图库</title>
+    <title>ApexWork 高阶路演 PPT 编辑器 (Visual-First V10)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
-        .slide-shadow { box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.15), 0 8px 10px -6px rgba(15, 23, 42, 0.08); }
-        /* 背景样式样板：由 AI 动态扩展并渲染 */
-        .bg-style-grid { background-image: radial-gradient(rgba(100, 116, 139, 0.22) 1px, transparent 1px); background-size: 24px 24px; }
-        .bg-style-mesh { background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%); }
-        .bg-style-dark { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .bg-style-amber { background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%); }
+        .slide-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        
+        /* 高清实景商业大图库 (已配合深色奢华遮罩) */
+        .bg-photo-tech {
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.75) 100%), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover; background-position: center;
+        }
+        .bg-photo-finance {
+            background-image: linear-gradient(135deg, rgba(10, 15, 30, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover; background-position: center;
+        }
+        .bg-photo-team {
+            background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(2, 6, 23, 0.92) 100%), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80');
+            background-size: cover; background-position: center;
+        }
+        .bg-style-mesh {
+            background: radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.25) 0%, transparent 45%),
+                        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.25) 0%, transparent 45%),
+                        linear-gradient(135deg, #0f172a 0%, #020617 100%);
+        }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <!-- 顶栏：返回商城主页 -->
-    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <!-- 顶部导航 bar -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
         <div class="flex items-center gap-3">
-            <a href="index.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded transition font-bold">← 返回主页商城</a>
-            <span class="h-4 w-[1px] bg-slate-200"></span>
-            <h1 id="deckTitle" class="font-bold text-sm text-slate-800">AeroTech 2026 全球创投战略与 ROI 路演套件</h1>
-            <span class="text-[11px] bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded font-bold">15 SLIDES PRO</span>
+            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition font-bold">← 返回商城首页</a>
+            <span class="h-4 w-[1px] bg-slate-800"></span>
+            <h1 class="font-bold text-sm text-slate-200">2026 AeroTech 创投旗舰路演套件 · 视觉增强图解版</h1>
+            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">VISUAL PRO V10</span>
         </div>
         <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-500">商用授权下载: <strong class="text-slate-900 font-mono font-bold">$9.99</strong></span>
-            <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md transition">
-                ⚡ 支付 $9.99 导出完整成果
+            <span class="text-xs text-slate-400">商用完整授权: <strong class="text-white font-mono text-sm">USD $9.99</strong></span>
+            <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center gap-1.5">
+                <span>⚡ 支付 $9.99 导出完整成果</span>
             </button>
         </div>
     </header>
 
     <!-- 主工作区 -->
     <div class="flex-1 flex overflow-hidden">
-        <!-- 左栏：缩略图 -->
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
-            <div class="p-3.5 border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex justify-between">
+        
+        <!-- 左侧：缩略图导航 -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
+            <div class="p-3.5 border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
                 <span>幻灯片页面列表</span>
-                <span class="font-mono text-slate-600">15 SLIDES</span>
+                <span class="font-mono bg-slate-800 px-2 py-0.5 rounded text-slate-400">15 SLIDES</span>
             </div>
-            <div id="thumbList" class="flex-1 overflow-y-auto p-3 space-y-2.5"></div>
+            <div id="thumbList" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scroll"></div>
         </aside>
 
-        <!-- 中间：画布区 + 工具条 (带背景切换) -->
-        <main class="flex-1 bg-slate-100/80 flex flex-col items-center overflow-y-auto relative">
+        <!-- 中间：画布展示区 + 置顶视觉工具条 -->
+        <main class="flex-1 bg-slate-950 flex flex-col items-center overflow-y-auto custom-scroll relative">
             
-            <!-- 永久置顶编辑栏：支持挑选 AI 魔改的几款背景图式 -->
-            <div class="sticky top-4 z-40 bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-2xl px-5 py-2.5 shadow-xl flex items-center gap-4 text-xs font-medium text-slate-200 my-4">
-                <span class="text-indigo-400 font-mono text-[11px]">🛠️ EDITOR:</span>
-                <button onclick="addBulletText()" class="hover:text-white hover:bg-slate-800 px-2.5 py-1 rounded-lg transition">📄 追加条目</button>
-                <div class="h-4 w-[1px] bg-slate-700"></div>
-                
-                <!-- 【核心升级】AI 热点背景图选择菜单 -->
-                <span class="text-slate-400 text-[11px]">🌌 切换 AI 魔改背景款型:</span>
+            <!-- 工具条：支持挑选商业高清大图与图表样式 -->
+            <div class="sticky top-4 z-40 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-2xl px-5 py-2.5 shadow-2xl flex items-center gap-4 text-xs font-medium text-slate-200 my-4">
+                <span class="text-indigo-400 font-mono text-[11px] font-bold">🛠️ VISUAL TOOLS:</span>
+                <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg transition border border-slate-700">
+                    📊 强化数据图表进度条
+                </button>
+                <div class="h-4 w-[1px] bg-slate-800"></div>
+                <span class="text-slate-400 text-[11px]">🌌 切换 AI 背景视觉图:</span>
                 <div class="flex items-center gap-1.5">
-                    <button onclick="changeBackground('grid')" class="px-2.5 py-1 bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white rounded text-[11px] border border-slate-700 transition font-mono">1. 科技亮光网格</button>
-                    <button onclick="changeBackground('mesh')" class="px-2.5 py-1 bg-slate-800 hover:bg-emerald-600 text-slate-300 hover:text-white rounded text-[11px] border border-slate-700 transition font-mono">2. 创投翡翠微光</button>
-                    <button onclick="changeBackground('dark')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded text-[11px] border border-slate-700 transition font-mono">3. 高管黑青石墨</button>
-                    <button onclick="changeBackground('amber')" class="px-2.5 py-1 bg-slate-800 hover:bg-amber-600 text-slate-300 hover:text-white rounded text-[11px] border border-slate-700 transition font-mono">4. 暖金金融质感</button>
+                    <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1. 赛博AI实景</button>
+                    <button onclick="changeBackground('finance')" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2. 金融楼宇实景</button>
+                    <button onclick="changeBackground('team')" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">3. 商务协作实景</button>
+                    <button onclick="changeBackground('mesh')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">4. 极简翡翠光斑</button>
                 </div>
             </div>
 
-            <!-- 主展示画布 -->
+            <!-- 主画布展示卡：高清大图 + SVG进度条 + 少字多图结构 -->
             <div class="w-full max-w-5xl px-8 pb-12 flex flex-col items-center">
-                <div id="slideCanvas" class="w-full aspect-[16/9] bg-white rounded-2xl border border-slate-200/80 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-style-grid">
-                    <!-- JS 自动注入对应页面内容 -->
+                <div id="slideCanvas" class="w-full aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech">
+                    <!-- JS 自动注入“高清图 + 图表进度条”页面内容 -->
                 </div>
-                <div class="flex items-center justify-between w-full max-w-4xl mt-6 text-xs text-slate-500">
-                    <span class="bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1 rounded-full font-medium">💡 点击画布文字可直接编辑修改</span>
+
+                <div class="flex items-center justify-between w-full max-w-4xl mt-6 text-xs text-slate-400">
+                    <span class="bg-slate-900 border border-slate-800 px-3.5 py-1.5 rounded-xl text-slate-300">
+                        💡 提示：已缩减枯燥文字！直接点击幻灯片内的卡片文字或百分比数值即可编辑
+                    </span>
                     <div class="flex items-center gap-3">
-                        <button onclick="prevSlide()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl font-bold">← 上一页</button>
-                        <span id="pageCounter" class="font-mono font-bold px-2">01 / 15</span>
-                        <button onclick="nextSlide()" class="px-4 py-2 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl font-bold">下一页 →</button>
+                        <button onclick="prevSlide()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl font-bold transition">← 上一页</button>
+                        <span id="pageCounter" class="font-mono font-bold text-slate-300 px-2">01 / 15</span>
+                        <button onclick="nextSlide()" class="px-4 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-xl font-bold transition">下一页 →</button>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- 右栏：参数修改与导出 -->
-        <aside class="w-80 bg-white border-l border-slate-200 p-5 flex flex-col justify-between shrink-0">
+        <!-- 右侧：参数与数据直接同步栏 -->
+        <aside class="w-80 bg-slate-900 border-l border-slate-800 p-5 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll">
             <div class="space-y-4">
-                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">参数即时渲染</div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">公司/项目品牌</label>
-                    <input id="bindBrand" type="text" value="AeroTech Global" oninput="updateFromForm()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                    <span>图文参数实时双向渲染</span>
+                    <span class="text-blue-400 font-mono">LIVE SYNC</span>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">主标题</label>
-                    <input id="bindTitle" type="text" oninput="updateFromForm()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs">
+                    <label class="block text-xs font-bold text-slate-300 mb-1">公司/项目品牌</label>
+                    <input id="bindBrand" type="text" value="AeroTech Global" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">核心指标 (KPI)</label>
-                    <input id="bindKpi" type="text" oninput="updateFromForm()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs">
+                    <label class="block text-xs font-bold text-slate-300 mb-1">当前主标题 (精简标语)</label>
+                    <input id="bindTitle" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">详细描述</label>
-                    <textarea id="bindSub" rows="3" oninput="updateFromForm()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs"></textarea>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">关键数据指标 (KPI)</label>
+                    <input id="bindKpi" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">要点卡片说明 (杜绝冗长段落)</label>
+                    <textarea id="bindSub" rows="3" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white leading-relaxed"></textarea>
                 </div>
             </div>
-            <div class="bg-slate-900 text-white rounded-2xl p-4 mt-6">
+
+            <!-- 收银台区域 -->
+            <div class="bg-gradient-to-br from-slate-950 to-blue-950 border border-blue-500/30 rounded-2xl p-4 mt-6 shadow-xl">
                 <div class="flex justify-between items-center text-xs mb-2">
-                    <span class="font-bold">15页完整 PPT 套件</span>
-                    <span class="text-emerald-400 font-mono font-bold">$9.99</span>
+                    <span class="font-bold text-slate-200">15页高清图解商用包</span>
+                    <span class="text-emerald-400 font-mono font-bold text-sm">$9.99</span>
                 </div>
-                <button onclick="exportPPT()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition">
-                    💳 支付 $9.99 导出成果
+                <p class="text-[11px] text-slate-400 mb-4 leading-relaxed">
+                    包含高清商业实景原图与可视化数据进度条，导出后完全兼容所有手机与 PC。
+                </p>
+                <button onclick="exportPPT()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-blue-600/30">
+                    💳 支付 $9.99 一键下载图文工程包
                 </button>
             </div>
         </aside>
     </div>
 
+    <!-- 视觉增强引擎 JS -->
     <script>
         const slidesData = [
-            { id: 1, title: "AeroTech 2026 全球智能商业战略", sub: "重塑高管创投视角 · 全渠道增长平衡对账书", kpi: "USD $24.8M", tag: "01. EXECUTIVE SUMMARY" },
-            { id: 2, title: "高管层管理概览 (C-Suite Overview)", sub: "聚焦企业级生产力降维打法，重塑核心工作流效率与合规标准", kpi: "98.4% Efficiency", tag: "02. STRATEGIC GOALS" },
-            { id: 3, title: "行业传统痛点分析 (Market Pain Points)", sub: "传统老旧软件维护费用超高、多设备导出错乱、商业化转化链路极长", kpi: "-45% Overhead", tag: "03. PROBLEM STATEMENT" },
-            { id: 4, title: "AI 驱动解决方案架构 (Our Solution)", sub: "便当盒式高阶 UI + 全自动脚本迭代 + 跨设备纯前端本地下载", kpi: "100% Native JS", tag: "04. SYSTEM ARCHITECTURE" },
-            { id: 5, title: "商业增长关键拐点 (Growth Inflection)", sub: "连续三季度复合增长率超预期，获欧美大厂决策层全面背书", kpi: "+340% YoY", tag: "05. GROWTH SCALE" },
-            { id: 6, title: "核心产品差异化分析 (Why ApexWork)", sub: "告别 90 年代老旧交互，采用 2026 视觉语义，大幅提升留存", kpi: "4.9/5 Rating", tag: "06. COMPETITIVE EDGE" },
-            { id: 7, title: "全渠道 ROI 监控模型 (ROI Dashboard)", sub: "实时追踪付费导出转化效率，精准平衡获客成本与终身价值", kpi: "3.2x LTV/CAC", tag: "07. FINANCIAL MODEL" },
-            { id: 8, title: "欧洲及北美 ATS 合规标准", sub: "通过极其严苛的企业级安全验证，确保数据本地运算不外泄", kpi: "SOC2 Compliance", tag: "08. GLOBAL SECURITY" },
-            { id: 9, title: "重点客户案例剖析 (Client Success)", sub: "财富 500 强企业真实使用反馈，采购效率提升 12 倍", kpi: "12x Speedup", tag: "09. CASE STUDIES" },
-            { id: 10, title: "2026 - 2028 产品迭代路线图", sub: "从静态模板向完全自主智能体进化，强化决策辅助能力", kpi: "Roadmap V3", tag: "10. FUTURE VISION" },
-            { id: 11, title: "核心创始与技术团队架构", sub: "拥有硅谷知名大厂及顶级高频交易系统研发经验", kpi: "15+ Yrs Exp", tag: "11. CORE TEAM" },
-            { id: 12, title: "全球化市场渗透策略", sub: "以欧洲为出发点，辐射跨国大中型企业办公套件市场", kpi: "42 Countries", tag: "12. MARKET EXPANSION" },
-            { id: 13, title: "潜在业务风险与应对模型", sub: "多层防刷预警机制、云端 Token 鉴权以及前端加密机制", kpi: "0 Breach", tag: "13. RISK MANAGEMENT" },
-            { id: 14, title: "投融资与财务预测对账表", sub: "未来 36 个月净现金流预期及估值敏感性对账分析", kpi: "USD $1.2B VAL", tag: "14. FINANCIAL FORECAST" },
-            { id: 15, title: "诚挚致谢与业务接洽 (Thank You)", sub: "立即扫码或点击链接回传定制，开启您的企业级商务升级", kpi: "APEXWORK.IO", tag: "15. CONCLUSION" }
+            { id: 1, title: "AeroTech 2026 全球智能战略", sub: "创投视角 · 破除低效传统冗长说明", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. EXECUTIVE COVER" },
+            { id: 2, title: "高管层工作流管理概览", sub: "企业生产力跨步进化，彻底取代 90 年代老旧文书套件", kpi: "98.4%", label: "流程自动化达成率", progress: 98, tag: "02. STRATEGIC GOALS" },
+            { id: 3, title: "传统痛点：极高维护与导出错乱", sub: "旧软件排版混乱、授权极其昂贵，阻碍跨国业务扩展", kpi: "-45%", label: "团队无效维护开销缩减", progress: 70, tag: "03. PAIN POINTS" },
+            { id: 4, title: "AI 高清视觉解决方案架构", sub: "全栈卡片化图解 + SVG 自适应数据条 + 一键移动端兼容", kpi: "12x", label: "项目路演成交提速", progress: 90, tag: "04. ARCHITECTURE" },
+            { id: 5, title: "商业增长指数与关键拐点", sub: "获欧美多家顶尖对冲基金及上市公司采购决策背书", kpi: "USD $24.8M", label: "上一季度新签约总净值", progress: 88, tag: "05. FINANCIAL PERFORMANCE" },
+            { id: 6, title: "核心竞争力：为什么选择我们", sub: "杜绝无效段落文字，把枯燥的商业报告化为画报级体验", kpi: "4.9/5", label: "全球商务高管评价", progress: 95, tag: "06. ADVANTAGE" },
+            { id: 7, title: "全渠道获客 ROI 对账模型", sub: "获客成本 CAC 与终身客单价值 LTV 黄金比率演示", kpi: "3.2x", label: "LTV/CAC 回报率", progress: 80, tag: "07. ROI DASHBOARD" },
+            { id: 8, title: "欧美双语 ATS 合规审查体系", sub: "银行级加密安全验证，符合欧洲 GDPR 及北美标准", kpi: "100%", label: "合规审查与数据安全通过率", progress: 100, tag: "08. COMPLIANCE" },
+            { id: 9, title: "世界 500 强实际落地案例", sub: "跨国整车厂与科技巨头联合实施方案报告书", kpi: "24,000+", label: "全球活跃付费订阅终端", progress: 92, tag: "09. SUCCESS CASE" },
+            { id: 10, title: "2026 - 2028 产品规划演进图", sub: "自主演化智能体深度整合，持续升级商务效率", kpi: "Roadmap V3", label: "新一代自主演进架构", progress: 75, tag: "10. ROADMAP" },
+            { id: 11, title: "核心创始及顶级架构师团队", sub: "核心人员来自顶级科技大厂及量化交易平台", kpi: "15+ Yrs", label: "高并发与 UI 设计核心经验", progress: 85, tag: "11. LEADERSHIP" },
+            { id: 12, title: "全球业务销售地图与覆盖", sub: "欧洲起步，辐射北美及亚洲主要金融中心", kpi: "42 Countries", label: "直接落地业务网络", progress: 80, tag: "12. GLOBAL MARKET" },
+            { id: 13, title: "系统稳定与防劫持安全体系", sub: "全平台本地生成，保障商业核心机密不外漏云端", kpi: "0 Breach", label: "历史核心资产安全零泄露", progress: 100, tag: "13. SECURITY" },
+            { id: 14, title: "未来 36 个月现金流与预期", sub: "盈亏平衡敏感性对账与利润率长期扩容分析", kpi: "USD $1.2B", label: "预期商业模型估值", progress: 90, tag: "14. FORECAST" },
+            { id: 15, title: "携手进化，重构企业演示生产力", sub: "立即开启您的企业级商务升级，获取终身授权", kpi: "APEXWORK.IO", tag: "15. CONCLUSION", label: "企业合作唯一接入门户", progress: 95 }
         ];
 
         let currentSlideIdx = 0;
-        let currentBgStyle = 'grid';
+        let currentBgStyle = 'tech';
 
-        const bgConfigs = {
-            "grid": { cls: "bg-style-grid bg-white text-slate-900", kpiCls: "text-blue-600 bg-blue-50/70" },
-            "mesh": { cls: "bg-style-mesh bg-white text-slate-900", kpiCls: "text-emerald-600 bg-emerald-50/70" },
-            "dark": { cls: "bg-style-dark text-white", kpiCls: "text-sky-400 bg-slate-800/80" },
-            "amber": { cls: "bg-style-amber bg-white text-slate-900", kpiCls: "text-amber-600 bg-amber-50/70" }
+        const bgStyles = {
+            "tech": "bg-photo-tech text-white",
+            "finance": "bg-photo-finance text-white",
+            "team": "bg-photo-team text-white",
+            "mesh": "bg-style-mesh text-white"
         };
 
         function renderAll() {
@@ -151,52 +183,73 @@
             const list = document.getElementById("thumbList");
             list.innerHTML = "";
             slidesData.forEach((item, idx) => {
-                const activeCls = idx === currentSlideIdx ? "border-blue-600 bg-blue-50/50" : "border-slate-200 hover:bg-slate-50";
+                const activeCls = idx === currentSlideIdx ? "border-blue-500 bg-slate-800 shadow-md ring-1 ring-blue-500" : "border-slate-800 bg-slate-900/60 hover:bg-slate-800/40";
                 list.innerHTML += `
                     <div onclick="selectSlide(${idx})" class="p-3 border rounded-xl cursor-pointer transition ${activeCls}">
-                        <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
+                        <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
                             <span>SLIDE ${idx+1<10?'0'+(idx+1):idx+1}</span>
-                            <span class="font-bold text-blue-600">${item.kpi}</span>
+                            <span class="font-bold text-emerald-400">${item.kpi}</span>
                         </div>
-                        <div class="text-xs font-bold text-slate-700 truncate">${item.title}</div>
+                        <div class="text-xs font-bold text-slate-200 truncate">${item.title}</div>
                     </div>
                 `;
             });
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / 15`;
         }
 
+        // 渲染主展示卡：高清大图背景 + 视觉 KPI 数据卡片 + SVG 可视化进度表
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
             const brand = document.getElementById("bindBrand").value || "AeroTech Global";
-            const cfg = bgConfigs[currentBgStyle] || bgConfigs["grid"];
+            const bgCls = bgStyles[currentBgStyle] || bgStyles["tech"];
 
-            canvas.className = `w-full aspect-[16/9] rounded-2xl border border-slate-200/80 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${cfg.cls}`;
+            canvas.className = `w-full aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-12 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls}`;
             
             canvas.innerHTML = `
-                <div class="flex justify-between items-center border-b border-current/10 pb-4 z-10">
-                    <span class="text-xs font-bold font-mono tracking-widest opacity-60">${brand} · ROADSHOW DECK</span>
-                    <span class="text-xs font-mono font-bold px-2.5 py-1 bg-current/10 rounded opacity-80">${item.tag}</span>
+                <!-- 顶栏牌子 -->
+                <div class="flex justify-between items-center border-b border-white/10 pb-4 z-10">
+                    <span class="text-xs font-bold font-mono tracking-widest text-slate-300">${brand} · EXECUTIVE ROADSHOW</span>
+                    <span class="text-xs font-mono font-bold px-3 py-1 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag}</span>
                 </div>
-                <div class="my-auto py-8 z-10">
-                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" class="text-4xl font-extrabold tracking-tight leading-tight mb-6">${item.title}</h2>
-                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" class="text-base opacity-80 max-w-2xl leading-relaxed">${item.sub}</p>
+
+                <!-- 中心高视觉冲击力文字区 (大幅减字，讲究留白) -->
+                <div class="my-auto py-6 z-10 max-w-3xl">
+                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" class="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-4 drop-shadow-md">${item.title}</h2>
+                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" class="text-base text-slate-300 leading-relaxed font-medium drop-shadow-sm">${item.sub}</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4 pt-6 border-t border-current/10 z-10">
-                    <div class="border rounded-xl p-4 ${cfg.kpiCls}">
-                        <div class="text-[10px] font-bold opacity-60 uppercase tracking-wider mb-1">KEY KPI HIGHLIGHT</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerText)" class="text-2xl font-black font-mono">${item.kpi}</div>
+
+                <!-- 底部：SVG 图表进度条 + 可视化数据卡 (真正拒绝全是废话的白框) -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 pt-6 border-t border-white/10 z-10 items-center">
+                    
+                    <!-- KPI 重点卡 -->
+                    <div class="md:col-span-5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-lg">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerText)" class="text-3xl font-black font-mono text-emerald-400 drop-shadow-sm">${item.kpi}</div>
                     </div>
-                    <div class="border border-current/10 rounded-xl p-4 flex items-center justify-between bg-current/5">
-                        <div class="text-xs font-bold opacity-90">高级商用路演 · Live Preview</div>
-                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+
+                    <!-- SVG 可视化能量表 / 进度条图例 -->
+                    <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-4 flex flex-col justify-center">
+                        <div class="flex justify-between items-center text-xs font-mono mb-2">
+                            <span class="text-slate-300 font-bold">● TARGET KPI COMPLETIOM</span>
+                            <span class="text-blue-400 font-bold">${item.progress}% METRIC</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                            <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${item.progress}%"></div>
+                        </div>
                     </div>
+
                 </div>
             `;
         }
 
-        function changeBackground(bgKey) {
-            currentBgStyle = bgKey;
+        function changeBackground(styleKey) {
+            currentBgStyle = styleKey;
+            renderMainSlide();
+        }
+
+        function toggleVisualChart() {
+            slidesData[currentSlideIdx].progress = slidesData[currentSlideIdx].progress < 90 ? 98 : 65;
             renderMainSlide();
         }
 
@@ -204,16 +257,20 @@
         function prevSlide() { if(currentSlideIdx > 0) { currentSlideIdx--; renderAll(); } }
         function nextSlide() { if(currentSlideIdx < slidesData.length-1) { currentSlideIdx++; renderAll(); } }
 
-        function updateFromCanvas(f, val) {
-            slidesData[currentSlideIdx][f] = val.trim();
-            syncFormInputs(); renderThumbnails();
+        function updateFromCanvas(field, val) {
+            slidesData[currentSlideIdx][field] = val.trim();
+            syncFormInputs();
+            renderThumbnails();
         }
+
         function updateFromForm() {
             slidesData[currentSlideIdx].title = document.getElementById("bindTitle").value;
             slidesData[currentSlideIdx].sub = document.getElementById("bindSub").value;
             slidesData[currentSlideIdx].kpi = document.getElementById("bindKpi").value;
-            renderThumbnails(); renderMainSlide();
+            renderThumbnails();
+            renderMainSlide();
         }
+
         function syncFormInputs() {
             const item = slidesData[currentSlideIdx];
             document.getElementById("bindTitle").value = item.title;
@@ -224,7 +281,7 @@
         function exportPPT() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('status') !== 'paid' && localStorage.getItem('APEX_PAID_TOKEN') !== 'true') {
-                if (confirm("🔒 点击确定跳转 USD $9.99 收银台解锁下载权限；若已完成交易请检查网址是否带有 ?status=paid。")) {
+                if (confirm("🔒 点击确定跳转至 USD $9.99 商业结账页面解锁；若已付款请确认网址带有 ?status=paid 参数。")) {
                     window.open("index.html?status=paid", "_self");
                 }
                 return;
@@ -232,7 +289,8 @@
             localStorage.setItem('APEX_PAID_TOKEN', 'true');
             const blob = new Blob([JSON.stringify({brand: document.getElementById("bindBrand").value, slides: slidesData}, null, 2)], {type: "application/json"});
             const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-            a.download = `ApexWork_PPT_Deck_${Date.now()}.json`; document.body.appendChild(a); a.click();
+            a.download = `AeroTech_Visual_Deck_${Date.now()}.json`;
+            document.body.appendChild(a); a.click();
         }
 
         window.onload = () => { renderAll(); };
