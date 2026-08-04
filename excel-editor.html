@@ -3,151 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK · Word 合规报告编辑器</title>
+    <title>APEXWORK · Excel 财务模型编辑器 — 12个月滚动预测 & ROI 计算</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
     <style>
-        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
-        .bento-card { @apply bg-white rounded-2xl shadow-sm border border-gray-100; }
-        .nav-item.active { @apply bg-indigo-50 text-indigo-700 border-indigo-200; }
-        .nav-item { @apply px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 cursor-pointer border border-transparent transition-all; }
-        .param-input { @apply w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none text-sm; }
-        .btn-primary { @apply w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition-all shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed; }
-        .btn-secondary { @apply w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition-all; }
-        .section-label { @apply text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2; }
-        .preview-page { @apply bg-white shadow-lg rounded-lg p-8 max-w-3xl mx-auto my-4 border border-gray-100; }
-        .kpi-card { @apply bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100; }
-        .toast { @apply fixed bottom-6 right-6 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm z-50 transition-all duration-300; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #eef0f4; }
+        .kpi-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 14px; padding: 20px; color: #fff; }
+        .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+        .kpi-label { font-size: 12px; font-weight: 500; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-primary { background: #0f172a; color: #fff; border-radius: 10px; padding: 12px 24px; font-weight: 600; transition: all 0.2s; }
+        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(15,23,42,0.2); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-secondary { background: #f1f5f9; color: #0f172a; border-radius: 10px; padding: 12px 24px; font-weight: 600; transition: all 0.2s; border: 1px solid #e2e8f0; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .nav-item { padding: 10px 14px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; color: #64748b; transition: all 0.15s; }
+        .nav-item:hover { background: #f1f5f9; color: #0f172a; }
+        .nav-item.active { background: #0f172a; color: #fff; }
+        .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.2s; }
+        .input-field:focus { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+        .table-cell { padding: 10px 12px; border: 1px solid #eef0f4; font-size: 13px; text-align: right; }
+        .table-header { padding: 10px 12px; background: #f8fafc; font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid #eef0f4; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #fff; padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 9999; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .month-tab { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1px solid #e2e8f0; color: #64748b; }
+        .month-tab:hover { border-color: #0f172a; color: #0f172a; }
+        .month-tab.active { background: #0f172a; color: #fff; border-color: #0f172a; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
     <!-- 顶部导航 -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-sm">A</span>
+                <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
+                    <span class="text-white font-bold text-lg">A</span>
                 </div>
                 <div>
-                    <h1 class="font-bold text-gray-900 text-sm">APEXWORK · Word 合规报告编辑器</h1>
-                    <p class="text-xs text-gray-400">ATS 智能排版 · 欧美合规报告</p>
+                    <h1 class="text-lg font-bold text-slate-900">Excel 财务模型编辑器</h1>
+                    <p class="text-xs text-slate-500">12个月滚动预测 · ROI 计算 · 一键导出 XLSX</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">✓ 已加密</span>
-                <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-medium">USD $9.99</span>
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-semibold text-slate-700">USD <span class="text-slate-900 font-bold">$9.99</span></span>
+                <a href="index.html" class="text-sm text-slate-500 hover:text-slate-900 transition">← 返回商城</a>
             </div>
         </div>
     </header>
 
     <!-- 主工作台 -->
-    <div class="max-w-7xl mx-auto px-4 py-6">
-        <div class="grid grid-cols-12 gap-6">
-            <!-- 左侧导航 -->
-            <div class="col-span-2">
-                <div class="bento-card p-4 sticky top-20">
-                    <div class="section-label">报告章节</div>
-                    <div class="space-y-1" id="pageNav">
-                        <div class="nav-item active" data-page="0">📄 封面</div>
-                        <div class="nav-item" data-page="1">📋 执行摘要</div>
-                        <div class="nav-item" data-page="2">🏢 公司概况</div>
-                        <div class="nav-item" data-page="3">💰 财务合规</div>
-                        <div class="nav-item" data-page="4">🔒 数据隐私</div>
-                        <div class="nav-item" data-page="5">👥 雇佣合规</div>
-                        <div class="nav-item" data-page="6">🌱 环境合规</div>
-                        <div class="nav-item" data-page="7">⚠️ 风险矩阵</div>
-                        <div class="nav-item" data-page="8">📌 结论建议</div>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-gray-100">
-                        <div class="section-label">模板预设</div>
-                        <select class="param-input" id="themePreset">
-                            <option value="corporate">🏛️ 企业合规</option>
-                            <option value="startup">🚀 初创融资</option>
-                            <option value="finance">💹 金融审计</option>
-                            <option value="healthcare">🏥 医疗健康</option>
-                        </select>
+    <div class="max-w-[1600px] mx-auto px-6 py-6 grid grid-cols-12 gap-6">
+        <!-- 左侧：12个月导航 -->
+        <div class="col-span-2">
+            <div class="bento-card p-4 sticky top-24">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">财务模型页</h3>
+                <div class="space-y-1">
+                    <div class="nav-item active" data-page="overview">📊 总览仪表盘</div>
+                    <div class="nav-item" data-page="revenue">💰 收入预测</div>
+                    <div class="nav-item" data-page="costs">📉 成本结构</div>
+                    <div class="nav-item" data-page="roi">📈 ROI 分析</div>
+                </div>
+                <div class="border-t border-slate-100 mt-4 pt-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">12个月滚动</h3>
+                    <div class="grid grid-cols-3 gap-1">
+                        <div class="month-tab active" data-month="0">M1</div>
+                        <div class="month-tab" data-month="1">M2</div>
+                        <div class="month-tab" data-month="2">M3</div>
+                        <div class="month-tab" data-month="3">M4</div>
+                        <div class="month-tab" data-month="4">M5</div>
+                        <div class="month-tab" data-month="5">M6</div>
+                        <div class="month-tab" data-month="6">M7</div>
+                        <div class="month-tab" data-month="7">M8</div>
+                        <div class="month-tab" data-month="8">M9</div>
+                        <div class="month-tab" data-month="9">M10</div>
+                        <div class="month-tab" data-month="10">M11</div>
+                        <div class="month-tab" data-month="11">M12</div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 中央预览 -->
-            <div class="col-span-7">
-                <div class="bento-card p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="font-semibold text-gray-800">实时预览</h2>
-                        <div class="flex gap-2">
-                            <button class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-all" onclick="zoomOut()">−</button>
-                            <span class="text-xs text-gray-400" id="zoomLevel">100%</span>
-                            <button class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-all" onclick="zoomIn()">+</button>
-                        </div>
-                    </div>
-                    <div id="previewContainer" class="overflow-y-auto max-h-[70vh] bg-gray-50 rounded-xl p-4">
-                        <!-- 动态预览内容 -->
+        <!-- 中央：实时预览 -->
+        <div class="col-span-7">
+            <div class="bento-card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-slate-900" id="pageTitle">📊 财务总览仪表盘</h2>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">实时计算</span>
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                     </div>
                 </div>
-            </div>
 
-            <!-- 右侧参数面板 -->
-            <div class="col-span-3">
-                <div class="bento-card p-4 sticky top-20">
-                    <div class="section-label">报告参数</div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">公司名称</label>
-                            <input type="text" class="param-input mt-1" id="companyName" value="AeroTech Dynamics" oninput="updatePreview()">
+                <!-- 总览 KPI 卡片 -->
+                <div id="overviewPage" class="page-content">
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="kpi-card">
+                            <div class="kpi-label">年度总收入</div>
+                            <div class="kpi-value mt-2" id="totalRevenue">$0</div>
+                            <div class="text-xs text-emerald-400 mt-1">↑ 12个月累计</div>
                         </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">报告标题</label>
-                            <input type="text" class="param-input mt-1" id="reportTitle" value="2026 年度合规报告" oninput="updatePreview()">
+                        <div class="kpi-card">
+                            <div class="kpi-label">年度总成本</div>
+                            <div class="kpi-value mt-2" id="totalCosts">$0</div>
+                            <div class="text-xs text-rose-400 mt-1">↓ 运营支出</div>
                         </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">报告日期</label>
-                            <input type="date" class="param-input mt-1" id="reportDate" value="2026-08-04" oninput="updatePreview()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">编制人</label>
-                            <input type="text" class="param-input mt-1" id="authorName" value="APEXWORK AI" oninput="updatePreview()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">公司地址</label>
-                            <input type="text" class="param-input mt-1" id="companyAddress" value="1 Market Street, San Francisco, CA" oninput="updatePreview()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">联系电话</label>
-                            <input type="text" class="param-input mt-1" id="companyPhone" value="+1 (415) 555-0123" oninput="updatePreview()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">邮箱</label>
-                            <input type="email" class="param-input mt-1" id="companyEmail" value="legal@aerotech.io" oninput="updatePreview()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-medium">合规等级</label>
-                            <select class="param-input mt-1" id="complianceLevel" onchange="updatePreview()">
-                                <option value="A+">A+ 卓越</option>
-                                <option value="A">A 优秀</option>
-                                <option value="B">B 良好</option>
-                                <option value="C">C 需改进</option>
-                            </select>
+                        <div class="kpi-card">
+                            <div class="kpi-label">净利润</div>
+                            <div class="kpi-value mt-2" id="netProfit">$0</div>
+                            <div class="text-xs text-sky-400 mt-1">= 收入 - 成本</div>
                         </div>
                     </div>
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="kpi-card">
+                            <div class="kpi-label">毛利率</div>
+                            <div class="kpi-value mt-2" id="grossMargin">0%</div>
+                            <div class="text-xs text-emerald-400 mt-1">↑ 健康度</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">净利率</div>
+                            <div class="kpi-value mt-2" id="netMargin">0%</div>
+                            <div class="text-xs text-emerald-400 mt-1">↑ 盈利能力</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">ROI</div>
+                            <div class="kpi-value mt-2" id="roiValue">0%</div>
+                            <div class="text-xs text-amber-400 mt-1">↑ 投资回报率</div>
+                        </div>
+                    </div>
+                    <!-- 12个月趋势表 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="table-header text-left">月份</th>
+                                    <th class="table-header">收入</th>
+                                    <th class="table-header">成本</th>
+                                    <th class="table-header">净利润</th>
+                                    <th class="table-header">利润率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overviewTable"></tbody>
+                        </table>
+                    </div>
+                </div>
 
-                    <!-- 付费导出区 -->
-                    <div class="mt-6 pt-4 border-t border-gray-200">
-                        <div class="section-label">付费导出</div>
-                        <div class="bg-gray-50 rounded-xl p-4 mb-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm text-gray-600">标准版</span>
-                                <span class="text-lg font-bold text-indigo-600">$9.99</span>
+                <!-- 收入预测页 -->
+                <div id="revenuePage" class="page-content hidden">
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">月均收入</div>
+                            <div class="text-xl font-bold text-slate-900" id="avgRevenue">$0</div>
+                        </div>
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">增长峰值</div>
+                            <div class="text-xl font-bold text-slate-900" id="peakRevenue">$0</div>
+                        </div>
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">增长谷值</div>
+                            <div class="text-xl font-bold text-slate-900" id="minRevenue">$0</div>
+                        </div>
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">平均增长率</div>
+                            <div class="text-xl font-bold text-emerald-600" id="growthRate">0%</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="table-header text-left">月份</th>
+                                    <th class="table-header">产品收入</th>
+                                    <th class="table-header">服务收入</th>
+                                    <th class="table-header">订阅收入</th>
+                                    <th class="table-header">总收入</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenueTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 成本结构页 -->
+                <div id="costsPage" class="page-content hidden">
+                    <div class="grid grid-cols-4 gap-4 mb-6">
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">固定成本</div>
+                            <div class="text-xl font-bold text-slate-900" id="fixedCosts">$0</div>
+                        </div>
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">可变成本</div>
+                            <div class="text-xl font-bold text-slate-900" id="variableCosts">$0</div>
+                        </div>
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">人力成本</div>
+                            <div class="text-xl font-bold text-slate-900" id="laborCosts">$0</div>
+                        </div>
+                        <div class="bento-card p-4">
+                            <div class="text-xs text-slate-500 mb-1">成本占比</div>
+                            <div class="text-xl font-bold text-rose-600" id="costRatio">0%</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="table-header text-left">月份</th>
+                                    <th class="table-header">固定成本</th>
+                                    <th class="table-header">可变成本</th>
+                                    <th class="table-header">人力成本</th>
+                                    <th class="table-header">总成本</th>
+                                </tr>
+                            </thead>
+                            <tbody id="costsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ROI 分析页 -->
+                <div id="roiPage" class="page-content hidden">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="kpi-card">
+                            <div class="kpi-label">累计投资</div>
+                            <div class="kpi-value mt-2" id="totalInvestment">$0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">累计回报</div>
+                            <div class="kpi-value mt-2" id="totalReturn">$0</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="kpi-card">
+                            <div class="kpi-label">ROI 百分比</div>
+                            <div class="kpi-value mt-2 text-emerald-400" id="roiPercent">0%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">回本周期</div>
+                            <div class="kpi-value mt-2" id="paybackPeriod">0 个月</div>
+                        </div>
+                    </div>
+                    <div class="bento-card p-6">
+                        <h3 class="font-bold text-slate-900 mb-4">ROI 计算逻辑</h3>
+                        <div class="space-y-3 text-sm text-slate-600">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                <span>累计投资 = Σ(固定成本 + 人力成本) × 12个月</span>
                             </div>
-                            <p class="text-xs text-gray-400">一次性付费 · 永久使用</p>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                <span>累计回报 = Σ(净利润) × 12个月</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                <span>ROI = (累计回报 - 累计投资) / 累计投资 × 100%</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                                <span>回本周期 = 累计投资 / 月均净利润</span>
+                            </div>
                         </div>
-                        <button class="btn-primary mb-2" id="exportBtn" onclick="handleExport()">
-                            📥 导出 DOCX 报告
-                        </button>
-                        <button class="btn-secondary" onclick="window.location.href='index.html'">
-                            ← 返回商城
-                        </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：参数绑定 & 付费导出 -->
+        <div class="col-span-3">
+            <div class="bento-card p-6 sticky top-24">
+                <h3 class="font-bold text-slate-900 mb-4">📋 参数绑定</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">公司名称</label>
+                        <input type="text" class="input-field mt-1" id="companyName" value="AeroTech Dynamics" placeholder="输入公司名称">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">初始投资额 ($)</label>
+                        <input type="number" class="input-field mt-1" id="initialInvestment" value="50000" min="0" step="1000">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">月增长率 (%)</label>
+                        <input type="number" class="input-field mt-1" id="monthlyGrowth" value="8" min="0" max="100" step="0.5">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">产品收入基数 ($)</label>
+                        <input type="number" class="input-field mt-1" id="productBase" value="12000" min="0" step="500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">服务收入基数 ($)</label>
+                        <input type="number" class="input-field mt-1" id="serviceBase" value="8000" min="0" step="500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">订阅收入基数 ($)</label>
+                        <input type="number" class="input-field mt-1" id="subscriptionBase" value="5000" min="0" step="500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">固定成本 ($)</label>
+                        <input type="number" class="input-field mt-1" id="fixedCost" value="8000" min="0" step="500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">可变成本率 (%)</label>
+                        <input type="number" class="input-field mt-1" id="variableRate" value="30" min="0" max="100" step="1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">人力成本 ($)</label>
+                        <input type="number" class="input-field mt-1" id="laborCost" value="10000" min="0" step="500">
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 mt-6 pt-6">
+                    <h3 class="font-bold text-slate-900 mb-4">💳 付费导出</h3>
+                    <div class="bg-slate-50 rounded-xl p-4 mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-slate-600">Excel 财务模型</span>
+                            <span class="text-lg font-bold text-slate-900">$9.99</span>
+                        </div>
+                        <div class="text-xs text-slate-400">12个月滚动预测 · ROI 计算 · 完整 XLSX</div>
+                    </div>
+                    <button class="btn-primary w-full mb-3" id="payBtn" onclick="handlePayment()">🔒 立即支付 $9.99</button>
+                    <button class="btn-secondary w-full" id="exportBtn" onclick="handleExport()" disabled>📥 导出 XLSX</button>
+                    <p class="text-xs text-slate-400 mt-3 text-center">支付后自动解锁导出 · 无需注册</p>
                 </div>
             </div>
         </div>
@@ -157,348 +332,177 @@
     <div id="toast" class="toast hidden"></div>
 
     <script>
-        // ===== 核心状态 =====
-        let currentPage = 0;
-        let zoomScale = 1;
-        const pages = ['cover', 'summary', 'company', 'finance', 'privacy', 'employment', 'environment', 'risk', 'conclusion'];
-
-        // ===== 页面数据 =====
-        const pageData = {
-            cover: {
-                title: '{{reportTitle}}',
-                subtitle: '公司年度合规与治理报告',
-                company: '{{companyName}}',
-                date: '{{reportDate}}',
-                author: '{{authorName}}'
-            },
-            summary: {
-                title: '执行摘要',
-                content: '本报告全面评估了公司在财务、数据隐私、雇佣、环境等关键领域的合规状况。总体合规等级达到 {{complianceLevel}} 级，各项指标均符合国际标准与当地法规要求。',
-                kpis: [
-                    { label: '合规等级', value: '{{complianceLevel}}' },
-                    { label: '合规率', value: '96%' },
-                    { label: '风险项', value: '3' }
-                ]
-            },
-            company: {
-                title: '公司概况',
-                content: '{{companyName}} 是一家专注于高端制造与技术创新领域的国际化企业，总部位于 {{companyAddress}}。公司致力于通过持续创新与严格合规管理，为全球客户提供优质产品与服务。',
-                details: [
-                    { label: '注册地址', value: '{{companyAddress}}' },
-                    { label: '联系电话', value: '{{companyPhone}}' },
-                    { label: '电子邮箱', value: '{{companyEmail}}' }
-                ]
-            },
-            finance: {
-                title: '财务合规',
-                content: '公司严格执行国际财务报告准则（IFRS），定期接受独立第三方审计。所有财务操作均符合反洗钱（AML）与反恐怖融资（CFT）相关法规要求。',
-                items: ['IFRS 准则合规', '独立审计通过', 'AML/CFT 合规', '税务申报及时']
-            },
-            privacy: {
-                title: '数据隐私合规',
-                content: '公司遵循 GDPR、CCPA 等国际隐私法规，建立完善的数据保护体系。所有用户数据均经过加密存储，访问权限严格管控，定期进行隐私影响评估（PIA）。',
-                items: ['GDPR 合规', 'CCPA 合规', '数据加密存储', '隐私影响评估']
-            },
-            employment: {
-                title: '雇佣合规',
-                content: '公司遵守国际劳工标准与当地劳动法规，建立公平、透明的雇佣体系。所有员工均签订合规劳动合同，享受法定福利与安全保障。',
-                items: ['劳动合同合规', '反歧视政策', '职业健康安全', '工时合规']
-            },
-            environment: {
-                title: '环境合规',
-                content: '公司积极履行环境保护责任，通过 ISO 14001 环境管理体系认证。生产运营严格遵守环保法规，持续降低碳排放与资源消耗。',
-                items: ['ISO 14001 认证', '碳排放控制', '废弃物管理', '绿色供应链']
-            },
-            risk: {
-                title: '风险矩阵',
-                content: '公司建立全面的风险管理体系，定期评估各类风险并制定应对措施。当前主要风险集中在市场波动、供应链中断与数据安全领域。',
-                risks: [
-                    { level: '高', item: '市场波动', action: '多元化布局' },
-                    { level: '中', item: '供应链中断', action: '备选供应商' },
-                    { level: '低', item: '数据安全', action: '加密防护' }
-                ]
-            },
-            conclusion: {
-                title: '结论与建议',
-                content: '总体而言，公司在各合规领域表现良好，达到 {{complianceLevel}} 级合规标准。建议持续关注法规变化，定期更新合规策略，加强员工合规培训，确保长期稳健发展。',
-                suggestions: ['持续法规跟踪', '定期合规审计', '加强员工培训', '完善应急机制']
-            }
+        // ========== 财务数据模型 ==========
+        const financialData = {
+            months: [],
+            initialized: false
         };
 
-        // ===== 渲染预览 =====
-        function updatePreview() {
-            const container = document.getElementById('previewContainer');
-            const page = pages[currentPage];
-            const data = pageData[page];
-            
-            // 替换模板变量
-            const company = document.getElementById('companyName').value;
-            const title = document.getElementById('reportTitle').value;
-            const date = document.getElementById('reportDate').value;
-            const author = document.getElementById('authorName').value;
-            const address = document.getElementById('companyAddress').value;
-            const phone = document.getElementById('companyPhone').value;
-            const email = document.getElementById('companyEmail').value;
-            const level = document.getElementById('complianceLevel').value;
+        // ========== 初始化 12 个月数据 ==========
+        function initFinancialData() {
+            const productBase = parseFloat(document.getElementById('productBase').value) || 12000;
+            const serviceBase = parseFloat(document.getElementById('serviceBase').value) || 8000;
+            const subscriptionBase = parseFloat(document.getElementById('subscriptionBase').value) || 5000;
+            const fixedCost = parseFloat(document.getElementById('fixedCost').value) || 8000;
+            const variableRate = parseFloat(document.getElementById('variableRate').value) || 30;
+            const laborCost = parseFloat(document.getElementById('laborCost').value) || 10000;
+            const growthRate = parseFloat(document.getElementById('monthlyGrowth').value) || 8;
 
-            let html = `<div class="preview-page" style="transform: scale(${zoomScale}); transform-origin: top center;">`;
-            
-            switch(page) {
-                case 'cover':
-                    html += `
-                        <div class="text-center py-16">
-                            <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                                <span class="text-white text-2xl font-bold">${company.charAt(0)}</span>
-                            </div>
-                            <h1 class="text-3xl font-bold text-gray-900 mb-4">${title}</h1>
-                            <p class="text-gray-500 text-lg mb-8">公司年度合规与治理报告</p>
-                            <div class="border-t border-gray-200 pt-6 mt-8">
-                                <p class="text-gray-600 mb-2">${company}</p>
-                                <p class="text-gray-400 text-sm">${date}</p>
-                                <p class="text-gray-400 text-sm mt-2">编制人：${author}</p>
-                            </div>
-                        </div>`;
-                    break;
-                case 'summary':
-                    html += `
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">${data.title}</h2>
-                        <p class="text-gray-600 leading-relaxed mb-8">${data.content.replace('{{complianceLevel}}', level)}</p>
-                        <div class="grid grid-cols-3 gap-4">
-                            ${data.kpis.map(kpi => `
-                                <div class="kpi-card text-center">
-                                    <p class="text-2xl font-bold text-indigo-600">${kpi.value.replace('{{complianceLevel}}', level)}</p>
-                                    <p class="text-xs text-gray-500 mt-1">${kpi.label}</p>
-                                </div>`).join('')}
-                        </div>`;
-                    break;
-                case 'company':
-                    html += `
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">${data.title}</h2>
-                        <p class="text-gray-600 leading-relaxed mb-8">${data.content.replace('{{companyName}}', company).replace('{{companyAddress}}', address)}</p>
-                        <div class="space-y-3">
-                            ${data.details.map(detail => `
-                                <div class="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-3">
-                                    <span class="text-sm text-gray-500">${detail.label}</span>
-                                    <span class="text-sm font-medium text-gray-800">${detail.value.replace('{{companyAddress}}', address).replace('{{companyPhone}}', phone).replace('{{companyEmail}}', email)}</span>
-                                </div>`).join('')}
-                        </div>`;
-                    break;
-                case 'finance':
-                case 'privacy':
-                case 'employment':
-                case 'environment':
-                    html += `
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">${data.title}</h2>
-                        <p class="text-gray-600 leading-relaxed mb-8">${data.content}</p>
-                        <div class="grid grid-cols-2 gap-4">
-                            ${data.items.map(item => `
-                                <div class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3">
-                                    <span class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                                        <span class="text-green-600 text-xs">✓</span>
-                                    </span>
-                                    <span class="text-sm text-gray-700">${item}</span>
-                                </div>`).join('')}
-                        </div>`;
-                    break;
-                case 'risk':
-                    html += `
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">${data.title}</h2>
-                        <p class="text-gray-600 leading-relaxed mb-8">${data.content}</p>
-                        <div class="space-y-3">
-                            ${data.risks.map(risk => `
-                                <div class="flex items-center gap-4 bg-gray-50 rounded-lg px-4 py-3">
-                                    <span class="w-16 text-center text-xs font-bold px-2 py-1 rounded-full ${
-                                        risk.level === '高' ? 'bg-red-100 text-red-700' :
-                                        risk.level === '中' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-green-100 text-green-700'
-                                    }">${risk.level}</span>
-                                    <span class="text-sm text-gray-700 flex-1">${risk.item}</span>
-                                    <span class="text-xs text-gray-400">→ ${risk.action}</span>
-                                </div>`).join('')}
-                        </div>`;
-                    break;
-                case 'conclusion':
-                    html += `
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">${data.title}</h2>
-                        <p class="text-gray-600 leading-relaxed mb-8">${data.content.replace('{{complianceLevel}}', level)}</p>
-                        <div class="space-y-3">
-                            ${data.suggestions.map(suggestion => `
-                                <div class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3">
-                                    <span class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <span class="text-indigo-600 text-xs">★</span>
-                                    </span>
-                                    <span class="text-sm text-gray-700">${suggestion}</span>
-                                </div>`).join('')}
-                        </div>`;
-                    break;
-            }
-            
-            html += `</div>`;
-            container.innerHTML = html;
-        }
+            financialData.months = [];
+            for (let i = 0; i < 12; i++) {
+                const growthFactor = Math.pow(1 + growthRate / 100, i);
+                const productRevenue = Math.round(productBase * growthFactor);
+                const serviceRevenue = Math.round(serviceBase * growthFactor);
+                const subscriptionRevenue = Math.round(subscriptionBase * growthFactor);
+                const totalRevenue = productRevenue + serviceRevenue + subscriptionRevenue;
+                const variableCost = Math.round(totalRevenue * variableRate / 100);
+                const totalCost = fixedCost + variableCost + laborCost;
+                const netProfit = totalRevenue - totalCost;
+                const margin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
 
-        // ===== 导航切换 =====
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                this.classList.add('active');
-                currentPage = parseInt(this.dataset.page);
-                updatePreview();
-            });
-        });
-
-        // ===== 缩放控制 =====
-        function zoomIn() {
-            zoomScale = Math.min(zoomScale + 0.1, 1.5);
-            document.getElementById('zoomLevel').textContent = Math.round(zoomScale * 100) + '%';
-            updatePreview();
-        }
-        function zoomOut() {
-            zoomScale = Math.max(zoomScale - 0.1, 0.5);
-            document.getElementById('zoomLevel').textContent = Math.round(zoomScale * 100) + '%';
-            updatePreview();
-        }
-
-        // ===== Ed25519 验签 =====
-        function verifyEd25519Signature() {
-            const params = new URLSearchParams(window.location.search);
-            const status = params.get('status');
-            const signature = params.get('signature');
-            
-            // 兼容旧链接：?status=paid 但强制要求 signature 存在
-            if (status === 'paid' && signature) {
-                // 实际生产环境应使用公钥验签，此处为前端模拟
-                const stored = localStorage.getItem('apexwork_paid');
-                if (stored === 'verified') return true;
-                
-                // 模拟验签通过
-                if (signature.length >= 64) {
-                    localStorage.setItem('apexwork_paid', 'verified');
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // ===== 导出 DOCX =====
-        async function handleExport() {
-            if (!verifyEd25519Signature()) {
-                showToast('⚠️ 请先完成 $9.99 支付验证');
-                return;
-            }
-
-            const btn = document.getElementById('exportBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ 生成中...';
-
-            try {
-                const zip = new JSZip();
-                const doc = zip.folder('word');
-                
-                // 构建 document.xml
-                const company = document.getElementById('companyName').value;
-                const title = document.getElementById('reportTitle').value;
-                const date = document.getElementById('reportDate').value;
-                const author = document.getElementById('authorName').value;
-                const level = document.getElementById('complianceLevel').value;
-
-                let docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-<w:body>`;
-
-                // 封面
-                docXml += `
-<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="2400"/></w:pPr>
-<w:r><w:rPr><w:b/><w:sz w:val="48"/></w:rPr><w:t>${title}</w:t></w:r></w:p>
-<w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-<w:r><w:rPr><w:sz w:val="28"/></w:rPr><w:t>公司年度合规与治理报告</w:t></w:r></w:p>
-<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="1200"/></w:pPr>
-<w:r><w:rPr><w:sz w:val="24"/></w:rPr><w:t>${company}</w:t></w:r></w:p>
-<w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-<w:r><w:rPr><w:sz w:val="22"/></w:rPr><w:t>${date}</w:t></w:r></w:p>
-<w:p><w:pPr><w:jc w:val="center"/></w:pPr>
-<w:r><w:rPr><w:sz w:val="22"/></w:rPr><w:t>编制人：${author}</w:t></w:r></w:p>`;
-
-                // 各章节
-                const sections = [
-                    { title: '执行摘要', content: `本报告全面评估了公司在财务、数据隐私、雇佣、环境等关键领域的合规状况。总体合规等级达到 ${level} 级，各项指标均符合国际标准与当地法规要求。` },
-                    { title: '公司概况', content: `${company} 是一家专注于高端制造与技术创新领域的国际化企业，总部位于 ${document.getElementById('companyAddress').value}。公司致力于通过持续创新与严格合规管理，为全球客户提供优质产品与服务。` },
-                    { title: '财务合规', content: '公司严格执行国际财务报告准则（IFRS），定期接受独立第三方审计。所有财务操作均符合反洗钱（AML）与反恐怖融资（CFT）相关法规要求。' },
-                    { title: '数据隐私合规', content: '公司遵循 GDPR、CCPA 等国际隐私法规，建立完善的数据保护体系。所有用户数据均经过加密存储，访问权限严格管控，定期进行隐私影响评估（PIA）。' },
-                    { title: '雇佣合规', content: '公司遵守国际劳工标准与当地劳动法规，建立公平、透明的雇佣体系。所有员工均签订合规劳动合同，享受法定福利与安全保障。' },
-                    { title: '环境合规', content: '公司积极履行环境保护责任，通过 ISO 14001 环境管理体系认证。生产运营严格遵守环保法规，持续降低碳排放与资源消耗。' },
-                    { title: '风险矩阵', content: '公司建立全面的风险管理体系，定期评估各类风险并制定应对措施。当前主要风险集中在市场波动、供应链中断与数据安全领域。' },
-                    { title: '结论与建议', content: `总体而言，公司在各合规领域表现良好，达到 ${level} 级合规标准。建议持续关注法规变化，定期更新合规策略，加强员工合规培训，确保长期稳健发展。` }
-                ];
-
-                sections.forEach(section => {
-                    docXml += `
-<w:p><w:pPr><w:spacing w:before="400"/></w:pPr>
-<w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>${section.title}</w:t></w:r></w:p>
-<w:p><w:pPr><w:spacing w:after="200"/></w:pPr>
-<w:r><w:rPr><w:sz w:val="24"/></w:rPr><w:t>${section.content}</w:t></w:r></w:p>`;
+                financialData.months.push({
+                    month: i + 1,
+                    productRevenue,
+                    serviceRevenue,
+                    subscriptionRevenue,
+                    totalRevenue,
+                    fixedCost,
+                    variableCost,
+                    laborCost,
+                    totalCost,
+                    netProfit,
+                    margin: Math.round(margin * 10) / 10
                 });
-
-                docXml += `</w:body></w:document>`;
-                doc.file('document.xml', docXml);
-
-                // 构建最小 docx 结构
-                doc.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Default Extension="xml" ContentType="application/xml"/>
-<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>`);
-
-                const rels = zip.folder('_rels');
-                rels.file('.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>`);
-
-                const wordRels = doc.folder('_rels');
-                wordRels.file('document.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-</Relationships>`);
-
-                // 生成 Blob 并下载
-                const blob = await zip.generateAsync({ type: 'blob' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${company}_合规报告_${date}.docx`;
-                a.click();
-                URL.revokeObjectURL(url);
-
-                showToast('✅ DOCX 报告已生成');
-            } catch (e) {
-                console.error(e);
-                showToast('❌ 生成失败，请重试');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '📥 导出 DOCX 报告';
             }
+            financialData.initialized = true;
+            updateAllViews();
         }
 
-        // ===== Toast =====
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+        // ========== 更新所有视图 ==========
+        function updateAllViews() {
+            if (!financialData.initialized) return;
+            updateOverview();
+            updateRevenue();
+            updateCosts();
+            updateROI();
         }
 
-        // ===== 初始化 =====
-        document.addEventListener('DOMContentLoaded', () => {
-            // 检查支付状态
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('status') === 'paid' && params.get('signature')) {
-                if (verifyEd25519Signature()) {
-                    showToast('✅ 支付验证通过，导出已解锁');
-                }
-            }
-            updatePreview();
-        });
-    </script>
-</body>
-</html>
+        // ========== 更新总览 ==========
+        function updateOverview() {
+            const months = financialData.months;
+            const totalRevenue = months.reduce((sum, m) => sum + m.totalRevenue, 0);
+            const totalCosts = months.reduce((sum, m) => sum + m.totalCost, 0);
+            const netProfit = totalRevenue - totalCosts;
+            const grossMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
+            const netMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
+            const investment = parseFloat(document.getElementById('initialInvestment').value) || 50000;
+            const roi = investment > 0 ? (netProfit / investment * 100) : 0;
+
+            document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toLocaleString();
+            document.getElementById('totalCosts').textContent = '$' + totalCosts.toLocaleString();
+            document.getElementById('netProfit').textContent = '$' + netProfit.toLocaleString();
+            document.getElementById('grossMargin').textContent = Math.round(grossMargin * 10) / 10 + '%';
+            document.getElementById('netMargin').textContent = Math.round(netMargin * 10) / 10 + '%';
+            document.getElementById('roiValue').textContent = Math.round(roi * 10) / 10 + '%';
+
+            const tbody = document.getElementById('overviewTable');
+            tbody.innerHTML = '';
+            months.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="table-cell text-left font-medium text-slate-700">M${m.month}</td>
+                    <td class="table-cell">$${m.totalRevenue.toLocaleString()}</td>
+                    <td class="table-cell">$${m.totalCost.toLocaleString()}</td>
+                    <td class="table-cell ${m.netProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}">$${m.netProfit.toLocaleString()}</td>
+                    <td class="table-cell">${m.margin}%</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== 更新收入预测 ==========
+        function updateRevenue() {
+            const months = financialData.months;
+            const totalRevenue = months.reduce((sum, m) => sum + m.totalRevenue, 0);
+            const avgRevenue = totalRevenue / 12;
+            const peakRevenue = Math.max(...months.map(m => m.totalRevenue));
+            const minRevenue = Math.min(...months.map(m => m.totalRevenue));
+            const firstMonth = months[0].totalRevenue;
+            const lastMonth = months[11].totalRevenue;
+            const growthRate = firstMonth > 0 ? ((lastMonth - firstMonth) / firstMonth * 100) : 0;
+
+            document.getElementById('avgRevenue').textContent = '$' + Math.round(avgRevenue).toLocaleString();
+            document.getElementById('peakRevenue').textContent = '$' + peakRevenue.toLocaleString();
+            document.getElementById('minRevenue').textContent = '$' + minRevenue.toLocaleString();
+            document.getElementById('growthRate').textContent = Math.round(growthRate * 10) / 10 + '%';
+
+            const tbody = document.getElementById('revenueTable');
+            tbody.innerHTML = '';
+            months.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="table-cell text-left font-medium text-slate-700">M${m.month}</td>
+                    <td class="table-cell">$${m.productRevenue.toLocaleString()}</td>
+                    <td class="table-cell">$${m.serviceRevenue.toLocaleString()}</td>
+                    <td class="table-cell">$${m.subscriptionRevenue.toLocaleString()}</td>
+                    <td class="table-cell font-semibold">$${m.totalRevenue.toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== 更新成本结构 ==========
+        function updateCosts() {
+            const months = financialData.months;
+            const totalFixed = months.reduce((sum, m) => sum + m.fixedCost, 0);
+            const totalVariable = months.reduce((sum, m) => sum + m.variableCost, 0);
+            const totalLabor = months.reduce((sum, m) => sum + m.laborCost, 0);
+            const totalCost = totalFixed + totalVariable + totalLabor;
+            const totalRevenue = months.reduce((sum, m) => sum + m.totalRevenue, 0);
+            const costRatio = totalRevenue > 0 ? (totalCost / totalRevenue * 100) : 0;
+
+            document.getElementById('fixedCosts').textContent = '$' + totalFixed.toLocaleString();
+            document.getElementById('variableCosts').textContent = '$' + totalVariable.toLocaleString();
+            document.getElementById('laborCosts').textContent = '$' + totalLabor.toLocaleString();
+            document.getElementById('costRatio').textContent = Math.round(costRatio * 10) / 10 + '%';
+
+            const tbody = document.getElementById('costsTable');
+            tbody.innerHTML = '';
+            months.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="table-cell text-left font-medium text-slate-700">M${m.month}</td>
+                    <td class="table-cell">$${m.fixedCost.toLocaleString()}</td>
+                    <td class="table-cell">$${m.variableCost.toLocaleString()}</td>
+                    <td class="table-cell">$${m.laborCost.toLocaleString()}</td>
+                    <td class="table-cell font-semibold">$${m.totalCost.toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ========== 更新 ROI 分析 ==========
+        function updateROI() {
+            const months = financialData.months;
+            const investment = parseFloat(document.getElementById('initialInvestment').value) || 50000;
+            const totalNetProfit = months.reduce((sum, m) => sum + m.netProfit, 0);
+            const totalReturn = investment + totalNetProfit;
+            const roiPercent = investment > 0 ? (totalNetProfit / investment * 100) : 0;
+            const avgMonthlyProfit = totalNetProfit / 12;
+            const paybackPeriod = avgMonthlyProfit > 0 ? Math.ceil(investment / avgMonthlyProfit) : 999;
+
+            document.getElementById('totalInvestment').textContent = '$' + investment.toLocaleString();
+            document.getElementById('totalReturn').textContent = '$' + totalReturn.toLocaleString();
+            document.getElementById('roiPercent').textContent = Math.round(roiPercent * 10) / 10 + '%';
+            document.getElementById('paybackPeriod').textContent = paybackPeriod > 12 ? '> 12 个月' : paybackPeriod + ' 个月';
+        }
+
+        // ========== 页面导航 ==========
+        function switchPage(page) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(page + 'Page').classList.remove('hidden');
+            document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+            const titles = {
+                overview: '📊 财务总览仪表盘',
+                revenue: '💰 收入预测',
