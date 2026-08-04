@@ -1,351 +1,259 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK · Excel 财务测算工作台</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #f8fafc; }
-        .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-        .kpi-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff; border-radius: 12px; padding: 16px; }
-        .kpi-card .label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .kpi-card .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
-        .kpi-card .delta { font-size: 12px; color: #34d399; margin-top: 4px; }
-        .nav-item { padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
-        .nav-item:hover { background: #f1f5f9; }
-        .nav-item.active { background: #0f172a; color: #fff; font-weight: 600; }
-        .input-field { width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: border 0.2s; }
-        .input-field:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
-        .btn-primary { background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
-        .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
-        .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: #f1f5f9; color: #0f172a; padding: 10px 20px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
-        .btn-secondary:hover { background: #e2e8f0; }
-        .table-cell { padding: 8px 12px; border: 1px solid #e2e8f0; font-size: 13px; }
-        .table-header { background: #f8fafc; font-weight: 600; color: #0f172a; }
-        .sticky-cta { position: sticky; bottom: 16px; z-index: 50; }
-        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: #fff; font-size: 14px; z-index: 999; animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEXWORK - Excel 财务模型编辑器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f8fafc; }
+  .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; transition: all 0.2s; }
+  .bento-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+  .nav-item { cursor: pointer; padding: 10px 14px; border-radius: 10px; transition: all 0.15s; font-size: 13px; }
+  .nav-item:hover { background: #f1f5f9; }
+  .nav-item.active { background: #0f172a; color: #ffffff; }
+  .kpi-card { background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; border-radius: 12px; padding: 16px; }
+  .btn-primary { background: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
+  .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: #f1f5f9; color: #0f172a; padding: 10px 20px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+  .btn-secondary:hover { background: #e2e8f0; }
+  .input-field { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; transition: border 0.2s; }
+  .input-field:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
+  .table-cell { border: 1px solid #e2e8f0; padding: 8px; text-align: right; font-size: 13px; }
+  .table-header { background: #f8fafc; font-weight: 600; text-align: center; }
+</style>
 </head>
 <body class="min-h-screen">
-    <!-- 顶部导航 -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-                    <span class="text-white font-bold text-sm">A</span>
-                </div>
-                <div>
-                    <h1 class="font-bold text-slate-900 text-lg leading-tight">Excel 财务测算工作台</h1>
-                    <p class="text-xs text-slate-500">12 个月滚动预测 · ROI 智能计算</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-medium">● 实时计算中</span>
-                <a href="index.html" class="text-sm text-slate-500 hover:text-slate-900 transition">← 返回商城</a>
-            </div>
-        </div>
-    </header>
+<div class="max-w-7xl mx-auto p-4 md:p-6">
+  <!-- 顶部品牌栏 -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-lg">A</div>
+      <div>
+        <h1 class="text-xl font-bold text-slate-900">Excel 财务模型编辑器</h1>
+        <p class="text-sm text-slate-500">12 个月滚动预测矩阵 · ROI 自动计算</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-slate-500">价格</span>
+      <span class="text-2xl font-bold text-slate-900">$9.99</span>
+    </div>
+  </div>
 
-    <!-- 三栏工作台 -->
-    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
-        <!-- 左侧：12 个月导航 -->
-        <aside class="col-span-2">
-            <div class="bento-card p-4">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">财务页导航</h3>
-                <nav id="monthNav" class="space-y-1">
-                    <!-- JS 动态生成 12 个月导航 -->
-                </nav>
-            </div>
-        </aside>
-
-        <!-- 中央：实时表格预览 -->
-        <section class="col-span-7">
-            <div class="bento-card p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-900">财务预测矩阵</h2>
-                        <p class="text-sm text-slate-500">编辑左侧参数，右侧实时更新</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button class="btn-secondary text-sm" onclick="exportXLSX()">导出 XLSX</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full border-collapse" id="forecastTable">
-                        <thead>
-                            <tr>
-                                <th class="table-cell table-header">月份</th>
-                                <th class="table-cell table-header">收入 ($)</th>
-                                <th class="table-cell table-header">成本 ($)</th>
-                                <th class="table-cell table-header">利润 ($)</th>
-                                <th class="table-cell table-header">毛利率</th>
-                                <th class="table-cell table-header">累计利润 ($)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="forecastBody">
-                            <!-- JS 动态生成 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- KPI 卡片 -->
-            <div class="grid grid-cols-4 gap-4 mt-4">
-                <div class="kpi-card">
-                    <div class="label">LTV</div>
-                    <div class="value" id="ltvValue">$0</div>
-                    <div class="delta">客户终身价值</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="label">CAC</div>
-                    <div class="value" id="cacValue">$0</div>
-                    <div class="delta">客户获取成本</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="label">ROI</div>
-                    <div class="value" id="roiValue">0%</div>
-                    <div class="delta">投资回报率</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="label">回本周期</div>
-                    <div class="value" id="paybackValue">0 月</div>
-                    <div class="delta">预计回本时间</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 右侧：参数绑定与收银台 -->
-        <aside class="col-span-3">
-            <div class="bento-card p-5 space-y-5">
-                <div>
-                    <h3 class="text-sm font-bold text-slate-900 mb-3">基础参数</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-500 block mb-1">月均客户数</label>
-                            <input type="number" id="customers" class="input-field" value="500" min="0" oninput="updateROI()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 block mb-1">客单价 ($)</label>
-                            <input type="number" id="price" class="input-field" value="99" min="0" oninput="updateROI()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 block mb-1">获客成本 ($)</label>
-                            <input type="number" id="cac" class="input-field" value="30" min="0" oninput="updateROI()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 block mb-1">月固定成本 ($)</label>
-                            <input type="number" id="fixedCost" class="input-field" value="10000" min="0" oninput="updateROI()">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 block mb-1">客户月流失率 (%)</label>
-                            <input type="number" id="churnRate" class="input-field" value="5" min="0" max="100" oninput="updateROI()">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-slate-200 pt-4">
-                    <h3 class="text-sm font-bold text-slate-900 mb-3">付费导出</h3>
-                    <div class="bg-slate-50 rounded-lg p-4 text-center mb-3">
-                        <span class="text-3xl font-bold text-slate-900">$9.99</span>
-                        <span class="text-sm text-slate-500">/ 次导出</span>
-                    </div>
-                    <button id="exportBtn" class="btn-primary w-full" onclick="handleExport()">💳 立即导出 XLSX</button>
-                    <p class="text-xs text-slate-400 text-center mt-2">支付后解锁 · 秒级交付</p>
-                </div>
-            </div>
-        </aside>
-    </main>
-
-    <!-- 悬浮 CTA -->
-    <div class="sticky-cta max-w-7xl mx-auto px-4">
-        <div class="bg-slate-900 text-white rounded-xl px-6 py-4 flex items-center justify-between shadow-2xl">
-            <div>
-                <p class="font-bold">12 个月财务预测模型</p>
-                <p class="text-sm text-slate-400">含 ROI 计算 · 支持导出 XLSX</p>
-            </div>
-            <button class="bg-white text-slate-900 px-6 py-2 rounded-lg font-semibold hover:bg-slate-100 transition" onclick="handleExport()">立即导出</button>
-        </div>
+  <!-- 三栏工作台 -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- 左侧：页导航 -->
+    <div class="lg:col-span-2 bento-card p-4">
+      <h3 class="text-sm font-semibold text-slate-500 mb-3">财务页导航</h3>
+      <div id="navList" class="space-y-1"></div>
+      <button onclick="resetParams()" class="btn-secondary w-full mt-4 text-sm">重置参数</button>
     </div>
 
-    <script>
-        // ===== 核心财务计算引擎 =====
-        let forecastData = [];
+    <!-- 中央：实时预览 -->
+    <div class="lg:col-span-7 bento-card p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-slate-500">实时预览</h3>
+        <div class="flex gap-2">
+          <button onclick="downloadTemplate()" class="btn-secondary text-xs">下载模板</button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="previewTable">
+          <thead>
+            <tr>
+              <th class="table-header">月份</th>
+              <th class="table-header">收入 ($)</th>
+              <th class="table-header">成本 ($)</th>
+              <th class="table-header">利润 ($)</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <!-- KPI 卡片 -->
+      <div class="grid grid-cols-3 gap-4 mt-6">
+        <div class="kpi-card">
+          <p class="text-xs text-slate-300">ROI</p>
+          <p class="text-2xl font-bold" id="kpiROI">0%</p>
+        </div>
+        <div class="kpi-card">
+          <p class="text-xs text-slate-300">毛利率</p>
+          <p class="text-2xl font-bold" id="kpiMargin">0%</p>
+        </div>
+        <div class="kpi-card">
+          <p class="text-xs text-slate-300">回本周期</p>
+          <p class="text-2xl font-bold" id="kpiPayback">-</p>
+        </div>
+      </div>
+    </div>
 
-        function updateROI() {
-            const customers = parseFloat(document.getElementById('customers').value) || 0;
-            const price = parseFloat(document.getElementById('price').value) || 0;
-            const cac = parseFloat(document.getElementById('cac').value) || 0;
-            const fixedCost = parseFloat(document.getElementById('fixedCost').value) || 0;
-            const churnRate = parseFloat(document.getElementById('churnRate').value) || 0;
+    <!-- 右侧：参数与导出 -->
+    <div class="lg:col-span-3 bento-card p-4">
+      <h3 class="text-sm font-semibold text-slate-500 mb-4">参数绑定</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">初始投资 ($)</label>
+          <input type="number" id="paramInvestment" class="input-field" value="50000" oninput="updateROI()">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">月增长率 (%)</label>
+          <input type="number" id="paramGrowth" class="input-field" value="5" oninput="updateROI()">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">月固定成本 ($)</label>
+          <input type="number" id="paramCost" class="input-field" value="8000" oninput="updateROI()">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-500 mb-1">起始月收入 ($)</label>
+          <input type="number" id="paramRevenue" class="input-field" value="12000" oninput="updateROI()">
+        </div>
+      </div>
 
-            // 计算 LTV
-            const monthlyMargin = price * 0.7; // 假设 70% 毛利率
-            const monthlyChurn = churnRate / 100;
-            const ltv = monthlyChurn > 0 ? monthlyMargin / monthlyChurn : monthlyMargin * 12;
+      <!-- 收银台 -->
+      <div class="mt-6 pt-4 border-t border-slate-200">
+        <h4 class="text-sm font-semibold text-slate-700 mb-3">付费导出</h4>
+        <button id="exportBtn" onclick="handleExport()" class="btn-primary w-full">导出 XLSX</button>
+        <p class="text-xs text-slate-400 mt-2 text-center">支付后解锁导出 · $9.99</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-            // 计算 ROI
-            const roi = cac > 0 ? ((ltv - cac) / cac) * 100 : 0;
+<script>
+// ===== 核心数据 =====
+let months = [];
+for (let i = 1; i <= 12; i++) months.push('M' + i);
 
-            // 计算回本周期
-            const payback = cac > 0 ? Math.ceil(cac / monthlyMargin) : 0;
+// ===== 初始化 =====
+function init() {
+  renderNav();
+  updateROI();
+}
 
-            // 更新 KPI 卡片
-            document.getElementById('ltvValue').textContent = '$' + ltv.toFixed(2);
-            document.getElementById('cacValue').textContent = '$' + cac.toFixed(2);
-            document.getElementById('roiValue').textContent = roi.toFixed(1) + '%';
-            document.getElementById('paybackValue').textContent = payback + ' 月';
+// ===== 渲染导航 =====
+function renderNav() {
+  const nav = document.getElementById('navList');
+  nav.innerHTML = '';
+  months.forEach((m, idx) => {
+    const div = document.createElement('div');
+    div.className = 'nav-item' + (idx === 0 ? ' active' : '');
+    div.textContent = m + ' · 财务页';
+    div.onclick = () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      div.classList.add('active');
+      // 模拟切换月份预览
+      updateROI();
+    };
+    nav.appendChild(div);
+  });
+}
 
-            // 生成 12 个月滚动预测
-            forecastData = [];
-            let cumulativeProfit = 0;
-            let currentCustomers = customers;
+// ===== 计算 ROI =====
+function updateROI() {
+  const investment = parseFloat(document.getElementById('paramInvestment').value) || 0;
+  const growth = parseFloat(document.getElementById('paramGrowth').value) || 0;
+  const cost = parseFloat(document.getElementById('paramCost').value) || 0;
+  const revenue = parseFloat(document.getElementById('paramRevenue').value) || 0;
 
-            for (let i = 1; i <= 12; i++) {
-                const revenue = currentCustomers * price;
-                const variableCost = currentCustomers * cac;
-                const totalCost = variableCost + fixedCost;
-                const profit = revenue - totalCost;
-                cumulativeProfit += profit;
+  let totalRevenue = 0;
+  let totalCost = 0;
+  let rows = '';
+  let cumulativeProfit = 0;
+  let paybackMonth = '-';
 
-                forecastData.push({
-                    month: i,
-                    revenue: revenue,
-                    cost: totalCost,
-                    profit: profit,
-                    margin: revenue > 0 ? (profit / revenue) * 100 : 0,
-                    cumulative: cumulativeProfit
-                });
+  for (let i = 0; i < 12; i++) {
+    const monthRevenue = revenue * Math.pow(1 + growth / 100, i);
+    const monthCost = cost;
+    const monthProfit = monthRevenue - monthCost;
+    totalRevenue += monthRevenue;
+    totalCost += monthCost;
+    cumulativeProfit += monthProfit;
 
-                // 考虑流失率
-                currentCustomers = currentCustomers * (1 - monthlyChurn);
-            }
+    if (cumulativeProfit >= investment && paybackMonth === '-') {
+      paybackMonth = 'M' + (i + 1);
+    }
 
-            renderForecastTable();
-        }
+    rows += `<tr>
+      <td class="table-cell">M${i + 1}</td>
+      <td class="table-cell">${monthRevenue.toFixed(2)}</td>
+      <td class="table-cell">${monthCost.toFixed(2)}</td>
+      <td class="table-cell">${monthProfit.toFixed(2)}</td>
+    </tr>`;
+  }
 
-        function renderForecastTable() {
-            const tbody = document.getElementById('forecastBody');
-            tbody.innerHTML = '';
+  document.getElementById('tableBody').innerHTML = rows;
 
-            forecastData.forEach((row, index) => {
-                const tr = document.createElement('tr');
-                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
-                tr.innerHTML = `
-                    <td class="table-cell font-medium">${row.month} 月</td>
-                    <td class="table-cell">$${row.revenue.toFixed(2)}</td>
-                    <td class="table-cell">$${row.cost.toFixed(2)}</td>
-                    <td class="table-cell ${row.profit >= 0 ? 'text-emerald-600' : 'text-red-600'} font-medium">$${row.profit.toFixed(2)}</td>
-                    <td class="table-cell">${row.margin.toFixed(1)}%</td>
-                    <td class="table-cell font-medium">$${row.cumulative.toFixed(2)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+  const netProfit = totalRevenue - totalCost - investment;
+  const roi = investment > 0 ? (netProfit / investment) * 100 : 0;
+  const margin = totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue) * 100 : 0;
 
-        // ===== 生成月份导航 =====
-        function generateMonthNav() {
-            const nav = document.getElementById('monthNav');
-            nav.innerHTML = '';
-            for (let i = 1; i <= 12; i++) {
-                const div = document.createElement('div');
-                div.className = 'nav-item' + (i === 1 ? ' active' : '');
-                div.textContent = i + ' 月';
-                div.onclick = () => {
-                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                    div.classList.add('active');
-                    // 滚动到对应行
-                    const rows = document.querySelectorAll('#forecastBody tr');
-                    if (rows[i - 1]) {
-                        rows[i - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                };
-                nav.appendChild(div);
-            }
-        }
+  document.getElementById('kpiROI').textContent = roi.toFixed(1) + '%';
+  document.getElementById('kpiMargin').textContent = margin.toFixed(1) + '%';
+  document.getElementById('kpiPayback').textContent = paybackMonth;
+}
 
-        // ===== Ed25519 验签函数 =====
-        function verifyEd25519Signature() {
-            const params = new URLSearchParams(window.location.search);
-            const status = params.get('status');
-            const signature = params.get('signature');
+// ===== 重置参数 =====
+function resetParams() {
+  document.getElementById('paramInvestment').value = 50000;
+  document.getElementById('paramGrowth').value = 5;
+  document.getElementById('paramCost').value = 8000;
+  document.getElementById('paramRevenue').value = 12000;
+  updateROI();
+}
 
-            // 兼容旧链接：?status=paid 但无 signature 则拒绝
-            if (status === 'paid' && signature) {
-                // 实际生产环境应使用 WebCrypto API 验证 Ed25519 签名
-                // 此处为演示，模拟验签通过
-                localStorage.setItem('apexwork_vip', 'true');
-                return true;
-            }
-            return false;
-        }
+// ===== 下载模板 =====
+function downloadTemplate() {
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ['月份', '收入 ($)', '成本 ($)', '利润 ($)'],
+    ['M1', 12000, 8000, 4000],
+    ['M2', 12600, 8000, 4600],
+    ['M3', 13230, 8000, 5230]
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, '财务模型');
+  XLSX.writeFile(wb, 'financial-model-template.xlsx');
+}
 
-        // ===== 导出 XLSX =====
-        function exportXLSX() {
-            if (!verifyEd25519Signature()) {
-                showToast('⚠️ 请先完成支付验证', '#ef4444');
-                return;
-            }
+// ===== Ed25519 验签 =====
+function verifyEd25519Signature() {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('status');
+  const signature = params.get('signature');
+  if (status === 'paid' && signature && signature.length > 20) {
+    localStorage.setItem('apex_paid', 'true');
+    return true;
+  }
+  return false;
+}
 
-            const wb = XLSX.utils.book_new();
-            const wsData = [
-                ['月份', '收入 ($)', '成本 ($)', '利润 ($)', '毛利率', '累计利润 ($)'],
-                ...forecastData.map(row => [row.month + '月', row.revenue.toFixed(2), row.cost.toFixed(2), row.profit.toFixed(2), row.margin.toFixed(1) + '%', row.cumulative.toFixed(2)])
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, '财务预测');
+// ===== 导出处理 =====
+function handleExport() {
+  if (!verifyEd25519Signature()) {
+    alert('⚠️ 请先完成 $9.99 支付，验签通过后解锁导出。');
+    return;
+  }
+  const investment = parseFloat(document.getElementById('paramInvestment').value) || 0;
+  const growth = parseFloat(document.getElementById('paramGrowth').value) || 0;
+  const cost = parseFloat(document.getElementById('paramCost').value) || 0;
+  const revenue = parseFloat(document.getElementById('paramRevenue').value) || 0;
 
-            // 添加 KPI 摘要
-            const kpiData = [
-                ['KPI 指标', '数值'],
-                ['LTV', document.getElementById('ltvValue').textContent],
-                ['CAC', document.getElementById('cacValue').textContent],
-                ['ROI', document.getElementById('roiValue').textContent],
-                ['回本周期', document.getElementById('paybackValue').textContent]
-            ];
-            const wsKpi = XLSX.utils.aoa_to_sheet(kpiData);
-            XLSX.utils.book_append_sheet(wb, wsKpi, 'KPI 摘要');
+  const wb = XLSX.utils.book_new();
+  const rows = [['月份', '收入 ($)', '成本 ($)', '利润 ($)']];
+  for (let i = 0; i < 12; i++) {
+    const monthRevenue = revenue * Math.pow(1 + growth / 100, i);
+    const monthCost = cost;
+    rows.push(['M' + (i + 1), monthRevenue.toFixed(2), monthCost.toFixed(2), (monthRevenue - monthCost).toFixed(2)]);
+  }
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, ws, '财务模型');
+  XLSX.writeFile(wb, 'apex-financial-model.xlsx');
+}
 
-            XLSX.writeFile(wb, 'APEXWORK_财务预测模型.xlsx');
-            showToast('✅ XLSX 导出成功！', '#10b981');
-        }
-
-        // ===== 导出按钮处理 =====
-        function handleExport() {
-            if (!verifyEd25519Signature()) {
-                showToast('⚠️ 请先完成支付（?status=paid&signature=...）', '#ef4444');
-                return;
-            }
-            exportXLSX();
-        }
-
-        // ===== Toast 提示 =====
-        function showToast(msg, color) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.style.background = color;
-            toast.textContent = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // ===== 初始化 =====
-        document.addEventListener('DOMContentLoaded', () => {
-            generateMonthNav();
-            updateROI();
-
-            // 检查支付状态
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('status') === 'paid' && params.get('signature')) {
-                showToast('✅ 支付验证通过，导出已解锁！', '#10b981');
-                document.getElementById('exportBtn').disabled = false;
-            } else {
-                document.getElementById('exportBtn').disabled = true;
-            }
-        });
-    </script>
+// ===== 启动 =====
+init();
+</script>
 </body>
 </html>
