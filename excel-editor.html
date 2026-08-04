@@ -3,248 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK Excel 财务模型编辑器 - $9.99 付费导出</title>
+    <title>APEXWORK - 商务三件套极速交付 SaaS 商城</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        .bento-card { @apply bg-white rounded-2xl shadow-sm border border-gray-100; }
-        .btn-primary { @apply bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed; }
-        .btn-locked { @apply bg-gray-300 text-gray-500 px-6 py-3 rounded-xl font-semibold cursor-not-allowed; }
-        .nav-item { @apply px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 cursor-pointer transition-all; }
-        .nav-item.active { @apply bg-blue-50 text-blue-700 border border-blue-200; }
-        .cell-input { @apply w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500; }
-        .kpi-card { @apply bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100; }
+        /* 2026 现代便当盒 Bento Grid 布局，亮白商务风 */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+        }
+        .bento-card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cta-btn {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            transition: opacity 0.2s ease;
+        }
+        .cta-btn:hover {
+            opacity: 0.9;
+        }
+        .kpi-card {
+            background: linear-gradient(135deg, #f0f9ff, #eef2ff);
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+        /* 少字多图，视觉冲击 */
+        .hero-img {
+            background-image: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1280&q=75&fm=webp');
+            background-size: cover;
+            background-position: center;
+            border-radius: 1.5rem;
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen">
     <!-- 顶部导航 -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">A</div>
-                <span class="font-semibold text-gray-800">APEXWORK Excel 财务模型</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-gray-500">USD $9.99</span>
-                <button id="exportBtn" class="btn-primary" disabled>🔒 付费导出 XLSX</button>
-            </div>
-        </div>
-    </header>
-
-    <!-- 主工作台 -->
-    <div class="max-w-7xl mx-auto px-4 py-6">
-        <div class="grid grid-cols-12 gap-6">
-            <!-- 左侧：工作表导航 -->
-            <div class="col-span-2">
-                <div class="bento-card p-4">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">📊 工作表</h3>
-                    <div class="space-y-2" id="sheetNav">
-                        <div class="nav-item active" data-sheet="overview">📋 总览</div>
-                        <div class="nav-item" data-sheet="revenue">📈 营收预测</div>
-                        <div class="nav-item" data-sheet="costs">💸 成本结构</div>
-                        <div class="nav-item" data-sheet="cashflow">💰 现金流</div>
-                        <div class="nav-item" data-sheet="valuation">🏆 估值模型</div>
-                    </div>
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl font-bold gradient-text">APEXWORK</span>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">Edge-Native SaaS</span>
                 </div>
-            </div>
-
-            <!-- 中央：表格预览 -->
-            <div class="col-span-7">
-                <div class="bento-card p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-lg font-semibold text-gray-800" id="sheetTitle">财务总览</h2>
-                        <div class="flex gap-2">
-                            <button class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg hover:bg-gray-200" onclick="addRow()">+ 添加行</button>
-                            <button class="px-3 py-1.5 text-sm bg-gray-100 rounded-lg hover:bg-gray-200" onclick="addColumn()">+ 添加列</button>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm" id="dataTable">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">项目</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">2024</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">2025</th>
-                                    <th class="px-4 py-3 text-left font-semibold text-gray-600">2026</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <tr>
-                                    <td class="px-4 py-3"><input class="cell-input" value="营收" data-field="label"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="1200000" data-field="2024"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="1800000" data-field="2025"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="2500000" data-field="2026"></td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3"><input class="cell-input" value="成本" data-field="label"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="720000" data-field="2024"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="1080000" data-field="2025"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="1500000" data-field="2026"></td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3"><input class="cell-input" value="毛利" data-field="label"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="480000" data-field="2024"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="720000" data-field="2025"></td>
-                                    <td class="px-4 py-3"><input class="cell-input" type="number" value="1000000" data-field="2026"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右侧：参数与付费 -->
-            <div class="col-span-3">
-                <div class="space-y-4">
-                    <div class="bento-card p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-3">🎨 主题预设</h3>
-                        <select class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" id="themeSelect">
-                            <option value="corporate">🏢 企业商务</option>
-                            <option value="startup">🚀 创投风格</option>
-                            <option value="minimal">⬜ 极简白</option>
-                        </select>
-                    </div>
-                    <div class="bento-card p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-3">📈 KPI 指标</h3>
-                        <div class="space-y-2">
-                            <div class="kpi-card">
-                                <p class="text-xs text-gray-500">毛利率</p>
-                                <p class="text-xl font-bold text-gray-800">40%</p>
-                            </div>
-                            <div class="kpi-card">
-                                <p class="text-xs text-gray-500">营收增长率</p>
-                                <p class="text-xl font-bold text-gray-800">50%</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bento-card p-4">
-                        <h3 class="text-sm font-semibold text-gray-700 mb-3">💳 解锁导出</h3>
-                        <p class="text-xs text-gray-500 mb-3">支付 $9.99 后解锁 XLSX 导出</p>
-                        <button class="w-full bg-green-600 text-white px-4 py-3 rounded-xl font-semibold hover:bg-green-700 transition-all" onclick="handlePayment()">
-                            💳 立即支付 $9.99
-                        </button>
-                        <p class="text-xs text-gray-400 mt-3 text-center">支付后自动解锁导出</p>
-                    </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-slate-600 hidden sm:block">商务三件套 · 极速交付</span>
+                    <a href="#pricing" class="cta-btn text-white px-4 py-2 rounded-xl text-sm font-semibold">立即开始</a>
                 </div>
             </div>
         </div>
-    </div>
+    </nav>
 
-    <script>
-        // ===== Ed25519 验签函数 =====
-        async function verifyEd25519Signature(signature, message, publicKey) {
-            try {
-                const key = await crypto.subtle.importKey(
-                    'raw',
-                    new Uint8Array(atob(publicKey).split('').map(c => c.charCodeAt(0))),
-                    { name: 'Ed25519' },
-                    false,
-                    ['verify']
-                );
-                const sigBytes = new Uint8Array(atob(signature).split('').map(c => c.charCodeAt(0)));
-                const msgBytes = new TextEncoder().encode(message);
-                return await crypto.subtle.verify('Ed25519', key, sigBytes, msgBytes);
-            } catch (e) {
-                console.error('验签失败:', e);
-                return false;
-            }
-        }
+    <!-- Hero 区 -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div>
+                <h1 class="text-4xl sm:text-5xl font-bold leading-tight">
+                    极速商务<br>
+                    <span class="gradient-text">三件套交付</span>
+                </h1>
+                <p class="mt-4 text-lg text-slate-600">PPT 路演战略 · Excel 财务模型 · Word 合规报告</p>
+                <p class="mt-2 text-slate-500">少字多图，视觉冲击，1 秒极速响应</p>
+                <div class="mt-8 flex gap-4">
+                    <a href="#products" class="cta-btn text-white px-6 py-3 rounded-xl font-semibold">浏览模板</a>
+                    <a href="#pricing" class="bg-white border border-slate-200 px-6 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50">查看价格</a>
+                </div>
+            </div>
+            <div class="hero-img h-80 lg:h-96"></div>
+        </div>
+    </section>
 
-        // ===== 支付处理 =====
-        async function handlePayment() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status');
-            const signature = urlParams.get('signature');
-            
-            if (status === 'paid' && signature) {
-                const verified = await verifyEd25519Signature(signature, 'payment', 'BASE64_PUBLIC_KEY');
-                if (verified) {
-                    localStorage.setItem('apx_paid', 'true');
-                    document.getElementById('exportBtn').disabled = false;
-                    document.getElementById('exportBtn').innerHTML = '📥 导出 XLSX';
-                    alert('✅ 支付验证通过，导出已解锁！');
-                } else {
-                    alert('❌ 签名验证失败，请联系客服');
-                }
-            } else {
-                // 模拟支付跳转
-                window.location.href = 'https://buy.stripe.com/test_xxx?status=paid&signature=demo_signature';
-            }
-        }
+    <!-- KPI 数据卡片 -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="kpi-card">
+                <p class="text-2xl font-bold">15+</p>
+                <p class="text-sm text-slate-600">专业模板</p>
+            </div>
+            <div class="kpi-card">
+                <p class="text-2xl font-bold">1s</p>
+                <p class="text-sm text-slate-600">极速响应</p>
+            </div>
+            <div class="kpi-card">
+                <p class="text-2xl font-bold">$9.99</p>
+                <p class="text-sm text-slate-600">统一价格</p>
+            </div>
+            <div class="kpi-card">
+                <p class="text-2xl font-bold">3-in-1</p>
+                <p class="text-sm text-slate-600">商务三件套</p>
+            </div>
+        </div>
+    </section>
 
-        // ===== 导出 XLSX =====
-        document.getElementById('exportBtn').addEventListener('click', function() {
-            if (localStorage.getItem('apx_paid') !== 'true') {
-                alert('请先完成支付解锁导出');
-                return;
-            }
-            
-            const wb = XLSX.utils.book_new();
-            const rows = [];
-            document.querySelectorAll('#tableBody tr').forEach(tr => {
-                const row = [];
-                tr.querySelectorAll('input').forEach(input => row.push(input.value));
-                rows.push(row);
-            });
-            
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            XLSX.utils.book_append_sheet(wb, ws, '财务模型');
-            XLSX.writeFile(wb, 'APEXWORK-财务模型.xlsx');
-        });
+    <!-- 产品区 -->
+    <section id="products" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h2 class="text-3xl font-bold text-center">产品矩阵</h2>
+        <p class="text-center text-slate-500 mt-2">少字多图，视觉冲击，一键导出</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <!-- PPT 卡片 -->
+            <div class="bento-card p-6">
+                <div class="h-40 bg-gradient-to-br from-sky-400 to-indigo-500 rounded-xl flex items-center justify-center">
+                    <span class="text-5xl">📊</span>
+                </div>
+                <h3 class="text-xl font-semibold mt-4">PPT 路演战略</h3>
+                <p class="text-slate-500 mt-2">15 页创投路演模板，动态 KPI 卡片</p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-lg font-bold">$9.99</span>
+                    <a href="editor.html" class="cta-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">立即编辑</a>
+                </div>
+            </div>
+            <!-- Excel 卡片 -->
+            <div class="bento-card p-6">
+                <div class="h-40 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
+                    <span class="text-5xl">📈</span>
+                </div>
+                <h3 class="text-xl font-semibold mt-4">Excel 财务模型</h3>
+                <p class="text-slate-500 mt-2">完整财务预测，自动计算引擎</p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-lg font-bold">$9.99</span>
+                    <a href="excel-editor.html" class="cta-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">立即编辑</a>
+                </div>
+            </div>
+            <!-- Word 卡片 -->
+            <div class="bento-card p-6">
+                <div class="h-40 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
+                    <span class="text-5xl">📄</span>
+                </div>
+                <h3 class="text-xl font-semibold mt-4">Word 合规报告</h3>
+                <p class="text-slate-500 mt-2">国际合规文档，ATS 双语适配</p>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-lg font-bold">$9.99</span>
+                    <a href="word-editor.html" class="cta-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">立即编辑</a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        // ===== 工作表导航切换 =====
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                const sheet = this.dataset.sheet;
-                const titles = {
-                    overview: '财务总览',
-                    revenue: '营收预测',
-                    costs: '成本结构',
-                    cashflow: '现金流',
-                    valuation: '估值模型'
-                };
-                document.getElementById('sheetTitle').textContent = titles[sheet];
-            });
-        });
+    <!-- 定价区 -->
+    <section id="pricing" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="bento-card p-8 max-w-lg mx-auto text-center">
+            <h2 class="text-2xl font-bold">统一价格</h2>
+            <p class="text-5xl font-bold gradient-text mt-4">$9.99</p>
+            <p class="text-slate-500 mt-2">单次导出 · 永久使用</p>
+            <ul class="text-left mt-6 space-y-2">
+                <li class="flex items-center gap-2">✅ 免费在线编辑</li>
+                <li class="flex items-center gap-2">✅ 付费导出三件套</li>
+                <li class="flex items-center gap-2">✅ Ed25519 签名授权</li>
+                <li class="flex items-center gap-2">✅ 零注册秒开 VIP</li>
+            </ul>
+            <a href="#products" class="cta-btn text-white px-8 py-3 rounded-xl font-semibold mt-8 inline-block">选择模板</a>
+        </div>
+    </section>
 
-        // ===== 添加行/列 =====
-        function addRow() {
-            const tbody = document.getElementById('tableBody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="px-4 py-3"><input class="cell-input" value="新项目" data-field="label"></td>
-                <td class="px-4 py-3"><input class="cell-input" type="number" value="0" data-field="2024"></td>
-                <td class="px-4 py-3"><input class="cell-input" type="number" value="0" data-field="2025"></td>
-                <td class="px-4 py-3"><input class="cell-input" type="number" value="0" data-field="2026"></td>
-            `;
-            tbody.appendChild(tr);
-        }
-
-        function addColumn() {
-            const thead = document.querySelector('#dataTable thead tr');
-            const th = document.createElement('th');
-            th.className = 'px-4 py-3 text-left font-semibold text-gray-600';
-            th.textContent = '2027';
-            thead.appendChild(th);
-            
-            document.querySelectorAll('#tableBody tr').forEach(tr => {
-                const td = document.createElement('td');
-                td.className = 'px-4 py-3';
-                td.innerHTML = '<input class="cell-input" type="number" value="0">';
-                tr.appendChild(td);
-            });
-        }
-
-        // ===== 初始化检查支付状态 =====
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('apx_paid') === 'true') {
-                document.getElementById('exportBtn').disabled = false;
-                document.getElementById('exportBtn').innerHTML = '📥 导出 XLSX';
-            }
-        });
-    </script>
+    <!-- 页脚 -->
+    <footer class="border-t border-slate-200 py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500 text-sm">
+            <p>© 2026 APEXWORK · Edge-Native 多智能体蜂群架构 · 零成本极客托管</p>
+        </div>
+    </footer>
 </body>
 </html>
