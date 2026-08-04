@@ -3,174 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK - 商务三件套极速交付 SaaS 商城</title>
+    <title>APEXWORK · Word 合规报告编辑器 | $9.99 付费导出</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* 2026 现代便当盒 Bento Grid 布局，亮白商务风 */
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
-        }
-        .bento-card {
-            background: #ffffff;
-            border-radius: 1.5rem;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .bento-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .cta-btn {
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
-            transition: opacity 0.2s ease;
-        }
-        .cta-btn:hover {
-            opacity: 0.9;
-        }
-        .kpi-card {
-            background: linear-gradient(135deg, #f0f9ff, #eef2ff);
-            border-radius: 1rem;
-            padding: 1rem;
-        }
-        /* 少字多图，视觉冲击 */
-        .hero-img {
-            background-image: url('https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1280&q=75&fm=webp');
-            background-size: cover;
-            background-position: center;
-            border-radius: 1.5rem;
-        }
+        * { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
+        body { background: #f8fafc; }
+        .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+        .nav-item { cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; }
+        .nav-item:hover { background: #f1f5f9; }
+        .nav-item.active { background: #eef2ff; border-left-color: #4f46e5; font-weight: 600; }
+        .btn-primary { background: #4f46e5; color: white; border-radius: 10px; padding: 12px 24px; font-weight: 600; transition: all 0.2s; }
+        .btn-primary:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+        .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-secondary { background: #f1f5f9; color: #334155; border-radius: 10px; padding: 12px 24px; font-weight: 500; transition: all 0.2s; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .input-field { border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; width: 100%; font-size: 14px; transition: border 0.2s; }
+        .input-field:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .label { font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
+        .kpi-card { background: linear-gradient(135deg, #eef2ff, #f8fafc); border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; }
+        .doc-preview { background: #ffffff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 40px 48px; max-width: 720px; margin: 0 auto; }
+        .doc-preview h1 { font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+        .doc-preview h2 { font-size: 18px; font-weight: 600; color: #4f46e5; margin-top: 24px; margin-bottom: 8px; border-bottom: 2px solid #eef2ff; padding-bottom: 4px; }
+        .doc-preview p { font-size: 14px; color: #475569; line-height: 1.7; margin-bottom: 8px; }
+        .doc-preview .meta { font-size: 12px; color: #94a3b8; margin-bottom: 24px; }
+        .doc-preview .section { margin-bottom: 16px; }
+        .doc-preview .kpi-row { display: flex; gap: 16px; margin: 12px 0; }
+        .doc-preview .kpi-item { flex: 1; background: #f8fafc; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #e2e8f0; }
+        .doc-preview .kpi-item .value { font-size: 20px; font-weight: 700; color: #4f46e5; }
+        .doc-preview .kpi-item .label { font-size: 11px; color: #64748b; margin-top: 4px; }
+        .doc-preview .table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        .doc-preview .table th { background: #eef2ff; padding: 8px 12px; text-align: left; font-size: 12px; font-weight: 600; color: #4338ca; border: 1px solid #e2e8f0; }
+        .doc-preview .table td { padding: 8px 12px; font-size: 13px; color: #475569; border: 1px solid #e2e8f0; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 14px 24px; border-radius: 12px; font-size: 14px; z-index: 9999; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #dc2626; }
+        .toast.success { background: #16a34a; }
     </style>
 </head>
 <body class="min-h-screen">
     <!-- 顶部导航 -->
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl font-bold gradient-text">APEXWORK</span>
-                    <span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">Edge-Native SaaS</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span class="text-sm text-slate-600 hidden sm:block">商务三件套 · 极速交付</span>
-                    <a href="#pricing" class="cta-btn text-white px-4 py-2 rounded-xl text-sm font-semibold">立即开始</a>
-                </div>
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">A</div>
+                <span class="font-bold text-slate-800">APEXWORK</span>
+                <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium">Word 合规报告</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-sm text-slate-500 hover:text-slate-700">← 返回商城</a>
+                <span class="text-sm font-semibold text-slate-700">USD $9.99</span>
             </div>
         </div>
     </nav>
 
-    <!-- Hero 区 -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
-                <h1 class="text-4xl sm:text-5xl font-bold leading-tight">
-                    极速商务<br>
-                    <span class="gradient-text">三件套交付</span>
-                </h1>
-                <p class="mt-4 text-lg text-slate-600">PPT 路演战略 · Excel 财务模型 · Word 合规报告</p>
-                <p class="mt-2 text-slate-500">少字多图，视觉冲击，1 秒极速响应</p>
-                <div class="mt-8 flex gap-4">
-                    <a href="#products" class="cta-btn text-white px-6 py-3 rounded-xl font-semibold">浏览模板</a>
-                    <a href="#pricing" class="bg-white border border-slate-200 px-6 py-3 rounded-xl font-semibold text-slate-700 hover:bg-slate-50">查看价格</a>
-                </div>
-            </div>
-            <div class="hero-img h-80 lg:h-96"></div>
+    <!-- 三栏工作台 -->
+    <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
+        <!-- 左侧：页导航 -->
+        <div class="col-span-2 bento-card p-4 h-fit sticky top-20">
+            <div class="label mb-3">报告章节</div>
+            <div id="pageNav" class="space-y-1"></div>
         </div>
-    </section>
 
-    <!-- KPI 数据卡片 -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="kpi-card">
-                <p class="text-2xl font-bold">15+</p>
-                <p class="text-sm text-slate-600">专业模板</p>
+        <!-- 中央：实时预览 -->
+        <div class="col-span-7 bento-card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-semibold text-slate-800">实时预览</h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-400">ATS 智能排版</span>
+                    <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-full font-medium">● 合规</span>
+                </div>
             </div>
-            <div class="kpi-card">
-                <p class="text-2xl font-bold">1s</p>
-                <p class="text-sm text-slate-600">极速响应</p>
-            </div>
-            <div class="kpi-card">
-                <p class="text-2xl font-bold">$9.99</p>
-                <p class="text-sm text-slate-600">统一价格</p>
-            </div>
-            <div class="kpi-card">
-                <p class="text-2xl font-bold">3-in-1</p>
-                <p class="text-sm text-slate-600">商务三件套</p>
-            </div>
+            <div id="docPreview" class="doc-preview"></div>
         </div>
-    </section>
 
-    <!-- 产品区 -->
-    <section id="products" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 class="text-3xl font-bold text-center">产品矩阵</h2>
-        <p class="text-center text-slate-500 mt-2">少字多图，视觉冲击，一键导出</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            <!-- PPT 卡片 -->
-            <div class="bento-card p-6">
-                <div class="h-40 bg-gradient-to-br from-sky-400 to-indigo-500 rounded-xl flex items-center justify-center">
-                    <span class="text-5xl">📊</span>
-                </div>
-                <h3 class="text-xl font-semibold mt-4">PPT 路演战略</h3>
-                <p class="text-slate-500 mt-2">15 页创投路演模板，动态 KPI 卡片</p>
-                <div class="flex items-center justify-between mt-4">
-                    <span class="text-lg font-bold">$9.99</span>
-                    <a href="editor.html" class="cta-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">立即编辑</a>
-                </div>
-            </div>
-            <!-- Excel 卡片 -->
-            <div class="bento-card p-6">
-                <div class="h-40 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
-                    <span class="text-5xl">📈</span>
-                </div>
-                <h3 class="text-xl font-semibold mt-4">Excel 财务模型</h3>
-                <p class="text-slate-500 mt-2">完整财务预测，自动计算引擎</p>
-                <div class="flex items-center justify-between mt-4">
-                    <span class="text-lg font-bold">$9.99</span>
-                    <a href="excel-editor.html" class="cta-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">立即编辑</a>
-                </div>
-            </div>
-            <!-- Word 卡片 -->
-            <div class="bento-card p-6">
-                <div class="h-40 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
-                    <span class="text-5xl">📄</span>
-                </div>
-                <h3 class="text-xl font-semibold mt-4">Word 合规报告</h3>
-                <p class="text-slate-500 mt-2">国际合规文档，ATS 双语适配</p>
-                <div class="flex items-center justify-between mt-4">
-                    <span class="text-lg font-bold">$9.99</span>
-                    <a href="word-editor.html" class="cta-btn text-white px-4 py-2 rounded-lg text-sm font-semibold">立即编辑</a>
+        <!-- 右侧：参数与付费导出 -->
+        <div class="col-span-3 space-y-4">
+            <!-- 参数面板 -->
+            <div class="bento-card p-5">
+                <div class="label mb-3">报告参数</div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="label">公司名称</label>
+                        <input type="text" id="companyName" class="input-field" value="AeroTech Dynamics" oninput="updatePreview()">
+                    </div>
+                    <div>
+                        <label class="label">报告标题</label>
+                        <input type="text" id="reportTitle" class="input-field" value="2026 年度企业合规报告" oninput="updatePreview()">
+                    </div>
+                    <div>
+                        <label class="label">报告日期</label>
+                        <input type="text" id="reportDate" class="input-field" value="2026-08-04" oninput="updatePreview()">
+                    </div>
+                    <div>
+                        <label class="label">编制人</label>
+                        <input type="text" id="authorName" class="input-field" value="Alex Chen" oninput="updatePreview()">
+                    </div>
+                    <div>
+                        <label class="label">合规评级</label>
+                        <select id="complianceRating" class="input-field" onchange="updatePreview()">
+                            <option value="A+">A+ (卓越)</option>
+                            <option value="A">A (优秀)</option>
+                            <option value="B+">B+ (良好)</option>
+                            <option value="B">B (合格)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- 定价区 -->
-    <section id="pricing" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="bento-card p-8 max-w-lg mx-auto text-center">
-            <h2 class="text-2xl font-bold">统一价格</h2>
-            <p class="text-5xl font-bold gradient-text mt-4">$9.99</p>
-            <p class="text-slate-500 mt-2">单次导出 · 永久使用</p>
-            <ul class="text-left mt-6 space-y-2">
-                <li class="flex items-center gap-2">✅ 免费在线编辑</li>
-                <li class="flex items-center gap-2">✅ 付费导出三件套</li>
-                <li class="flex items-center gap-2">✅ Ed25519 签名授权</li>
-                <li class="flex items-center gap-2">✅ 零注册秒开 VIP</li>
-            </ul>
-            <a href="#products" class="cta-btn text-white px-8 py-3 rounded-xl font-semibold mt-8 inline-block">选择模板</a>
+            <!-- 付费导出面板 -->
+            <div class="bento-card p-5 border-2 border-indigo-100">
+                <div class="label mb-3">付费导出</div>
+                <div class="space-y-3">
+                    <div class="kpi-card">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-slate-600">DOCX 标准交付</span>
+                            <span class="text-lg font-bold text-indigo-600">$9.99</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1">含 ATS 智能排版 + 合规报告模板</p>
+                    </div>
+                    <button id="payBtn" class="btn-primary w-full" onclick="handlePayment()">
+                        🔒 立即支付 $9.99
+                    </button>
+                    <button id="exportBtn" class="btn-secondary w-full" disabled onclick="exportDocx()">
+                        📥 导出 DOCX
+                    </button>
+                    <p id="payStatus" class="text-xs text-slate-400 text-center mt-2">未支付 · 导出已锁定</p>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
 
-    <!-- 页脚 -->
-    <footer class="border-t border-slate-200 py-8 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-500 text-sm">
-            <p>© 2026 APEXWORK · Edge-Native 多智能体蜂群架构 · 零成本极客托管</p>
-        </div>
-    </footer>
-</body>
-</html>
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ========== 报告数据 ==========
+        const reportData = {
+            sections: [
+                { id: 'cover', title: '封面', icon: '📄' },
+                { id: 'executive', title: '执行摘要', icon: '📊' },
+                { id: 'company', title: '公司概况', icon: '🏢' },
+                { id: 'financial', title: '财务合规', icon: '💰' },
+                { id: 'privacy', title: '数据隐私', icon: '🔒' },
+                { id: 'employment', title: '雇佣合规', icon: '👥' },
+                { id: 'environmental', title: '环境合规', icon: '🌱' },
+                { id: 'risk', title: '风险矩阵', icon: '⚠️' },
+                { id: 'conclusion', title: '结论建议', icon: '✅' }
+            ],
+            kpis: {
+                financial: [
+                    { label: '营收增长率', value: '32.5%' },
+                    { label: '净利润率', value: '18.2%' },
+                    { label: '资产负债率', value: '42.1%' }
+                ],
+                privacy: [
+                    { label: '数据加密率', value: '100%' },
+                    { label: 'GDPR 合规', value: 'A+' },
+                    { label: '隐私审计', value: '通过' }
+                ],
+                employment: [
+                    { label: '员工满意度', value: '4.2/5' },
+                    { label: '培训覆盖率', value: '96%' },
+                    { label: '安全事件', value: '0' }
+                ]
+            }
+        };
+
+        // ========== 状态管理 ==========
+        let currentPage = 0;
+        let isPaid = false;
+        const STORAGE_KEY = 'apexwork_word_license';
+
+        // ========== 初始化 ==========
+        function init() {
+            renderNav();
+            updatePreview();
+            checkStoredLicense();
+        }
+
+        // ========== 渲染导航 ==========
+        function renderNav() {
+            const nav = document.getElementById('pageNav');
+            nav.innerHTML = reportData.sections.map((s, i) => `
+                <div class="nav-item px-3 py-2 rounded-lg text-sm ${i === currentPage ? 'active' : ''}" onclick="navigateTo(${i})">
+                    <span class="mr-2">${s.icon}</span>${s.title}
+                </div>
+            `).join('');
+        }
+
+        // ========== 导航切换 ==========
+        function navigateTo(index) {
+            currentPage = index;
+            renderNav();
+            updatePreview();
+        }
+
+        // ========== 更新预览 ==========
+        function updatePreview() {
+            const company = document.getElementById('companyName').value;
+            const title = document.getElementById('reportTitle').value;
+            const date = document.getElementById('reportDate').value;
+            const author = document.getElementById('authorName').value;
+            const rating = document.getElementById('complianceRating').value;
+
+            const preview = document.getElementById('docPreview');
+            const section = reportData.sections[currentPage];
+
+            let html = '';
+            switch (section.id) {
+                case 'cover':
+                    html = `
+                        <div style="text-align:center; padding: 60px 0;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🏢</div>
+                            <h1>${company}</h1>
+                            <h2 style="font-size: 22px; color: #1e293b; border: none; margin-top: 12px;">${title}</h2>
+                            <div class="meta" style="margin-top: 24px;">报告日期：${date}</div>
+                            <div class="meta">编制人：${author}</div>
+                            <div style="margin-top: 32px; display: inline-block; background: #eef2ff; padding: 8px 24px; border-radius: 20px; font-weight: 600; color: #4f46e5;">合规评级：${rating}</div>
+                        </div>
+                    `;
+                    break;
+                case 'executive':
+                    html = `
+                        <h1>执行摘要</h1>
+                        <div class="meta">${company} · ${date}</div>
+                        <div class="section">
+                            <p>本报告全面评估 ${company} 在 2026 财年的合规运营状况。公司整体合规评级为 <strong>${rating}</strong>，各项指标均达到或超过行业标准。</p>
+                        </div>
+                        <div class="kpi-row">
+                            <div class="kpi-item"><div class="value">${rating}</div><div class="label">综合评级</div></div>
+                            <div class="kpi-item"><div class="value">32.5%</div><div class="label">营收增长</div></div>
+                            <div class="kpi-item"><div class="value">0</div><div class="label">重大违规</div></div>
+                        </div>
+                        <div class="section">
+                            <p>关键发现：公司在数据隐私保护、财务透明度和雇佣合规方面表现优异，建议持续强化环境合规投入。</p>
+                        </div>
+                    `;
+                    break;
+                case 'company':
+                    html = `
+                        <h1>公司概况</h1>
+                        <div class="meta">${company}</div>
+                        <div class="section">
+                            <p><strong>公司名称：</strong>${company}</p>
+                            <p><strong>成立时间：</strong>2018 年</p>
+                            <p><strong>总部地址：</strong>美国特拉华州威尔明顿市</p>
+                            <p><strong>员工规模：</strong>1,200+ 人</p>
+                            <p><strong>业务范围：</strong>航空航天技术研发、智能制造、数据分析服务</p>
+                        </div>
+                        <div class="section">
+                            <h2>组织架构</h2>
+                            <table class="table">
+                                <tr><th>部门</th><th>负责人</th><th>员工数</th></tr>
+                                <tr><td>研发部</td><td>Dr. Sarah Kim</td><td>450</td></tr>
+                                <tr><td>生产部</td><td>James Wilson</td><td>380</td></tr>
+                                <tr><td>市场部</td><td>Emily Zhang</td><td>120</td></tr>
+                                <tr><td>财务部</td><td>Michael Brown</td><td>80</td></tr>
+                                <tr><td>合规部</td><td>Lisa Wang</td><td>50</td></tr>
+                            </table>
+                        </div>
+                    `;
+                    break;
+                case 'financial':
+                    html = `
+                        <h1>财务合规</h1>
+                        <div class="meta">${company} · 2026 财年</div>
+                        <div class="kpi-row">
+                            ${reportData.kpis.financial.map(k => `
+                                <div class="kpi-item"><div class="value">${k.value}</div><div class="label">${k.label}</div></div>
+                            `).join('')}
+                        </div>
+                        <div class="section">
+                            <h2>审计意见</h2>
+                            <p>经独立审计机构审核，公司财务报表符合 GAAP 准则，无重大错报风险。内部控制体系运行有效。</p>
+                        </div>
+                        <div class="section">
+                            <h2>税务合规</h2>
+                            <p>公司按时足额缴纳各项税费，无欠税记录。转让定价政策符合 OECD 指引。</p>
+                        </div>
+                    `;
+                    break;
+                case 'privacy':
+                    html = `
+                        <h1>数据隐私合规</h1>
+                        <div class="meta">GDPR · CCPA · PIPL</div>
+                        <div class="kpi-row">
+                            ${reportData.kpis.privacy.map(k => `
+                                <div class="kpi-item"><div class="value">${k.value}</div><div class="label">${k.label}</div></div>
+                            `).join('')}
+                        </div>
+                        <div class="section">
+                            <h2>数据保护措施</h2>
+                            <p>公司实施端到端数据加密，所有客户数据存储于符合 SOC2 标准的数据中心。定期进行渗透测试与漏洞扫描。</p>
+                        </div>
+                        <div class="section">
+                            <h2>隐私政策</h2>
+                            <p>公司隐私政策已更新至 2026 版，明确数据收集范围、使用目的与用户权利。用户可随时行使数据删除权。</p>
+                        </div>
+                    `;
+                    break;
+                case 'employment':
+                    html = `
+                        <h1>雇佣合规</h1>
+                        <div class="meta">${company} · 人力资源</div>
+                        <div class="kpi-row">
+                            ${reportData.kpis.employment.map(k => `
+                                <div class="kpi-item"><div class="value">${k.value}</div><div class="label">${k.label}</div></div>
+                            `).join('')}
+                        </div>
+                        <div class="section">
+                            <h2>劳动权益保障</h2>
+                            <p>公司严格执行劳动法规定，提供具有竞争力的薪酬福利。员工平均工龄 3.2 年，离职率低于行业平均水平。</p>
+                        </div>
+                        <div class="section">
+                            <h2>职业健康与安全</h2>
+                            <p>年度安全培训覆盖率 100%，工作场所事故率为零。已通过 ISO 45001 职业健康安全管理体系认证。</p>
+                        </div>
+                    `;
+                    break;
+                case 'environmental':
+                    html = `
+                        <h1>环境合规</h1>
+                        <div class="meta">ESG · 可持续发展</div>
+                        <div class="section">
+                            <h2>碳排放管理</h2>
+                            <p>公司承诺 2030 年实现碳中和。2026 年碳排放较基准年减少 28%，可再生能源使用占比达 45%。</p>
+                        </div>
+                        <div class="section">
+                            <h2>废弃物管理</h2>
+                            <p>生产废弃物回收利用率达 92%，危险废弃物 100% 合规处置。已通过 ISO 14001 环境管理体系认证。</p>
+                        </div>
+                        <div class="section">
+                            <h2>ESG 评级</h2>
+                            <p>公司 MSCI ESG 评级为 AA，处于行业前 15% 水平。连续两年入选道琼斯可持续发展指数。</p>
+                        </div>
+                    `;
+                    break;
+                case 'risk':
+                    html = `
+                        <h1>风险矩阵</h1>
+                        <div class="meta">${company} · 2026</div>
+                        <div class="section">
+                            <table class="table">
+                                <tr><th>风险类别</th><th>等级</th><th>缓解措施</th></tr>
+                                <tr><td>市场风险</td><td>中</td><td>多元化产品线</td></tr>
+                                <tr><td>运营风险</td><td>低</td><td>ISO 9001 体系</td></tr>
+                                <tr><td>合规风险</td><td>低</td><td>季度合规审计</td></tr>
+                                <tr><td>网络安全</td><td>中</td><td>零信任架构</td></tr>
+                                <tr><td>供应链</td><td>中</td><td>双源采购策略</td></tr>
+                            </table>
+                        </div>
+                        <div class="section">
+                            <h2>风险应对策略</h2>
+                            <p>公司建立企业风险管理委员会，每季度评估重大风险。关键风险均配备应急预案，确保业务连续性。</p>
+                        </div>
+                    `;
+                    break;
+                case 'conclusion':
+                    html = `
+                        <h1>结论与建议</h1>
+                        <div class="meta">${company} · ${date}</div>
+                        <div class="section">
+                            <h2>总体结论</h2>
+                            <p>${company} 在 2026 年度整体合规表现优异，综合评级 <strong>${rating}</strong>。公司在财务透明、数据隐私和雇佣权益方面达到行业标杆水平。</p>
+                        </div>
+                        <div class="section">
+                            <h2>改进建议</h2>
+                            <p>1. 加大环境合规投入，加速碳中和进程；</p>
+                            <p>2. 强化供应链 ESG 审查，提升全链条合规水平；</p>
+                            <p>3. 持续完善数据治理体系，应对新兴法规要求。</p>
+                        </div>
+                        <div class="section" style="text-align:center; margin-top: 40px;">
+                            <p style="font-size: 12px; color: #94a3b8;">— 报告结束 —</p>
+                            <p style="font-size: 12px; color: #94a3b8;">${company} · 合规部</p>
+                        </div>
+                    `;
+                    break;
+            }
+            preview.innerHTML = html;
+        }
+
+        // ========== Ed25519 验签 ==========
+        function verifyEd25519Signature(signature, message) {
+            // 生产环境应使用 WebCrypto API 进行真实 Ed25519 验签
+            // 此处为前端演示逻辑，实际部署时替换为公钥验签
+            if (!signature || signature.length < 64) return false;
+            try {
+                // 模拟验签：检查签名格式与消息哈希匹配
+                const hash = btoa(message).slice(0, 32);
+                return signature.includes(hash) || signature.length >= 128;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // ========== 检查本地授权 ==========
+        function checkStoredLicense() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const license = JSON.parse(stored);
+                    if (license.valid && license.expires > Date.now()) {
+                        isPaid = true;
+                        unlockExport();
+                    }
+                }
+            } catch (e) {
+                console.log('No stored license');
+            }
+        }
+
+        // ========== 支付处理 ==========
+        function handlePayment() {
+            // 模拟支付网关跳转
+            // 生产环境替换为 Stripe Payment Links 或 LemonSqueezy
+            const gateway = 'stripe';
+            const mockSignature = 'ed25519_' + btoa(Date.now().toString()).slice(0, 32) + '_' + btoa('apexwork_paid').slice(0, 32) + '_' + btoa('demo_signature').slice(0, 32);
+            const callbackUrl = window.location.origin + window.location.pathname + '?status=paid&signature=' + mockSignature + '&gateway=' + gateway;
+            
+            showToast('正在跳转支付网关...', 'info');
+            
+            // 模拟支付回调
+            setTimeout(() => {
+                // 解析回调参数
+                const params = new URLSearchParams(callbackUrl.split('?')[1]);
+                const status = params.get('status');
+                const signature = params.get('signature');
+                const gatewayName = params.get('gateway');
+
+                if (status === 'paid' && verifyEd25519Signature(signature, 'apexwork_paid')) {
+                    // 验签通过，写入本地授权
+                    const license = {
+                        valid: true,
+                        gateway: gatewayName,
+                        signature: signature,
+                        expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // 1年有效
+                        purchasedAt: Date.now()
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(license));
+                    isPaid = true;
+                    unlockExport();
+                    showToast('✅ 支付成功！DOCX 导出已解锁', 'success');
+                } else {
+                    showToast('❌ 支付验证失败，请重试', 'error');
+                }
+            }, 1500);
+        }
+
+        // ========== 解锁导出 ==========
+        function unlockExport() {
+            const exportBtn = document.getElementById('exportBtn');
+            const payBtn = document.getElementById('payBtn');
+            const payStatus = document.getElementById('payStatus');
+            
+            exportBtn.disabled = false;
+            exportBtn.classList.remove('btn-secondary');
+            exportBtn.classList.add('btn-primary');
+            payBtn.disabled = true;
+            payBtn.textContent = '✅ 已支付';
+            payStatus.textContent = '已支付 · 导出已解锁';
+            payStatus.classList.add('text-green-600');
+        }
+
+        // ========== 导出 DOCX ==========
+        async function exportDocx() {
+            if (!isPaid) {
+                showToast('请先完成支付后再导出', 'error');
+                return;
+            }
+
+            showToast('正在生成 DOCX 文件...', 'info');
+
+            try {
+                const company = document.getElementById('companyName').value;
+                const title = document.getElementById('reportTitle').value;
+                const date = document.getElementById('reportDate').value;
+                const author = document.getElementById('authorName').value;
+                const rating = document.getElementById('complianceRating').value;
+
+                // 构建 DOCX XML
+                const docxContent = buildDocxXml(company, title, date, author, rating);
+                
+                // 创建 ZIP
+                const zip = new JSZip();
+                zip.file('[Content_Types].xml', getContentTypesXml());
+                zip.file('_rels/.rels', getRelsXml());
+                zip.file('word/document.xml', docxContent);
+                zip.file('word/_rels/document.xml.rels', getDocumentRelsXml());
+                zip.file('word/styles.xml', getStylesXml());
+
+                // 生成 Blob
+                const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                
+                // 下载
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${company}_合规报告_${date}.docx`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showToast('✅ DOCX 导出成功！', 'success');
+            } catch (e) {
+                console.error('Export error:', e);
+                showToast('❌ 导出失败，请重试', 'error');
+            }
+        }
+
+        // ========== 构建 DOCX XML ==========
+        function buildDocxXml(company, title, date, author, rating) {
+            return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="48"/></w:rPr><w:t>${company}</w:t></w:r></w:p>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="36"/></w:rPr><w:t>${title}</w:t></w:r></w:p>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="24"/></w:rPr><w:t>报告日期：${date}</w:t></w:r></w:p>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:sz w:val="24"/></w:rPr><w:t>编制人：${author}</w:t></w:r></w:p>
+    <w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="28"/></w:rPr><w:t>合规评级：${rating}</w:t></w:r></w:p>
+    <w:p><w:r><w:br/></w:r></w:p>
+    <w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>执行摘要</w:t></w:r></w:p>
+    <w:p><w:r><w:sz w:val="24"/></w:r><w:r><w:t>本报告全面评估 ${company} 在 2026 财年的合规运营状况。公司整体合规评级为 ${rating}，各项指标均达到或超过行业标准。</w:t></w:r></w:p>
+    <w:p><w:r><w:br/></w:r></w:p>
+    <w:p><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>公司概况</w:t></w:r></w:p>
+    <w:p><w:r><w:sz w:val="24"/></w:r><w:r><w:t>公司名称：${company}</w:t></w:r></w:p>
+    <w:p><w:r><w:sz w:val="24"/></w:r><w:r><w:t>成立时间：2018 年</w:t></w:r></w:p>
+    <w:p><w:r><w:sz w:val="24"/></w:r><w:r><w:t>员工规模：1,200+ 人</w:t></w:r></w:p>
+    <w:p><w:r><w:sz w:val="24"/></w:r><w:r><w:t>业务范围：航空航天技术研发、智能制造、数据分析服务</w:t></w:r></w:p
