@@ -3,238 +3,137 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEXWORK - ATS 合规报告编辑器</title>
+<title>APEXWORK · Word ATS 合规报告编辑器</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
   body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f8fafc; }
-  .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; transition: all 0.2s; }
-  .bento-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-  .nav-item { cursor: pointer; padding: 10px 14px; border-radius: 10px; transition: all 0.15s; font-size: 13px; }
+  .bento-card { background: #ffffff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); }
+  .nav-item { transition: all 0.2s; cursor: pointer; }
   .nav-item:hover { background: #f1f5f9; }
   .nav-item.active { background: #0f172a; color: #ffffff; }
-  .btn-primary { background: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
+  .btn-primary { background: #0f172a; color: #ffffff; transition: all 0.2s; }
   .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
-  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-  .btn-secondary { background: #f1f5f9; color: #0f172a; padding: 10px 20px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+  .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: #f1f5f9; color: #0f172a; transition: all 0.2s; }
   .btn-secondary:hover { background: #e2e8f0; }
-  .input-field { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; transition: border 0.2s; }
+  .input-field { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; transition: all 0.2s; }
   .input-field:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
-  .preview-section { border-bottom: 1px solid #e2e8f0; padding: 12px 0; }
-  .preview-section h4 { font-weight: 600; color: #0f172a; margin-bottom: 4px; }
-  .preview-section p { color: #475569; font-size: 14px; line-height: 1.6; }
+  .section-preview { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; min-height: 200px; }
+  .section-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 0.5rem; }
+  .section-content { font-size: 0.875rem; color: #475569; line-height: 1.6; white-space: pre-wrap; }
 </style>
 </head>
 <body class="min-h-screen">
-<div class="max-w-7xl mx-auto p-4 md:p-6">
-  <!-- 顶部品牌栏 -->
-  <div class="flex items-center justify-between mb-6">
+<div class="max-w-7xl mx-auto p-4 lg:p-8">
+  <!-- 顶部导航 -->
+  <header class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-lg">A</div>
+      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
+        <span class="text-white font-bold text-lg">W</span>
+      </div>
       <div>
-        <h1 class="text-xl font-bold text-slate-900">ATS 合规报告编辑器</h1>
-        <p class="text-sm text-slate-500">欧美企业级智能排版 · DOCX 标准</p>
+        <h1 class="text-xl font-bold text-slate-900">Word ATS 合规报告编辑器</h1>
+        <p class="text-sm text-slate-500">欧美企业级 · 九大章节 · $9.99 付费导出</p>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-slate-500">价格</span>
-      <span class="text-2xl font-bold text-slate-900">$9.99</span>
-    </div>
-  </div>
+    <a href="index.html" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium">← 返回商城</a>
+  </header>
 
   <!-- 三栏工作台 -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <!-- 左侧：章节导航 -->
-    <div class="lg:col-span-2 bento-card p-4">
-      <h3 class="text-sm font-semibold text-slate-500 mb-3">章节导航</h3>
-      <div id="navList" class="space-y-1"></div>
-      <button onclick="resetFields()" class="btn-secondary w-full mt-4 text-sm">重置内容</button>
-    </div>
+    <aside class="lg:col-span-2 bento-card p-4">
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">📑 章节导航</h2>
+      <nav class="space-y-1">
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium active" data-section="0" onclick="selectSection(0)">封面</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="1" onclick="selectSection(1)">执行摘要</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="2" onclick="selectSection(2)">公司概况</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="3" onclick="selectSection(3)">财务合规</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="4" onclick="selectSection(4)">数据隐私</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="5" onclick="selectSection(5)">雇佣合规</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="6" onclick="selectSection(6)">环境合规</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="7" onclick="selectSection(7)">风险矩阵</button>
+        <button class="nav-item w-full text-left px-3 py-2 rounded-lg text-sm font-medium" data-section="8" onclick="selectSection(8)">结论建议</button>
+      </nav>
+      <div class="mt-6 p-4 bg-slate-50 rounded-lg">
+        <p class="text-xs text-slate-600 font-medium">💡 提示</p>
+        <p class="text-xs text-slate-500 mt-1">编辑右侧内容，实时预览更新。导出时自动生成完整 DOCX。</p>
+      </div>
+    </aside>
 
     <!-- 中央：实时预览 -->
-    <div class="lg:col-span-7 bento-card p-4">
+    <main class="lg:col-span-7 bento-card p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-semibold text-slate-500">实时预览</h3>
-        <div class="flex gap-2">
-          <button onclick="downloadTemplate()" class="btn-secondary text-xs">下载模板</button>
-        </div>
+        <h2 class="text-lg font-semibold text-slate-900">👁️ 实时预览</h2>
+        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full">ATS 智能排版</span>
       </div>
-      <div id="previewContent" class="space-y-4"></div>
-    </div>
+      <div class="section-preview" id="previewArea">
+        <div class="section-title" id="previewTitle">封面</div>
+        <div class="section-content" id="previewContent">公司名称</div>
+      </div>
+    </main>
 
-    <!-- 右侧：参数与导出 -->
-    <div class="lg:col-span-3 bento-card p-4">
-      <h3 class="text-sm font-semibold text-slate-500 mb-4">报告参数</h3>
+    <!-- 右侧：编辑与导出 -->
+    <aside class="lg:col-span-3 bento-card p-6">
+      <h2 class="text-lg font-semibold text-slate-900 mb-4">✏️ 内容编辑</h2>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs text-slate-500 mb-1">公司名称</label>
-          <input type="text" id="paramCompany" class="input-field" value="AeroTech Solutions" oninput="updatePreview()">
+          <label class="block text-sm font-medium text-slate-700 mb-1">章节标题</label>
+          <input type="text" id="sectionTitle" class="input-field w-full" value="封面" oninput="updatePreview()">
         </div>
         <div>
-          <label class="block text-xs text-slate-500 mb-1">报告日期</label>
-          <input type="text" id="paramDate" class="input-field" value="2026-08-04" oninput="updatePreview()">
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">执行摘要</label>
-          <textarea id="paramSummary" class="input-field" rows="3" oninput="updatePreview()">本报告评估公司合规状况，涵盖财务、数据隐私、雇佣、环境四大领域，并提出风险缓解建议。</textarea>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">财务合规状态</label>
-          <select id="paramFinance" class="input-field" onchange="updatePreview()">
-            <option value="合规">合规</option>
-            <option value="部分合规">部分合规</option>
-            <option value="不合规">不合规</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">数据隐私状态</label>
-          <select id="paramPrivacy" class="input-field" onchange="updatePreview()">
-            <option value="合规">合规</option>
-            <option value="部分合规">部分合规</option>
-            <option value="不合规">不合规</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">雇佣合规状态</label>
-          <select id="paramEmployment" class="input-field" onchange="updatePreview()">
-            <option value="合规">合规</option>
-            <option value="部分合规">部分合规</option>
-            <option value="不合规">不合规</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-500 mb-1">环境合规状态</label>
-          <select id="paramEnvironment" class="input-field" onchange="updatePreview()">
-            <option value="合规">合规</option>
-            <option value="部分合规">部分合规</option>
-            <option value="不合规">不合规</option>
-          </select>
+          <label class="block text-sm font-medium text-slate-700 mb-1">章节内容</label>
+          <textarea id="sectionContent" class="input-field w-full h-48" oninput="updatePreview()">公司名称</textarea>
         </div>
       </div>
 
       <!-- 收银台 -->
-      <div class="mt-6 pt-4 border-t border-slate-200">
-        <h4 class="text-sm font-semibold text-slate-700 mb-3">付费导出</h4>
-        <button id="exportBtn" onclick="handleExport()" class="btn-primary w-full">导出 DOCX</button>
-        <p class="text-xs text-slate-400 mt-2 text-center">支付后解锁导出 · $9.99</p>
+      <div class="mt-8 p-4 bg-slate-900 rounded-xl text-white">
+        <h3 class="font-semibold mb-2">💳 付费导出</h3>
+        <p class="text-sm text-slate-300 mb-4">解锁 DOCX 完整交付包</p>
+        <p class="text-3xl font-bold mb-4">$9.99 <span class="text-sm font-normal text-slate-400">/ 一次性</span></p>
+        <button id="exportBtn" class="btn-primary w-full py-3 rounded-lg font-semibold" onclick="handleExport()">🔒 验签后导出</button>
+        <p class="text-xs text-slate-400 mt-3 text-center">支付回调 ?status=paid&signature=...</p>
       </div>
-    </div>
+    </aside>
   </div>
 </div>
 
 <script>
-// ===== 章节定义 =====
+// ===== 章节数据模型 =====
 const sections = [
-  { id: 'cover', name: '封面' },
-  { id: 'summary', name: '执行摘要' },
-  { id: 'company', name: '公司概况' },
-  { id: 'finance', name: '财务合规' },
-  { id: 'privacy', name: '数据隐私' },
-  { id: 'employment', name: '雇佣合规' },
-  { id: 'environment', name: '环境合规' },
-  { id: 'risk', name: '风险矩阵' },
-  { id: 'conclusion', name: '结论建议' }
+  { title: '封面', content: 'APEXWORK 企业合规报告\n2026 年度\n版本 1.0' },
+  { title: '执行摘要', content: '本报告概述公司在财务、数据隐私、雇佣、环境四大维度的合规现状与改进建议。' },
+  { title: '公司概况', content: '公司名称：APEXWORK Inc.\n注册地：美国特拉华州\n员工数：150\n成立年份：2020' },
+  { title: '财务合规', content: '遵循 GAAP 标准，年度审计由四大会计师事务所执行，无重大调整事项。' },
+  { title: '数据隐私', content: '符合 GDPR 与 CCPA 要求，建立数据保护影响评估（DPIA）流程，用户数据加密存储。' },
+  { title: '雇佣合规', content: '遵循平等就业机会（EEO）法规，制定反骚扰政策，年度合规培训覆盖率 100%。' },
+  { title: '环境合规', content: '通过 ISO 14001 认证，碳排放较去年减少 15%，废弃物回收率达 90%。' },
+  { title: '风险矩阵', content: '识别 5 项高风险、8 项中风险、12 项低风险，已制定对应缓解措施。' },
+  { title: '结论建议', content: '整体合规水平良好，建议加强供应链 ESG 审查，并引入第三方合规审计。' }
 ];
+let currentSection = 0;
 
-// ===== 初始化 =====
-function init() {
-  renderNav();
+// 选择章节
+function selectSection(index) {
+  currentSection = index;
+  document.querySelectorAll('.nav-item').forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+  });
+  document.getElementById('sectionTitle').value = sections[index].title;
+  document.getElementById('sectionContent').value = sections[index].content;
   updatePreview();
 }
 
-// ===== 渲染导航 =====
-function renderNav() {
-  const nav = document.getElementById('navList');
-  nav.innerHTML = '';
-  sections.forEach((sec, idx) => {
-    const div = document.createElement('div');
-    div.className = 'nav-item' + (idx === 0 ? ' active' : '');
-    div.textContent = sec.name;
-    div.onclick = () => {
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      div.classList.add('active');
-      // 滚动到对应预览区域
-      const el = document.getElementById('preview-' + sec.id);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-    nav.appendChild(div);
-  });
-}
-
-// ===== 更新预览 =====
+// 更新预览
 function updatePreview() {
-  const company = document.getElementById('paramCompany').value || '未命名公司';
-  const date = document.getElementById('paramDate').value || '2026-01-01';
-  const summary = document.getElementById('paramSummary').value || '';
-  const finance = document.getElementById('paramFinance').value;
-  const privacy = document.getElementById('paramPrivacy').value;
-  const employment = document.getElementById('paramEmployment').value;
-  const environment = document.getElementById('paramEnvironment').value;
-
-  const preview = document.getElementById('previewContent');
-  preview.innerHTML = `
-    <div class="preview-section" id="preview-cover">
-      <h4 class="text-lg font-bold">${company}</h4>
-      <p class="text-sm text-slate-400">ATS 合规报告 · ${date}</p>
-    </div>
-    <div class="preview-section" id="preview-summary">
-      <h4>执行摘要</h4>
-      <p>${summary}</p>
-    </div>
-    <div class="preview-section" id="preview-company">
-      <h4>公司概况</h4>
-      <p>${company} 是一家专注于航空科技的企业，致力于提供创新解决方案。</p>
-    </div>
-    <div class="preview-section" id="preview-finance">
-      <h4>财务合规</h4>
-      <p>状态：${finance}。财务报告符合 GAAP 标准，审计流程完善。</p>
-    </div>
-    <div class="preview-section" id="preview-privacy">
-      <h4>数据隐私</h4>
-      <p>状态：${privacy}。符合 GDPR 要求，用户数据加密存储。</p>
-    </div>
-    <div class="preview-section" id="preview-employment">
-      <h4>雇佣合规</h4>
-      <p>状态：${employment}。雇佣政策符合欧美劳动法，无歧视行为。</p>
-    </div>
-    <div class="preview-section" id="preview-environment">
-      <h4>环境合规</h4>
-      <p>状态：${environment}。碳排放达标，环保认证齐全。</p>
-    </div>
-    <div class="preview-section" id="preview-risk">
-      <h4>风险矩阵</h4>
-      <p>主要风险：市场波动、供应链中断、数据泄露。缓解措施已制定。</p>
-    </div>
-    <div class="preview-section" id="preview-conclusion">
-      <h4>结论建议</h4>
-      <p>整体合规状况良好，建议持续监控风险并定期更新合规策略。</p>
-    </div>
-  `;
-}
-
-// ===== 重置字段 =====
-function resetFields() {
-  document.getElementById('paramCompany').value = 'AeroTech Solutions';
-  document.getElementById('paramDate').value = '2026-08-04';
-  document.getElementById('paramSummary').value = '本报告评估公司合规状况，涵盖财务、数据隐私、雇佣、环境四大领域，并提出风险缓解建议。';
-  document.getElementById('paramFinance').value = '合规';
-  document.getElementById('paramPrivacy').value = '合规';
-  document.getElementById('paramEmployment').value = '合规';
-  document.getElementById('paramEnvironment').value = '合规';
-  updatePreview();
-}
-
-// ===== 下载模板 =====
-function downloadTemplate() {
-  const zip = new JSZip();
-  const doc = zip.folder('ats-report');
-  doc.file('README.txt', 'ATS 合规报告模板 - 使用 APEXWORK 编辑器生成');
-  zip.generateAsync({ type: 'blob' }).then(content => {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(content);
-    link.download = 'ats-report-template.zip';
-    link.click();
-  });
+  const title = document.getElementById('sectionTitle').value;
+  const content = document.getElementById('sectionContent').value;
+  document.getElementById('previewTitle').textContent = title;
+  document.getElementById('previewContent').textContent = content;
+  sections[currentSection].title = title;
+  sections[currentSection].content = content;
 }
 
 // ===== Ed25519 验签 =====
@@ -246,44 +145,73 @@ function verifyEd25519Signature() {
     localStorage.setItem('apex_paid', 'true');
     return true;
   }
-  return false;
+  return localStorage.getItem('apex_paid') === 'true';
 }
 
-// ===== 导出处理 =====
+// ===== 导出 DOCX =====
 function handleExport() {
   if (!verifyEd25519Signature()) {
-    alert('⚠️ 请先完成 $9.99 支付，验签通过后解锁导出。');
+    alert('⚠️ 未检测到有效支付签名。请完成 $9.99 支付后重试。');
     return;
   }
-  const company = document.getElementById('paramCompany').value || '未命名公司';
-  const date = document.getElementById('paramDate').value || '2026-01-01';
-  const summary = document.getElementById('paramSummary').value || '';
-  const finance = document.getElementById('paramFinance').value;
-  const privacy = document.getElementById('paramPrivacy').value;
-  const employment = document.getElementById('paramEmployment').value;
-  const environment = document.getElementById('paramEnvironment').value;
+  exportDOCX();
+}
 
+function exportDOCX() {
   const zip = new JSZip();
-  const doc = zip.folder('ats-report');
-  doc.file('cover.txt', `${company}\nATS 合规报告\n${date}`);
-  doc.file('summary.txt', `执行摘要\n${summary}`);
-  doc.file('finance.txt', `财务合规\n状态：${finance}`);
-  doc.file('privacy.txt', `数据隐私\n状态：${privacy}`);
-  doc.file('employment.txt', `雇佣合规\n状态：${employment}`);
-  doc.file('environment.txt', `环境合规\n状态：${environment}`);
-  doc.file('risk.txt', '风险矩阵\n主要风险：市场波动、供应链中断、数据泄露。缓解措施已制定。');
-  doc.file('conclusion.txt', '结论建议\n整体合规状况良好，建议持续监控风险并定期更新合规策略。');
-
-  zip.generateAsync({ type: 'blob' }).then(content => {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(content);
-    link.download = 'ats-compliance-report.zip';
-    link.click();
+  const doc = zip.folder('word');
+  doc.file('document.xml', generateDocumentXML());
+  doc.file('_rels/document.xml.rels', generateRelsXML());
+  zip.file('[Content_Types].xml', generateContentTypesXML());
+  zip.file('_rels/.rels', generateRootRelsXML());
+  zip.generateAsync({ type: 'blob' }).then((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'APEXWORK-ATS-Compliance-Report.docx';
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('✅ DOCX 已生成，感谢购买！');
   });
 }
 
-// ===== 启动 =====
-init();
+function generateDocumentXML() {
+  let body = '';
+  sections.forEach((sec) => {
+    body += `<w:p><w:pPr><w:rPr><w:b/><w:sz w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t>${sec.title}</w:t></w:r></w:p>`;
+    body += `<w:p><w:r><w:t>${sec.content.replace(/\n/g, '</w:t></w:r></w:p><w:p><w:r><w:t>')}</w:t></w:r></w:p>`;
+  });
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:body>${body}</w:body>
+  </w:document>`;
+}
+
+function generateRelsXML() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  </Relationships>`;
+}
+
+function generateContentTypesXML() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+    <Default Extension="xml" ContentType="application/xml"/>
+    <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  </Types>`;
+}
+
+function generateRootRelsXML() {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  </Relationships>`;
+}
+
+// ===== 初始化 =====
+selectSection(0);
 </script>
 </body>
 </html>
