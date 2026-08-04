@@ -4,7 +4,7 @@ on:
   schedule:
     # 每天早晨和傍晚由 GitHub 云服务器自动运行一次 (无须用户开机开网页)
     - cron: '0 0,12 * * *'
-  workflow_dispatch: # 也支持你在仓库后台点按钮立刻运行
+  workflow_dispatch: # 支持你在后台手动触发
 
 jobs:
   auto-evolve:
@@ -13,18 +13,73 @@ jobs:
       - name: 1. 自动拉取当前全站代码快照
         uses: actions/checkout@v4
 
-      - name: 2. 运行 AI 极客逻辑与大厂排版自优化脚本
+      - name: 2. 启动 12 大智能体部门协作内核与 RLFF 自进化
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
-          echo "🤖 启动云端 AI 算力池巡航，自主对比全球商用路演规范..."
-          # 这里可以调用 python 脚本或 curl 让 API 审查并自动提交精修代码
-          echo "- [EVO-RECORD | $(date '+%Y-%m-%d %H:%M')]: 云端服务器 7x24 自动巡航已扫描并优化模板细节。" >> MEMORY.md
+          node -e '
+          const fs = require("fs");
           
+          async function runSwarmEvolve() {
+            const apiKey = process.env.DEEPSEEK_API_KEY;
+            if (!apiKey) {
+              console.log("提示: 未检测到 DEEPSEEK_API_KEY，跳过大模型自建，仅执行巡检。");
+              return;
+            }
+
+            // 读取天网宪法与记事
+            const constitution = fs.existsSync("AI-EMPIRE-CONSTITUTION.md") ? fs.readFileSync("AI-EMPIRE-CONSTITUTION.md", "utf8") : "";
+            const memory = fs.existsSync("MEMORY.md") ? fs.readFileSync("MEMORY.md", "utf8") : "";
+
+            const prompt = `你是 APEXWORK AI 员工天网中枢（12大部门协作引擎）。
+请严格遵守《天网宪法 V5.0》，针对我们的商务三件套（PPT/Excel/Word）商城进行离线巡航优化。
+请审查当前记忆库：\n${memory.slice(-1500)}\n
+请输出一个简短的进化战报，如果发现 UI 引导语或排版可以转化率更高，请严格以格式：
+===FILE: 要修改的文件名===
+<新文件内容>
+来输出你要修正的模板代码。如果本次仅优化转化文案，可只输出战报。`;
+
+            const res = await fetch("https://api.deepseek.com/chat/completions", {
+              method: "POST",
+              headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+              body: JSON.stringify({
+                model: "deepseek-chat",
+                messages: [
+                  { role: "system", content: constitution.slice(0, 2000) },
+                  { role: "user", content: prompt }
+                ],
+                temperature: 0.4
+              })
+            });
+
+            if (!res.ok) throw new Error("API 响应失败: " + res.statusText);
+            const data = await res.json();
+            const content = data.choices[0].message.content;
+
+            // 自动解析并无损落盘目标文件
+            const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
+            let match;
+            while ((match = fileRegex.exec(content)) !== null) {
+              const targetPath = match[1].trim();
+              const newCode = match[2].trim().replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "");
+              if (targetPath && fs.existsSync(targetPath)) {
+                fs.writeFileSync(targetPath, newCode, "utf8");
+                console.log(`✅ [主动产品部/施工工程部]: 云端已优化写入文件 ${targetPath}`);
+              }
+            }
+
+            // 追加记事
+            const now = new Date().toISOString().replace("T", " ").slice(0, 16);
+            fs.appendFileSync("MEMORY.md", `\n- [EVO-RECORD | ${now}]: 7x24 云端永动机完成轮巡：大模型自主审查优化完成。`, "utf8");
+          }
+          
+          runSwarmEvolve().catch(err => console.error("内核执行异常:", err));
+          '
+
       - name: 3. 自动将新代码快照推向主线上线
         run: |
           git config --global user.name "AI-Autonomous-CTO"
           git config --global user.email "bot@apexwork.io"
           git add -A
-          git commit -m "🤖 Autonomous Cloud Evolve: Auto-polished store templates & UI" || echo "No changes"
+          git commit -m "🤖 Autonomous Cloud Evolve: 12-Dept Swarm optimized store UI & RLFF records" || echo "No changes"
           git push origin main
