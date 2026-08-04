@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V25 真·全量回滚 + @部门专属人设对话)</title>
+    <title>ApexWork AI 驾驶舱 (V26 多部门 Token 语块协同引擎)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -17,6 +17,22 @@
         .themed-inner { background-color: var(--bg-inner); border-color: var(--border-color); }
         .themed-text { color: var(--text-main); }
         .themed-subtext { color: var(--text-sub); }
+
+        /* 👑 Token 语块胶囊样式 */
+        .dept-token {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            margin: 0 3px;
+            user-select: none;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-4 font-sans">
@@ -26,7 +42,7 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V25 真·全量回滚 + @人设对话</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V26 多部门 Token 语块协同</span>
             <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -55,7 +71,7 @@
         <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">💾 保存授权</button>
     </div>
 
-    <!-- 👑 真·全量回滚弹窗：拉取该 Commit 下的所有文件树并一键整库覆写 -->
+    <!-- 真·全库回退弹窗 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="themed-card border max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-3">
@@ -68,15 +84,15 @@
         </div>
     </div>
 
-    <!-- 9 大部门按键：点击后自动 @ 注入发令台并切换专属对话人设 -->
+    <!-- 9 大部门按键：点击后支持连续追加 @ 语块 -->
     <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
         <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5 text-xs font-mono">
             <div class="flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (点击自动 @ 专属定向发单并激活部门人设对话):</span>
+                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (点击可连续追加多个 @ 语块进行多部门协同会商):</span>
                 <span id="activeDeptLabel" class="text-indigo-400 font-bold">[当前视图: 全体部门]</span>
             </div>
             <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-0.5 rounded transition">
-                ↺ 恢复全体视图
+                ↺ 清空关联视图
             </button>
         </div>
         <div class="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-9 gap-1.5 text-center font-mono">
@@ -140,20 +156,25 @@
                 <div id="bugAlertBanner" class="mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono" data-status="green">
                     <div class="flex items-center gap-2">
                         <span class="text-emerald-400 font-bold">✅ [QA 自动化检查]:</span>
-                        <span class="text-emerald-300">系统运行平稳，全站无 404 死链，各部门专员在线对话中。</span>
+                        <span class="text-emerald-300">系统运行平稳，全站无 404 死链，多部门 Token 协同引擎在线。</span>
                     </div>
                     <span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>
                 </div>
 
                 <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
-                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台 (支持与对应 @部门 进行专属人设对话)</span>
+                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台 (支持多部门 Token 胶囊连续 @ 与独立语块点删)</span>
                     <span class="text-[10px] font-mono themed-subtext">快捷触发: <strong class="themed-text">Ctrl + Enter</strong></span>
                 </div>
+                
+                <!-- 👑 富文本 Token 语块输入框 -->
                 <div class="mb-2.5">
-                    <textarea id="cmd" rows="2" placeholder="输入你想对该部门说的话；或直接点击上方部门按钮自动带 @ 进来对话..." class="w-full themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
+                    <div id="cmd" contenteditable="true" 
+                         class="w-full h-24 themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner overflow-y-auto custom-scrollbar"
+                         placeholder="在此输入指示；或点击上方部门按钮连续追加 @ 语块..."></div>
                 </div>
+
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 与 @部门 深度人设对话 (V25 引擎)</span>
+                    <span>🚀 立即发车 / 多部门 Token 协同群聊 (V26 引擎)</span>
                 </button>
             </div>
 
@@ -163,7 +184,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V25 在线。点击上方部门按钮，不仅会绑定发令台，还能与该部门负责人进行 100% 垂直人设对话。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V26 在线。输入框支持点选多部门生成胶囊 Token，按 Backspace 会将整个部门语块作为整体抹除。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -235,24 +256,48 @@
             document.getElementById("rollbackModal").classList.add("hidden");
         }
 
+        // 👑 连续追加 Token 语块交互核心逻辑
         function inspectDept(deptName, btnEl) {
-            if (activeFilterDept === deptName) {
-                resetDeptFilter();
-                return;
-            }
-
             activeFilterDept = deptName;
             document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-500/10"));
             btnEl.classList.add("ring-2", "ring-indigo-500", "bg-indigo-500/10");
             
-            document.getElementById("activeDeptLabel").innerText = `[当前视图: ${deptName}]`;
+            document.getElementById("activeDeptLabel").innerText = `[主责聚焦: ${deptName}]`;
             
-            const cmdInput = document.getElementById("cmd");
-            const existingText = cmdInput.value.replace(/^@【[^】]+】\s*/, "");
-            cmdInput.value = `@【${deptName}】 ${existingText}`;
-            cmdInput.focus();
+            const cmdBox = document.getElementById("cmd");
+            cmdBox.focus();
 
-            appendLog(`🎯 董事长已聚焦【${activeFilterDept}】，可直接与该部门进行人设对话。`, "text-indigo-400 font-bold");
+            // 创建不可分割的胶囊 DOM 元素 (Token Pill)
+            const tokenSpan = document.createElement("span");
+            tokenSpan.className = "dept-token";
+            tokenSpan.contentEditable = "false"; // 设为不可独立编辑，确保整体视为一个语块
+            tokenSpan.setAttribute("data-dept", deptName);
+            tokenSpan.innerText = `@【${deptName}】`;
+
+            // 在光标处或末尾插入胶囊，并带一个空格方便接着打字
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0 && cmdBox.contains(selection.anchorNode)) {
+                const range = selection.getRangeAt(0);
+                range.collapse(true);
+                range.insertNode(tokenSpan);
+                
+                // 插入一个跟随的空白文本节点，方便用户直接输入后续文字
+                const spaceNode = document.createTextNode(" ");
+                tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
+                
+                // 移动光标到空格后
+                range.setStartAfter(spaceNode);
+                range.setEndAfter(spaceNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+                cmdBox.appendChild(tokenSpan);
+                cmdBox.appendChild(document.createTextNode(" "));
+                // 滚动到底部
+                cmdBox.scrollTop = cmdBox.scrollHeight;
+            }
+
+            appendLog(`🎯 董事长已在控制台追加【${deptName}】协同语块。`, "text-indigo-400 font-bold");
             loadHistoryFromMemory();
         }
 
@@ -260,13 +305,37 @@
             activeFilterDept = "";
             document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-500/10"));
             document.getElementById("activeDeptLabel").innerText = `[当前视图: 全体部门]`;
-            
-            const cmdInput = document.getElementById("cmd");
-            cmdInput.value = cmdInput.value.replace(/^@【[^】]+】\s*/, "");
-
-            appendLog(`🌐 已重置恢复全体部门视图。`, "text-slate-400");
+            document.getElementById("cmd").innerHTML = "";
+            appendLog(`🌐 已清空控制台语块及全局过滤。`, "text-slate-400");
             loadHistoryFromMemory();
         }
+
+        // 👑 监听键盘：实现“按 Backspace 时，如果光标紧挨着 Token 语块，则整块抹除”
+        document.addEventListener("DOMContentLoaded", () => {
+            const cmdBox = document.getElementById("cmd");
+            if (cmdBox) {
+                cmdBox.addEventListener("keydown", function(e) {
+                    if (e.key === "Backspace") {
+                        const selection = window.getSelection();
+                        if (selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            // 检查光标前一个节点是不是 dept-token 胶囊
+                            let prevNode = range.startContainer;
+                            if (prevNode.nodeType === Node.TEXT_NODE && range.startOffset === 0) {
+                                prevNode = prevNode.previousSibling;
+                            } else if (prevNode.nodeType === Node.ELEMENT_NODE && range.startOffset > 0) {
+                                prevNode = prevNode.childNodes[range.startOffset - 1];
+                            }
+
+                            if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains("dept-token")) {
+                                e.preventDefault();
+                                prevNode.remove(); // 瞬间整块抹除语块！
+                            }
+                        }
+                    }
+                });
+            }
+        });
 
         function getRealStandardTime() {
             const d = new Date();
@@ -322,15 +391,13 @@
             } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-6">异常：${err.message}</div>`; }
         }
 
-        // 👑 终极核心：真·全库一键回退（获取目标 Commit 的完整文件树，逐一把所有文件原封不动覆写到当前主分支！）
         async function revertToSelectedCommit(targetSha, shortSha) {
-            if (!confirm(`⏳ 确定要将整座仓库的所有文件硬核回滚到历史版本 [#${shortSha}] 吗？此操作将彻底抹掉之后的错误修改！`)) return;
+            if (!confirm(`⏳ 确定要将整座仓库的所有文件硬核回滚到历史版本 [#${shortSha}] 吗？`)) return;
             closeRollbackModal();
             try {
                 const keys = getKeys();
                 appendLog(`⏳ 正在获取历史版本 [#${shortSha}] 的全库文件树清单...`, "text-amber-500");
 
-                // 1. 获取目标 commit 的 tree
                 const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
                 if (!treeRes.ok) throw new Error("无法拉取历史版本的文件目录树");
                 const treeData = await treeRes.json();
@@ -338,19 +405,13 @@
                 const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
                 appendLog(`📦 扫描到历史版本共有 ${filesToRestore.length} 个文件需要回滚还原。`, "text-indigo-400");
 
-                // 2. 逐个文件下载其在历史版本中的原始内容，并强制 PUT 覆盖到当前主分支
                 for (const fileObj of filesToRestore) {
                     appendLog(`🔄 还原文件: ${fileObj.path} ...`, "text-slate-400");
-                    
-                    // 获取文件内容
                     const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
                     const fileJson = await fileContentRes.json();
-                    const rawContentBase64 = fileJson.content; // 已经是 base64
-
-                    // 获取当前主分支该文件的最新 sha（如果存在）
+                    const rawContentBase64 = fileJson.content;
                     const currentFile = await getGithubFileSafe(fileObj.path, keys.gh);
 
-                    // 强行写入
                     const payload = {
                         message: `⏳ VETO: True rollback whole repo to #${shortSha} for ${fileObj.path}`,
                         content: rawContentBase64
@@ -365,13 +426,12 @@
                     if (!putRes.ok) throw new Error(`还原文件 ${fileObj.path} 失败`);
                 }
 
-                // 3. 写入战报记忆
                 const nowStr = getRealStandardTime();
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长执行真·全库回退，整仓完美还原至快照 #${shortSha}。`;
                 await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: True Rollback to #${shortSha}`, keys.gh);
 
-                appendLog(`✅ 真·全库回退成功！整座仓库已完美复原至 [#${shortSha}]，GitHub Pages 即将自动完成刷新。`, "text-emerald-500 font-bold");
+                appendLog(`✅ 真·全库回退成功！整座仓库已完美复原至 [#${shortSha}]。`, "text-emerald-500 font-bold");
                 await loadHistoryFromMemory();
             } catch(err) { appendLog("❌ 全库回退异常: " + err.message, "text-rose-500"); }
         }
@@ -508,7 +568,8 @@
                 if (latestRun.conclusion === "failure") {
                     isAutoHealing = true;
                     const errDetail = await fetchRunErrorLogs(latestRun.id);
-                    document.getElementById("cmd").value = `【@缺陷与QA质检部 紧急自愈】：流水线报警："${errDetail}"。请立刻排查并仅修复受影响的源码！`;
+                    const cmdBox = document.getElementById("cmd");
+                    cmdBox.innerHTML = `<span class="dept-token" contenteditable="false" data-dept="缺陷与QA质检部">@【缺陷与QA质检部】</span> 紧急自愈：流水线报警 "${errDetail}"。`;
                     try {
                         await triggerSwarmAutonomousAction();
                     } finally {
@@ -520,33 +581,30 @@
             if (!qaMonitorInterval) qaMonitorInterval = setInterval(loopTask, 30000);
         }
 
-        // 👑 核心升级：赋予每个部门独特的“垂直人设 Prompt”，实现真正的与对应部门深度专属对话
+        // 👑 多部门协同发车引擎：提取输入框中的所有 Token 胶囊，解析出参与会商的多部门
         async function triggerSwarmAutonomousAction() {
             const btn = document.getElementById("runBtn");
-            const cmdInput = document.getElementById("cmd");
-            const cmd = cmdInput.value.trim() || "【@大脑中枢】：执行例行巡检。";
+            const cmdBox = document.getElementById("cmd");
+            
+            // 从富文本框中提取所有被 @ 的部门胶囊
+            const tokenElements = cmdBox.querySelectorAll(".dept-token");
+            let targetDepts = [];
+            tokenElements.forEach(el => {
+                const dept = el.getAttribute("data-dept");
+                if (dept && !targetDepts.includes(dept)) targetDepts.push(dept);
+            });
 
-            const deptMatch = cmd.match(/^@【([^】]+)】/);
-            const targetDept = deptMatch ? deptMatch[1] : (activeFilterDept || "大脑中枢");
+            // 如果没点胶囊，默认取当前过滤部门或大脑中枢
+            if (targetDepts.length === 0) {
+                targetDepts = [activeFilterDept || "大脑中枢"];
+            }
 
-            // 为 9 大部门定制专属人设和专业背景
-            const deptPersonas = {
-                "大脑中枢": "你是 APEXWORK 统领全局的【大脑中枢】总控。负责项目整体调度、任务拆解与全局战略把控。",
-                "缺陷与QA质检部": "你是 APEXWORK 严苛的【缺陷与QA质检部】专家。负责代码拦截、404死链排查、页面报错自愈与质量门槛防线。",
-                "主动产品部": "你是 APEXWORK 敏锐的【主动产品部】总监。负责产品体验规划、盲排优化、交互所见即所得与业务闭环补坑。",
-                "施工工程部": "你是 APEXWORK 顶级的【施工工程部】首席架构师。擅长 HTML/Tailwind/JS 全栈代码重写、原子级落地与 1 秒极致响应。",
-                "视觉策划部": "你是 APEXWORK 优雅的【视觉策划部】UI总监。专注于少字多图排版、Bento 风格卡片、高级配色与沉浸式网页美学。",
-                "审核质量部": "你是 APEXWORK 严谨的【审核质量部】主管。把控 85 分合规门槛、代码规范、文档排版与审计标准。",
-                "转化销售部": "你是 APEXWORK 敏锐的【转化销售部】负责人。专注于 $9.99 商业授权收银闭环、ROI 矩阵测算、转化率与付费漏斗优化。",
-                "推广营销部": "你是 APEXWORK 活跃的【推广营销部】专家。擅长海外公域流量获取、社群推广、SEO 增长与曝光策略。",
-                "国际法务部": "你是 APEXWORK 资深的【国际法务部】顾问。负责 ATS 智能排版盲测、GDPR 隐私合规、Ed25519 验签与数据安全。"
-            };
-
-            const systemPersona = deptPersonas[targetDept] || "你是 APEXWORK 企业智能体蜂群专员。";
+            const rawText = cmdBox.innerText.replace(/@【[^】]+】/g, "").trim() || "请各大主责部门汇报近期工作进展。";
+            const primaryDept = targetDepts[0];
 
             btn.disabled = true;
-            btn.innerHTML = `<span>⚙️ 【${targetDept}】正在进行垂直人设对话与执行...</span>`;
-            appendLog(`🧠 [发单中枢]：已精准唤醒【 ${targetDept} 】（人设已加载），正在开始对话...`);
+            btn.innerHTML = `<span>⚙️ 正在呼叫 [${targetDepts.join(", ")}] 多部门协同会商...</span>`;
+            appendLog(`🧠 [发单中枢]：已精准锁定多方协同部门：【 ${targetDepts.join("、")} 】...`);
 
             try {
                 const keys = getKeys();
@@ -557,36 +615,36 @@
                 
                 const treeSummary = repoTree.join("\n");
 
-                const prompt = `${systemPersona}
-当前项目物理文件树：
+                const prompt = `你是 APEXWORK 企业智能体蜂群中枢。
+本次参与协同会商的主责部门：【${targetDepts.join(", ")}】
+项目物理文件树：
 ${treeSummary}
 
 【近期战报记忆】：
 ${memoryFile.content || "无"}
 
-【董事长（你正在对话的上级）提出的指示或提问】：
-"${cmd}"
+【董事长（协同发单）的指令】：
+"${rawText}"
 
 【极重要硬规（绝对防错）】：
-1. 你现在代表【${targetDept}】直接与董事长进行专业、垂直、符合你部门人设的对话或答复。
-2. 如果董事长的指令仅仅是提问、闲聊或发表意见，请以该部门负责人的口吻进行详尽、专业、有深度的主观汇报与解答，**绝不准擅自盲目去修改无关的代码文件**！
-3. 只有当董事长明确下达了“修改/重写某某页面”的代码任务时，才允许输出对应的 ===FILE: 文件名=== 代码块。
-4. 必须输出 ===SWARM_LOG=== 开始的部门回复战报，和 ===NEW_MEMORY=== 提炼的带有 [EVO-RECORD | 部门名称]: 的记忆。
+1. 你代表上述被 @ 的部门共同进行专业、深度的多方对话与协同汇报。
+2. 绝不准擅自修改与指令无关的文件！只有当董事长明确下达修改代码任务时，才允许输出 ===FILE: 文件名=== 块。
+3. 必须输出 ===SWARM_LOG=== 开始的协同战报，和 ===NEW_MEMORY=== 提炼的带有 [EVO-RECORD | 协同部门]: 的记忆。
 
 格式结构标准样例：
 ===SWARM_LOG===
-<【${targetDept}】负责人向董事长做出的专业汇报与对话答复>
+<多部门联合向董事长做出的专业汇报与答复>
 ===NEW_MEMORY===
-- [EVO-RECORD | ${targetDept}]: <一句话简短提炼对话核心>
-===FILE: 目标文件名.html=== (若为纯对话或无需改代码可省略此块)`;
+- [EVO-RECORD | ${primaryDept}]: <一句话简短提炼>
+===FILE: 目标文件名.html=== (若纯对话可省略此块)`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [{ role: "system", content: systemPersona }, { role: "user", content: prompt }],
-                        temperature: 0.5
+                        messages: [{ role: "system", content: "你是遵守规范的多部门蜂群协同智能体。" }, { role: "user", content: prompt }],
+                        temperature: 0.4
                     })
                 });
 
@@ -598,15 +656,13 @@ ${memoryFile.content || "无"}
 
                 if (memParts.length < 2) throw new Error("模型响应未带记忆块");
 
-                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已完成专属对话汇报。";
+                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已完成多部门联合会商。";
                 const rawMemoryLine = memParts[1].split("===FILE:")[0].trim();
 
-                appendLog(`🤖 【${targetDept} 专属回复】:\n${swarmLogText}`, "text-emerald-400 font-bold");
+                appendLog(`🤖 【多部门联合协同回复】:\n${swarmLogText}`, "text-emerald-400 font-bold");
 
                 const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
                 let match;
-                let filesWritten = 0;
-
                 while ((match = fileRegex.exec(aiAnswer)) !== null) {
                     const targetFilePath = match[1].trim().replace(/[^a-zA-Z0-9_\-\.\/]/g, "");
                     let newFileContent = match[2].trim().replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
@@ -614,23 +670,22 @@ ${memoryFile.content || "无"}
 
                     appendLog(`📍 [定向落盘]: =>【 ${targetFilePath} 】...`, "text-indigo-400 font-bold");
                     const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 [${targetDept}]: ${targetFilePath}`, keys.gh);
+                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 [协同会商]: ${targetFilePath}`, keys.gh);
                     appendLog(`✅ 文件 [ ${targetFilePath} ] 更新成功！`, "text-emerald-500");
-                    filesWritten++;
                 }
 
-                const cleanTimestampedLine = stripAndEnforceRealTime(`- [EVO-RECORD | ${targetDept}]: ` + rawMemoryLine.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, ""));
+                const cleanTimestampedLine = stripAndEnforceRealTime(`- [EVO-RECORD | ${targetDepts.join("+")}]: ` + rawMemoryLine.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, ""));
                 const updatedMemory = (memoryFile.content || "") + "\n" + cleanTimestampedLine;
-                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory [${targetDept}]`, keys.gh);
+                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory [${targetDepts.join("+")}]`, keys.gh);
 
-                appendLog(`🏆 【${targetDept}】对话汇报完毕！`, "text-emerald-400 font-black");
-                cmdInput.value = "";
+                appendLog(`🏆 多部门联合会商圆满交付！`, "text-emerald-400 font-black");
+                cmdBox.innerHTML = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ 对话协同异常: " + err.message, "text-rose-500");
+                appendLog("❌ 协同会商异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 与 @部门 深度人设对话 (V25 引擎)</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V26 引擎)</span>";
             }
         }
 
