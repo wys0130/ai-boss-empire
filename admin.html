@@ -322,13 +322,17 @@
             } catch(err) { appendLog("❌ 否决异常: " + err.message, "text-rose-500"); }
         }
 
-        function formatStandardTime(dateObj) {
+        // ==========================================
+        // 👑 1. 真实本地时钟标准解析：不再出现倒推时间与时钟错乱
+        // ==========================================
+        function formatStandardTime(dateObj = new Date()) {
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
             const d = String(dateObj.getDate()).padStart(2, '0');
             const hh = String(dateObj.getHours()).padStart(2, '0');
             const mm = String(dateObj.getMinutes()).padStart(2, '0');
-            return `${y}-${m}-${d} ${hh}:${mm}`;
+            const ss = String(dateObj.getSeconds()).padStart(2, '0');
+            return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
         }
 
         async function loadHistoryFromMemory() {
@@ -354,7 +358,7 @@
                 lines.reverse().forEach((line, idx) => {
                     const isLatest = idx === 0;
                     const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})/);
-                    const timeStr = exactDateMatch ? exactDateMatch[1] : formatStandardTime(new Date(Date.now() - (idx * 180 * 60 * 1000)));
+                    const timeStr = exactDateMatch ? exactDateMatch[1] : formatStandardTime(new Date());
                     let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
 
                     let cardBorder = isLatest ? "border-emerald-500/60 themed-inner shadow-md ring-1 ring-emerald-500/20" : "border-gray-500/20 themed-inner opacity-75";
@@ -510,9 +514,103 @@ ${memoryFile.content || "无"}
             }
         }
 
+        // ==========================================
+        // 👑 2. 核心大招：QA 监工自愈闭环 (Auto-Heal Closed Loop)
+        // ==========================================
+        let qaMonitorInterval = null;
+        let isAutoHealing = false;
+
+        async function checkLatestQARun() {
+            try {
+                const keys = getKeys();
+                const url = `https://api.github.com/repos/${REPO}/actions/runs?per_page=1`;
+                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data.workflow_runs && data.workflow_runs[0] ? data.workflow_runs[0] : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function fetchRunErrorLogs(runId) {
+            try {
+                const keys = getKeys();
+                const url = `https://api.github.com/repos/${REPO}/actions/runs/${runId}/jobs`;
+                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
+                const data = await res.json();
+                if (!data.jobs || data.jobs.length === 0) return "流水线异常退出";
+                
+                const failedJob = data.jobs.find(j => j.conclusion === "failure");
+                if (!failedJob) return "持续集成未通过";
+                
+                const failedStep = failedJob.steps.find(s => s.conclusion === "failure");
+                return `[作业: ${failedJob.name}] 失败步骤 -> ${failedStep ? failedStep.name : '物理链接或语法校验异常'}`;
+            } catch (e) {
+                return "无法获取构建异常堆栈";
+            }
+        }
+
+        async function startQAGuardLoop() {
+            appendLog("🛡️ [QA 监工总管在线]：正在实时监控 GitHub Actions 流水线通过状态...", "text-indigo-400 font-bold");
+            
+            async function loopTask() {
+                if (isAutoHealing) return;
+                
+                const latestRun = await checkLatestQARun();
+                if (!latestRun) return;
+
+                if (latestRun.status !== "completed") {
+                    appendLog(`⏳ [QA 状态] 当前部署流水线 [#${latestRun.run_number}] 仍在构建扫描中...`, "text-yellow-500");
+                    return;
+                }
+
+                if (latestRun.conclusion === "success") {
+                    const statusBadge = document.getElementById("qaStatusBadge");
+                    if (statusBadge) statusBadge.innerHTML = `<span class="text-emerald-400 font-bold">✅ QA GREEN (#${latestRun.run_number})</span>`;
+                    return;
+                }
+
+                // 👑 如果流水线失败了（Failure）——立即自动触发 AI 纠错闭环！
+                if (latestRun.conclusion === "failure") {
+                    isAutoHealing = true;
+                    appendLog(`❌ [QA 警报触发]：检测到发布流水线 [#${latestRun.run_number}] 拦截报红！正在调取具体日志...`, "text-rose-500 font-bold");
+                    
+                    const errDetail = await fetchRunErrorLogs(latestRun.id);
+                    appendLog(`🐞 [异常堆栈获取]：${errDetail}`, "text-rose-400");
+                    
+                    const fixCommand = `【审核质量部 + 施工工程部极客自愈紧急单】：
+自动监工系统捕获到最新 GitHub Actions 流水线报错："${errDetail}"。
+请立即自查可能导致 404 的文件名（严格遵守 index.html, editor.html, excel-editor.html, word-editor.html 的物理落地标准）以及 JS 语法报错。
+必须输出经过彻底修正的 ===FILE: 报错文件名=== 代码块，彻底消灭 CI 构建红条！`;
+
+                    document.getElementById("cmd").value = fixCommand;
+                    appendLog("🚀 [QA 唤醒蜂群]：已把编译错误反喂给大模型，正在静默生成新修复代码...", "text-amber-400 font-bold");
+                    
+                    try {
+                        await triggerSwarmAutonomousAction();
+                        appendLog("🛠️ [修复推送完成]：新代码已推往 GitHub，等待下次流水线执行转绿！", "text-emerald-400");
+                    } catch (healErr) {
+                        appendLog("❌ [自愈重试异常]：" + healErr.message, "text-rose-500");
+                    } finally {
+                        isAutoHealing = false;
+                    }
+                }
+            }
+
+            loopTask();
+            if (!qaMonitorInterval) {
+                qaMonitorInterval = setInterval(loopTask, 30000);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initAdminTheme();
-            if (localStorage.getItem("APEX_GH_TOKEN")) loadHistoryFromMemory();
+            if (localStorage.getItem("APEX_GH_TOKEN")) {
+                loadHistoryFromMemory();
+                // 👑 页面已授权成功，主动开启 30 秒无人工 QA 巡检与闭环自愈
+                startQAGuardLoop();
+            }
             document.getElementById("cmd").addEventListener("keydown", function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); triggerSwarmAutonomousAction(); }
             });
