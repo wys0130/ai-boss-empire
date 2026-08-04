@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEXWORK · Excel 财务模型编辑器 (WYSIWYG Pro)</title>
+<title>APEXWORK · Excel 全量矩阵直编财务模型 (WYSIWYG Pro)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -15,15 +15,16 @@
   .kpi-card { border-left: 4px solid #0f172a; }
   .btn-primary { background: #0f172a; color: #ffffff; transition: all 0.2s; }
   .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
-  .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
   .input-field { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; transition: all 0.2s; }
   .input-field:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
   .table-cell { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: right; font-size: 0.875rem; }
   .table-header { background: #f8fafc; font-weight: 600; text-align: center; }
   .month-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
   .month-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; white-space: nowrap; }
-  [contenteditable="true"]:hover { outline: 1px dashed #0f172a; background: rgba(15,23,42,0.03); cursor: text; }
-  [contenteditable="true"]:focus { outline: 2px solid #0f172a; background: #ffffff; }
+  /* 👑 所见即所得直编高亮样式 */
+  .editable-cell { background: rgba(16, 185, 129, 0.06); color: #047857; font-weight: 700; cursor: text; transition: background 0.2s; }
+  .editable-cell:hover { background: rgba(16, 185, 129, 0.15); outline: 1px dashed #10b981; }
+  .editable-cell:focus { outline: 2px solid #10b981; background: #ffffff; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -37,12 +38,12 @@
           <span class="h-4 w-[1px] bg-slate-200"></span>
           <div>
               <h1 class="font-bold text-sm text-slate-800">Excel 财务模型编辑器</h1>
-              <p class="text-[10px] font-mono text-slate-400">12 个月滚动预测 · 表格所见即所得直编 · $9.99 导出</p>
+              <p class="text-[10px] font-mono text-slate-400">12 个月矩阵全量直编 · 动态汇总 · $9.99 导出</p>
           </div>
       </div>
       <div class="flex items-center gap-3">
           <span class="text-xs font-mono text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-bold">
-              ● 实时计算中
+              ● 全矩阵实时计算中
           </span>
           <button onclick="handleExport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
               ⚡ 立即导出 .XLSX 测算表 ($9.99)
@@ -54,7 +55,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <!-- 左侧：月份导航 -->
     <aside class="lg:col-span-2 bento-card p-4">
-      <h2 class="text-sm font-semibold text-slate-700 mb-4">📊 月份导航</h2>
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">📊 月份焦点导航</h2>
       <div class="month-nav lg:flex-col lg:overflow-visible">
         <button class="month-btn nav-item active" data-month="0" onclick="selectMonth(0)">1月</button>
         <button class="month-btn nav-item" data-month="1" onclick="selectMonth(1)">2月</button>
@@ -70,16 +71,16 @@
         <button class="month-btn nav-item" data-month="11" onclick="selectMonth(11)">12月</button>
       </div>
       <div class="mt-6 p-4 bg-slate-50 rounded-lg">
-        <p class="text-xs text-slate-600 font-medium">💡 所见即所得提示</p>
-        <p class="text-xs text-slate-500 mt-1">直接点击中央表格内的收入/成本数值可原地修改，全网 ROI 瞬间重新计算。</p>
+        <p class="text-xs text-slate-600 font-medium">💡 极客直编提示</p>
+        <p class="text-xs text-slate-500 mt-1">不仅当前焦点月份可改，连同右侧的 **Q1 汇总** 与 **全年总计** 单元格全部支持原地双击敲字直编！</p>
       </div>
     </aside>
 
-    <!-- 中央：所见即所得预览 -->
+    <!-- 中央：全矩阵可编辑预览 -->
     <main class="lg:col-span-7 bento-card p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-slate-900">📈 财务预测矩阵</h2>
-        <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-bold">WYSIWYG 激活</span>
+        <h2 class="text-lg font-semibold text-slate-900">📈 财务预测矩阵 (全量直编)</h2>
+        <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full font-bold">WYSIWYG 全局激活</span>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm" id="financeTable">
@@ -87,8 +88,8 @@
             <tr>
               <th class="table-header">项目</th>
               <th class="table-header" id="thMonth">1月</th>
-              <th class="table-header">Q1</th>
-              <th class="table-header">全年</th>
+              <th class="table-header">Q1 汇总 (可直编)</th>
+              <th class="table-header">全年总计 (可直编)</th>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -155,6 +156,8 @@
 const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 let currentMonth = 0;
 let financeData = [];
+// 额外支持 Q1 与全年汇总的手工直编覆盖偏移量
+let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
 
 function initFinanceData() {
   financeData = [];
@@ -172,50 +175,57 @@ function updateROI() {
   const fixed = parseFloat(document.getElementById('fixedCost').value) || 0;
   const varRate = parseFloat(document.getElementById('variableCostRate').value) || 0;
 
-  let totalRevenue = 0, totalCost = 0;
   for (let i = 0; i < 12; i++) {
     const revenue = 12000 * Math.pow(1 + growth/100, i);
     const cost = fixed + revenue * varRate/100;
     financeData[i] = { revenue, cost, profit: revenue - cost };
-    totalRevenue += financeData[i].revenue;
-    totalCost += financeData[i].cost;
   }
 
-  const totalProfit = totalRevenue - totalCost;
-  const grossMargin = totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue * 100) : 0;
-  const netMargin = totalRevenue > 0 ? (totalProfit / totalRevenue * 100) : 0;
+  // 重置手工覆盖以跟随公式联动
+  manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
+  recomputeKPIsAndRender();
+}
+
+// 👑 核心组件直编监听：不管是当前月、Q1还是全年，点哪里改哪里！
+function updateCellFromTable(field, scope, rawText) {
+  const val = parseFloat(rawText.replace(/[^0-9.-]/g, "")) || 0;
+  
+  if (scope === 'month') {
+    const cur = financeData[currentMonth];
+    if (field === 'revenue') cur.revenue = val;
+    if (field === 'cost') cur.cost = val;
+    cur.profit = cur.revenue - cur.cost;
+  } else if (scope === 'q1') {
+    if (field === 'revenue') manualOverrides.q1Rev = val;
+    if (field === 'cost') manualOverrides.q1Cost = val;
+  } else if (scope === 'year') {
+    if (field === 'revenue') manualOverrides.yearRev = val;
+    if (field === 'cost') manualOverrides.yearCost = val;
+  }
+
+  recomputeKPIsAndRender(false);
+}
+
+function recomputeKPIsAndRender(rebuildDom = true) {
+  let totalRevenue = 0, totalCost = 0;
+  financeData.forEach(m => { totalRevenue += m.revenue; totalCost += m.cost; });
+
+  const yearRev = manualOverrides.yearRev !== null ? manualOverrides.yearRev : totalRevenue;
+  const yearCost = manualOverrides.yearCost !== null ? manualOverrides.yearCost : totalCost;
+  const totalProfit = yearRev - yearCost;
+
+  const investment = parseFloat(document.getElementById('initialInvestment').value) || 50000;
+  const grossMargin = yearRev > 0 ? ((yearRev - yearCost) / yearRev * 100) : 0;
+  const netMargin = yearRev > 0 ? (totalProfit / yearRev * 100) : 0;
   const roi = investment > 0 ? (totalProfit / investment * 100) : 0;
-  const payback = totalProfit > 0 ? (investment / (totalProfit / 12)) : 0;
+  const payback = totalProfit > 0 ? (investment / (totalProfit / 12)) : 99;
 
   document.getElementById('kpiGrossMargin').textContent = grossMargin.toFixed(1) + '%';
   document.getElementById('kpiNetMargin').textContent = netMargin.toFixed(1) + '%';
   document.getElementById('kpiROI').textContent = roi.toFixed(1) + '%';
   document.getElementById('kpiPayback').textContent = payback.toFixed(1) + ' 月';
 
-  renderTable(true);
-}
-
-function updateCellFromTable(field, rawText) {
-  const val = parseFloat(rawText.replace(/[^0-9.-]/g, "")) || 0;
-  const cur = financeData[currentMonth];
-  if (field === 'revenue') {
-    cur.revenue = val;
-  } else if (field === 'cost') {
-    cur.cost = val;
-  }
-  cur.profit = cur.revenue - cur.cost;
-  
-  let totalRev = 0, totalCost = 0;
-  financeData.forEach(m => { totalRev += m.revenue; totalCost += m.cost; });
-  const totalProfit = totalRev - totalCost;
-  const investment = parseFloat(document.getElementById('initialInvestment').value) || 50000;
-  
-  document.getElementById('kpiGrossMargin').textContent = (totalRev > 0 ? ((totalRev - totalCost)/totalRev)*100 : 0).toFixed(1) + '%';
-  document.getElementById('kpiNetMargin').textContent = (totalRev > 0 ? (totalProfit/totalRev)*100 : 0).toFixed(1) + '%';
-  document.getElementById('kpiROI').textContent = (investment > 0 ? (totalProfit/investment)*100 : 0).toFixed(1) + '%';
-  document.getElementById('kpiPayback').textContent = (totalProfit > 0 ? (investment/(totalProfit/12)) : 99).toFixed(1) + ' 月';
-  
-  renderTable(false);
+  renderTable(rebuildDom);
 }
 
 function renderTable(rebuildHtml = true) {
@@ -223,37 +233,46 @@ function renderTable(rebuildHtml = true) {
   thMonth.textContent = months[currentMonth];
 
   const current = financeData[currentMonth];
-  const q1Revenue = financeData.slice(0,3).reduce((s,m) => s + m.revenue, 0);
-  const q1Cost = financeData.slice(0,3).reduce((s,m) => s + m.cost, 0);
-  const q1Profit = q1Revenue - q1Cost;
-  const yearRevenue = financeData.reduce((s,m) => s + m.revenue, 0);
-  const yearCost = financeData.reduce((s,m) => s + m.cost, 0);
-  const yearProfit = yearRevenue - yearCost;
+  const calcQ1Rev = financeData.slice(0,3).reduce((s,m) => s + m.revenue, 0);
+  const calcQ1Cost = financeData.slice(0,3).reduce((s,m) => s + m.cost, 0);
+  
+  const q1Rev = manualOverrides.q1Rev !== null ? manualOverrides.q1Rev : calcQ1Rev;
+  const q1Cost = manualOverrides.q1Cost !== null ? manualOverrides.q1Cost : calcQ1Cost;
+  const q1Profit = q1Rev - q1Cost;
+
+  const calcYearRev = financeData.reduce((s,m) => s + m.revenue, 0);
+  const calcYearCost = financeData.reduce((s,m) => s + m.cost, 0);
+  
+  const yearRev = manualOverrides.yearRev !== null ? manualOverrides.yearRev : calcYearRev;
+  const yearCost = manualOverrides.yearCost !== null ? manualOverrides.yearCost : calcYearCost;
+  const yearProfit = yearRev - yearCost;
 
   const tbody = document.getElementById('tableBody');
   if (rebuildHtml) {
     tbody.innerHTML = `
       <tr>
-        <td class="table-cell font-medium text-left">收入 (可点击直编)</td>
-        <td class="table-cell font-bold text-emerald-600 bg-emerald-50/40 cursor-text" contenteditable="true" onblur="updateCellFromTable('revenue', this.textContent)" id="cellRev">${current.revenue.toFixed(0)}</td>
-        <td class="table-cell">$${q1Revenue.toFixed(0)}</td>
-        <td class="table-cell">$${yearRevenue.toFixed(0)}</td>
+        <td class="table-cell font-medium text-left">收入</td>
+        <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('revenue', 'month', this.textContent)">$${current.revenue.toFixed(0)}</td>
+        <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('revenue', 'q1', this.textContent)">$${q1Rev.toFixed(0)}</td>
+        <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('revenue', 'year', this.textContent)">$${yearRev.toFixed(0)}</td>
       </tr>
       <tr>
-        <td class="table-cell font-medium text-left">成本 (可点击直编)</td>
-        <td class="table-cell font-bold text-rose-600 bg-rose-50/40 cursor-text" contenteditable="true" onblur="updateCellFromTable('cost', this.textContent)" id="cellCost">${current.cost.toFixed(0)}</td>
-        <td class="table-cell">$${q1Cost.toFixed(0)}</td>
-        <td class="table-cell">$${yearCost.toFixed(0)}</td>
+        <td class="table-cell font-medium text-left">成本</td>
+        <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('cost', 'month', this.textContent)">$${current.cost.toFixed(0)}</td>
+        <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('cost', 'q1', this.textContent)">$${q1Cost.toFixed(0)}</td>
+        <td class="table-cell editable-cell" contenteditable="true" onblur="updateCellFromTable('cost', 'year', this.textContent)">$${yearCost.toFixed(0)}</td>
       </tr>
       <tr class="bg-slate-50">
-        <td class="table-cell font-medium text-left">利润 (自动计算)</td>
-        <td class="table-cell font-semibold" id="cellProfit">$${current.profit.toFixed(0)}</td>
-        <td class="table-cell font-semibold">$${q1Profit.toFixed(0)}</td>
-        <td class="table-cell font-semibold">$${yearProfit.toFixed(0)}</td>
+        <td class="table-cell font-medium text-left text-slate-900 font-bold">利润 (自动核算)</td>
+        <td class="table-cell font-semibold text-slate-900" id="cellCurProfit">$${current.profit.toFixed(0)}</td>
+        <td class="table-cell font-semibold text-slate-900" id="cellQ1Profit">$${q1Profit.toFixed(0)}</td>
+        <td class="table-cell font-semibold text-slate-900" id="cellYearProfit">$${yearProfit.toFixed(0)}</td>
       </tr>
     `;
   } else {
-    document.getElementById('cellProfit').textContent = '$' + current.profit.toFixed(0);
+    document.getElementById('cellCurProfit').textContent = '$' + current.profit.toFixed(0);
+    document.getElementById('cellQ1Profit').textContent = '$' + q1Profit.toFixed(0);
+    document.getElementById('cellYearProfit').textContent = '$' + yearProfit.toFixed(0);
   }
 }
 
@@ -297,7 +316,7 @@ function exportXLSX() {
 }
 
 initFinanceData();
-updateROI();
+recomputeKPIsAndRender(true);
 </script>
 </body>
 </html>
