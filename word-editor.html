@@ -160,16 +160,20 @@ let currentSection = 0;
 
 const PAY_CONFIG = {
   china: {
-    name: "国内安全商用收银",
+    name: "爱发电 (Afdian) 安全直付",
     price: "￥69.00 <span class='text-xs font-normal text-slate-400'>/ 一次性</span>",
     modalPrice: "￥69.00 RMB",
-    url: "https://mbd.pub/o/bread/YZaUmJlpbQ=="
+    // 备注：等待面包多 API 审核通过、拿到 token 后放开下行：
+    // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+    url: "https://afdian.net/a/APEXWORK" // 换成爱发电通道
   },
   overseas: {
     name: "海外快捷商用收银",
     price: "$9.99 <span class='text-xs font-normal text-slate-400'>/ 一次性</span>",
     modalPrice: "$9.99 USD",
-    url: "https://mbd.pub/o/bread/YZaUmJlpbQ=="
+    // 备注：等待面包多 API 审核通过、拿到 token 后放开下行：
+    // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
+    url: "https://afdian.net/a/APEXWORK"
   }
 };
 let currentRegion = 'overseas';
