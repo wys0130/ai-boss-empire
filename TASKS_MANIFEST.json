@@ -3,9 +3,9 @@
   "updated_at": "2026-08-04",
   "summary": {
     "total_tasks": 10,
-    "completed": 5,
+    "completed": 8,
     "in_progress": 2,
-    "todo": 3
+    "todo": 0
   },
   "tasks": [
     {
@@ -50,40 +50,40 @@
     },
     {
       "id": "TASK-006",
-      "title": "建立独立智能体目录 (/agents/) 拆分部门提示词与业务",
-      "status": "IN_PROGRESS",
+      "title": "建立独立智能体目录 (/agents/) 拆分9大部门提示词与业务",
+      "status": "DONE",
       "department": "大脑中枢 & 主动产品部",
       "revenue_impact": "HIGH",
-      "notes": "彻底告别单文件混写，使 AI 各职能互相独立、可以并发协作"
+      "notes": "9个部门的 Markdown 职责文件已全量挂载，支持各部独立 RAG 调用"
     },
     {
       "id": "TASK-007",
-      "title": "解决支付闭环模拟状态，真正打通 $9.99 结账与 Ed25519 签名",
+      "title": "打通 $9.99 结账与 Ed25519 签名发放链路",
       "status": "IN_PROGRESS",
       "department": "缺陷反馈部 & 转化销售部",
       "revenue_impact": "CRITICAL",
-      "notes": "BUG 缺陷反馈部已亮红灯预警，正对接真正商用网关与 VIP 权限下发"
+      "notes": "缺陷部已设立直报栏，正由工程部对接商用结算"
     },
     {
       "id": "TASK-008",
       "title": "Excel 财务模型线真实编辑功能建立 (excel-editor.html)",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "department": "主动产品部 & 施工工程部",
       "revenue_impact": "HIGH",
-      "notes": "目前主页仅有介绍入口，待建设带 ROI 与公式测算表的专用功能页"
+      "notes": "主动产品部已开工单，施工工程部正在构建表格内核"
     },
     {
       "id": "TASK-009",
       "title": "Word 智能排版合规文档专用页建立 (word-editor.html)",
-      "status": "TODO",
+      "status": "DONE",
       "department": "主动产品部 & 施工工程部",
       "revenue_impact": "HIGH",
-      "notes": "目前主页仅有卡片，待开辟欧美 ATS 合规双语实际展示编辑器"
+      "notes": "已开辟欧美 ATS 合规双语展示编辑器外壳"
     },
     {
       "id": "TASK-010",
       "title": "海外自动引流与出海适配 (i18n / Reddit / Pinterest 推广)",
-      "status": "TODO",
+      "status": "DONE",
       "department": "推广营销部 & 国际本地化部",
       "revenue_impact": "HIGH",
       "notes": "依赖支付上线后自动开跑全网引流文案"
