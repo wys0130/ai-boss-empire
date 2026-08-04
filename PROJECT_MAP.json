@@ -1,0 +1,51 @@
+{
+  "project_name": "APEXWORK ENTERPRISE SUITE STORE",
+  "version": "2026.8.0",
+  "architecture_style": "Declarative Data-Driven Component Routing + Edge-Native",
+  "manifest": {
+    "core_portals": {
+      "index.html": {
+        "role": "主页商城门户",
+        "description": "包含创投三件套展示、可视化营销卡片与核心路演引流"
+      },
+      "editor.html": {
+        "role": "在线可视化演示精修区",
+        "description": "仅保存外壳与路由控制，数据依赖 /data/，视图依赖 /components/"
+      },
+      "admin.html": {
+        "role": "董事长驾驶舱 & AI CTO 控制台",
+        "description": "具备本地密钥管理、一键快照回退、GitHub 真实文件树感知与系统终端"
+      }
+    },
+    "data_layer": {
+      "data/aerotech-deck.json": {
+        "role": "声明式演示数据库",
+        "description": "存放 15 页 PPT 的标语、KPI 进度条参数与卡片短语，文案运营仅修改此文件"
+      },
+      "data/theme-presets.json": {
+        "role": "边缘视觉图库配置",
+        "description": "封装所有 WebP 边缘降维背景图 URL 与遮罩渐变色，视觉配置仅修改此文件"
+      }
+    },
+    "component_layer": {
+      "components/toolbar.html": {
+        "role": "顶部可视化操作条组件",
+        "description": "负责 6 大大厂排版功能：图表变换、绝对居中/左齐对界、主题颜色与 WebP 图库切换"
+      },
+      "components/slide-card.html": {
+        "role": "幻灯片卡片渲染模板",
+        "description": "提供 SVG 能量条与 KPI 重点展示的 DOM 外壳，通过 {{KEY}} 变量动态挂载"
+      }
+    },
+    "governance_and_memory": {
+      "AI-EMPIRE-CONSTITUTION.md": {
+        "role": "最高工程宪法",
+        "description": "永久硬编码 Edge-Native、RAG 按需检索、视觉优先与商业收款底线"
+      },
+      "MEMORY.md": {
+        "role": "AI 经验进化与避坑黑名单",
+        "description": "以秒级时序记载最近 5 次升级与董事长 VETO 否决记录，自动修剪历史"
+      }
+    }
+  }
+}
