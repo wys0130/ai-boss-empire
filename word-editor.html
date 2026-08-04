@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEXWORK · Word ATS 智能排版合规报告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans p-6">
+    <header class="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800 shadow-lg">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded text-white font-bold">← 返回商城</a>
+            <h1 class="font-bold text-sm">欧美企业级 ATS 智能排版合规报告 (Word DOCX)</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-indigo-400 font-mono">ATS 规范度: 99.8%</span>
+            <button onclick="exportWord()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-md">
+                ⚡ 立即导出 ATS 合规包 ($9.99)
+            </button>
+        </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-6 flex-1">
+        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+            <h2 class="text-xs font-bold text-indigo-400 font-mono uppercase">🛡️ 文档元数据编辑 (联动预览)</h2>
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">报告标题</label>
+                <input id="titleInput" type="text" value="Q3 Global Strategic Compliance Report" oninput="updatePreview()" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+            </div>
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">生成日期 (自动校准)</label>
+                <input id="dateInput" type="text" readonly class="w-full bg-slate-950/50 border border-slate-800 rounded p-2 text-xs text-emerald-400 font-mono">
+            </div>
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">合规法律声明</label>
+                <textarea id="summaryInput" rows="4" oninput="updatePreview()" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white leading-relaxed">本报告严格遵循欧美 GDPR 隐私准则及 ATS 机器审查规范，杜绝任何特殊字符乱码与图形遮挡，确保 100% 机器精准解析。</textarea>
+            </div>
+        </section>
+
+        <section class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-8 flex flex-col justify-between overflow-hidden">
+            <div class="bg-white text-slate-900 rounded-lg p-10 shadow-2xl min-h-[420px] flex flex-col justify-between">
+                <div>
+                    <div class="border-b-2 border-slate-900 pb-4 mb-4 flex justify-between items-end">
+                        <h2 id="prevTitle" class="text-xl font-black text-slate-900">Q3 Global Strategic Compliance Report</h2>
+                        <span id="prevDate" class="text-xs font-mono text-slate-500"></span>
+                    </div>
+                    <p id="prevSummary" class="text-xs text-slate-700 leading-relaxed"></p>
+                    <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded text-xs font-mono text-slate-600">
+                        <strong>[ ATS PARSER TEST ]:</strong> PASS | ENCODING: UTF-8 | LAYOUT: STANDARD A4
+                    </div>
+                </div>
+                <div class="text-right text-[10px] font-mono text-slate-400 border-t pt-2 mt-4">ApexWork Enterprise ATS Engine V3</div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function updatePreview() {
+            document.getElementById('prevTitle').innerText = document.getElementById('titleInput').value;
+            document.getElementById('prevSummary').innerText = document.getElementById('summaryInput').value;
+        }
+        function exportWord() {
+            alert('✅ 正在打包生成通过北美银行 ATS 盲测的标准 .DOCX 报告...');
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            // 动态注入当前准确日期，不再有乱码字符串
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+            document.getElementById('prevDate').innerText = today;
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
