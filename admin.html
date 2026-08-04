@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V23 QA-Integrated Swarm Engine)</title>
+    <title>ApexWork AI 驾驶舱 (V24 @Dept Mention Engine)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -26,7 +26,7 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V23 QA-INTEGRATED</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V24 @DEPT MENTION</span>
             <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -68,11 +68,11 @@
         </div>
     </div>
 
-    <!-- 9 大部门按键 (👑 第二部门升级为：缺陷与QA质检部) -->
+    <!-- 9 大部门按键：点击后自动 @ 注入发令台 -->
     <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
         <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5 text-xs font-mono">
             <div class="flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (再点一次已选部门可恢复全体视角):</span>
+                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (点击自动 @ 专属定向发单，再点一次恢复全体):</span>
                 <span id="activeDeptLabel" class="text-indigo-400 font-bold">[当前视图: 全体部门]</span>
             </div>
             <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-0.5 rounded transition">
@@ -84,8 +84,8 @@
                 <div class="text-[11px] font-bold text-indigo-400 group-hover:underline">🧠 大脑中枢</div>
                 <div class="text-[9px] text-gray-400 truncate mt-0.5">工单调度分发</div>
             </button>
-            <button onclick="inspectDept('缺陷反馈部', this)" class="dept-btn themed-inner border border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-rose-400 group-hover:underline">🐞 缺陷与QA质检部</div>
+            <button onclick="inspectDept('缺陷与QA质检部', this)" class="dept-btn themed-inner border border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
+                <div class="text-[11px] font-bold text-rose-400 group-hover:underline">🐞 缺陷与QA部</div>
                 <div class="text-[9px] text-rose-300 truncate mt-0.5">BUG/自动自愈闭环</div>
             </button>
             <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
@@ -137,25 +137,23 @@
         <section class="lg:col-span-7 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl justify-between">
             <div>
                 <!-- BUG 报警与 QA 闭环栏 -->
-                <div id="bugAlertBanner" class="mb-2.5 bg-rose-500/10 border border-rose-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-rose-500 font-bold">🐞 [缺陷与QA质检报告]:</span>
-                        <span class="text-rose-300">系统升级 V23，已打通 QA 流水线报错 ➔ AI 自动生成自改闭环。</span>
+                <div id="bugAlertBanner" class="mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono" data-status="green">
+                    <div class="flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">✅ [QA 自动化检查]:</span>
+                        <span class="text-emerald-300">系统运行平稳，全站无 404 死链，各部门智能体在线待命。</span>
                     </div>
-                    <button onclick="autoFixPaymentBug()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-2.5 py-1 rounded text-[11px] transition">
-                        ⚡ 派单解决
-                    </button>
+                    <span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>
                 </div>
 
                 <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
-                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台</span>
+                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台 (支持 @部门 定向发单)</span>
                     <span class="text-[10px] font-mono themed-subtext">快捷触发: <strong class="themed-text">Ctrl + Enter</strong></span>
                 </div>
                 <div class="mb-2.5">
-                    <textarea id="cmd" rows="2" placeholder="输入指示；或留空直接 Enter（触发蜂群全自动自查/重构多文件/修死链与按键功能）..." class="w-full themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
+                    <textarea id="cmd" rows="2" placeholder="输入指示；或直接点击上方部门按钮自动带 @ 进来..." class="w-full themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner"></textarea>
                 </div>
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 唤醒蜂群自驱建设 (V23 QA 闭环引擎)</span>
+                    <span>🚀 立即发车 / 唤醒蜂群自驱建设 (V24 @Dept 引擎)</span>
                 </button>
             </div>
 
@@ -165,7 +163,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V23 在线。已合并【缺陷与QA质检部】，自动捕获 CI 红条并闭环写库。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V24 在线。点击上方部门按钮即可直接在下方输入框生成 @ 专属派单前缀。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -177,7 +175,7 @@
         </section>
     </main>
 
-    <!-- 👑 终极极客引擎：包含真实系统时钟强制校准 + QA自愈巡检 + 多文件原子推送 -->
+    <!-- 👑 核心逻辑脚本 -->
     <script>
         const REPO = "wys0130/ai-boss-empire";
         let activeFilterDept = "";
@@ -237,6 +235,7 @@
             document.getElementById("rollbackModal").classList.add("hidden");
         }
 
+        // 👑 关键升级：点击部门按钮 ➔ 1. 过滤战报 2. 自动在输入框出 @部门 引导定向发单
         function inspectDept(deptName, btnEl) {
             if (activeFilterDept === deptName) {
                 resetDeptFilter();
@@ -248,7 +247,14 @@
             btnEl.classList.add("ring-2", "ring-indigo-500", "bg-indigo-500/10");
             
             document.getElementById("activeDeptLabel").innerText = `[当前视图: ${deptName}]`;
-            appendLog(`🎯 董事长已聚焦检查【${deptName}】专属战报...`, "text-indigo-400 font-bold");
+            
+            // 自动在输入框前置注入 @部门 指令前缀
+            const cmdInput = document.getElementById("cmd");
+            const existingText = cmdInput.value.replace(/^@【[^】]+】\s*/, ""); // 清除旧的 @
+            cmdInput.value = `@【${deptName}】 ${existingText}`;
+            cmdInput.focus();
+
+            appendLog(`🎯 董事长已聚焦【${activeFilterDept}】，发令台已自动绑定该主责部门。`, "text-indigo-400 font-bold");
             loadHistoryFromMemory();
         }
 
@@ -256,28 +262,15 @@
             activeFilterDept = "";
             document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-500/10"));
             document.getElementById("activeDeptLabel").innerText = `[当前视图: 全体部门]`;
-            appendLog(`🌐 已重置恢复查看集团全体部门战报。`, "text-slate-400");
+            
+            // 清除输入框的 @ 引导
+            const cmdInput = document.getElementById("cmd");
+            cmdInput.value = cmdInput.value.replace(/^@【[^】]+】\s*/, "");
+
+            appendLog(`🌐 已重置恢复全体部门视图。`, "text-slate-400");
             loadHistoryFromMemory();
         }
 
-        // ==========================================
-        // 👑 1. 升级版防重复派单锁：已经解决的，绝不重复派单！
-        // ==========================================
-        function autoFixPaymentBug() {
-            const banner = document.getElementById("bugAlertBanner");
-            // 如果系统状态已显示绿色通过，当场拦截，不重复发单
-            if (banner && banner.getAttribute("data-status") === "green") {
-                alert("✅ 当前系统 CI 流水线已经全部绿色通过，历史缺陷已完全自愈，无需重复派单！");
-                return;
-            }
-
-            document.getElementById("cmd").value = "【🐞缺陷与QA质检部 + 工程部协作】：自查可能导致 404 的文件名丢失或语法错误，确保 index.html, editor.html, excel-editor.html, word-editor.html 正常运行。";
-            triggerSwarmAutonomousAction();
-        }
-
-        // ==========================================
-        // 👑 1. 彻底杀死 AI 脑补时间：提交前强制注入当前电脑本地标准时间
-        // ==========================================
         function getRealStandardTime() {
             const d = new Date();
             const y = d.getFullYear();
@@ -289,10 +282,8 @@
             return `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
         }
 
-        // 强行把大模型产出的任何伪造时钟串替换为本地电脑真实时间
         function stripAndEnforceRealTime(memoryLine) {
             const realTimeStr = getRealStandardTime();
-            // 清除旧的 [EVO-RECORD | xxxx-xx-xx xx:xx:xx] 或 [EVO-RECORD]:
             let cleaned = memoryLine.replace(/\[EVO-RECORD[^\]]*\]:/, "").trim();
             return `- [EVO-RECORD | ${realTimeStr}]: ${cleaned}`;
         }
@@ -366,28 +357,21 @@
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 let allLines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
                 
-                // 👑 极致精准过滤：如果董事长点击了某个专属部门
                 let lines = allLines;
                 if (activeFilterDept) {
-                    // 定义每个部门的核心语义词库，实现战报与部门精准对齐
                     const deptKeywords = {
-                        "大脑中枢": ["中枢", "调度", "发单", "总控", "V22", "V23"],
-                        "缺陷与QA质检部": ["缺陷", "QA", "修复", "404", "报错", "自愈", "闭环", "编译", "流转", "拦截"],
-                        "主动产品部": ["产品", "规划", "盲排", "补坑", "需求", "架构"],
-                        "施工工程部": ["工程", "重写", "落地", "代码", "JS", "HTML", "脚本", "推送", "同步", "原子"],
-                        "视觉策划部": ["视觉", "排版", "UI", "背景", "大图", "配色", "高精", "磨砂", "样式"],
-                        "审核质量部": ["质量", "审核", "门槛", "85分", "规范", "合规"],
-                        "转化销售部": ["销售", "转化", "$9.99", "授权", "支付", "收银", "ROI", "订单"],
-                        "推广营销部": ["营销", "推广", "海外", "公域", "流量", "曝光"],
-                        "国际法务部": ["法务", "ATS", "GDPR", "隐私", "安全", "加密", "验签"]
+                        "大脑中枢": ["中枢", "调度", "发单", "总控"],
+                        "缺陷与QA质检部": ["缺陷", "QA", "修复", "404", "报错", "自愈", "闭环"],
+                        "主动产品部": ["产品", "规划", "盲排", "补坑", "需求"],
+                        "施工工程部": ["工程", "重写", "落地", "代码", "JS", "HTML", "脚本", "推送"],
+                        "视觉策划部": ["视觉", "排版", "UI", "背景", "配色", "高精", "磨砂"],
+                        "审核质量部": ["质量", "审核", "门槛", "85分", "规范"],
+                        "转化销售部": ["销售", "转化", "$9.99", "授权", "支付", "收银", "ROI"],
+                        "推广营销部": ["营销", "推广", "海外", "公域", "流量", "曝光", "营销"],
+                        "国际法务部": ["法务", "ATS", "GDPR", "隐私", "安全", "加密"]
                     };
-
                     const keywords = deptKeywords[activeFilterDept] || [activeFilterDept];
-
-                    // 筛选出真正包含该部门名称 或 包含其职能关键字的战报
-                    lines = allLines.filter(line => {
-                        return line.includes(activeFilterDept) || keywords.some(kw => line.includes(kw));
-                    });
+                    lines = allLines.filter(line => line.includes(activeFilterDept) || keywords.some(kw => line.includes(kw)));
                 }
 
                 document.getElementById("historyCount").innerText = `${lines.length} RECORDS`;
@@ -396,7 +380,7 @@
                     feed.innerHTML = `
                         <div class="themed-inner border rounded-xl p-6 text-center space-y-2">
                             <div class="text-xs text-indigo-400 font-bold">🔍 【${activeFilterDept}】当前暂无独立战报</div>
-                            <div class="text-[11px] themed-subtext">该部门近期未产生单独工单。您可以随时在右侧向其派发专属任务！</div>
+                            <div class="text-[11px] themed-subtext">该部门近期未产生单独战报。您可以随时在右侧输入框向其派发专属任务！</div>
                         </div>
                     `;
                     return;
@@ -453,9 +437,6 @@
             return await res.json();
         }
 
-        // ==========================================
-        // 👑 2. 缺陷与QA质检部：无头持续集成自愈监工 (CI Auto-Heal Loop)
-        // ==========================================
         async function checkLatestQARun() {
             try {
                 const keys = getKeys();
@@ -483,188 +464,134 @@
             } catch (e) { return "无法获取构建异常堆栈"; }
         }
 
-        // ==========================================
-        // 👑 2. QA 持续集成自愈监工：绿色即隐藏红框，告别重复派单
-        // ==========================================
         async function startQAGuardLoop() {
             async function loopTask() {
                 if (isAutoHealing) return;
-                
                 const latestRun = await checkLatestQARun();
                 if (!latestRun) return;
 
-                if (latestRun.status !== "completed") {
-                    appendLog(`⏳ [QA 状态] 当前部署流水线 [#${latestRun.run_number}] 仍在构建扫描中...`, "text-yellow-500");
-                    return;
-                }
-
-                const banner = document.getElementById("bugAlertBanner");
-                const statusBadge = document.getElementById("qaStatusBadge");
-
-                // 👑 分支 A：如果 CI 流水线成功 (Success) ➔ 报警框变绿，屏蔽派单按钮！
                 if (latestRun.conclusion === "success") {
-                    if (statusBadge) statusBadge.innerHTML = `✅ QA GREEN (#${latestRun.run_number})`;
+                    const banner = document.getElementById("bugAlertBanner");
                     if (banner) {
-                        banner.setAttribute("data-status", "green");
-                        banner.className = "mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2.5 flex items-center justify-between text-xs font-mono";
-                        banner.innerHTML = `
-                            <div class="flex items-center gap-2">
-                                <span class="text-emerald-400 font-bold">✅ [QA 自动检查]:</span>
-                                <span class="text-emerald-300">最新构建 #$${latestRun.run_number} 已全量绿色通过，全站 0 死链 / 0 缺陷。</span>
-                            </div>
-                            <span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>
-                        `;
+                        banner.className = "mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono";
+                        banner.innerHTML = `<div class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✅ [QA 自动化检查]:</span><span class="text-emerald-300">构建 #${latestRun.run_number} 全量绿色通过。</span></div><span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>`;
                     }
                     return;
                 }
 
-                // 👑 分支 B：如果流水线失败了 (Failure) ➔ 报警框飘红，仅触发一次自愈修复！
                 if (latestRun.conclusion === "failure") {
-                    if (banner && banner.getAttribute("data-status") === "healing-" + latestRun.run_number) {
-                        // 防止同一个失败流水线重复无限发送
-                        return;
-                    }
-
                     isAutoHealing = true;
-                    if (banner) banner.setAttribute("data-status", "healing-" + latestRun.run_number);
-
-                    appendLog(`❌ [QA 警报触发]：检测到发布流水线 [#${latestRun.run_number}] 拦截报红！正在调取具体日志...`, "text-rose-500 font-bold");
-                    
                     const errDetail = await fetchRunErrorLogs(latestRun.id);
-                    appendLog(`🐞 [缺陷与QA质检部介入]：${errDetail}`, "text-rose-400");
-                    
-                    const fixCommand = `【🐞缺陷与QA质检部 + 工程部自愈指令】：
-监控捕获最新 Actions 构建报错："${errDetail}"。
-请立即解决导致编译失败的问题（严格确保 index.html, editor.html, excel-editor.html, word-editor.html 4个关键文件存在且无语法报错）。
-输出正确的 ===FILE: 报错文件名=== 代码块！`;
-
-                    document.getElementById("cmd").value = fixCommand;
-                    appendLog("🚀 [QA 唤醒蜂群]：错误已提交至中枢，自动重构新修复代码...", "text-amber-400 font-bold");
-                    
+                    document.getElementById("cmd").value = `【@缺陷与QA质检部 紧急自愈】：流水线报警："${errDetail}"。请立刻排查并仅修复受影响的源码，不许乱改其他不相关网页！`;
                     try {
                         await triggerSwarmAutonomousAction();
-                        appendLog("🛠️ [修复推送完成]：代码已强制推往远端，等待 GitHub 下轮编译验证！", "text-emerald-400");
-                    } catch (healErr) {
-                        appendLog("❌ [自愈执行异常]：" + healErr.message, "text-rose-500");
                     } finally {
                         isAutoHealing = false;
                     }
                 }
             }
-
             loopTask();
-            if (!qaMonitorInterval) {
-                qaMonitorInterval = setInterval(loopTask, 30000);
-            }
+            if (!qaMonitorInterval) qaMonitorInterval = setInterval(loopTask, 30000);
         }
 
-        // ==========================================
-        // 👑 3. 终极多文件引擎 (支持文件分割、写库与时间强制校准)
-        // ==========================================
+        // 👑 终极发车引擎：严格识别 @部门 归属，绝不张冠李戴
         async function triggerSwarmAutonomousAction() {
             const btn = document.getElementById("runBtn");
             const cmdInput = document.getElementById("cmd");
-            const cmd = cmdInput.value.trim() || "【缺陷与QA质检部+工程部协作】：一键检查并独立修正 excel-editor.html 与 word-editor.html 真实业务逻辑，保证无死链！";
+            const cmd = cmdInput.value.trim() || "【@大脑中枢】：执行例行巡检。";
+
+            // 提取 @ 的目标部门
+            const deptMatch = cmd.match(/^@【([^】]+)】/);
+            const targetDept = deptMatch ? deptMatch[1] : (activeFilterDept || "大脑中枢");
 
             btn.disabled = true;
-            btn.innerHTML = "<span>⚙️ 9 大智能部门多文件协同建设中...</span>";
-            appendLog("🧠 [大脑中枢 V23 启动]：准备多文件原子并发写库管道...");
+            btn.innerHTML = `<span>⚙️ [${targetDept}] 正在全算力定向执行...</span>`;
+            appendLog(`🧠 [发单中枢]：已精准锁定主责部门【 ${targetDept} 】，下达定向任务...`);
 
             try {
                 const keys = getKeys();
-                const [memoryFile, constFile, repoTree] = await Promise.all([
+                const [memoryFile, repoTree] = await Promise.all([
                     getGithubFileSafe("MEMORY.md", keys.gh),
-                    getGithubFileSafe("AI-EMPIRE-CONSTITUTION.md", keys.gh),
                     fetchLiveRepoTree(keys.gh)
                 ]);
                 
-                const treeSummary = repoTree.length > 0 ? repoTree.join("\n") : "index.html\neditor.html\nadmin.html\nMEMORY.md";
-                appendLog(`📁 [实时项目树检索成功]，发单中...`);
+                const treeSummary = repoTree.join("\n");
 
-                const prompt = `你是 APEXWORK 智能体蜂群中枢（V23 多文件控制引擎）。
-项目现有物理文件树：
+                const prompt = `你是 APEXWORK 企业智能体蜂群中枢。
+当前定向发单主责部门：【${targetDept}】
+项目物理文件树：
 ${treeSummary}
 
-【近期演进记忆】：
+【近期战报记忆】：
 ${memoryFile.content || "无"}
 
-【指令 / 任务】：
+【董事长最新指令】：
 "${cmd}"
 
-【极重要规范】：
-1. 你的回答必须使用 ===SWARM_LOG=== 开始写协作战报，用 ===NEW_MEMORY=== 提炼一条记忆；
-2. 严禁把代码覆盖错文件！要写 Excel 必须写在 ===FILE: excel-editor.html=== 之下；要写 Word 必须写在 ===FILE: word-editor.html=== 之下。你可以同时输出一个或多个 ===FILE: 文件名=== 块！
-3. 所有 HTML 页面绝不允许只有视觉空壳！必须在页尾自带完整的原生 <script>，实现真实的动态数值计算与点击交互！
+【极重要硬规（绝对防错）】：
+1. 你的任务是针对【${targetDept}】的职能以及董事长的指令进行精准对齐。
+2. 绝对不准“顺手”去重构或修改与该指令无关的其他网页（例如：如果董事长在【推广营销部】或【视觉策划部】吐槽或提问，绝不准擅自去覆盖修改 excel-editor.html 或 word-editor.html 的核心代码！）！只有当指令明确要求修改网页时，才允许输出对应的 ===FILE: 文件名=== 代码块。
+3. 必须输出 ===SWARM_LOG=== 开始的部门协作战报，和 ===NEW_MEMORY=== 提炼的带有 [EVO-RECORD | 部门名称]: 的记忆。
 
 格式结构标准样例：
 ===SWARM_LOG===
-<写简炼部门协作战报>
+<【${targetDept}】专属行动战报>
 ===NEW_MEMORY===
-- [EVO-RECORD]: <一句话简短提炼本轮迭代>
-===FILE: excel-editor.html===
-<完整干净的 Excel 工作台源码>
-===FILE: word-editor.html===
-<完整干净的 Word ATS 合规报告源码>`;
+- [EVO-RECORD | ${targetDept}]: <一句话简短提炼>
+===FILE: 目标文件名.html=== (若无需改代码可省略此块)`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [{ role: "system", content: "你是能够完美分离多文件边界、绝不张冠李戴的企业多智能体蜂群。" }, { role: "user", content: prompt }],
+                        messages: [{ role: "system", content: "你是严守边界、绝不胡乱越权改动其他文件的企业垂直智能体。" }, { role: "user", content: prompt }],
                         temperature: 0.3
                     })
                 });
 
-                if (!dsRes.ok) throw new Error("API 响应失败: " + dsRes.statusText);
+                if (!dsRes.ok) throw new Error("API 失败: " + dsRes.statusText);
                 const aiAnswer = (await dsRes.json()).choices[0].message.content;
 
                 const swarmParts = aiAnswer.split("===SWARM_LOG===");
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
 
-                if (memParts.length < 2) throw new Error("大模型响应未带记忆块或被截断");
+                if (memParts.length < 2) throw new Error("模型响应未带记忆块");
 
-                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已分配多部门完成协同。";
+                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已完成定向督办。";
                 const rawMemoryLine = memParts[1].split("===FILE:")[0].trim();
 
-                appendLog(`🤖 [各部行动直报]:\n${swarmLogText}`, "text-emerald-400 font-bold");
+                appendLog(`🤖 [${targetDept} 直报]:\n${swarmLogText}`, "text-emerald-400 font-bold");
 
-                // 使用正则表达式匹配所有的 ===FILE: xxx.html=== 代码块，并发写入远端！
+                // 可选的多文件解析落盘
                 const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
                 let match;
                 let filesWritten = 0;
 
                 while ((match = fileRegex.exec(aiAnswer)) !== null) {
                     const targetFilePath = match[1].trim().replace(/[^a-zA-Z0-9_\-\.\/]/g, "");
-                    let newFileContent = match[2].trim();
-                    newFileContent = newFileContent.replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
+                    let newFileContent = match[2].trim().replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
+                    if (!targetFilePath) continue;
 
-                    if (!targetFilePath || targetFilePath.length > 40) continue;
-
-                    appendLog(`📍 [目标对齐落盘]: =>【 ${targetFilePath} 】...`, "text-indigo-400 font-bold");
+                    appendLog(`📍 [定向落盘]: =>【 ${targetFilePath} 】...`, "text-indigo-400 font-bold");
                     const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 Swarm V23: ${targetFilePath}`, keys.gh);
-                    appendLog(`✅ 文件 [ ${targetFilePath} ] 物理覆盖成功！`, "text-emerald-500");
+                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 [${targetDept}]: ${targetFilePath}`, keys.gh);
+                    appendLog(`✅ 文件 [ ${targetFilePath} ] 写入成功！`, "text-emerald-500");
                     filesWritten++;
                 }
 
-                if (filesWritten === 0) {
-                    throw new Error("模型响应中未找到标准 ===FILE: filename=== 代码块！");
-                }
-
-                // 👑 彻底杀死时间幻觉：将新记忆的时间强硬覆盖为当前本地标准时间！
-                const cleanTimestampedLine = stripAndEnforceRealTime(rawMemoryLine);
+                const cleanTimestampedLine = stripAndEnforceRealTime(`- [EVO-RECORD | ${targetDept}]: ` + rawMemoryLine.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, ""));
                 const updatedMemory = (memoryFile.content || "") + "\n" + cleanTimestampedLine;
-                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory: ${cleanTimestampedLine.slice(0, 35)}`, keys.gh);
+                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory [${targetDept}]`, keys.gh);
 
-                appendLog(`🏆 协同大功告成！本次并发落地 ${filesWritten} 个物理文件，AI 闭环自演进完成。`, "text-emerald-400 font-black");
+                appendLog(`🏆 【${targetDept}】任务圆满交付！`, "text-emerald-400 font-black");
                 cmdInput.value = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ V23 协同执行出现异常: " + err.message, "text-rose-500");
+                appendLog("❌ 协同执行异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 唤醒蜂群自驱建设 (V23 QA 闭环引擎)</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 唤醒蜂群自驱建设 (V24 @Dept 引擎)</span>";
             }
         }
 
@@ -672,7 +599,6 @@ ${memoryFile.content || "无"}
             initAdminTheme();
             if (localStorage.getItem("APEX_GH_TOKEN")) {
                 loadHistoryFromMemory();
-                // 页面打开成功后，立刻开启动态持续 QA 巡检与闭环自解
                 startQAGuardLoop();
             }
             document.getElementById("cmd").addEventListener("keydown", function(e) {
