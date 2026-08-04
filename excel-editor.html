@@ -3,218 +3,239 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>APEXWORK - Excel 财务模型编辑器</title>
+<title>APEXWORK · Excel 财务模型编辑器</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f8fafc; }
-  .bento-card { background: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; transition: all 0.2s; }
-  .bento-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-  .nav-item { cursor: pointer; padding: 10px 14px; border-radius: 10px; transition: all 0.15s; font-size: 13px; }
+  .bento-card { background: #ffffff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); }
+  .nav-item { transition: all 0.2s; cursor: pointer; }
   .nav-item:hover { background: #f1f5f9; }
   .nav-item.active { background: #0f172a; color: #ffffff; }
-  .kpi-card { background: linear-gradient(135deg, #0f172a, #1e293b); color: #ffffff; border-radius: 12px; padding: 16px; }
-  .btn-primary { background: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-weight: 600; transition: all 0.2s; }
+  .kpi-card { border-left: 4px solid #0f172a; }
+  .btn-primary { background: #0f172a; color: #ffffff; transition: all 0.2s; }
   .btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
-  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-  .btn-secondary { background: #f1f5f9; color: #0f172a; padding: 10px 20px; border-radius: 10px; font-weight: 500; transition: all 0.2s; }
+  .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: #f1f5f9; color: #0f172a; transition: all 0.2s; }
   .btn-secondary:hover { background: #e2e8f0; }
-  .input-field { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; transition: border 0.2s; }
+  .input-field { border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; transition: all 0.2s; }
   .input-field:focus { outline: none; border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15,23,42,0.1); }
-  .table-cell { border: 1px solid #e2e8f0; padding: 8px; text-align: right; font-size: 13px; }
+  .table-cell { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: right; font-size: 0.875rem; }
   .table-header { background: #f8fafc; font-weight: 600; text-align: center; }
+  .month-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
+  .month-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; white-space: nowrap; }
 </style>
 </head>
 <body class="min-h-screen">
-<div class="max-w-7xl mx-auto p-4 md:p-6">
-  <!-- 顶部品牌栏 -->
-  <div class="flex items-center justify-between mb-6">
+<div class="max-w-7xl mx-auto p-4 lg:p-8">
+  <!-- 顶部导航 -->
+  <header class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-lg">A</div>
+      <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
+        <span class="text-white font-bold text-lg">A</span>
+      </div>
       <div>
         <h1 class="text-xl font-bold text-slate-900">Excel 财务模型编辑器</h1>
-        <p class="text-sm text-slate-500">12 个月滚动预测矩阵 · ROI 自动计算</p>
+        <p class="text-sm text-slate-500">12 个月滚动预测 · ROI 自动计算 · $9.99 付费导出</p>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-slate-500">价格</span>
-      <span class="text-2xl font-bold text-slate-900">$9.99</span>
-    </div>
-  </div>
+    <a href="index.html" class="btn-secondary px-4 py-2 rounded-lg text-sm font-medium">← 返回商城</a>
+  </header>
 
   <!-- 三栏工作台 -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- 左侧：页导航 -->
-    <div class="lg:col-span-2 bento-card p-4">
-      <h3 class="text-sm font-semibold text-slate-500 mb-3">财务页导航</h3>
-      <div id="navList" class="space-y-1"></div>
-      <button onclick="resetParams()" class="btn-secondary w-full mt-4 text-sm">重置参数</button>
-    </div>
+    <!-- 左侧：月份导航 -->
+    <aside class="lg:col-span-2 bento-card p-4">
+      <h2 class="text-sm font-semibold text-slate-700 mb-4">📊 月份导航</h2>
+      <div class="month-nav lg:flex-col lg:overflow-visible">
+        <button class="month-btn nav-item active" data-month="0" onclick="selectMonth(0)">1月</button>
+        <button class="month-btn nav-item" data-month="1" onclick="selectMonth(1)">2月</button>
+        <button class="month-btn nav-item" data-month="2" onclick="selectMonth(2)">3月</button>
+        <button class="month-btn nav-item" data-month="3" onclick="selectMonth(3)">4月</button>
+        <button class="month-btn nav-item" data-month="4" onclick="selectMonth(4)">5月</button>
+        <button class="month-btn nav-item" data-month="5" onclick="selectMonth(5)">6月</button>
+        <button class="month-btn nav-item" data-month="6" onclick="selectMonth(6)">7月</button>
+        <button class="month-btn nav-item" data-month="7" onclick="selectMonth(7)">8月</button>
+        <button class="month-btn nav-item" data-month="8" onclick="selectMonth(8)">9月</button>
+        <button class="month-btn nav-item" data-month="9" onclick="selectMonth(9)">10月</button>
+        <button class="month-btn nav-item" data-month="10" onclick="selectMonth(10)">11月</button>
+        <button class="month-btn nav-item" data-month="11" onclick="selectMonth(11)">12月</button>
+      </div>
+      <div class="mt-6 p-4 bg-slate-50 rounded-lg">
+        <p class="text-xs text-slate-600 font-medium">💡 提示</p>
+        <p class="text-xs text-slate-500 mt-1">点击月份切换编辑，修改参数后 ROI 自动重算。</p>
+      </div>
+    </aside>
 
     <!-- 中央：实时预览 -->
-    <div class="lg:col-span-7 bento-card p-4">
+    <main class="lg:col-span-7 bento-card p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-semibold text-slate-500">实时预览</h3>
-        <div class="flex gap-2">
-          <button onclick="downloadTemplate()" class="btn-secondary text-xs">下载模板</button>
-        </div>
+        <h2 class="text-lg font-semibold text-slate-900">📈 财务预测矩阵</h2>
+        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full">实时预览</span>
       </div>
       <div class="overflow-x-auto">
-        <table class="w-full text-sm" id="previewTable">
+        <table class="w-full text-sm" id="financeTable">
           <thead>
             <tr>
-              <th class="table-header">月份</th>
-              <th class="table-header">收入 ($)</th>
-              <th class="table-header">成本 ($)</th>
-              <th class="table-header">利润 ($)</th>
+              <th class="table-header">项目</th>
+              <th class="table-header" id="thMonth">1月</th>
+              <th class="table-header">Q1</th>
+              <th class="table-header">全年</th>
             </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
+          <tbody id="tableBody">
+            <!-- 动态生成 -->
+          </tbody>
         </table>
       </div>
       <!-- KPI 卡片 -->
-      <div class="grid grid-cols-3 gap-4 mt-6">
-        <div class="kpi-card">
-          <p class="text-xs text-slate-300">ROI</p>
-          <p class="text-2xl font-bold" id="kpiROI">0%</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        <div class="kpi-card p-4 bg-slate-50 rounded-lg">
+          <p class="text-xs text-slate-500">毛利率</p>
+          <p class="text-2xl font-bold text-slate-900" id="kpiGrossMargin">--</p>
         </div>
-        <div class="kpi-card">
-          <p class="text-xs text-slate-300">毛利率</p>
-          <p class="text-2xl font-bold" id="kpiMargin">0%</p>
+        <div class="kpi-card p-4 bg-slate-50 rounded-lg">
+          <p class="text-xs text-slate-500">净利率</p>
+          <p class="text-2xl font-bold text-slate-900" id="kpiNetMargin">--</p>
         </div>
-        <div class="kpi-card">
-          <p class="text-xs text-slate-300">回本周期</p>
-          <p class="text-2xl font-bold" id="kpiPayback">-</p>
+        <div class="kpi-card p-4 bg-slate-50 rounded-lg">
+          <p class="text-xs text-slate-500">ROI</p>
+          <p class="text-2xl font-bold text-slate-900" id="kpiROI">--</p>
+        </div>
+        <div class="kpi-card p-4 bg-slate-50 rounded-lg">
+          <p class="text-xs text-slate-500">回本周期</p>
+          <p class="text-2xl font-bold text-slate-900" id="kpiPayback">--</p>
         </div>
       </div>
-    </div>
+    </main>
 
     <!-- 右侧：参数与导出 -->
-    <div class="lg:col-span-3 bento-card p-4">
-      <h3 class="text-sm font-semibold text-slate-500 mb-4">参数绑定</h3>
+    <aside class="lg:col-span-3 bento-card p-6">
+      <h2 class="text-lg font-semibold text-slate-900 mb-4">⚙️ 参数设置</h2>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs text-slate-500 mb-1">初始投资 ($)</label>
-          <input type="number" id="paramInvestment" class="input-field" value="50000" oninput="updateROI()">
+          <label class="block text-sm font-medium text-slate-700 mb-1">初始投资 ($)</label>
+          <input type="number" id="initialInvestment" class="input-field w-full" value="50000" oninput="updateROI()">
         </div>
         <div>
-          <label class="block text-xs text-slate-500 mb-1">月增长率 (%)</label>
-          <input type="number" id="paramGrowth" class="input-field" value="5" oninput="updateROI()">
+          <label class="block text-sm font-medium text-slate-700 mb-1">月增长率 (%)</label>
+          <input type="number" id="growthRate" class="input-field w-full" value="5" oninput="updateROI()">
         </div>
         <div>
-          <label class="block text-xs text-slate-500 mb-1">月固定成本 ($)</label>
-          <input type="number" id="paramCost" class="input-field" value="8000" oninput="updateROI()">
+          <label class="block text-sm font-medium text-slate-700 mb-1">固定成本 ($/月)</label>
+          <input type="number" id="fixedCost" class="input-field w-full" value="8000" oninput="updateROI()">
         </div>
         <div>
-          <label class="block text-xs text-slate-500 mb-1">起始月收入 ($)</label>
-          <input type="number" id="paramRevenue" class="input-field" value="12000" oninput="updateROI()">
+          <label class="block text-sm font-medium text-slate-700 mb-1">可变成本率 (%)</label>
+          <input type="number" id="variableCostRate" class="input-field w-full" value="40" oninput="updateROI()">
         </div>
       </div>
 
       <!-- 收银台 -->
-      <div class="mt-6 pt-4 border-t border-slate-200">
-        <h4 class="text-sm font-semibold text-slate-700 mb-3">付费导出</h4>
-        <button id="exportBtn" onclick="handleExport()" class="btn-primary w-full">导出 XLSX</button>
-        <p class="text-xs text-slate-400 mt-2 text-center">支付后解锁导出 · $9.99</p>
+      <div class="mt-8 p-4 bg-slate-900 rounded-xl text-white">
+        <h3 class="font-semibold mb-2">💳 付费导出</h3>
+        <p class="text-sm text-slate-300 mb-4">解锁 XLSX 完整交付包</p>
+        <p class="text-3xl font-bold mb-4">$9.99 <span class="text-sm font-normal text-slate-400">/ 一次性</span></p>
+        <button id="exportBtn" class="btn-primary w-full py-3 rounded-lg font-semibold" onclick="handleExport()">🔒 验签后导出</button>
+        <p class="text-xs text-slate-400 mt-3 text-center">支付回调 ?status=paid&signature=...</p>
       </div>
-    </div>
+    </aside>
   </div>
 </div>
 
 <script>
-// ===== 核心数据 =====
-let months = [];
-for (let i = 1; i <= 12; i++) months.push('M' + i);
+// ===== 财务数据模型 =====
+const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+let currentMonth = 0;
+let financeData = [];
 
-// ===== 初始化 =====
-function init() {
-  renderNav();
-  updateROI();
-}
-
-// ===== 渲染导航 =====
-function renderNav() {
-  const nav = document.getElementById('navList');
-  nav.innerHTML = '';
-  months.forEach((m, idx) => {
-    const div = document.createElement('div');
-    div.className = 'nav-item' + (idx === 0 ? ' active' : '');
-    div.textContent = m + ' · 财务页';
-    div.onclick = () => {
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      div.classList.add('active');
-      // 模拟切换月份预览
-      updateROI();
-    };
-    nav.appendChild(div);
-  });
-}
-
-// ===== 计算 ROI =====
-function updateROI() {
-  const investment = parseFloat(document.getElementById('paramInvestment').value) || 0;
-  const growth = parseFloat(document.getElementById('paramGrowth').value) || 0;
-  const cost = parseFloat(document.getElementById('paramCost').value) || 0;
-  const revenue = parseFloat(document.getElementById('paramRevenue').value) || 0;
-
-  let totalRevenue = 0;
-  let totalCost = 0;
-  let rows = '';
-  let cumulativeProfit = 0;
-  let paybackMonth = '-';
-
+// 初始化 12 个月数据
+function initFinanceData() {
+  financeData = [];
+  const baseRevenue = 12000;
   for (let i = 0; i < 12; i++) {
-    const monthRevenue = revenue * Math.pow(1 + growth / 100, i);
-    const monthCost = cost;
-    const monthProfit = monthRevenue - monthCost;
-    totalRevenue += monthRevenue;
-    totalCost += monthCost;
-    cumulativeProfit += monthProfit;
+    financeData.push({
+      revenue: baseRevenue * Math.pow(1.05, i),
+      cost: 8000 + baseRevenue * Math.pow(1.05, i) * 0.4,
+      profit: 0
+    });
+    financeData[i].profit = financeData[i].revenue - financeData[i].cost;
+  }
+}
 
-    if (cumulativeProfit >= investment && paybackMonth === '-') {
-      paybackMonth = 'M' + (i + 1);
-    }
+// 更新 ROI 计算
+function updateROI() {
+  const investment = parseFloat(document.getElementById('initialInvestment').value) || 0;
+  const growth = parseFloat(document.getElementById('growthRate').value) || 0;
+  const fixed = parseFloat(document.getElementById('fixedCost').value) || 0;
+  const varRate = parseFloat(document.getElementById('variableCostRate').value) || 0;
 
-    rows += `<tr>
-      <td class="table-cell">M${i + 1}</td>
-      <td class="table-cell">${monthRevenue.toFixed(2)}</td>
-      <td class="table-cell">${monthCost.toFixed(2)}</td>
-      <td class="table-cell">${monthProfit.toFixed(2)}</td>
-    </tr>`;
+  let totalRevenue = 0, totalCost = 0;
+  for (let i = 0; i < 12; i++) {
+    const revenue = 12000 * Math.pow(1 + growth/100, i);
+    const cost = fixed + revenue * varRate/100;
+    financeData[i] = { revenue, cost, profit: revenue - cost };
+    totalRevenue += revenue;
+    totalCost += cost;
   }
 
-  document.getElementById('tableBody').innerHTML = rows;
+  const totalProfit = totalRevenue - totalCost;
+  const grossMargin = totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue * 100) : 0;
+  const netMargin = totalRevenue > 0 ? (totalProfit / totalRevenue * 100) : 0;
+  const roi = investment > 0 ? (totalProfit / investment * 100) : 0;
+  const payback = totalProfit > 0 ? (investment / (totalProfit / 12)) : 0;
 
-  const netProfit = totalRevenue - totalCost - investment;
-  const roi = investment > 0 ? (netProfit / investment) * 100 : 0;
-  const margin = totalRevenue > 0 ? ((totalRevenue - totalCost) / totalRevenue) * 100 : 0;
-
+  document.getElementById('kpiGrossMargin').textContent = grossMargin.toFixed(1) + '%';
+  document.getElementById('kpiNetMargin').textContent = netMargin.toFixed(1) + '%';
   document.getElementById('kpiROI').textContent = roi.toFixed(1) + '%';
-  document.getElementById('kpiMargin').textContent = margin.toFixed(1) + '%';
-  document.getElementById('kpiPayback').textContent = paybackMonth;
+  document.getElementById('kpiPayback').textContent = payback.toFixed(1) + ' 月';
+
+  renderTable();
 }
 
-// ===== 重置参数 =====
-function resetParams() {
-  document.getElementById('paramInvestment').value = 50000;
-  document.getElementById('paramGrowth').value = 5;
-  document.getElementById('paramCost').value = 8000;
-  document.getElementById('paramRevenue').value = 12000;
-  updateROI();
+// 渲染表格
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const thMonth = document.getElementById('thMonth');
+  thMonth.textContent = months[currentMonth];
+
+  const current = financeData[currentMonth];
+  const q1Revenue = financeData.slice(0,3).reduce((s,m) => s + m.revenue, 0);
+  const q1Cost = financeData.slice(0,3).reduce((s,m) => s + m.cost, 0);
+  const q1Profit = q1Revenue - q1Cost;
+  const yearRevenue = financeData.reduce((s,m) => s + m.revenue, 0);
+  const yearCost = financeData.reduce((s,m) => s + m.cost, 0);
+  const yearProfit = yearRevenue - yearCost;
+
+  tbody.innerHTML = `
+    <tr>
+      <td class="table-cell font-medium text-left">收入</td>
+      <td class="table-cell">$${current.revenue.toFixed(0)}</td>
+      <td class="table-cell">$${q1Revenue.toFixed(0)}</td>
+      <td class="table-cell">$${yearRevenue.toFixed(0)}</td>
+    </tr>
+    <tr>
+      <td class="table-cell font-medium text-left">成本</td>
+      <td class="table-cell">$${current.cost.toFixed(0)}</td>
+      <td class="table-cell">$${q1Cost.toFixed(0)}</td>
+      <td class="table-cell">$${yearCost.toFixed(0)}</td>
+    </tr>
+    <tr class="bg-slate-50">
+      <td class="table-cell font-medium text-left">利润</td>
+      <td class="table-cell font-semibold">$${current.profit.toFixed(0)}</td>
+      <td class="table-cell font-semibold">$${q1Profit.toFixed(0)}</td>
+      <td class="table-cell font-semibold">$${yearProfit.toFixed(0)}</td>
+    </tr>
+  `;
 }
 
-// ===== 下载模板 =====
-function downloadTemplate() {
-  const wb = XLSX.utils.book_new();
-  const data = [
-    ['月份', '收入 ($)', '成本 ($)', '利润 ($)'],
-    ['M1', 12000, 8000, 4000],
-    ['M2', 12600, 8000, 4600],
-    ['M3', 13230, 8000, 5230]
-  ];
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  XLSX.utils.book_append_sheet(wb, ws, '财务模型');
-  XLSX.writeFile(wb, 'financial-model-template.xlsx');
+// 选择月份
+function selectMonth(index) {
+  currentMonth = index;
+  document.querySelectorAll('.month-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+  });
+  renderTable();
 }
 
 // ===== Ed25519 验签 =====
@@ -226,34 +247,33 @@ function verifyEd25519Signature() {
     localStorage.setItem('apex_paid', 'true');
     return true;
   }
-  return false;
+  return localStorage.getItem('apex_paid') === 'true';
 }
 
-// ===== 导出处理 =====
+// ===== 导出 XLSX =====
 function handleExport() {
   if (!verifyEd25519Signature()) {
-    alert('⚠️ 请先完成 $9.99 支付，验签通过后解锁导出。');
+    alert('⚠️ 未检测到有效支付签名。请完成 $9.99 支付后重试。');
     return;
   }
-  const investment = parseFloat(document.getElementById('paramInvestment').value) || 0;
-  const growth = parseFloat(document.getElementById('paramGrowth').value) || 0;
-  const cost = parseFloat(document.getElementById('paramCost').value) || 0;
-  const revenue = parseFloat(document.getElementById('paramRevenue').value) || 0;
-
-  const wb = XLSX.utils.book_new();
-  const rows = [['月份', '收入 ($)', '成本 ($)', '利润 ($)']];
-  for (let i = 0; i < 12; i++) {
-    const monthRevenue = revenue * Math.pow(1 + growth / 100, i);
-    const monthCost = cost;
-    rows.push(['M' + (i + 1), monthRevenue.toFixed(2), monthCost.toFixed(2), (monthRevenue - monthCost).toFixed(2)]);
-  }
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  XLSX.utils.book_append_sheet(wb, ws, '财务模型');
-  XLSX.writeFile(wb, 'apex-financial-model.xlsx');
+  exportXLSX();
 }
 
-// ===== 启动 =====
-init();
+function exportXLSX() {
+  const wb = XLSX.utils.book_new();
+  const data = [['月份', '收入', '成本', '利润']];
+  financeData.forEach((m, i) => {
+    data.push([months[i], m.revenue.toFixed(2), m.cost.toFixed(2), m.profit.toFixed(2)]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, '财务预测');
+  XLSX.writeFile(wb, 'APEXWORK-Financial-Model.xlsx');
+  alert('✅ XLSX 已生成，感谢购买！');
+}
+
+// ===== 初始化 =====
+initFinanceData();
+updateROI();
 </script>
 </body>
 </html>
