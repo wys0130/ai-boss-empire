@@ -6,5 +6,6 @@
     { "id": "excel", "filename": "excel-editor.html", "title": "Excel 财务模型工作台" },
     { "id": "word", "filename": "word-editor.html", "title": "Word ATS 合规报告编辑器" },
     { "id": "admin", "filename": "admin.html", "title": "AI 驾驶舱" }
+    
   ]
 }
