@@ -1,11 +1,16 @@
 {
   "project_name": "APEXWORK ENTERPRISE SUITE STORE",
   "updated_at": "2026-08-04",
+  "rlff_engine": {
+    "reward_signal": "daily_success_orders",
+    "pruning_threshold": 7,
+    "min_ctr": 0.005
+  },
   "summary": {
-    "total_tasks": 10,
-    "completed": 8,
+    "total_tasks": 13,
+    "completed": 10,
     "in_progress": 2,
-    "todo": 0
+    "todo": 1
   },
   "tasks": [
     {
@@ -59,18 +64,18 @@
     {
       "id": "TASK-007",
       "title": "打通 $9.99 结账与 Ed25519 签名发放链路",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "department": "缺陷反馈部 & 转化销售部",
       "revenue_impact": "CRITICAL",
-      "notes": "缺陷部已设立直报栏，正由工程部对接商用结算"
+      "notes": "已通过 zero-auth.js 对接在线结账回跳，持久化写入 Ed25519 签名"
     },
     {
       "id": "TASK-008",
       "title": "Excel 财务模型线真实编辑功能建立 (excel-editor.html)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "department": "主动产品部 & 施工工程部",
       "revenue_impact": "HIGH",
-      "notes": "主动产品部已开工单，施工工程部正在构建表格内核"
+      "notes": "Excel 模型 12 个月财务预测与 KPI 实时矩阵已上线，支持导出 XLSX"
     },
     {
       "id": "TASK-009",
@@ -78,15 +83,39 @@
       "status": "DONE",
       "department": "主动产品部 & 施工工程部",
       "revenue_impact": "HIGH",
-      "notes": "已开辟欧美 ATS 合规双语展示编辑器外壳"
+      "notes": "已建立欧美 ATS 企业级合规九大章节编辑器，支持导出 DOCX"
     },
     {
       "id": "TASK-010",
       "title": "海外自动引流与出海适配 (i18n / Reddit / Pinterest 推广)",
-      "status": "DONE",
+      "status": "IN_PROGRESS",
       "department": "推广营销部 & 国际本地化部",
       "revenue_impact": "HIGH",
       "notes": "依赖支付上线后自动开跑全网引流文案"
+    },
+    {
+      "id": "TASK-011",
+      "title": "接入 GitHub Actions 每天 2 次云端永动机自主巡航优化",
+      "status": "IN_PROGRESS",
+      "department": "大脑中枢 & SRE容灾部",
+      "revenue_impact": "CRITICAL",
+      "notes": "通过 ai-autonomous-agent.yml 定时拉起 DeepSeek 自主精修 HTML 与代码"
+    },
+    {
+      "id": "TASK-012",
+      "title": "建立基于成交率的 RLFF 组件末位淘汰与算力池奖励",
+      "status": "DONE",
+      "department": "数据与AB测试部 & 算法提示词调优部",
+      "revenue_impact": "CRITICAL",
+      "notes": "连续7天无购买或展示点击率低于0.5%的卡片版式自动进冷宫"
+    },
+    {
+      "id": "TASK-013",
+      "title": "欧美本地化汇率与境内/海外支付无痕自适应匹配",
+      "status": "TODO",
+      "department": "国际出海本地化部",
+      "revenue_impact": "MEDIUM",
+      "notes": "利用 IP 识别动态切换 ¥69(微信/支付宝) 与 $9.99(Stripe/Apple Pay) 网关"
     }
   ]
 }
