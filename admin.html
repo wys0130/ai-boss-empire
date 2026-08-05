@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK 驾驶舱 (V36 终极精修版)</title>
+    <title>APEXWORK 驾驶舱 (V37 标准版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="bg-[#0b0f19] text-[#f8fafc] min-h-screen flex flex-col justify-between p-3 font-sans">
 
-    <!-- 极速浮动说明卡片 -->
+    <!-- 悬浮说明气泡 -->
     <div id="apexTooltip"></div>
 
-    <!-- 👑 顶栏：砍掉多余的主页按钮，保留干练的数据与控制按钮 -->
+    <!-- 👑 顶栏：砍掉多余的主页按键，只保留极炼的运维功能 -->
     <header class="max-w-7xl w-full mx-auto bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-2.5 mb-2.5 flex flex-wrap items-center justify-between gap-3 shadow-lg">
         <div class="flex items-center gap-2.5">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -46,7 +46,7 @@
         </div>
     </div>
 
-    <!-- 1. 三期目标工单进度看板 (单行强制省略 + 气泡展示全文) -->
+    <!-- 1. 三期目标工单进度看板 -->
     <section class="max-w-7xl w-full mx-auto mb-2.5 bg-[#111827] border border-[#1f2937] rounded-xl p-3 shadow-md">
         <div class="flex items-center justify-between mb-2 border-b border-slate-800 pb-1.5">
             <div class="flex items-center gap-2">
@@ -73,7 +73,7 @@
             <button onclick="resetDeptFilter()" class="text-[10px] text-slate-400 hover:text-white px-2 py-0.5">清空视图</button>
         </div>
         <div class="grid grid-cols-3 lg:grid-cols-9 gap-1.5 text-center font-mono" id="deptButtonsContainer">
-            <!-- 见 js/admin-core.js 自动生成莫兰迪按键 -->
+            <!-- 见 components/admin-core.js 自动生成莫兰迪按键 -->
         </div>
     </section>
 
@@ -111,7 +111,7 @@
                 <pre id="log" class="flex-1 text-[11px] font-mono text-slate-300 p-2.5 bg-[#0b0f19] border border-slate-800 rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱在线。严格点击插入模式生效中。</pre>
             </div>
 
-            <!-- 👑 仅保留右下角这一个主页按键，并采用好看的蓝紫渐变高亮样式！ -->
+            <!-- 👑 唯一保留、且采用高级渐变蓝紫样式的直达商城按键！ -->
             <div class="mt-1.5 pt-1.5 border-t border-slate-800 flex justify-between items-center text-xs">
                 <span class="text-slate-500 font-mono text-[10px]">AUTO-EVOLVE: ACTIVE</span>
                 <button onclick="openLiveSiteForceBypass()" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white border border-blue-400/50 rounded-lg font-bold shadow-md transition flex items-center gap-1.5 text-xs">
@@ -121,7 +121,7 @@
         </section>
     </main>
 
-    <!-- 纯洁加载远端核心控制脚本 -->
-    <script src="js/admin-core.js"></script>
+    <!-- 👑 引入你现有的 components/ 文件夹中的控制脚本 -->
+    <script src="components/admin-core.js"></script>
 </body>
 </html>
