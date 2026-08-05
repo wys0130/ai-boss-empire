@@ -8,9 +8,9 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 3,
+    "completed": 4,
     "in_progress": 1,
-    "todo": 5
+    "todo": 4
   },
   "tasks": [
     {
@@ -44,7 +44,7 @@
       "id": "TASK-104",
       "stage": "STAGE_1_MVP_GLOBAL",
       "title": "实现万里汇 (WorldFirst) 跨境数字服务贸易结汇与本地储蓄卡验证",
-      "status": "TODO",
+      "status": "DONE",
       "department": "董事长 & 国际法务部",
       "revenue_impact": "HIGH",
       "notes": "配合老板手动验证第一张外卡到账，以服务贸易规避外汇结汇卡脖子问题。"

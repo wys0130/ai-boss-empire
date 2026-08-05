@@ -164,6 +164,61 @@
           "tag": "05. ASK"
         }
       ]
+    },
+    "leap_gravity_llm_pitch": {
+      "key": "leap_gravity_llm_pitch",
+      "brand": "APEXWORK",
+      "titleName": "Position: LLMs Can't Jump — Gravity Is the New Edge",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "startup",
+      "slides": [
+        {
+          "id": 1,
+          "title": "LLMs Can't Jump — But We Can",
+          "sub": "Positioning is the missing leap in AI's next curve",
+          "kpi": "0.1s",
+          "label": "Latency to Insight",
+          "progress": 85,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "Gravity Is Worth Asking About",
+          "sub": "Market pull vs. model push — we side with gravity",
+          "kpi": "3.2x",
+          "label": "Faster Market Fit",
+          "progress": 70,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Stateless MCP: Speed Without Strings",
+          "sub": "Zero-state orchestration for real-time decisions",
+          "kpi": "99.99%",
+          "label": "Uptime SLA",
+          "progress": 95,
+          "tag": "03. SOLUTION"
+        },
+        {
+          "id": 4,
+          "title": "Pi Minimalism: Less Code, More Value",
+          "sub": "One-line logic replaces thousand-line stacks",
+          "kpi": "−78%",
+          "label": "Dev Effort Cut",
+          "progress": 88,
+          "tag": "04. TRACTION"
+        },
+        {
+          "id": 5,
+          "title": "The Leap Is Now",
+          "sub": "Invest in the position, not the prediction",
+          "kpi": "$12M",
+          "label": "Pipeline in Q3",
+          "progress": 100,
+          "tag": "05. CLOSE"
+        }
+      ]
     }
   }
 }
