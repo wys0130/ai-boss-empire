@@ -8,9 +8,9 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 4,
+    "completed": 5,
     "in_progress": 1,
-    "todo": 4
+    "todo": 3
   },
   "tasks": [
     {
@@ -53,7 +53,7 @@
       "id": "TASK-201",
       "stage": "STAGE_2_CN_UPGRADE",
       "title": "国内正规军升级：接入广州网络经营个体户执照与对对公参数",
-      "status": "TODO",
+      "status": "DONE",
       "department": "董事长 & 国际法务部",
       "revenue_impact": "HIGH",
       "notes": "赚到第一笔美金且流水稳定后启动。办执照不租实体办公室，完成电子税务局核定。"

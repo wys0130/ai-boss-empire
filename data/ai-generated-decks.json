@@ -274,6 +274,61 @@
           "tag": "05. CLOSURE"
         }
       ]
+    },
+    "retrieval_gravity_ultra": {
+      "key": "retrieval_gravity_ultra",
+      "brand": "APEXWORK",
+      "titleName": "100x Cheaper Retrieval: Beating GPT-5.6 Sol with Open-Weight Gravity",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "startup",
+      "slides": [
+        {
+          "id": 1,
+          "title": "Retrieval Is the New Moats — Cost Is the Gravity",
+          "sub": "Open models at 1/100th cost outperform closed giants on recall.",
+          "kpi": "100x",
+          "label": "Cost Reduction",
+          "progress": 10,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "Why GPT-5.6 Sol Fails on Long-Tail Queries",
+          "sub": "Parametric memory decays; retrieval-augmented open weights stay fresh.",
+          "kpi": "-98%",
+          "label": "Latency Drop",
+          "progress": 25,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Open-Weight Stack: Dense + Sparse Hybrid Retrieval",
+          "sub": "Combine bi-encoders with inverted indexes — no API lock-in.",
+          "kpi": "+87%",
+          "label": "Recall Lift",
+          "progress": 50,
+          "tag": "03. SOLUTION"
+        },
+        {
+          "id": 4,
+          "title": "Benchmark: Beat Sol on NQ, TriviaQA, and BEIR",
+          "sub": "Our pipeline wins on 12/15 datasets while costing $0.004 per 1k queries.",
+          "kpi": "12/15",
+          "label": "Win Rate",
+          "progress": 75,
+          "tag": "04. PROOF"
+        },
+        {
+          "id": 5,
+          "title": "Deploy in Days: From Prototype to Production at Scale",
+          "sub": "One-click Kubernetes helm chart, auto-scaling to 10k QPS.",
+          "kpi": "3d",
+          "label": "Time-to-Market",
+          "progress": 95,
+          "tag": "05. CALL"
+        }
+      ]
     }
   }
 }
