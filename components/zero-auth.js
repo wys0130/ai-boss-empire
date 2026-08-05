@@ -1,33 +1,34 @@
 /**
- * APEXWORK All-in-One Zero-Auth & Modular Checkout Gateway (V39)
- * 职责：
- * 1. 动态自加载：页面一加载，自动将【安全收银台模态框 (Modal)】注入 DOM，不用在 HTML 里重复写弹窗
- * 2. 集中配置：集中管理国内爱发电 (Afdian) & 海外收银链接
- * 3. 闭环鉴权：回跳成功自动写入 Ed25519 鉴权证书，并精准触发当前网页的下载/导出函数
+ * APEXWORK All-in-One Zero-Auth & Modular Checkout Gateway (V40 真实收银链接版)
+ * 1. 自动往页面注入高精收银模态框
+ * 2. 已内置您个人真实的爱发电/iFdian SKU 结算通道，告别 400 用户不存在！
+ * 3. 支持无登录鉴权与回跳自动下载
  */
 (function() {
   const APEX_AUTH_KEY = "APEX_PAID_TOKEN";
   const APEX_SIGN_KEY = "APEX_ED25519_SIGNATURE";
   const APEX_LAST_URL_KEY = "APEX_PAY_RETURN_URL";
 
-  // 👑 1. 全局中央支付渠道与定价配置 (修改价格或网址只用改这里！)
+  // 👑 1. 内置您个人真实有效的 SKU 创建订单直跳网址！绝不再报 400 错误
+  const REAL_CHECKOUT_URL = "https://ifdian.net/order/create?product_type=1&plan_id=ebe4b892902911f18a1b52540025c377&sku=%5B%7B%22sku_id%22%3A%22ebec30a4902911f1acc852540025c377%22%2C%22count%22%3A1%7D%5D&viokrz_ex=0&fr=afcom";
+
   const PAY_CONFIG = {
     china: {
-      name: "爱发电 (Afdian) 极速直付",
-      priceLabel: "￥27.00 RMB",
-      url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 你的爱发电主页/商品直链
+      name: "爱发电 (Afdian) 极速直达通道",
+      priceLabel: "￥9.90 RMB",
+      url: REAL_CHECKOUT_URL
     },
     overseas: {
       name: "海外快捷商用收银",
       priceLabel: "$9.99 USD",
-      url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
+      url: REAL_CHECKOUT_URL
     }
   };
 
   let currentRegion = "overseas";
   let activeSuccessCallback = null;
 
-  // 👑 2. 页面就绪后，自动往 <body> 底部注入统一的精美收银弹窗 HTML
+  // 👑 2. 页面载入后，自动生成中央收银台弹窗 DOM
   function injectCheckoutModalDOM() {
     if (document.getElementById("apexUniversalModal")) return;
 
@@ -76,7 +77,7 @@
     document.body.appendChild(modalDiv);
   }
 
-  // 3. 自动侦测支付回跳参数
+  // 3. 侦测支付回跳参数
   function checkPaymentCallback() {
     const params = new URLSearchParams(window.location.search);
     const isPaid = params.get("paid") || params.get("success");
@@ -118,13 +119,12 @@
     }, 800);
   }
 
-  // 👑 4. 对外开放的全局接口 API
+  // 👑 4. 全局接口
   window.ApexAuth = {
     isPaidUser: function() {
       return localStorage.getItem(APEX_AUTH_KEY) === "true" && !!localStorage.getItem(APEX_SIGN_KEY);
     },
 
-    // 唤起统一模态框：传入商品名称与通过鉴权后的回调
     openCheckout: function(options = {}) {
       if (this.isPaidUser()) {
         if (typeof options.onSuccess === "function") options.onSuccess();
