@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V29 @无残留终极版)</title>
+    <title>ApexWork AI 驾驶舱 (V30 @战略看板版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -68,7 +68,7 @@
         <div class="flex items-center gap-3">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V29 @零残留补全</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V30 @战略看板版</span>
             <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -77,6 +77,9 @@
             </button>
             <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition shadow-sm">
                 <span>⏳ 一键回退</span>
+            </button>
+            <button onclick="loadTasksManifest()" class="text-xs font-mono px-3 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/40 rounded-lg transition font-bold">
+                <span>📋 刷新计划</span>
             </button>
             <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition">
                 <span>🔄 刷新记事</span>
@@ -109,6 +112,29 @@
             </div>
         </div>
     </div>
+
+    <!-- 👑 战略工单与三期里程碑看板 (TASK MANIFEST DASHBOARD) -->
+    <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between mb-3 border-b border-gray-500/20 pb-2">
+            <div class="flex items-center gap-2">
+                <span class="text-amber-400 font-bold font-mono text-xs">📋 前·中·后三期战略工单看板 (TASKS MANIFEST):</span>
+                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded">
+                    载入中...
+                </span>
+            </div>
+            <div class="flex gap-1.5 font-mono text-[10px]">
+                <button onclick="filterManifest('ALL')" class="manifest-tab px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold">全景 (ALL)</button>
+                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white">前期 [MVP出海]</button>
+                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white">中期 [国内合规]</button>
+                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white">后期 [全面躺利]</button>
+            </div>
+        </div>
+
+        <!-- 任务列表容器 -->
+        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+            <div class="text-center text-xs themed-subtext py-6 font-mono col-span-full">正在拉取远端 TASKS_MANIFEST.json ...</div>
+        </div>
+    </section>
 
     <!-- 9 大部门按键 -->
     <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
@@ -204,7 +230,7 @@
                 </div>
 
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 蜂群智能协同 (V29 引擎)</span>
+                    <span>🚀 立即发车 / 蜂群智能协同 (V30 引擎)</span>
                 </button>
             </div>
 
@@ -214,7 +240,7 @@
                     <span>SWARM TERMINAL:</span>
                     <span class="text-emerald-500 font-mono">● READY</span>
                 </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V29 在线。已完美解决 @ 下拉选择后的字符残留问题。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V30 在线。三期战略工单看板与全链路协同已激活。</pre>
             </div>
 
             <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
@@ -232,6 +258,8 @@
         let activeFilterDept = "";
         let qaMonitorInterval = null;
         let isAutoHealing = false;
+        let rawManifestTasks = [];
+        let currentManifestFilter = 'ALL';
 
         const allDeptNames = [
             "大脑中枢", "缺陷与QA质检部", "主动产品部", "施工工程部", 
@@ -265,6 +293,7 @@
             toggleConfig();
             alert("✅ 密钥生效!");
             loadHistoryFromMemory();
+            loadTasksManifest();
             startQAGuardLoop();
         }
 
@@ -352,6 +381,110 @@
             loadHistoryFromMemory();
         }
 
+        // 👑 计划书与三期战略看板 (TASKS_MANIFEST.json 挂载引擎)
+        async function loadTasksManifest() {
+            const listEl = document.getElementById('manifestList');
+            try {
+                const keys = getKeys();
+                const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+                if (!fileObj.content) {
+                    listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full">尚未在仓库根目录找到 TASKS_MANIFEST.json 文件</div>`;
+                    return;
+                }
+                const manifest = JSON.parse(fileObj.content);
+                rawManifestTasks = manifest.tasks || [];
+                
+                // 更新顶部概览角标
+                const sum = manifest.summary || { completed: 0, total_tasks: 0 };
+                document.getElementById('manifestSummaryBadge').innerText = `完成度: ${sum.completed}/${sum.total_tasks} | 考核日期: ${manifest.updated_at || '实时'}`;
+                
+                renderManifestTasks();
+            } catch (err) {
+                listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full">拉取远端计划书异常: ${err.message}</div>`;
+            }
+        }
+
+        function filterManifest(stageKey) {
+            currentManifestFilter = stageKey;
+            document.querySelectorAll('.manifest-tab').forEach(btn => {
+                btn.className = "manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white";
+            });
+            event.target.className = "manifest-tab px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
+            renderManifestTasks();
+        }
+
+        function renderManifestTasks() {
+            const listEl = document.getElementById('manifestList');
+            listEl.innerHTML = "";
+
+            const filtered = currentManifestFilter === 'ALL' 
+                ? rawManifestTasks 
+                : rawManifestTasks.filter(t => t.stage === currentManifestFilter || (!t.stage && currentManifestFilter === 'ALL'));
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="text-center text-xs themed-subtext py-6 col-span-full font-mono">该目标阶段暂无下派工单</div>`;
+                return;
+            }
+
+            filtered.forEach(task => {
+                const isDone = task.status === 'DONE';
+                const isInProg = task.status === 'IN_PROGRESS';
+                
+                let borderCls = isDone ? "border-emerald-500/50 bg-emerald-500/5" : (isInProg ? "border-amber-500/50 bg-amber-500/5" : "border-slate-800 themed-inner");
+                let badgeTxt = isDone ? "✅ DONE" : (isInProg ? "🔥 推进中" : "📌 TODO");
+                let badgeCls = isDone ? "bg-emerald-500/20 text-emerald-400" : (isInProg ? "bg-amber-500/20 text-amber-400" : "bg-slate-800 text-slate-400");
+                
+                let stageTag = task.stage === 'STAGE_1_MVP_GLOBAL' ? '前期[MVP出海]' : (task.stage === 'STAGE_2_CN_UPGRADE' ? '中期[国内合规]' : (task.stage === 'STAGE_3_FULL_SCALE' ? '后期[全能躺赢]' : '通用任务'));
+
+                listEl.innerHTML += `
+                    <div class="border rounded-xl p-2.5 flex flex-col justify-between transition ${borderCls}">
+                        <div>
+                            <div class="flex items-center justify-between text-[10px] font-mono mb-1">
+                                <span class="font-bold text-indigo-400">[${task.id}] · ${stageTag}</span>
+                                <span class="font-bold px-1.5 py-0.5 rounded ${badgeCls}">${badgeTxt}</span>
+                            </div>
+                            <div class="text-xs font-bold themed-text font-mono truncate mb-1" title="${task.title}">${task.title}</div>
+                            <div class="text-[11px] themed-subtext font-mono line-clamp-2">${task.notes || '没有额外备注说明'}</div>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-gray-500/10 flex items-center justify-between text-[10px] font-mono">
+                            <span class="text-slate-400 truncate max-w-[130px]">👥 ${task.department}</span>
+                            <button onclick="toggleTaskStatus('${task.id}')" class="px-2 py-0.5 rounded border border-slate-700 hover:bg-slate-800 text-indigo-400 font-bold transition">
+                                ${isDone ? '撤销打勾' : '🎯 完成打勾'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function toggleTaskStatus(taskId) {
+            const task = rawManifestTasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const prevStatus = task.status;
+            task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
+            appendLog(`✏️ 董事长发起手动进度更新: [${taskId}] 状态自 "${prevStatus}" 变更为 "${task.status}"...`, "text-amber-400");
+            
+            try {
+                const keys = getKeys();
+                const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+                const manifest = JSON.parse(fileObj.content);
+                const targetInManifest = manifest.tasks.find(t => t.id === taskId);
+                if (targetInManifest) {
+                    targetInManifest.status = task.status;
+                    manifest.summary.completed = manifest.tasks.filter(t => t.status === 'DONE').length;
+                    manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
+                    manifest.updated_at = new Date().toISOString().slice(0, 10);
+                    
+                    await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Chairman: Check Milestone Task [${taskId}] -> ${task.status}`, keys.gh);
+                    appendLog(`✅ TASKS_MANIFEST.json 计划看板已同步更新至 GitHub 仓库！`, "text-emerald-500 font-bold");
+                    await loadTasksManifest();
+                }
+            } catch (e) {
+                appendLog(`❌ 更新工单进度出现错误: ${e.message}`, "text-rose-500");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             const cmdBox = document.getElementById("cmd");
             const dropdown = document.getElementById("mentionDropdown");
@@ -411,7 +544,6 @@
                 const item = document.createElement("div");
                 item.className = "mention-item themed-text border-b border-gray-500/10 flex items-center justify-between";
                 item.innerHTML = `<span>@${dept}</span><span class="text-[9px] themed-subtext">主责部门</span>`;
-                // 👑 重点升级：onmousedown 配合 preventDefault 防止失去焦点导致字符漏删！
                 item.onmousedown = (e) => {
                     e.preventDefault();
                     selectMentionDept(dept);
@@ -429,7 +561,6 @@
             if (dropdown) dropdown.style.display = "none";
         }
 
-        // 👑 重点升级：使用 Range 同时覆盖 @ 字符和已输入的关键词，彻底销毁，零残留！
         function selectMentionDept(deptName) {
             hideMentionDropdown();
             const cmdBox = document.getElementById("cmd");
@@ -445,14 +576,12 @@
                     const cursorOffset = range.startOffset;
                     const atIdx = text.lastIndexOf("@", cursorOffset);
                     if (atIdx !== -1) {
-                        // 覆盖从 @ 到光标结束的位置，全部彻底剔除！
                         range.setStart(textNode, atIdx);
                         range.setEnd(textNode, cursorOffset);
                         range.deleteContents();
                     }
                 }
 
-                // 嵌入词条胶囊
                 const tokenSpan = createDeptTokenElement(deptName);
                 range.insertNode(tokenSpan);
                 const spaceNode = document.createTextNode(" ");
@@ -812,7 +941,7 @@ ${memoryFile.content || "无"}
                 appendLog("❌ 协同会商异常: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V29 引擎)</span>";
+                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V30 引擎)</span>";
             }
         }
 
@@ -820,6 +949,7 @@ ${memoryFile.content || "无"}
             initAdminTheme();
             if (localStorage.getItem("APEX_GH_TOKEN")) {
                 loadHistoryFromMemory();
+                loadTasksManifest();
                 startQAGuardLoop();
             }
             document.getElementById("cmd").addEventListener("keydown", function(e) {
