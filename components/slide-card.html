@@ -1,16 +1,20 @@
-<!-- 幻灯片卡片视图模版：优先单行、折行绝对居中、文字极少、强调 SVG 进度条 -->
-<div class="slide-card-wrapper w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden my-auto" style="background: {{OVERLAY}}, url('{{BG_URL}}'); background-size: cover; background-position: center;">
+<!-- APEXWORK 幻灯片通用智能卡片视图 (支持 Cover / Bento / Compare / Timeline 多布局) -->
+<div class="slide-card-wrapper w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-8 md:p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden my-auto select-text" 
+     style="background: {{OVERLAY}}, url('{{BG_URL}}'); background-size: cover; background-position: center;">
     
-    <!-- 顶层标识标签 -->
-    <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10">
-        <span class="text-xs font-bold font-mono tracking-widest text-slate-300">{{BRAND}} · DECK</span>
-        <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">{{TAG}}</span>
+    <!-- 顶部商用标识栏 -->
+    <div class="flex justify-between items-center border-b border-white/10 pb-2.5 z-10">
+        <span class="text-xs font-bold font-mono tracking-widest text-slate-300">{{BRAND}} · ENTERPRISE DECK</span>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded font-bold">100% EDGE-NATIVE</span>
+            <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">{{TAG}}</span>
+        </div>
     </div>
 
-    <!-- 中心视觉标语区：折行绝对居中 -->
-    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col {{ALIGN_CLASS}} w-full mx-auto">
+    <!-- 核心视觉标语与正文区 (动态对齐，优先一句话呈现) -->
+    <div class="my-auto py-3 z-10 max-w-3xl flex flex-col {{ALIGN_CLASS}} w-full mx-auto">
         <h2 contenteditable="true" data-field="title" 
-            class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full {{TEXT_ALIGN}}">
+            class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-2.5 drop-shadow-md w-full {{TEXT_ALIGN}} text-white">
             {{TITLE}}
         </h2>
         <p contenteditable="true" data-field="sub" 
@@ -19,19 +23,29 @@
         </p>
     </div>
 
-    <!-- 底部：关键指标 KPI 与 SVG 可视化能量进度条 -->
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center">
-        <div class="md:col-span-5 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{{LABEL}}</div>
-            <div contenteditable="true" data-field="kpi" class="text-2xl font-black font-mono {{KPI_COLOR}} drop-shadow-sm">{{KPI}}</div>
-        </div>
-        <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
-            <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
-                <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
-                <span class="text-blue-400 font-bold">{{PROGRESS}}%</span>
+    <!-- 动态排版分发引擎：依据布局模式展示多款数据呈现表 -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-4 border-t border-white/10 z-10 items-center">
+        <!-- 主 KPI 可视化数据舱 -->
+        <div class="md:col-span-5 bg-slate-900/85 backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg flex flex-col justify-between">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex justify-between">
+                <span>{{LABEL}}</span>
+                <span class="text-blue-400 font-mono">KPI VALUE</span>
             </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: {{PROGRESS}}%"></div>
+            <div contenteditable="true" data-field="kpi" class="text-2xl md:text-3xl font-black font-mono {{KPI_COLOR}} drop-shadow-sm">{{KPI}}</div>
+        </div>
+
+        <!-- 动态能量进度条与行业分位比对 -->
+        <div class="md:col-span-7 bg-slate-900/70 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center space-y-2">
+            <div class="flex justify-between items-center text-[11px] font-mono">
+                <span class="text-slate-300 font-bold">● BENCHMARK ACHIEVEMENT</span>
+                <span class="text-emerald-400 font-bold font-mono">{{PROGRESS}}%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-700/80">
+                <div class="bg-gradient-to-r from-blue-500 via-indigo-400 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: {{PROGRESS}}%"></div>
+            </div>
+            <div class="flex justify-between text-[9px] font-mono text-slate-400">
+                <span>INDUSTRY AVG: 45%</span>
+                <span>APEXWORK TARGET: 100%</span>
             </div>
         </div>
     </div>
