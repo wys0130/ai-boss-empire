@@ -1,8 +1,7 @@
 /**
- * APEXWORK 驾驶舱模块化控制内核 (js/admin-core.js)
- * 特性：
- * 1. 完整在 DOMContentLoaded 调用 renderDeptButtons，保证 9 大部门正确渲染且绝对可点！
- * 2. 严格遵循 isCmdActive 判断：未点输入框不塞字，点了才塞。
+ * APEXWORK 驾驶舱模块化内核 (components/admin-core.js)
+ * 1. 自动挂载至全局 window，彻底解决 HTML onclick 点击无效问题
+ * 2. 严格遵循 isCmdActive 判断：没点击输入框不塞字，点了再塞
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -23,8 +22,13 @@ const deptConfig = [
     { name: "国际法务部", cls: "theme-teal" }
 ];
 
-// 👑 1. 核心修复：在这里显式执行 renderDeptButtons()，保证所有按钮顺畅渲染！
-window.addEventListener('DOMContentLoaded', () => {
+// 👑 全局直达主页
+window.openLiveSiteForceBypass = function() {
+    window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
+};
+
+// 👑 自动执行加载函数 (避开 DOMContentLoaded 时差死坑)
+function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
     
@@ -45,28 +49,32 @@ window.addEventListener('DOMContentLoaded', () => {
         cmdBox.addEventListener("keydown", function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
-                triggerSwarmAutonomousAction();
+                window.triggerSwarmAutonomousAction();
             }
             if (e.key === "Escape") hideMentionDropdown();
         });
     }
 
     if (localStorage.getItem("APEX_GH_TOKEN")) {
-        syncAllData();
+        window.syncAllData();
     }
-});
-
-function openLiveSiteForceBypass() {
-    window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
 }
 
-function syncAllData() {
+// 如果 DOM 已就绪立即执行，否则等待加载
+if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initAdminEngine);
+} else {
+    initAdminEngine();
+}
+
+window.syncAllData = function() {
     loadTasksManifest();
     loadHistoryFromMemory();
-}
+};
 
 function initApexTooltip() {
     const tooltip = document.getElementById("apexTooltip");
+    if (!tooltip) return;
     document.addEventListener("mouseover", (e) => {
         const target = e.target.closest("[data-tooltip]");
         if (target) {
@@ -95,20 +103,21 @@ function renderDeptButtons() {
         const btn = document.createElement("button");
         btn.className = `dept-btn border rounded p-1.5 text-left transition ${dept.cls}`;
         btn.innerHTML = `<div class="text-[11px] font-bold truncate">${dept.name}</div>`;
-        btn.onclick = () => inspectDept(dept.name, btn);
+        btn.onclick = () => window.inspectDept(dept.name, btn);
         container.appendChild(btn);
     });
 }
 
-// 👑 点击判断逻辑：没点击输入框点部门，绝不写一个字符到框里！
-function inspectDept(deptName, btnEl) {
+// 👑 点击判断规则：没先点过输入框，只筛选，绝对不写入文字！
+window.inspectDept = function(deptName, btnEl) {
     activeFilterDept = deptName;
-    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.45");
-    btnEl.style.opacity = "1";
-    document.getElementById("activeDeptLabel").innerText = `[${deptName}]`;
+    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
+    if (btnEl) btnEl.style.opacity = "1";
+    const activeLabel = document.getElementById("activeDeptLabel");
+    if (activeLabel) activeLabel.innerText = `[${deptName}]`;
 
     const cmdBox = document.getElementById("cmd");
-    if (isCmdActive) {
+    if (isCmdActive && cmdBox) {
         cmdBox.focus();
         const tokenSpan = document.createElement("span");
         tokenSpan.className = "dept-token";
@@ -134,24 +143,27 @@ function inspectDept(deptName, btnEl) {
         }
         appendLog(`🎯 插入词条 -> @${deptName}`);
     } else {
-        appendLog(`🔍 聚焦部门 -> [${deptName}] (未激活输入框，不写入词条)`);
+        appendLog(`🔍 聚焦部门 -> [${deptName}] (未点选输入框，仅作视图过滤)`);
     }
 
     loadHistoryFromMemory();
-}
+};
 
-function resetDeptFilter() {
+window.resetDeptFilter = function() {
     activeFilterDept = "";
     isCmdActive = false;
     document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "1");
-    document.getElementById("activeDeptLabel").innerText = `[全景视图]`;
-    document.getElementById("cmd").innerHTML = "";
+    const activeLabel = document.getElementById("activeDeptLabel");
+    if (activeLabel) activeLabel.innerText = `[全景视图]`;
+    const cmdBox = document.getElementById("cmd");
+    if (cmdBox) cmdBox.innerHTML = "";
     appendLog(`🌐 恢复全景模式`);
     loadHistoryFromMemory();
-}
+};
 
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
+    if (!listEl) return;
     try {
         const keys = getKeys();
         const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
@@ -162,24 +174,29 @@ async function loadTasksManifest() {
         const manifest = JSON.parse(fileObj.content);
         rawManifestTasks = manifest.tasks || [];
         const sum = manifest.summary || { completed: 0, total_tasks: 0 };
-        document.getElementById('manifestSummaryBadge').innerText = `完成度: ${sum.completed}/${sum.total_tasks}`;
+        const badge = document.getElementById('manifestSummaryBadge');
+        if (badge) badge.innerText = `完成度: ${sum.completed}/${sum.total_tasks}`;
         renderManifestTasks();
     } catch (err) {
-        listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取工单错误</div>`;
+        listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取工单错误: ${err.message}</div>`;
     }
 }
 
-function filterManifest(stageKey) {
+window.filterManifest = function(stageKey) {
     currentManifestFilter = stageKey;
     document.querySelectorAll('.manifest-tab').forEach(btn => {
         btn.className = "manifest-tab px-2.5 py-0.5 rounded text-slate-400 hover:text-white";
     });
-    event.target.className = "manifest-tab px-2.5 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
+    const targetBtn = window.event?.target;
+    if (targetBtn) {
+        targetBtn.className = "manifest-tab px-2.5 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
+    }
     renderManifestTasks();
-}
+};
 
 function renderManifestTasks() {
     const listEl = document.getElementById('manifestList');
+    if (!listEl) return;
     listEl.innerHTML = "";
 
     const filtered = currentManifestFilter === 'ALL' 
@@ -219,7 +236,7 @@ function renderManifestTasks() {
     });
 }
 
-async function toggleTaskStatus(taskId) {
+window.toggleTaskStatus = async function(taskId) {
     const task = rawManifestTasks.find(t => t.id === taskId);
     if (!task) return;
     task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
@@ -235,34 +252,39 @@ async function toggleTaskStatus(taskId) {
             manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
             manifest.updated_at = new Date().toISOString().slice(0, 10);
             await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
-            appendLog(`✅ 进度书已写回 GitHub`);
+            appendLog(`✅ 进度书已同步回 GitHub`);
             loadTasksManifest();
         }
     } catch (e) {
         appendLog(`❌ 更新进度异常: ${e.message}`, "text-rose-500");
     }
-}
+};
 
 function getKeys() {
     const gh = localStorage.getItem("APEX_GH_TOKEN");
     const ds = localStorage.getItem("APEX_DS_KEY");
-    if (!gh || !ds) { toggleConfig(); throw new Error("请先在顶栏配置密钥!"); }
+    if (!gh || !ds) { window.toggleConfig(); throw new Error("请先在顶栏配置密钥!"); }
     return { gh, ds };
 }
 
-function toggleConfig() { document.getElementById("configArea").classList.toggle("hidden"); }
-function saveKeys() {
+window.toggleConfig = function() {
+    const el = document.getElementById("configArea");
+    if (el) el.classList.toggle("hidden");
+};
+
+window.saveKeys = function() {
     localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
     localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
-    toggleConfig();
-    syncAllData();
-}
+    window.toggleConfig();
+    window.syncAllData();
+};
 
 function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
 function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
 function appendLog(msg, color = "") {
     const log = document.getElementById("log");
+    if (!log) return;
     if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2.5 bg-[#0b0f19] border border-slate-800 rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
     log.innerText += `\n>> ${msg}`;
     log.scrollTop = log.scrollHeight;
@@ -289,12 +311,14 @@ async function pushGithubFile(path, content, sha, message, token) {
 
 async function loadHistoryFromMemory() {
     const feed = document.getElementById("historyFeed");
+    if (!feed) return;
     try {
         const keys = getKeys();
         const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
         let lines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
         if (activeFilterDept) lines = lines.filter(l => l.includes(activeFilterDept));
-        document.getElementById("historyCount").innerText = `${lines.length}条`;
+        const countBadge = document.getElementById("historyCount");
+        if (countBadge) countBadge.innerText = `${lines.length}条`;
         if (lines.length === 0) {
             feed.innerHTML = `<div class="p-3 text-center text-xs text-slate-500 font-mono">无记录</div>`;
             return;
@@ -313,17 +337,25 @@ async function loadHistoryFromMemory() {
                 </div>
             `;
         });
-    } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取错误</div>`; }
+    } catch (err) {
+        feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取错误</div>`;
+    }
 }
 
-function openRollbackModal() {
-    document.getElementById("rollbackModal").classList.remove("hidden");
+window.openRollbackModal = function() {
+    const el = document.getElementById("rollbackModal");
+    if (el) el.classList.remove("hidden");
     fetchCommitHistory();
-}
-function closeRollbackModal() { document.getElementById("rollbackModal").classList.add("hidden"); }
+};
+
+window.closeRollbackModal = function() {
+    const el = document.getElementById("rollbackModal");
+    if (el) el.classList.add("hidden");
+};
 
 async function fetchCommitHistory() {
     const container = document.getElementById("commitListContainer");
+    if (!container) return;
     container.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 font-mono">加载中...</div>`;
     try {
         const keys = getKeys();
@@ -348,12 +380,14 @@ async function fetchCommitHistory() {
                 </div>
             `;
         });
-    } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取失败</div>`; }
+    } catch (err) {
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取失败</div>`;
+    }
 }
 
-async function revertToSelectedCommit(targetSha, shortSha) {
+window.revertToSelectedCommit = async function(targetSha, shortSha) {
     if (!confirm(`⏳ 确定还原至快照 [#${shortSha}] 吗？`)) return;
-    closeRollbackModal();
+    window.closeRollbackModal();
     try {
         const keys = getKeys();
         const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
@@ -371,14 +405,16 @@ async function revertToSelectedCommit(targetSha, shortSha) {
         appendLog(`✅ 快照还原成功 [#${shortSha}]`);
         loadHistoryFromMemory();
     } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
-}
+};
 
-async function triggerSwarmAutonomousAction() {
+window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
-    const rawText = cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报";
-    btn.disabled = true;
-    btn.innerHTML = "<span>⚙️ 蜂群协同执行中...</span>";
+    const rawText = cmdBox ? (cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报") : "常规进展汇报";
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "<span>⚙️ 蜂群协同执行中...</span>";
+    }
     try {
         const keys = getKeys();
         const [memoryFile, repoTreeRes] = await Promise.all([
@@ -405,12 +441,14 @@ async function triggerSwarmAutonomousAction() {
         const aiAnswer = (await dsRes.json()).choices[0].message.content;
         const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "完毕。";
         appendLog(`🤖 回复:\n${swarmLogText}`, "text-white");
-        cmdBox.innerHTML = "";
+        if (cmdBox) cmdBox.innerHTML = "";
         loadHistoryFromMemory();
     } catch (err) {
         appendLog("❌ 异常: " + err.message, "text-rose-500");
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = "<span>🚀 提交至云端蜂群协同执行</span>";
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = "<span>🚀 提交至云端蜂群协同执行</span>";
+        }
     }
-}
+};
