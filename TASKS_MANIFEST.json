@@ -8,9 +8,9 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 2,
+    "completed": 3,
     "in_progress": 1,
-    "todo": 6
+    "todo": 5
   },
   "tasks": [
     {
@@ -35,7 +35,7 @@
       "id": "TASK-103",
       "stage": "STAGE_1_MVP_GLOBAL",
       "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广引流贴",
-      "status": "TODO",
+      "status": "DONE",
       "department": "推广营销部 & 国际本地化部",
       "revenue_impact": "CRITICAL",
       "notes": "生产关于 Excel 财务模型和 PPT 战略演示的高价值欧美干货文，内嵌商城链接，发入 marketing/campaigns/ 目录。"

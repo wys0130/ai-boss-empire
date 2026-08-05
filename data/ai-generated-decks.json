@@ -109,6 +109,61 @@
           "tag": "05. CTA"
         }
       ]
+    },
+    "gravity_ask_worth": {
+      "key": "gravity_ask_worth",
+      "brand": "APEXWORK",
+      "titleName": "Gravity Is Worth Asking About",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "high-tech",
+      "slides": [
+        {
+          "id": 1,
+          "title": "When Gravity Pulls, Ask Why",
+          "sub": "Unseen forces drive every market shift.",
+          "kpi": "3.2x",
+          "label": "Signal Strength",
+          "progress": 100,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "The Weight of Inertia",
+          "sub": "Legacy systems resist change—until they break.",
+          "kpi": "-41%",
+          "label": "Legacy Drag",
+          "progress": 75,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Counter-Gravity Model",
+          "sub": "We flip the pull into propulsion.",
+          "kpi": "+180%",
+          "label": "Momentum Gain",
+          "progress": 85,
+          "tag": "03. SOLUTION"
+        },
+        {
+          "id": 4,
+          "title": "Orbital Metrics",
+          "sub": "Track escape velocity in real time.",
+          "kpi": "9.8m/s²",
+          "label": "Acceleration",
+          "progress": 95,
+          "tag": "04. PROOF"
+        },
+        {
+          "id": 5,
+          "title": "Launch Trajectory",
+          "sub": "One question changes the orbit.",
+          "kpi": "$2.4B",
+          "label": "Market Impact",
+          "progress": 100,
+          "tag": "05. ASK"
+        }
+      ]
     }
   }
 }
