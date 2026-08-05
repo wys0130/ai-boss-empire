@@ -3,870 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK 极简工业驾驶舱 (V32)</title>
+    <title>APEXWORK 驾驶舱 (模块化专业版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { -webkit-font-smoothing: antialiased; transition: background-color 0.2s, color 0.2s; }
+        body { -webkit-font-smoothing: antialiased; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 4px; }
-        body.theme-dark { --bg-body: #090d16; --bg-card: #111827; --bg-inner: #0b0f19; --border-color: #1f2937; --text-main: #f3f4f6; --text-sub: #6b7280; }
-        body.theme-light { --bg-body: #f3f4f6; --bg-card: #ffffff; --bg-inner: #f9fafb; --border-color: #e5e7eb; --text-main: #111827; --text-sub: #6b7280; }
-        .themed-body { background-color: var(--bg-body); color: var(--text-main); }
-        .themed-card { background-color: var(--bg-card); border-color: var(--border-color); }
-        .themed-inner { background-color: var(--bg-inner); border-color: var(--border-color); }
-        .themed-text { color: var(--text-main); }
-        .themed-subtext { color: var(--text-sub); }
-
-        /* 👑 绝对单行溢出截断 */
-        .truncate-line {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: block;
-        }
-
-        /* 👑 极速响应浮动说明框 (Tooltip) */
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        .truncate-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
         #apexTooltip {
-            position: fixed;
-            z-index: 9999;
-            pointer-events: none;
-            display: none;
-            max-width: 280px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(99, 102, 241, 0.4);
-            color: #f8fafc;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-family: monospace;
-            line-height: 1.5;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
-            white-space: pre-wrap;
+            position: fixed; z-index: 9999; pointer-events: none; display: none; max-width: 300px;
+            background: #09090e; border: 1px solid #3f3f46; color: #f4f4f5; padding: 8px 12px;
+            border-radius: 6px; font-size: 11px; font-family: monospace; line-height: 1.6;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8); white-space: pre-wrap;
         }
-
         .dept-token {
             display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.15);
             color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); padding: 1px 6px;
-            border-radius: 4px; font-size: 11px; font-weight: bold; margin: 0 2px;
-            cursor: pointer; user-select: none; white-space: nowrap;
+            border-radius: 4px; font-size: 11px; font-weight: 600; margin: 0 2px;
         }
-        .dept-token:hover { background: rgba(99, 102, 241, 0.3); }
-
         #mentionDropdown {
-            position: absolute; z-index: 100; display: none; width: 160px; max-height: 180px;
-            overflow-y: auto; border-radius: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            position: absolute; z-index: 100; display: none; width: 150px; max-height: 180px;
+            overflow-y: auto; border-radius: 6px; background: #141417; border: 1px solid #27272a;
         }
-        .mention-item { padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: monospace; }
-        .mention-item:hover, .mention-item.selected { background: rgba(99, 102, 241, 0.3); color: #ffffff; }
+        .mention-item { padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: monospace; color: #f4f4f5; }
+        .mention-item:hover { background: #27272a; }
     </style>
 </head>
-<body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-3 font-sans">
+<body class="bg-[#09090b] text-[#f4f4f5] min-h-screen flex flex-col justify-between p-3 font-sans">
 
-    <!-- 👑 极客急速气泡弹层 (挪上去秒出完整字) -->
     <div id="apexTooltip"></div>
 
-    <!-- 顶栏：极其克制，杜绝彩色干扰 -->
-    <header class="max-w-7xl w-full mx-auto themed-card border rounded-lg px-4 py-2 mb-2 flex items-center justify-between gap-3 shadow">
-        <div class="flex items-center gap-2">
+    <!-- 极简冷灰顶栏 -->
+    <header class="max-w-7xl w-full mx-auto bg-[#141417] border border-[#27272a] rounded-lg px-4 py-2 mb-2 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <h1 class="font-bold font-mono text-xs tracking-wide themed-text">APEXWORK 驾驶舱</h1>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded font-bold">V32 极简</span>
+            <h1 class="font-bold font-mono text-xs tracking-wide">APEXWORK 驾驶舱</h1>
+            <span id="qaStatusBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-zinc-900 text-zinc-400 border border-zinc-800 rounded font-bold">QA: NORMAL</span>
         </div>
-        <div class="flex items-center gap-1">
-            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono px-2 py-1 themed-inner hover:opacity-80 border rounded">
-                <span>🌞/🌙</span>
-            </button>
-            <button onclick="openRollbackModal()" class="text-xs font-mono px-2 py-1 bg-slate-800 text-slate-300 hover:text-white border border-slate-700 rounded">
-                <span>⏳ 回退</span>
-            </button>
-            <button onclick="loadTasksManifest()" class="text-xs font-mono px-2 py-1 bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 rounded font-bold">
-                <span>📋 刷新计划</span>
-            </button>
-            <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-2 py-1 themed-inner hover:opacity-80 border rounded">
-                <span>🔄 战报</span>
-            </button>
-            <button onclick="toggleConfig()" class="text-xs font-mono px-2 py-1 bg-slate-800 text-slate-300 hover:text-white border border-slate-700 rounded">
-                <span>🔑 密钥</span>
-            </button>
+        <div class="flex items-center gap-1.5 text-xs font-mono">
+            <button onclick="openRollbackModal()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded text-zinc-300">历史快照</button>
+            <button onclick="syncAllData()" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-zinc-200 font-bold">🔄 同步数据</button>
+            <button onclick="toggleConfig()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded text-zinc-300">🔑 密钥</button>
         </div>
     </header>
 
-    <!-- 密钥配置 -->
-    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-2 p-3 themed-card border rounded-lg shadow">
+    <!-- 密钥配置区 -->
+    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-2 p-3 bg-[#141417] border border-zinc-700 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full themed-inner border rounded p-1.5 text-xs font-mono">
-            <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full themed-inner border rounded p-1.5 text-xs font-mono">
+            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full bg-[#0d0d0f] border border-zinc-800 rounded p-1.5 text-xs font-mono">
+            <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full bg-[#0d0d0f] border border-zinc-800 rounded p-1.5 text-xs font-mono">
         </div>
-        <button onclick="saveKeys()" class="mt-2 w-full bg-indigo-600 text-white text-xs font-bold py-1.5 rounded">💾 保存</button>
+        <button onclick="saveKeys()" class="mt-2 w-full bg-zinc-200 text-zinc-900 hover:bg-white text-xs font-bold py-1.5 rounded">保存配置</button>
     </div>
 
-    <!-- 一键回退弹窗 -->
-    <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="themed-card border max-w-lg w-full rounded-xl p-4 flex flex-col max-h-[70vh]">
-            <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
-                <span class="font-bold text-xs font-mono">⏳ 历史快照还原</span>
-                <button onclick="closeRollbackModal()" class="text-gray-400 hover:text-white text-sm font-bold">✕</button>
+    <!-- 历史还原弹窗 -->
+    <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#141417] border border-zinc-800 max-w-lg w-full rounded-xl p-4 flex flex-col max-h-[70vh]">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2">
+                <span class="font-bold text-xs font-mono">历史快照还原</span>
+                <button onclick="closeRollbackModal()" class="text-zinc-500 hover:text-white text-sm font-bold">✕</button>
             </div>
             <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-1.5 custom-scrollbar pr-1"></div>
         </div>
     </div>
 
-    <!-- 👑 三期战略卡片：单行精干排版 + 滑过立即显示完整全文字 -->
-    <section class="max-w-7xl w-full mx-auto mb-2 themed-card border rounded-lg p-3 shadow">
-        <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5">
+    <!-- 三期目标计划看板 (极致缩断 + 鼠标悬浮气泡) -->
+    <section class="max-w-7xl w-full mx-auto mb-2 bg-[#141417] border border-[#27272a] rounded-lg p-3">
+        <div class="flex items-center justify-between mb-2 border-b border-zinc-800 pb-1.5">
             <div class="flex items-center gap-2">
-                <span class="text-slate-300 font-bold font-mono text-xs">📋 目标进展:</span>
-                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded">读取中...</span>
+                <span class="text-zinc-300 font-bold font-mono text-xs">执行清单:</span>
+                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-zinc-900 text-zinc-400 border border-zinc-800 rounded">载入中...</span>
             </div>
             <div class="flex gap-1 font-mono text-[10px]">
-                <button onclick="filterManifest('ALL')" class="manifest-tab px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold">全部</button>
-                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">1.出海</button>
-                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">2.国内</button>
-                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">3.后期</button>
+                <button onclick="filterManifest('ALL')" class="manifest-tab px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 font-bold border border-zinc-700">全部</button>
+                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2 py-0.5 rounded text-zinc-500 hover:text-zinc-300">1.出海</button>
+                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2 py-0.5 rounded text-zinc-500 hover:text-zinc-300">2.国内</button>
+                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2 py-0.5 rounded text-zinc-500 hover:text-zinc-300">3.后期</button>
             </div>
         </div>
-
-        <!-- 任务容器 -->
-        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-1"></div>
+        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-2 max-h-[145px] overflow-y-auto custom-scrollbar pr-1"></div>
     </section>
 
-    <!-- 9 大部门按钮 (去掉了花哨的彩色背景，统一工业风格) -->
-    <section class="max-w-7xl w-full mx-auto mb-2 themed-card border rounded-lg p-2 shadow">
-        <div class="flex items-center justify-between mb-1.5 border-b border-gray-500/20 pb-1 text-[11px] font-mono">
+    <!-- 9 大部门切换栏 -->
+    <section class="max-w-7xl w-full mx-auto mb-2 bg-[#141417] border border-[#27272a] rounded-lg p-2">
+        <div class="flex items-center justify-between mb-1.5 border-b border-zinc-800/80 pb-1 text-[11px] font-mono">
             <div class="flex items-center gap-2">
-                <span class="text-slate-300 font-bold">🤖 智能部门:</span>
-                <span id="activeDeptLabel" class="text-indigo-400">[全景]</span>
+                <span class="text-zinc-400 font-medium">聚焦部门:</span>
+                <span id="activeDeptLabel" class="text-zinc-200 font-bold">[全景视图]</span>
             </div>
-            <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">
-                ↺ 清空筛选
-            </button>
+            <button onclick="resetDeptFilter()" class="text-[10px] text-zinc-500 hover:text-zinc-300 px-1.5 py-0.5">清空视图</button>
         </div>
-        <div class="grid grid-cols-3 lg:grid-cols-9 gap-1 text-center font-mono">
-            <button onclick="inspectDept('大脑中枢', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🧠 大脑中枢</div>
-            </button>
-            <button onclick="inspectDept('缺陷与QA质检部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🐞 缺陷QA部</div>
-            </button>
-            <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🔧 主动产品</div>
-            </button>
-            <button onclick="inspectDept('施工工程部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🛠️ 施工工程</div>
-            </button>
-            <button onclick="inspectDept('视觉策划部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🎨 视觉策划</div>
-            </button>
-            <button onclick="inspectDept('审核质量部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">⚖️ 审核质量</div>
-            </button>
-            <button onclick="inspectDept('转化销售部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">📈 转化销售</div>
-            </button>
-            <button onclick="inspectDept('推广营销部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">📢 推广营销</div>
-            </button>
-            <button onclick="inspectDept('国际法务部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🛡️ 国际法务</div>
-            </button>
+        <div class="grid grid-cols-3 lg:grid-cols-9 gap-1 text-center font-mono" id="deptButtonsContainer">
+            <!-- 由 js/admin-core.js 渲染 -->
         </div>
     </section>
 
-    <!-- 双栏工作台 -->
+    <!-- 底部日志与指令台 -->
     <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-start overflow-hidden">
-        
-        <!-- 左栏：执行日志 -->
-        <aside class="lg:col-span-5 themed-card border rounded-lg p-2.5 flex flex-col h-[460px] shadow">
-            <div class="flex items-center justify-between border-b border-gray-500/20 pb-1 mb-1.5">
-                <span class="text-xs font-bold font-mono themed-text">🕒 部门日志</span>
-                <span id="historyCount" class="text-[10px] font-mono themed-inner border px-1.5 py-0.5 rounded themed-subtext">0条</span>
+        <aside class="lg:col-span-5 bg-[#141417] border border-[#27272a] rounded-lg p-2.5 flex flex-col h-[420px]">
+            <div class="flex items-center justify-between border-b border-zinc-800/80 pb-1 mb-1.5">
+                <span class="text-xs font-bold font-mono text-zinc-400">系统战报日志</span>
+                <span id="historyCount" class="text-[10px] font-mono text-zinc-500">0条</span>
             </div>
             <div id="historyFeed" class="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-1"></div>
         </aside>
 
-        <!-- 右栏：控制台指令 -->
-        <section class="lg:col-span-7 themed-card border rounded-lg p-2.5 flex flex-col h-[460px] shadow justify-between relative">
-            <div id="mentionDropdown" class="themed-card border shadow-xl"></div>
+        <section class="lg:col-span-7 bg-[#141417] border border-[#27272a] rounded-lg p-2.5 flex flex-col h-[420px] justify-between relative">
+            <div id="mentionDropdown"></div>
 
             <div>
-                <div id="bugAlertBanner" class="mb-1.5 bg-slate-800 border border-slate-700 rounded p-1.5 flex items-center justify-between text-xs font-mono">
-                    <span class="text-emerald-400 font-bold">✅ 系统平稳运行中</span>
-                    <span class="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 bg-slate-900 rounded">正常</span>
-                </div>
-
-                <div class="flex items-center justify-between border-b border-gray-500/20 pb-1 mb-1.5 text-xs font-mono">
-                    <span class="font-bold text-indigo-400">控制台指令区 (@ 呼叫部门)</span>
-                    <span class="text-[10px] themed-subtext">快捷触发: <strong class="themed-text">Ctrl+Enter</strong></span>
+                <div class="flex items-center justify-between border-b border-zinc-800/80 pb-1 mb-1.5 text-xs font-mono">
+                    <span class="font-medium text-zinc-400">发送调度指令 (输入 @ 呼叫部门)</span>
+                    <span class="text-[10px] text-zinc-600">Ctrl+Enter 快速发送</span>
                 </div>
                 
                 <div class="mb-1.5 relative">
                     <div id="cmd" contenteditable="true" 
-                         class="w-full h-20 themed-inner border rounded p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 overflow-y-auto custom-scrollbar"
-                         placeholder="输入指令；敲 @ 唤出部门..."></div>
+                         class="w-full h-20 bg-[#0d0d0f] border border-zinc-800 rounded p-2 text-xs text-zinc-200 font-mono focus:outline-none focus:border-zinc-600 overflow-y-auto custom-scrollbar"
+                         placeholder="点击此处输入；如：@大脑中枢 @主动产品部 抓取公开合规热点设计一款新PPT..."></div>
                 </div>
 
-                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded text-xs transition shadow flex items-center justify-center gap-1.5">
-                    <span>🚀 发射指令 / 蜂群协同 (V32)</span>
+                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 font-bold py-2 rounded text-xs transition flex items-center justify-center gap-1.5">
+                    <span>🚀 提交至云端蜂群协同执行</span>
                 </button>
             </div>
 
             <div class="flex-1 mt-1.5 flex flex-col min-h-0">
-                <pre id="log" class="flex-1 text-[11px] font-mono text-slate-300 p-2 themed-inner border rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 控制台 V32 在线。悬浮卡片文字气泡已激活。</pre>
-            </div>
-
-            <div class="mt-1.5 pt-1 border-t border-gray-500/20 flex justify-between items-center text-xs">
-                <span class="themed-subtext font-mono text-[10px]">CACHE: OFF</span>
-                <button onclick="openLiveSiteForceBypass()" class="text-indigo-400 hover:text-indigo-300 font-mono font-bold text-xs">
-                    🔥 无缓存打开主页 →
-                </button>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-zinc-400 p-2 bg-[#0d0d0f] border border-zinc-800/80 rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱在线。严格点击插入模式生效中。</pre>
             </div>
         </section>
     </main>
 
-    <script>
-        const REPO = "wys0130/ai-boss-empire";
-        let activeFilterDept = "";
-        let qaMonitorInterval = null;
-        let isAutoHealing = false;
-        let rawManifestTasks = [];
-        let currentManifestFilter = 'ALL';
-
-        const allDeptNames = [
-            "大脑中枢", "缺陷与QA质检部", "主动产品部", "施工工程部", 
-            "视觉策划部", "审核质量部", "转化销售部", "推广营销部", "国际法务部"
-        ];
-
-        // 👑 极速浮动说明卡片引擎 (Tooltip Engine)
-        function initApexTooltip() {
-            const tooltip = document.getElementById("apexTooltip");
-            document.addEventListener("mouseover", (e) => {
-                const target = e.target.closest("[data-tooltip]");
-                if (target) {
-                    const text = target.getAttribute("data-tooltip");
-                    if (text) {
-                        tooltip.innerText = text;
-                        tooltip.style.display = "block";
-                    }
-                }
-            });
-            document.addEventListener("mousemove", (e) => {
-                const tooltip = document.getElementById("apexTooltip");
-                if (tooltip.style.display === "block") {
-                    tooltip.style.left = (e.clientX + 12) + "px";
-                    tooltip.style.top = (e.clientY + 12) + "px";
-                }
-            });
-            document.addEventListener("mouseout", (e) => {
-                const target = e.target.closest("[data-tooltip]");
-                if (target) {
-                    const tooltip = document.getElementById("apexTooltip");
-                    tooltip.style.display = "none";
-                }
-            });
-        }
-
-        function initAdminTheme() {
-            const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
-            document.body.className = `themed-body ${savedTheme} min-h-screen flex flex-col justify-between p-3 font-sans`;
-            document.getElementById("themeBtn").innerHTML = savedTheme === "theme-light" ? "<span>🌙</span>" : "<span>🌞</span>";
-        }
-
-        function toggleAdminTheme() {
-            const nextTheme = document.body.classList.contains("theme-dark") ? "theme-light" : "theme-dark";
-            document.body.className = `themed-body ${nextTheme} min-h-screen flex flex-col justify-between p-3 font-sans`;
-            localStorage.setItem("APEX_ADMIN_THEME", nextTheme);
-            document.getElementById("themeBtn").innerHTML = nextTheme === "theme-light" ? "<span>🌙</span>" : "<span>🌞</span>";
-        }
-
-        function getKeys() {
-            const gh = localStorage.getItem("APEX_GH_TOKEN");
-            const ds = localStorage.getItem("APEX_DS_KEY");
-            if (!gh || !ds) { toggleConfig(); throw new Error("请先配置 Token!"); }
-            return { gh, ds };
-        }
-
-        function toggleConfig() { document.getElementById("configArea").classList.toggle("hidden"); }
-        function saveKeys() {
-            localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
-            localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
-            toggleConfig();
-            loadHistoryFromMemory();
-            loadTasksManifest();
-            startQAGuardLoop();
-        }
-
-        function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-        function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-        function appendLog(msg, color = "") {
-            const log = document.getElementById("log");
-            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2 themed-inner border rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
-            log.innerText += `\n>> ${msg}`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function openLiveSiteForceBypass() {
-            window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
-        }
-
-        function openRollbackModal() {
-            document.getElementById("rollbackModal").classList.remove("hidden");
-            fetchCommitHistory();
-        }
-
-        function closeRollbackModal() {
-            document.getElementById("rollbackModal").classList.add("hidden");
-        }
-
-        function createDeptTokenElement(deptName) {
-            const tokenSpan = document.createElement("span");
-            tokenSpan.className = "dept-token";
-            tokenSpan.contentEditable = "false";
-            tokenSpan.setAttribute("data-dept", deptName);
-            tokenSpan.innerText = `@【${deptName}】`;
-            return tokenSpan;
-        }
-
-        function inspectDept(deptName, btnEl) {
-            activeFilterDept = deptName;
-            document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-1", "ring-indigo-500", "bg-indigo-500/10"));
-            btnEl.classList.add("ring-1", "ring-indigo-500", "bg-indigo-500/10");
-            document.getElementById("activeDeptLabel").innerText = `[${deptName}]`;
-            
-            const cmdBox = document.getElementById("cmd");
-            cmdBox.focus();
-
-            const tokenSpan = createDeptTokenElement(deptName);
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0 && cmdBox.contains(selection.anchorNode)) {
-                const range = selection.getRangeAt(0);
-                range.collapse(true);
-                range.insertNode(tokenSpan);
-                const spaceNode = document.createTextNode(" ");
-                tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
-                range.setStartAfter(spaceNode);
-                range.setEndAfter(spaceNode);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            } else {
-                cmdBox.appendChild(tokenSpan);
-                cmdBox.appendChild(document.createTextNode(" "));
-                cmdBox.scrollTop = cmdBox.scrollHeight;
-            }
-
-            appendLog(`🎯 追加【${deptName}】协同`, "text-indigo-400 font-bold");
-            loadHistoryFromMemory();
-        }
-
-        function resetDeptFilter() {
-            activeFilterDept = "";
-            document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-1", "ring-indigo-500", "bg-indigo-500/10"));
-            document.getElementById("activeDeptLabel").innerText = `[全景]`;
-            document.getElementById("cmd").innerHTML = "";
-            appendLog(`🌐 清空部门筛选`, "text-slate-400");
-            loadHistoryFromMemory();
-        }
-
-        // 👑 计划书完全精简：单行强截断 + data-tooltip 极大文本提示
-        async function loadTasksManifest() {
-            const listEl = document.getElementById('manifestList');
-            try {
-                const keys = getKeys();
-                const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
-                if (!fileObj.content) {
-                    listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">未找到 TASKS_MANIFEST.json</div>`;
-                    return;
-                }
-                const manifest = JSON.parse(fileObj.content);
-                rawManifestTasks = manifest.tasks || [];
-                
-                const sum = manifest.summary || { completed: 0, total_tasks: 0 };
-                document.getElementById('manifestSummaryBadge').innerText = `${sum.completed}/${sum.total_tasks}`;
-                
-                renderManifestTasks();
-            } catch (err) {
-                listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取任务失败</div>`;
-            }
-        }
-
-        function filterManifest(stageKey) {
-            currentManifestFilter = stageKey;
-            document.querySelectorAll('.manifest-tab').forEach(btn => {
-                btn.className = "manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white";
-            });
-            event.target.className = "manifest-tab px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
-            renderManifestTasks();
-        }
-
-        function renderManifestTasks() {
-            const listEl = document.getElementById('manifestList');
-            listEl.innerHTML = "";
-
-            const filtered = currentManifestFilter === 'ALL' 
-                ? rawManifestTasks 
-                : rawManifestTasks.filter(t => t.stage === currentManifestFilter || (!t.stage && currentManifestFilter === 'ALL'));
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="text-center text-xs themed-subtext py-4 col-span-full font-mono">暂无工单</div>`;
-                return;
-            }
-
-            filtered.forEach(task => {
-                const isDone = task.status === 'DONE';
-                const isInProg = task.status === 'IN_PROGRESS';
-                
-                let borderCls = isDone ? "border-emerald-500/40 bg-emerald-500/5" : (isInProg ? "border-amber-500/40 bg-amber-500/5" : "border-slate-800 themed-inner");
-                let badgeTxt = isDone ? "✅完成" : (isInProg ? "🔥推进" : "📌待办");
-                let badgeCls = isDone ? "bg-emerald-500/20 text-emerald-400" : (isInProg ? "bg-amber-500/20 text-amber-400" : "bg-slate-800 text-slate-400");
-                
-                let stageTag = task.stage === 'STAGE_1_MVP_GLOBAL' ? '1.出海' : (task.stage === 'STAGE_2_CN_UPGRADE' ? '2.国内' : '3.后期');
-
-                // 👑 重点改进：添加 truncate-line 单行强制省略，以及 data-tooltip 提供悬浮即看！
-                listEl.innerHTML += `
-                    <div class="border rounded p-2 flex flex-col justify-between transition ${borderCls}" 
-                         data-tooltip="【工单编号】：${task.id}\n【详细说明】：${task.title}\n【备注细节】：${task.notes || '无'}\n【责任部门】：${task.department}">
-                        <div>
-                            <div class="flex items-center justify-between text-[10px] font-mono mb-1">
-                                <span class="font-bold text-indigo-400">[${task.id}] ${stageTag}</span>
-                                <span class="font-bold px-1 py-0.2 rounded ${badgeCls}">${badgeTxt}</span>
-                            </div>
-                            <span class="text-xs font-bold themed-text font-mono truncate-line mb-0.5">${task.title}</span>
-                            <span class="text-[10px] themed-subtext font-mono truncate-line">${task.notes || '无介绍'}</span>
-                        </div>
-                        <div class="mt-1.5 pt-1.5 border-t border-gray-500/10 flex items-center justify-between text-[10px] font-mono">
-                            <span class="text-slate-400 truncate max-w-[100px]">👥 ${task.department}</span>
-                            <button onclick="toggleTaskStatus('${task.id}')" class="px-2 py-0.5 rounded border border-slate-700 hover:bg-slate-800 text-indigo-400 font-bold">
-                                ${isDone ? '撤回' : '🎯打勾'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        async function toggleTaskStatus(taskId) {
-            const task = rawManifestTasks.find(t => t.id === taskId);
-            if (!task) return;
-            
-            task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
-            appendLog(`✏️ 更新进度 [${taskId}] 为: ${task.status}`, "text-amber-400");
-            
-            try {
-                const keys = getKeys();
-                const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
-                const manifest = JSON.parse(fileObj.content);
-                const targetInManifest = manifest.tasks.find(t => t.id === taskId);
-                if (targetInManifest) {
-                    targetInManifest.status = task.status;
-                    manifest.summary.completed = manifest.tasks.filter(t => t.status === 'DONE').length;
-                    manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
-                    manifest.updated_at = new Date().toISOString().slice(0, 10);
-                    
-                    await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
-                    appendLog(`✅ 看板已推送更新`, "text-emerald-500 font-bold");
-                    await loadTasksManifest();
-                }
-            } catch (e) {
-                appendLog(`❌ 更新失败: ${e.message}`, "text-rose-500");
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initApexTooltip(); // 👑 启动浮动卡片提示引擎
-            const cmdBox = document.getElementById("cmd");
-            const dropdown = document.getElementById("mentionDropdown");
-
-            if (cmdBox && dropdown) {
-                cmdBox.addEventListener("input", function(e) {
-                    const selection = window.getSelection();
-                    if (!selection.rangeCount) return;
-                    const textBeforeCursor = (selection.anchorNode.textContent || "").slice(0, selection.anchorOffset);
-                    const match = textBeforeCursor.match(/@([^\s@]*)$/);
-                    if (match) showMentionDropdown(match[1]);
-                    else hideMentionDropdown();
-                });
-
-                cmdBox.addEventListener("keydown", function(e) {
-                    if (e.key === "Backspace") {
-                        const selection = window.getSelection();
-                        if (selection.rangeCount > 0) {
-                            const range = selection.getRangeAt(0);
-                            let prevNode = range.startContainer;
-                            if (prevNode.nodeType === Node.TEXT_NODE && range.startOffset === 0) prevNode = prevNode.previousSibling;
-                            else if (prevNode.nodeType === Node.ELEMENT_NODE && range.startOffset > 0) prevNode = prevNode.childNodes[range.startOffset - 1];
-
-                            if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains("dept-token")) {
-                                e.preventDefault();
-                                prevNode.remove();
-                            }
-                        }
-                    } else if (e.key === "Escape") hideMentionDropdown();
-                });
-            }
-        });
-
-        function showMentionDropdown(query) {
-            const dropdown = document.getElementById("mentionDropdown");
-            const filtered = allDeptNames.filter(d => d.includes(query));
-            if (filtered.length === 0) { hideMentionDropdown(); return; }
-
-            dropdown.innerHTML = "";
-            filtered.forEach(dept => {
-                const item = document.createElement("div");
-                item.className = "mention-item themed-text border-b border-gray-500/10 flex items-center justify-between";
-                item.innerHTML = `<span>@${dept}</span><span class="text-[9px] themed-subtext">主责</span>`;
-                item.onmousedown = (e) => { e.preventDefault(); selectMentionDept(dept); };
-                dropdown.appendChild(item);
-            });
-
-            dropdown.style.display = "block";
-            dropdown.style.bottom = "90px";
-            dropdown.style.left = "15px";
-        }
-
-        function hideMentionDropdown() {
-            const dropdown = document.getElementById("mentionDropdown");
-            if (dropdown) dropdown.style.display = "none";
-        }
-
-        function selectMentionDept(deptName) {
-            hideMentionDropdown();
-            const cmdBox = document.getElementById("cmd");
-            cmdBox.focus();
-
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const textNode = range.startContainer;
-                if (textNode.nodeType === Node.TEXT_NODE) {
-                    const text = textNode.textContent;
-                    const cursorOffset = range.startOffset;
-                    const atIdx = text.lastIndexOf("@", cursorOffset);
-                    if (atIdx !== -1) {
-                        range.setStart(textNode, atIdx);
-                        range.setEnd(textNode, cursorOffset);
-                        range.deleteContents();
-                    }
-                }
-                const tokenSpan = createDeptTokenElement(deptName);
-                range.insertNode(tokenSpan);
-                const spaceNode = document.createTextNode(" ");
-                tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
-                range.setStartAfter(spaceNode);
-                range.setEndAfter(spaceNode);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-            appendLog(`✨ 已添加【${deptName}】`, "text-indigo-400");
-        }
-
-        function getRealStandardTime() {
-            const d = new Date();
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const mm = String(d.getMinutes()).padStart(2, '0');
-            const ss = String(d.getSeconds()).padStart(2, '0');
-            return `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
-        }
-
-        function stripAndEnforceRealTime(memoryLine) {
-            const realTimeStr = getRealStandardTime();
-            let cleaned = memoryLine.replace(/\[EVO-RECORD[^\]]*\]:/, "").trim();
-            return `- [EVO-RECORD | ${realTimeStr}]: ${cleaned}`;
-        }
-
-        async function fetchCommitHistory() {
-            const container = document.getElementById("commitListContainer");
-            container.innerHTML = `<div class="text-center text-xs themed-subtext py-4 font-mono">拉取快照中...</div>`;
-            try {
-                const keys = getKeys();
-                const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
-                const commits = await res.json();
-                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取失败</div>`;
-
-                container.innerHTML = "";
-                commits.forEach((item, idx) => {
-                    const shaShort = item.sha.slice(0, 7);
-                    const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
-                    const isCurrent = idx === 0;
-
-                    container.innerHTML += `
-                        <div class="themed-inner border rounded p-1.5 flex items-center justify-between gap-2">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-1.5 mb-0.5">
-                                    <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
-                                    <span class="text-[10px] themed-subtext font-mono">${timeStr}</span>
-                                </div>
-                                <div class="text-xs themed-text font-mono truncate">${item.commit.message}</div>
-                            </div>
-                            <div>
-                                ${isCurrent ? 
-                                    `<button disabled class="px-2.5 py-1 bg-gray-500/20 text-gray-400 text-[10px] rounded">当前</button>` : 
-                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-2.5 py-1 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded text-[10px] font-bold">回写还原</button>`
-                                }
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">异常</div>`; }
-        }
-
-        async function revertToSelectedCommit(targetSha, shortSha) {
-            if (!confirm(`⏳ 确定要将全库重置还原至版本 [#${shortSha}] 吗？`)) return;
-            closeRollbackModal();
-            try {
-                const keys = getKeys();
-                appendLog(`⏳ 正在获取 [#${shortSha}] 的快照树...`, "text-amber-500");
-
-                const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
-                if (!treeRes.ok) throw new Error("无法拉取目录树");
-                const treeData = await treeRes.json();
-                
-                const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
-                for (const fileObj of filesToRestore) {
-                    const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
-                    const fileJson = await fileContentRes.json();
-                    const currentFile = await getGithubFileSafe(fileObj.path, keys.gh);
-
-                    const payload = { message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content };
-                    if (currentFile.sha) payload.sha = currentFile.sha;
-
-                    await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
-                        method: "PUT",
-                        headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                        body: JSON.stringify(payload)
-                    });
-                }
-
-                const nowStr = getRealStandardTime();
-                const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 执行全库回退至 #${shortSha}。`;
-                await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: Rollback to #${shortSha}`, keys.gh);
-
-                appendLog(`✅ 一键回滚完成！[#${shortSha}]`, "text-emerald-500 font-bold");
-                await loadHistoryFromMemory();
-            } catch(err) { appendLog("❌ 回滚异常: " + err.message, "text-rose-500"); }
-        }
-
-        async function loadHistoryFromMemory() {
-            const feed = document.getElementById("historyFeed");
-            try {
-                const keys = getKeys();
-                const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                let lines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
-                
-                if (activeFilterDept) {
-                    lines = lines.filter(line => line.includes(activeFilterDept));
-                }
-
-                document.getElementById("historyCount").innerText = `${lines.length}条`;
-
-                if (lines.length === 0) {
-                    feed.innerHTML = `<div class="themed-inner border rounded p-3 text-center text-xs themed-subtext font-mono">暂无独立战报</div>`;
-                    return;
-                }
-
-                feed.innerHTML = "";
-                lines.reverse().forEach((line, idx) => {
-                    const isLatest = idx === 0;
-                    const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
-                    const timeStr = exactDateMatch ? exactDateMatch[1] : "归档";
-                    let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
-
-                    let cardBorder = isLatest ? "border-emerald-500/40 themed-inner" : "border-gray-500/20 themed-inner opacity-75";
-                    feed.innerHTML += `
-                        <div class="border rounded p-1.5 transition ${cardBorder}">
-                            <div class="flex items-center justify-between text-[10px] font-mono themed-subtext mb-0.5 border-b border-gray-500/10 pb-0.5">
-                                <span class="themed-text font-bold">⏱️ ${timeStr}</span>
-                                <span>#${lines.length - idx}</span>
-                            </div>
-                            <div class="text-xs ${isLatest ? 'themed-text font-medium' : 'themed-subtext'} leading-relaxed font-mono">${cleanText}</div>
-                        </div>
-                    `;
-                });
-            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取错误</div>`; }
-        }
-
-        async function getGithubFileSafe(path, token) {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
-            if (!res.ok) return { content: "", sha: null };
-            const data = await res.json();
-            return { content: b64_to_utf8(data.content), sha: data.sha };
-        }
-
-        async function fetchLiveRepoTree(token) {
-            try {
-                const res = await fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${token}` } });
-                if (!res.ok) return [];
-                const data = await res.json();
-                return data.tree.map(node => `${node.type === 'tree' ? '📁' : '📄'} ${node.path}`);
-            } catch(e) { return []; }
-        }
-
-        async function pushGithubFile(path, content, sha, message, token) {
-            const payload = { message: message, content: utf8_to_b64(content) };
-            if (sha) payload.sha = sha;
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-                method: "PUT",
-                headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            if (!res.ok) throw new Error(`提交至 ${path} 失败`);
-            return await res.json();
-        }
-
-        async function checkLatestQARun() {
-            try {
-                const keys = getKeys();
-                const url = `https://api.github.com/repos/${REPO}/actions/runs?per_page=1`;
-                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
-                if (!res.ok) return null;
-                const data = await res.json();
-                return data.workflow_runs && data.workflow_runs[0] ? data.workflow_runs[0] : null;
-            } catch (e) { return null; }
-        }
-
-        async function fetchRunErrorLogs(runId) {
-            try {
-                const keys = getKeys();
-                const url = `https://api.github.com/repos/${REPO}/actions/runs/${runId}/jobs`;
-                const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
-                const data = await res.json();
-                if (!data.jobs || data.jobs.length === 0) return "流水线异常";
-                const failedJob = data.jobs.find(j => j.conclusion === "failure");
-                const failedStep = failedJob?.steps.find(s => s.conclusion === "failure");
-                return `失败 -> ${failedStep ? failedStep.name : '未知'}`;
-            } catch (e) { return "获取堆栈错误"; }
-        }
-
-        async function startQAGuardLoop() {
-            async function loopTask() {
-                if (isAutoHealing) return;
-                const latestRun = await checkLatestQARun();
-                if (!latestRun) return;
-
-                if (latestRun.conclusion === "failure") {
-                    isAutoHealing = true;
-                    const errDetail = await fetchRunErrorLogs(latestRun.id);
-                    const cmdBox = document.getElementById("cmd");
-                    cmdBox.innerHTML = "";
-                    cmdBox.appendChild(createDeptTokenElement("缺陷与QA质检部"));
-                    cmdBox.appendChild(document.createTextNode(` 自愈报警："${errDetail}"。`));
-                    try { await triggerSwarmAutonomousAction(); } finally { isAutoHealing = false; }
-                }
-            }
-            loopTask();
-            if (!qaMonitorInterval) qaMonitorInterval = setInterval(loopTask, 30000);
-        }
-
-        async function triggerSwarmAutonomousAction() {
-            const btn = document.getElementById("runBtn");
-            const cmdBox = document.getElementById("cmd");
-            
-            const tokenElements = cmdBox.querySelectorAll(".dept-token");
-            let targetDepts = [];
-            tokenElements.forEach(el => {
-                const dept = el.getAttribute("data-dept");
-                if (dept && !targetDepts.includes(dept)) targetDepts.push(dept);
-            });
-
-            if (targetDepts.length === 0) targetDepts = [activeFilterDept || "大脑中枢"];
-            const rawText = cmdBox.innerText.replace(/@【[^】]+】/g, "").trim() || "最新情况汇报。";
-            const primaryDept = targetDepts[0];
-
-            btn.disabled = true;
-            btn.innerHTML = `<span>⚙️ [${targetDepts.join(", ")}] 协同中...</span>`;
-            appendLog(`🧠 呼叫：【 ${targetDepts.join("、")} 】...`);
-
-            try {
-                const keys = getKeys();
-                const [memoryFile, repoTree] = await Promise.all([
-                    getGithubFileSafe("MEMORY.md", keys.gh),
-                    fetchLiveRepoTree(keys.gh)
-                ]);
-                
-                const prompt = `你是 APEXWORK 企业智能体蜂群中枢。
-协同部门：【${targetDepts.join(", ")}】
-目录树：\n${repoTree.join("\n")}
-记忆：\n${memoryFile.content || "无"}
-董事长指令："${rawText}"
-
-规则：
-1. 输出 ===SWARM_LOG=== 开始的战报，和 ===NEW_MEMORY=== 提炼的一句话记事。
-2. 绝不准修改与指令无关文件！只有明确改代码时，才输出 ===FILE: 文件名=== 块。
-
-格式样例：
-===SWARM_LOG===
-<简练答复>
-===NEW_MEMORY===
-- [EVO-RECORD | ${primaryDept}]: <一句话提炼>
-===FILE: 目标文件名.html=== (可选)`;
-
-                const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "deepseek-chat",
-                        messages: [{ role: "system", content: "你是极简中枢。" }, { role: "user", content: prompt }],
-                        temperature: 0.4
-                    })
-                });
-
-                if (!dsRes.ok) throw new Error("API 异常");
-                const aiAnswer = (await dsRes.json()).choices[0].message.content;
-
-                const swarmParts = aiAnswer.split("===SWARM_LOG===");
-                const memParts = aiAnswer.split("===NEW_MEMORY===");
-                if (memParts.length < 2) throw new Error("无记事块");
-
-                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "完成。";
-                const rawMemoryLine = memParts[1].split("===FILE:")[0].trim();
-
-                appendLog(`🤖 答复:\n${swarmLogText}`, "text-emerald-400 font-bold");
-
-                const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
-                let match;
-                while ((match = fileRegex.exec(aiAnswer)) !== null) {
-                    const targetFilePath = match[1].trim().replace(/[^a-zA-Z0-9_\-\.\/]/g, "");
-                    let newFileContent = match[2].trim().replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
-                    if (!targetFilePath) continue;
-
-                    const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 [协同]: ${targetFilePath}`, keys.gh);
-                    appendLog(`✅ 更新 [ ${targetFilePath} ]`, "text-emerald-500");
-                }
-
-                const cleanTimestampedLine = stripAndEnforceRealTime(`- [EVO-RECORD | ${targetDepts.join("+")}]: ` + rawMemoryLine.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, ""));
-                const updatedMemory = (memoryFile.content || "") + "\n" + cleanTimestampedLine;
-                await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory [${targetDepts.join("+")}]`, keys.gh);
-
-                appendLog(`🏆 交付成功！`, "text-emerald-400 font-black");
-                cmdBox.innerHTML = "";
-                await loadHistoryFromMemory();
-            } catch (err) {
-                appendLog("❌ 错误: " + err.message, "text-rose-500");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "<span>🚀 发射指令 / 蜂群协同 (V32)</span>";
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initApexTooltip();
-            initAdminTheme();
-            if (localStorage.getItem("APEX_GH_TOKEN")) {
-                loadHistoryFromMemory();
-                loadTasksManifest();
-                startQAGuardLoop();
-            }
-            document.getElementById("cmd").addEventListener("keydown", function(e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); triggerSwarmAutonomousAction(); }
-            });
-        });
-    </script>
+    <!-- 👑 引入模块化核心脚本 -->
+    <script src="components/admin-core.js"></script>
 </body>
 </html>
