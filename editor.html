@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V17 WPS-Aligned Multi-Deck Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 👑 引入统一鉴权与弹窗组件 -->
     <script src="components/zero-auth.js"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; }
@@ -43,6 +44,7 @@
         </div>
         <div class="flex items-center gap-4">
             <span class="text-xs text-slate-400">商用授权价: <strong class="text-white font-mono text-sm">$9.99</strong></span>
+            <!-- 👑 按钮统一使用 exportPPT() 唤起模态框 -->
             <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5">
                 <span>⚡ 支付 $9.99 导出包</span>
             </button>
@@ -64,26 +66,23 @@
         <!-- 中间画布工作区 -->
         <main class="flex-1 bg-slate-950 flex flex-col items-center justify-between p-5 overflow-hidden relative">
             
-            <!-- 👑 【核心对齐】WPS / Office 工具栏 -->
+            <!-- WPS / Office 工具栏 -->
             <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-4 py-1.5 shadow-2xl flex flex-wrap items-center gap-3 text-xs font-medium text-slate-200 shrink-0 max-w-4xl w-full justify-between">
-                
-                <!-- 图表 & 排版组 -->
                 <div class="flex items-center gap-1.5">
                     <span class="text-indigo-400 font-mono text-[10px] font-bold">WPS/OFFICE 组件:</span>
-                    <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换标准进度条 / 双柱对比">
+                    <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">
                         📊 转换图表
                     </button>
-                    <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换中轴居中或对界左排">
+                    <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">
                         📐 布局对齐
                     </button>
-                    <button onclick="toggleCardStyle()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换卡片通透遮罩">
+                    <button onclick="toggleCardStyle()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">
                         ✨ 遮罩深度
                     </button>
                 </div>
 
                 <div class="h-3.5 w-[1px] bg-slate-800"></div>
 
-                <!-- 商务视觉风格切换 -->
                 <div class="flex items-center gap-1.5">
                     <span class="text-slate-400 text-[10px]">Edge背景:</span>
                     <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1.科技</button>
@@ -147,25 +146,6 @@
     </div>
 
     <script>
-        // 👑 支付渠道配置（爱发电为主，面包多备注保留待通过后放开）
-        const PPT_PAY_CONFIG = {
-      china: {
-        name: "爱发电 (Afdian) 极速直付",
-        price: "￥27.00 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
-        modalPrice: "￥27.00 RMB",
-        // // 面包多保留注释，审核通过后可随时放开：
-        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 1. 换成 .com  2. 换成你的真实ID/方案链接
-      },
-      overseas: {
-        name: "海外快捷商用收银",
-        price: "$9.99 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
-        modalPrice: "$9.99 USD",
-        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
-      }
-        };
-
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech",
@@ -379,22 +359,20 @@
             document.getElementById("bindKpi").value = item.kpi;
         }
 
-        // 👑 升级导出函数：使用 zero-auth 鉴权；未付费立即引导爱发电（面包多备注保留）
+        // 👑 升级导出函数：使用 zero-auth 模块化弹窗
         function exportPPT() {
-            if (window.ApexAuth && window.ApexAuth.isPaidUser()) {
-                const blob = new Blob([JSON.stringify({brand: document.getElementById("bindBrand").value, slides: slidesData}, null, 2)], {type: "application/json"});
-                const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-                a.download = `${currentDeckKey}_Visual_Deck_${Date.now()}.json`;
-                document.body.appendChild(a); a.click();
-            } else {
-                if (confirm("🔒 该可视化 PPT 路演套件需商业授权。\n点击【确定】跳转至爱发电 (Afdian) 极速直付页；无需账号注册，扫码后将凭回跳自动解锁全部下载权限！")) {
-                    window.location.href = PPT_PAY_CONFIG.afdianUrl;
+            ApexAuth.openCheckout({
+                title: "APEXWORK 15页可视化路演战略套件 (.PPTX)",
+                onSuccess: () => {
+                    const blob = new Blob([JSON.stringify({brand: document.getElementById("bindBrand").value, slides: slidesData}, null, 2)], {type: "application/json"});
+                    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+                    a.download = `${currentDeckKey}_Visual_Deck_${Date.now()}.json`;
+                    document.body.appendChild(a); a.click();
                 }
-            }
+            });
         }
 
         window.onload = () => { loadDeckByRouter(); };
     </script>
 </body>
 </html>
-
