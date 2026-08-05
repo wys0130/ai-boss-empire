@@ -6,6 +6,7 @@
 <title>APEXWORK · Excel 财务模型编辑器</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- 👑 引入统一鉴权与弹窗组件 -->
 <script src="components/zero-auth.js"></script>
 <style>
   body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f1f5f9; }
@@ -44,6 +45,7 @@
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         实时动态测算中
       </span>
+      <!-- 👑 一键呼起模块化收银台 -->
       <button onclick="openCheckoutModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">
         立即解锁完整 .XLSX ($9.99)
       </button>
@@ -51,7 +53,7 @@
   </header>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- 月份导航 (修复为现代化精美胶囊布局) -->
+    <!-- 月份导航 -->
     <aside class="lg:col-span-2 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📅 月份控制台</h2>
       <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer">
@@ -150,94 +152,35 @@
       <div class="p-6 bg-slate-900 rounded-2xl text-white shadow-xl border border-slate-800">
         <div class="flex justify-between items-center mb-3">
           <span class="text-xs font-bold text-emerald-400 font-mono uppercase tracking-wider">Commercial License</span>
-          <button onclick="togglePayRegion()" id="regionSwitchBtn" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-2.5 py-1 rounded-lg font-mono transition">
-            🌍 切换国内/海外
+          <!-- 👑 按钮触发弹窗内部的地域切换，外观更干练 -->
+          <button onclick="ApexAuth.openCheckout({title: 'APEXWORK 12个月财务预测模型 (.XLSX)', onSuccess: () => executeXLSXExport()})" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-2.5 py-1 rounded-lg font-mono transition">
+            🌍 安全收银
           </button>
         </div>
-        <h3 class="font-bold text-base mb-1" id="payDesc">欧美标准商业建模表</h3>
-        <p class="text-3xl font-black mb-4 font-mono text-white" id="payPrice">$9.99 <span class="text-xs font-normal text-slate-400">/ 一次性</span></p>
+        <h3 class="font-bold text-base mb-1">欧美标准商业建模表</h3>
+        <p class="text-3xl font-black mb-4 font-mono text-white">$9.99 <span class="text-xs font-normal text-slate-400">/ 一次性</span></p>
         <button onclick="openCheckoutModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
           <span>⚡ 立即解锁下载原表 (.XLSX)</span>
         </button>
-        <p class="text-[11px] text-slate-400 mt-3 text-center" id="payTip">免注册账号 · 支持信用卡、Apple Pay 与扫码</p>
+        <p class="text-[11px] text-slate-400 mt-3 text-center">免注册账号 · 支持信用卡、Apple Pay 与扫码</p>
       </div>
     </aside>
   </div>
 </div>
 
-<!-- 极速付款与核单弹窗 -->
-<div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-slate-900">
-    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-        <span class="font-bold text-base">商业订单核对与发单</span>
-      </div>
-      <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
-    </div>
-    <div class="space-y-3 mb-6 text-sm">
-      <div class="flex justify-between py-1 border-b border-slate-100">
-        <span class="text-slate-500">商品名称</span>
-        <span class="font-semibold text-slate-800">APEXWORK 12个月财务预测模型</span>
-      </div>
-      <div class="flex justify-between py-1 border-b border-slate-100">
-        <span class="text-slate-500">应付总金额</span>
-        <span class="font-black text-lg text-emerald-600" id="modalPriceText">$9.99 USD</span>
-      </div>
-      <div class="flex justify-between py-1 border-b border-slate-100">
-        <span class="text-slate-500">发货与鉴权</span>
-        <span class="font-semibold text-slate-800">付完款极速回写授权证书</span>
-      </div>
-    </div>
-    <button onclick="handleSmartExport()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
-      前往收银台安全支付 →
-    </button>
-  </div>
-</div>
-
+<!-- 👑 所有脚本业务逻辑，零弹窗定义 -->
 <script>
 const months = ['01月','02月','03月','04月','05月','06月','07月','08月','09月','10月','11月','12月'];
 let currentMonth = 0;
 let financeData = [];
 let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
 
-const PAY_CONFIG = {
-      china: {
-        name: "爱发电 (Afdian) 极速直付",
-        price: "￥27.00 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
-        modalPrice: "￥27.00 RMB",
-        // // 面包多保留注释，审核通过后可随时放开：
-        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 1. 换成 .com  2. 换成你的真实ID/方案链接
-      },
-      overseas: {
-        name: "海外快捷商用收银",
-        price: "$9.99 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
-        modalPrice: "$9.99 USD",
-        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
-      }
-};
-let currentRegion = 'overseas';
-
-function togglePayRegion() {
-  currentRegion = currentRegion === 'china' ? 'overseas' : 'china';
-  document.getElementById('payPrice').innerHTML = PAY_CONFIG[currentRegion].price;
-  document.getElementById('payDesc').textContent = PAY_CONFIG[currentRegion].name;
-  document.getElementById('modalPriceText').textContent = PAY_CONFIG[currentRegion].modalPrice;
-}
-
-function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); }
-function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
-
-function handleSmartExport() {
-  // 调用 zero-auth 鉴权判断，如果已持有本地签名直接放行导出
-  if (window.ApexAuth && window.ApexAuth.isPaidUser()) {
-    closeCheckoutModal();
-    executeXLSXExport();
-  } else {
-    window.location.href = PAY_CONFIG[currentRegion].url;
-  }
+// 👑 全局通用调用：唤醒统一模态框，验证成功即可立刻回调下载
+function openCheckoutModal() {
+  ApexAuth.openCheckout({
+    title: "APEXWORK 12个月财务预测模型 (.XLSX)",
+    onSuccess: () => executeXLSXExport()
+  });
 }
 
 function initFinanceData() {
@@ -364,7 +307,6 @@ function executeXLSXExport() {
     data.push([months[i], m.revenue.toFixed(2), m.cost.toFixed(2), m.profit.toFixed(2)]);
   });
   const ws = XLSX.utils.aoa_to_sheet(data);
-  // 注入列宽规范
   ws['!cols'] = [{ wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
   XLSX.utils.book_append_sheet(wb, ws, '12个月滚动财务模型');
   XLSX.writeFile(wb, 'APEXWORK-12Month-Financial-Model.xlsx');
@@ -376,5 +318,3 @@ recomputeKPIsAndRender(true);
 </script>
 </body>
 </html>
-
-
