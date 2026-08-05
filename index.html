@@ -17,7 +17,6 @@
     <!-- 顶部导航栏 -->
     <header class="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div class="flex items-center gap-3">
-            <!-- 👑 董事长隐形后门：连续点击 Logo 3次，为您个人唤醒驾驶舱入口 -->
             <span id="logoTrigger" onclick="checkChairmanStealthAccess()" class="bg-blue-600 text-white font-mono text-xs px-2.5 py-1 rounded-lg font-bold shadow-md cursor-pointer select-none" title="APEXWORK ENTERPRISE">APEXWORK</span>
             <h1 class="font-bold text-sm tracking-wide text-slate-800">智能办公交付商城 (2026 RELEASE)</h1>
         </div>
@@ -27,10 +26,8 @@
             <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600">WORD 合规报告</a>
             <span class="h-4 w-[1px] bg-slate-200"></span>
             
-            <!-- 普通买家看到的：商业授权状态区 -->
             <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-3 py-1 rounded-lg font-bold">👤 游客视图</span>
             
-            <!-- 👑 董事长个人独享入口（默认完全隐藏，仅对绑定了 Token 或敲出暗门的你现身） -->
             <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-3.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse">
                 👑 董事长驾驶舱 →
             </a>
@@ -40,20 +37,20 @@
     <!-- 主体内容区：商务三件套直达 -->
     <main class="max-w-7xl mx-auto w-full px-8 py-10 space-y-12">
         
-        <!-- 顶部英雄横幅 (👑 已彻底改造为买家/用户视角的商用引导，不再泄露后台) -->
+        <!-- 顶部英雄横幅 -->
         <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-2xl p-8 text-white shadow-xl flex justify-between items-center">
             <div>
                 <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">COMMERCIAL ENTERPRISE LICENSE</span>
                 <h2 class="text-2xl font-black tracking-tight mt-2">破除低效传统冗长，全视觉商业交付新纪元</h2>
                 <p class="text-xs text-slate-300 mt-1">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
             </div>
-            <!-- 👑 修复：改为点击触发全站三件套商用授权包收银页面 -->
+            <!-- 👑 修复：一键唤醒中央组件的模块化收银台 -->
             <button onclick="openBundleCheckout()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center gap-2">
                 <span>⚡ 立即解锁商用三件套包 ($9.99 / ￥69)</span>
             </button>
         </div>
 
-        <!-- 第一板块：PPT 路演套件 (已绑定专属路由参数 ?deck=xxx) -->
+        <!-- 第一板块：PPT 路演套件 -->
         <section id="ppt-section">
             <div class="flex justify-between items-center mb-6">
                 <div>
@@ -64,7 +61,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- 卡片 1 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between">
                     <div>
                         <span class="bg-blue-500/10 text-blue-600 border border-blue-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES</span>
@@ -77,7 +73,6 @@
                     </div>
                 </div>
 
-                <!-- 卡片 2 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between">
                     <div>
                         <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES</span>
@@ -90,7 +85,6 @@
                     </div>
                 </div>
 
-                <!-- 卡片 3 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between">
                     <div>
                         <span class="bg-amber-500/10 text-amber-600 border border-amber-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES</span>
@@ -115,7 +109,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Excel 模块卡片：直达 excel-editor.html -->
                 <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30">
                     <div>
                         <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL</span>
@@ -128,7 +121,6 @@
                     </div>
                 </div>
 
-                <!-- Word 模块卡片：直达 word-editor.html -->
                 <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30">
                     <div>
                         <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD</span>
@@ -142,7 +134,6 @@
                 </div>
             </div>
         </section>
-
     </main>
 
     <!-- 页脚 -->
@@ -150,47 +141,26 @@
         APEXWORK · AI-POWERED ENTERPRISE STORE · VISUAL ENGINE 2026
     </footer>
 
-    <!-- 👑 极客 RBAC 鉴权、支付配置与隐形门脚本：三权分立与防 404 自护 -->
     <script>
         let logoClickCount = 0;
         let clickTimer = null;
 
-        // 👑 全局通用支付配置（使用 afdian.com 域名；面包多完整注释保留待后续审核通过使用）
-        const PAY_CONFIG = {
-            china: {
-                name: "爱发电 (Afdian) 极速直付",
-                price: "￥27.00 / 全站三件套",
-                // // 面包多备用通道（审核通过并配置 API 后解开注释即可）：
-                // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-                url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 请将此处替换为你正确的爱发电主页或方案直链
-            },
-            overseas: {
-                name: "海外快捷商用收银",
-                price: "$9.99 / 全站三件套",
-                // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-                url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
-            }
-        };
-
-        // 👑 主页商用套件包唤醒与跳转收银
+        // 👑 主页一键购买，使用中央弹窗
         window.openBundleCheckout = function() {
-            if (window.ApexAuth && typeof window.ApexAuth.isPaidUser === "function" && window.ApexAuth.isPaidUser()) {
-                alert("🎉 您已持有合法商用签名证书，无需重复购买！直接点击下方任意组件即可解锁畅用。");
-                return;
-            }
-            if (confirm("⚡ 确认前往【爱发电 (Afdian)】极速直付页？\n\n支付后凭回跳即可自动生成设备证书，免注册解锁 PPT/Excel/Word 全站商用三件套！")) {
-                window.location.href = PAY_CONFIG.china.url;
-            }
+            ApexAuth.openCheckout({
+                title: "APEXWORK 智能办公商用三件套企业包 (PPT/Excel/Word)",
+                onSuccess: () => {
+                    alert("🎉 您已激活全站商用权限！请畅享三件套无限次下载包。");
+                }
+            });
         };
 
-        // 1. 识别并初始化当前用户的角色视图
         function initRoleBasedView() {
             const roleBadge = document.getElementById("userRoleBadge");
             const adminPortal = document.getElementById("adminSecretPortal");
             const ghToken = localStorage.getItem("APEX_GH_TOKEN");
             const isPaidUser = localStorage.getItem("APEX_PAID_TOKEN") === "true";
 
-            // 如果浏览器本地持有你的 GitHub 授权密钥，自动为你现出【👑 董事长专属通道】
             if (ghToken) {
                 adminPortal.classList.remove("hidden");
                 roleBadge.innerHTML = "👑 集团董事长";
@@ -204,7 +174,6 @@
             }
         }
 
-        // 2. 董事长隐形唤醒暗门：快速连续点击左上角 Logo 3次
         function checkChairmanStealthAccess() {
             logoClickCount++;
             clearTimeout(clickTimer);
@@ -218,7 +187,6 @@
             }
         }
 
-        // 3. 防 404 自护监听
         document.addEventListener('DOMContentLoaded', () => {
             initRoleBasedView();
 
