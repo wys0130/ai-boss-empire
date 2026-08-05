@@ -219,6 +219,61 @@
           "tag": "05. CLOSE"
         }
       ]
+    },
+    "discovery_loop_velocity": {
+      "key": "discovery_loop_velocity",
+      "brand": "APEXWORK",
+      "titleName": "Discovery Loop: The New Gravity for Market Fit",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "startup",
+      "slides": [
+        {
+          "id": 1,
+          "title": "Every Product Dies Without a Loop",
+          "sub": "Stop pushing features. Start pulling insights.",
+          "kpi": "+68%",
+          "label": "Faster Iteration",
+          "progress": 100,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "The Loop: Observe → Infer → Act → Repeat",
+          "sub": "A closed circuit between user behavior and product decisions.",
+          "kpi": "24h",
+          "label": "Cycle Time",
+          "progress": 75,
+          "tag": "02. MECHANISM"
+        },
+        {
+          "id": 3,
+          "title": "Why Loops Beat Roadmaps",
+          "sub": "Roadmaps assume. Loops adapt.",
+          "kpi": "3.2x",
+          "label": "Market Fit Probability",
+          "progress": 80,
+          "tag": "03. CONTRAST"
+        },
+        {
+          "id": 4,
+          "title": "Drop the Guesswork, Keep the Signal",
+          "sub": "Every iteration is a data point, not a gamble.",
+          "kpi": "-41%",
+          "label": "Wasted Builds",
+          "progress": 65,
+          "tag": "04. EFFICIENCY"
+        },
+        {
+          "id": 5,
+          "title": "Your Next Unfair Advantage",
+          "sub": "Deploy the loop today, own the curve tomorrow.",
+          "kpi": "$2M",
+          "label": "ARR Impact",
+          "progress": 90,
+          "tag": "05. CLOSURE"
+        }
+      ]
     }
   }
 }
