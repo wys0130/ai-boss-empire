@@ -1,20 +1,47 @@
-<!-- 顶层高阶视觉组件工具条 -->
-<div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-4 py-1.5 shadow-2xl flex flex-wrap items-center gap-2.5 text-xs font-medium text-slate-200 shrink-0 max-w-4xl w-full justify-between">
-    <div class="flex items-center gap-2">
-        <span class="text-indigo-400 font-mono text-[10px] font-bold">TOOLS:</span>
-        <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换图表展示形态">
-            📊 进度/环形卡
+<!-- APEXWORK 商务三件套通用高阶编辑工具条 (WPS/Office-Aligned Pro Toolbar) -->
+<div class="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl px-3.5 py-1.5 shadow-2xl flex flex-wrap items-center gap-2 text-xs font-medium text-slate-200 shrink-0 max-w-4xl w-full justify-between select-none">
+    
+    <!-- 1. 排版模式切换器 (Multi-Layout Switcher) -->
+    <div class="flex items-center gap-1">
+        <span class="text-indigo-400 font-mono text-[10px] font-bold">WPS版式:</span>
+        <button onclick="changeSlideLayout('cover')" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="大字海报展示">
+            📑 封面
         </button>
-        <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]" title="切换居中或两侧排版">
-            📐 布局重排
+        <button onclick="changeSlideLayout('bento')" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="Bento 数据看板">
+            🍱 看板
+        </button>
+        <button onclick="changeSlideLayout('compare')" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="双柱竞品对照">
+            ⚖️ 对比
+        </button>
+        <button onclick="changeSlideLayout('timeline')" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="3年路线里程碑">
+            🚀 路线
         </button>
     </div>
+
     <div class="h-3.5 w-[1px] bg-slate-800"></div>
-    <div class="flex items-center gap-1.5">
-        <span class="text-slate-400 text-[10px]">边缘加速背景(WebP):</span>
-        <button onclick="changeBackground('tech')" class="px-2 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1.科技</button>
-        <button onclick="changeBackground('finance')" class="px-2 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2.金融</button>
-        <button onclick="changeBackground('team')" class="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">3.团队</button>
-        <button onclick="changeBackground('mesh')" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">4.极简</button>
+
+    <!-- 2. 可视化图表与高亮组件 -->
+    <div class="flex items-center gap-1">
+        <span class="text-emerald-400 font-mono text-[10px] font-bold">组件:</span>
+        <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="调整指标达成百分比形态">
+            📊 进度条
+        </button>
+        <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="切换中轴或两侧排版">
+            📐 居中
+        </button>
+        <button onclick="toggleCardStyle()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded transition border border-slate-700 text-[11px]" title="调整毛玻璃遮罩透明度">
+            ✨ 遮罩
+        </button>
+    </div>
+
+    <div class="h-3.5 w-[1px] bg-slate-800"></div>
+
+    <!-- 3. 商用色彩滤镜库 -->
+    <div class="flex items-center gap-1">
+        <span class="text-slate-400 text-[10px]">主题:</span>
+        <button onclick="changeBackground('tech')" class="px-2 py-0.5 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">科技蓝</button>
+        <button onclick="changeBackground('finance')" class="px-2 py-0.5 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">资本金</button>
+        <button onclick="changeBackground('team')" class="px-2 py-0.5 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">深邃黑</button>
+        <button onclick="changeBackground('mesh')" class="px-2 py-0.5 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">极简绿</button>
     </div>
 </div>
