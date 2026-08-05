@@ -3,34 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK 驾驶舱 (V31 极简清爽版)</title>
+    <title>APEXWORK 极简工业驾驶舱 (V32)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
+        body { -webkit-font-smoothing: antialiased; transition: background-color 0.2s, color 0.2s; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 4px; }
-        body.theme-dark { --bg-body: #030712; --bg-card: #0f172a; --bg-inner: #020617; --border-color: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8; }
-        body.theme-light { --bg-body: #f1f5f9; --bg-card: #ffffff; --bg-inner: #f8fafc; --border-color: #e2e8f0; --text-main: #0f172a; --text-sub: #475569; }
+        body.theme-dark { --bg-body: #090d16; --bg-card: #111827; --bg-inner: #0b0f19; --border-color: #1f2937; --text-main: #f3f4f6; --text-sub: #6b7280; }
+        body.theme-light { --bg-body: #f3f4f6; --bg-card: #ffffff; --bg-inner: #f9fafb; --border-color: #e5e7eb; --text-main: #111827; --text-sub: #6b7280; }
         .themed-body { background-color: var(--bg-body); color: var(--text-main); }
         .themed-card { background-color: var(--bg-card); border-color: var(--border-color); }
         .themed-inner { background-color: var(--bg-inner); border-color: var(--border-color); }
         .themed-text { color: var(--text-main); }
         .themed-subtext { color: var(--text-sub); }
 
-        /* 👑 文本截断与鼠标悬浮查看全貌 */
-        .text-ellipsis-1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        
-        .dept-token {
-            display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.25);
-            color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.5); padding: 2px 8px;
-            border-radius: 6px; font-size: 11px; font-weight: bold; margin: 0 3px;
-            cursor: pointer; user-select: none; white-space: nowrap; transition: all 0.2s;
+        /* 👑 绝对单行溢出截断 */
+        .truncate-line {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
         }
-        .dept-token:hover { background: rgba(99, 102, 241, 0.4); }
+
+        /* 👑 极速响应浮动说明框 (Tooltip) */
+        #apexTooltip {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            display: none;
+            max-width: 280px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            color: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            line-height: 1.5;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
+            white-space: pre-wrap;
+        }
+
+        .dept-token {
+            display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.15);
+            color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); padding: 1px 6px;
+            border-radius: 4px; font-size: 11px; font-weight: bold; margin: 0 2px;
+            cursor: pointer; user-select: none; white-space: nowrap;
+        }
+        .dept-token:hover { background: rgba(99, 102, 241, 0.3); }
 
         #mentionDropdown {
-            position: absolute; z-index: 100; display: none; width: 180px; max-height: 200px;
+            position: absolute; z-index: 100; display: none; width: 160px; max-height: 180px;
             overflow-y: auto; border-radius: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
         .mention-item { padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: monospace; }
@@ -39,35 +64,37 @@
 </head>
 <body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-3 font-sans">
 
-    <!-- 顶栏：极简干练 -->
-    <header class="max-w-7xl w-full mx-auto themed-card border rounded-xl px-4 py-2 mb-2.5 flex items-center justify-between gap-3 shadow-md">
-        <div class="flex items-center gap-2.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+    <!-- 👑 极客急速气泡弹层 (挪上去秒出完整字) -->
+    <div id="apexTooltip"></div>
+
+    <!-- 顶栏：极其克制，杜绝彩色干扰 -->
+    <header class="max-w-7xl w-full mx-auto themed-card border rounded-lg px-4 py-2 mb-2 flex items-center justify-between gap-3 shadow">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <h1 class="font-bold font-mono text-xs tracking-wide themed-text">APEXWORK 驾驶舱</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V31 极简</span>
-            <span id="qaStatusBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA ON</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded font-bold">V32 极简</span>
         </div>
-        <div class="flex items-center gap-1.5">
-            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono px-2.5 py-1 themed-inner hover:opacity-80 border rounded-md">
+        <div class="flex items-center gap-1">
+            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono px-2 py-1 themed-inner hover:opacity-80 border rounded">
                 <span>🌞/🌙</span>
             </button>
-            <button onclick="openRollbackModal()" class="text-xs font-mono px-2.5 py-1 bg-amber-600/20 text-amber-500 border border-amber-500/40 rounded-md">
+            <button onclick="openRollbackModal()" class="text-xs font-mono px-2 py-1 bg-slate-800 text-slate-300 hover:text-white border border-slate-700 rounded">
                 <span>⏳ 回退</span>
             </button>
-            <button onclick="loadTasksManifest()" class="text-xs font-mono px-2.5 py-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 rounded-md font-bold">
+            <button onclick="loadTasksManifest()" class="text-xs font-mono px-2 py-1 bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 rounded font-bold">
                 <span>📋 刷新计划</span>
             </button>
-            <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-2.5 py-1 themed-inner hover:opacity-80 border rounded-md">
+            <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-2 py-1 themed-inner hover:opacity-80 border rounded">
                 <span>🔄 战报</span>
             </button>
-            <button onclick="toggleConfig()" class="text-xs font-mono px-2.5 py-1 bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 rounded-md">
+            <button onclick="toggleConfig()" class="text-xs font-mono px-2 py-1 bg-slate-800 text-slate-300 hover:text-white border border-slate-700 rounded">
                 <span>🔑 密钥</span>
             </button>
         </div>
     </header>
 
     <!-- 密钥配置 -->
-    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-2 p-3 themed-card border border-indigo-500/50 rounded-xl shadow-lg">
+    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-2 p-3 themed-card border rounded-lg shadow">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full themed-inner border rounded p-1.5 text-xs font-mono">
             <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full themed-inner border rounded p-1.5 text-xs font-mono">
@@ -86,112 +113,112 @@
         </div>
     </div>
 
-    <!-- 👑 三期目标看板：极简排版 + 单行截断 + 悬浮展示全称 -->
-    <section class="max-w-7xl w-full mx-auto mb-2.5 themed-card border rounded-xl p-3 shadow-md">
+    <!-- 👑 三期战略卡片：单行精干排版 + 滑过立即显示完整全文字 -->
+    <section class="max-w-7xl w-full mx-auto mb-2 themed-card border rounded-lg p-3 shadow">
         <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5">
             <div class="flex items-center gap-2">
-                <span class="text-amber-400 font-bold font-mono text-xs">📋 三期目标计划:</span>
-                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded">拉取中...</span>
+                <span class="text-slate-300 font-bold font-mono text-xs">📋 目标进展:</span>
+                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded">读取中...</span>
             </div>
             <div class="flex gap-1 font-mono text-[10px]">
                 <button onclick="filterManifest('ALL')" class="manifest-tab px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold">全部</button>
-                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">1.前期出海</button>
-                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">2.中期国内</button>
-                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">3.后期躺利</button>
+                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">1.出海</button>
+                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">2.国内</button>
+                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">3.后期</button>
             </div>
         </div>
 
-        <!-- 任务列表容器 (单行截断，鼠标放置弹气泡) -->
-        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1"></div>
+        <!-- 任务容器 -->
+        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-1"></div>
     </section>
 
-    <!-- 9 大主责部门快捷筛选 -->
-    <section class="max-w-7xl w-full mx-auto mb-2.5 themed-card border rounded-xl p-2.5 shadow-md">
+    <!-- 9 大部门按钮 (去掉了花哨的彩色背景，统一工业风格) -->
+    <section class="max-w-7xl w-full mx-auto mb-2 themed-card border rounded-lg p-2 shadow">
         <div class="flex items-center justify-between mb-1.5 border-b border-gray-500/20 pb-1 text-[11px] font-mono">
             <div class="flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">🤖 智能部门:</span>
-                <span id="activeDeptLabel" class="text-indigo-400">[全景视图]</span>
+                <span class="text-slate-300 font-bold">🤖 智能部门:</span>
+                <span id="activeDeptLabel" class="text-indigo-400">[全景]</span>
             </div>
             <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">
                 ↺ 清空筛选
             </button>
         </div>
         <div class="grid grid-cols-3 lg:grid-cols-9 gap-1 text-center font-mono">
-            <button onclick="inspectDept('大脑中枢', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-indigo-400 truncate">🧠 大脑中枢</div>
+            <button onclick="inspectDept('大脑中枢', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🧠 大脑中枢</div>
             </button>
-            <button onclick="inspectDept('缺陷与QA质检部', this)" class="dept-btn themed-inner border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-rose-400 truncate">🐞 缺陷QA部</div>
+            <button onclick="inspectDept('缺陷与QA质检部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🐞 缺陷QA部</div>
             </button>
-            <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-amber-400 truncate">🔧 主动产品</div>
+            <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🔧 主动产品</div>
             </button>
-            <button onclick="inspectDept('施工工程部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-blue-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-blue-400 truncate">🛠️ 施工工程</div>
+            <button onclick="inspectDept('施工工程部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🛠️ 施工工程</div>
             </button>
-            <button onclick="inspectDept('视觉策划部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-emerald-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-emerald-400 truncate">🎨 视觉策划</div>
+            <button onclick="inspectDept('视觉策划部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🎨 视觉策划</div>
             </button>
-            <button onclick="inspectDept('审核质量部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-purple-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-purple-400 truncate">⚖️ 审核质量</div>
+            <button onclick="inspectDept('审核质量部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">⚖️ 审核质量</div>
             </button>
-            <button onclick="inspectDept('转化销售部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-pink-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-pink-400 truncate">📈 转化销售</div>
+            <button onclick="inspectDept('转化销售部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">📈 转化销售</div>
             </button>
-            <button onclick="inspectDept('推广营销部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-cyan-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-cyan-400 truncate">📢 推广营销</div>
+            <button onclick="inspectDept('推广营销部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">📢 推广营销</div>
             </button>
-            <button onclick="inspectDept('国际法务部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-teal-400 rounded-lg p-1.5 text-left group">
-                <div class="text-[11px] font-bold text-teal-400 truncate">🛡️ 国际法务</div>
+            <button onclick="inspectDept('国际法务部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-slate-300 group-hover:text-indigo-400 truncate">🛡️ 国际法务</div>
             </button>
         </div>
     </section>
 
     <!-- 双栏工作台 -->
-    <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 items-start overflow-hidden">
+    <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-start overflow-hidden">
         
         <!-- 左栏：执行日志 -->
-        <aside class="lg:col-span-5 themed-card border rounded-xl p-3 flex flex-col h-[480px] shadow-md">
-            <div class="flex items-center justify-between border-b border-gray-500/20 pb-1.5 mb-2">
-                <span class="text-xs font-bold font-mono themed-text">🕒 部门战报日志</span>
+        <aside class="lg:col-span-5 themed-card border rounded-lg p-2.5 flex flex-col h-[460px] shadow">
+            <div class="flex items-center justify-between border-b border-gray-500/20 pb-1 mb-1.5">
+                <span class="text-xs font-bold font-mono themed-text">🕒 部门日志</span>
                 <span id="historyCount" class="text-[10px] font-mono themed-inner border px-1.5 py-0.5 rounded themed-subtext">0条</span>
             </div>
-            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-1.5 custom-scrollbar pr-1"></div>
+            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-1"></div>
         </aside>
 
         <!-- 右栏：控制台指令 -->
-        <section class="lg:col-span-7 themed-card border rounded-xl p-3 flex flex-col h-[480px] shadow-md justify-between relative">
+        <section class="lg:col-span-7 themed-card border rounded-lg p-2.5 flex flex-col h-[460px] shadow justify-between relative">
             <div id="mentionDropdown" class="themed-card border shadow-xl"></div>
 
             <div>
-                <div id="bugAlertBanner" class="mb-2 bg-emerald-500/10 border border-emerald-500/40 rounded-lg p-1.5 flex items-center justify-between text-xs font-mono">
-                    <span class="text-emerald-300 font-bold">✅ 系统平稳运行中</span>
-                    <span class="text-[10px] text-slate-500 font-bold px-1.5 py-0.5 bg-slate-900 rounded">正常</span>
+                <div id="bugAlertBanner" class="mb-1.5 bg-slate-800 border border-slate-700 rounded p-1.5 flex items-center justify-between text-xs font-mono">
+                    <span class="text-emerald-400 font-bold">✅ 系统平稳运行中</span>
+                    <span class="text-[10px] text-slate-400 font-bold px-1.5 py-0.5 bg-slate-900 rounded">正常</span>
                 </div>
 
-                <div class="flex items-center justify-between border-b border-gray-500/20 pb-1.5 mb-1.5 text-xs font-mono">
-                    <span class="font-bold text-indigo-400">控制台指令区 (输入 @ 呼叫部门)</span>
+                <div class="flex items-center justify-between border-b border-gray-500/20 pb-1 mb-1.5 text-xs font-mono">
+                    <span class="font-bold text-indigo-400">控制台指令区 (@ 呼叫部门)</span>
                     <span class="text-[10px] themed-subtext">快捷触发: <strong class="themed-text">Ctrl+Enter</strong></span>
                 </div>
                 
-                <div class="mb-2 relative">
+                <div class="mb-1.5 relative">
                     <div id="cmd" contenteditable="true" 
-                         class="w-full h-20 themed-inner border rounded-lg p-2.5 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 overflow-y-auto custom-scrollbar"
+                         class="w-full h-20 themed-inner border rounded p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 overflow-y-auto custom-scrollbar"
                          placeholder="输入指令；敲 @ 唤出部门..."></div>
                 </div>
 
-                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs transition shadow flex items-center justify-center gap-1.5">
-                    <span>🚀 发射指令 / 蜂群协同 (V31)</span>
+                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded text-xs transition shadow flex items-center justify-center gap-1.5">
+                    <span>🚀 发射指令 / 蜂群协同 (V32)</span>
                 </button>
             </div>
 
-            <div class="flex-1 mt-2 flex flex-col min-h-0">
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-2.5 themed-inner border rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 控制台 V31 在线。文字展示已缩简，悬浮可查看完整描述。</pre>
+            <div class="flex-1 mt-1.5 flex flex-col min-h-0">
+                <pre id="log" class="flex-1 text-[11px] font-mono text-slate-300 p-2 themed-inner border rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 控制台 V32 在线。悬浮卡片文字气泡已激活。</pre>
             </div>
 
-            <div class="mt-2 pt-1.5 border-t border-gray-500/20 flex justify-between items-center text-xs">
+            <div class="mt-1.5 pt-1 border-t border-gray-500/20 flex justify-between items-center text-xs">
                 <span class="themed-subtext font-mono text-[10px]">CACHE: OFF</span>
-                <button onclick="openLiveSiteForceBypass()" class="text-emerald-500 hover:text-emerald-400 font-mono font-bold text-xs">
+                <button onclick="openLiveSiteForceBypass()" class="text-indigo-400 hover:text-indigo-300 font-mono font-bold text-xs">
                     🔥 无缓存打开主页 →
                 </button>
             </div>
@@ -211,6 +238,35 @@
             "视觉策划部", "审核质量部", "转化销售部", "推广营销部", "国际法务部"
         ];
 
+        // 👑 极速浮动说明卡片引擎 (Tooltip Engine)
+        function initApexTooltip() {
+            const tooltip = document.getElementById("apexTooltip");
+            document.addEventListener("mouseover", (e) => {
+                const target = e.target.closest("[data-tooltip]");
+                if (target) {
+                    const text = target.getAttribute("data-tooltip");
+                    if (text) {
+                        tooltip.innerText = text;
+                        tooltip.style.display = "block";
+                    }
+                }
+            });
+            document.addEventListener("mousemove", (e) => {
+                const tooltip = document.getElementById("apexTooltip");
+                if (tooltip.style.display === "block") {
+                    tooltip.style.left = (e.clientX + 12) + "px";
+                    tooltip.style.top = (e.clientY + 12) + "px";
+                }
+            });
+            document.addEventListener("mouseout", (e) => {
+                const target = e.target.closest("[data-tooltip]");
+                if (target) {
+                    const tooltip = document.getElementById("apexTooltip");
+                    tooltip.style.display = "none";
+                }
+            });
+        }
+
         function initAdminTheme() {
             const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
             document.body.className = `themed-body ${savedTheme} min-h-screen flex flex-col justify-between p-3 font-sans`;
@@ -227,7 +283,7 @@
         function getKeys() {
             const gh = localStorage.getItem("APEX_GH_TOKEN");
             const ds = localStorage.getItem("APEX_DS_KEY");
-            if (!gh || !ds) { toggleConfig(); throw new Error("请先点击【🔑 密钥】配置 Token!"); }
+            if (!gh || !ds) { toggleConfig(); throw new Error("请先配置 Token!"); }
             return { gh, ds };
         }
 
@@ -246,7 +302,7 @@
 
         function appendLog(msg, color = "") {
             const log = document.getElementById("log");
-            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2.5 themed-inner border rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
+            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2 themed-inner border rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
             log.innerText += `\n>> ${msg}`;
             log.scrollTop = log.scrollHeight;
         }
@@ -307,13 +363,13 @@
         function resetDeptFilter() {
             activeFilterDept = "";
             document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-1", "ring-indigo-500", "bg-indigo-500/10"));
-            document.getElementById("activeDeptLabel").innerText = `[全景视图]`;
+            document.getElementById("activeDeptLabel").innerText = `[全景]`;
             document.getElementById("cmd").innerHTML = "";
             appendLog(`🌐 清空部门筛选`, "text-slate-400");
             loadHistoryFromMemory();
         }
 
-        // 👑 计划书精简自绘：长文字自动 1 行截断 + title 悬浮气泡全景
+        // 👑 计划书完全精简：单行强截断 + data-tooltip 极大文本提示
         async function loadTasksManifest() {
             const listEl = document.getElementById('manifestList');
             try {
@@ -367,16 +423,17 @@
                 
                 let stageTag = task.stage === 'STAGE_1_MVP_GLOBAL' ? '1.出海' : (task.stage === 'STAGE_2_CN_UPGRADE' ? '2.国内' : '3.后期');
 
-                // 重点：卡片缩编，加入 title 悬浮气泡查看完整文字！
+                // 👑 重点改进：添加 truncate-line 单行强制省略，以及 data-tooltip 提供悬浮即看！
                 listEl.innerHTML += `
-                    <div class="border rounded-lg p-2 flex flex-col justify-between transition ${borderCls}" title="【详细说明】\n任务：${task.title}\n备注：${task.notes || '无'}\n部门：${task.department}">
+                    <div class="border rounded p-2 flex flex-col justify-between transition ${borderCls}" 
+                         data-tooltip="【工单编号】：${task.id}\n【详细说明】：${task.title}\n【备注细节】：${task.notes || '无'}\n【责任部门】：${task.department}">
                         <div>
                             <div class="flex items-center justify-between text-[10px] font-mono mb-1">
                                 <span class="font-bold text-indigo-400">[${task.id}] ${stageTag}</span>
                                 <span class="font-bold px-1 py-0.2 rounded ${badgeCls}">${badgeTxt}</span>
                             </div>
-                            <div class="text-xs font-bold themed-text font-mono text-ellipsis-1 mb-0.5">${task.title}</div>
-                            <div class="text-[10px] themed-subtext font-mono text-ellipsis-1">${task.notes || '无介绍'}</div>
+                            <span class="text-xs font-bold themed-text font-mono truncate-line mb-0.5">${task.title}</span>
+                            <span class="text-[10px] themed-subtext font-mono truncate-line">${task.notes || '无介绍'}</span>
                         </div>
                         <div class="mt-1.5 pt-1.5 border-t border-gray-500/10 flex items-center justify-between text-[10px] font-mono">
                             <span class="text-slate-400 truncate max-w-[100px]">👥 ${task.department}</span>
@@ -417,6 +474,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            initApexTooltip(); // 👑 启动浮动卡片提示引擎
             const cmdBox = document.getElementById("cmd");
             const dropdown = document.getElementById("mentionDropdown");
 
@@ -537,7 +595,7 @@
                     const isCurrent = idx === 0;
 
                     container.innerHTML += `
-                        <div class="themed-inner border rounded-lg p-2 flex items-center justify-between gap-2">
+                        <div class="themed-inner border rounded p-1.5 flex items-center justify-between gap-2">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-1.5 mb-0.5">
                                     <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
@@ -608,7 +666,7 @@
                 document.getElementById("historyCount").innerText = `${lines.length}条`;
 
                 if (lines.length === 0) {
-                    feed.innerHTML = `<div class="themed-inner border rounded-lg p-4 text-center text-xs themed-subtext font-mono">暂无独立战报，可在右侧向部门派单！</div>`;
+                    feed.innerHTML = `<div class="themed-inner border rounded p-3 text-center text-xs themed-subtext font-mono">暂无独立战报</div>`;
                     return;
                 }
 
@@ -619,9 +677,9 @@
                     const timeStr = exactDateMatch ? exactDateMatch[1] : "归档";
                     let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
 
-                    let cardBorder = isLatest ? "border-emerald-500/50 themed-inner" : "border-gray-500/20 themed-inner opacity-75";
+                    let cardBorder = isLatest ? "border-emerald-500/40 themed-inner" : "border-gray-500/20 themed-inner opacity-75";
                     feed.innerHTML += `
-                        <div class="border rounded-lg p-2 transition ${cardBorder}">
+                        <div class="border rounded p-1.5 transition ${cardBorder}">
                             <div class="flex items-center justify-between text-[10px] font-mono themed-subtext mb-0.5 border-b border-gray-500/10 pb-0.5">
                                 <span class="themed-text font-bold">⏱️ ${timeStr}</span>
                                 <span>#${lines.length - idx}</span>
@@ -630,7 +688,7 @@
                         </div>
                     `;
                 });
-            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-6">拉取错误</div>`; }
+            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取错误</div>`; }
         }
 
         async function getGithubFileSafe(path, token) {
@@ -717,12 +775,12 @@
             });
 
             if (targetDepts.length === 0) targetDepts = [activeFilterDept || "大脑中枢"];
-            const rawText = cmdBox.innerText.replace(/@【[^】]+】/g, "").trim() || "汇报最新进展。";
+            const rawText = cmdBox.innerText.replace(/@【[^】]+】/g, "").trim() || "最新情况汇报。";
             const primaryDept = targetDepts[0];
 
             btn.disabled = true;
-            btn.innerHTML = `<span>⚙️ 呼叫 [${targetDepts.join(", ")}] 协同中...</span>`;
-            appendLog(`🧠 协同部门：【 ${targetDepts.join("、")} 】...`);
+            btn.innerHTML = `<span>⚙️ [${targetDepts.join(", ")}] 协同中...</span>`;
+            appendLog(`🧠 呼叫：【 ${targetDepts.join("、")} 】...`);
 
             try {
                 const keys = getKeys();
@@ -733,17 +791,17 @@
                 
                 const prompt = `你是 APEXWORK 企业智能体蜂群中枢。
 协同部门：【${targetDepts.join(", ")}】
-物理目录树：\n${repoTree.join("\n")}
+目录树：\n${repoTree.join("\n")}
 记忆：\n${memoryFile.content || "无"}
 董事长指令："${rawText}"
 
 规则：
-1. 输出 ===SWARM_LOG=== 开始的战报，和 ===NEW_MEMORY=== 提炼的带有 [EVO-RECORD | 部门]: 的一句话记事。
-2. 绝不准修改与指令无关文件！只有要求改代码时，才允许输出 ===FILE: 文件名=== 块。
+1. 输出 ===SWARM_LOG=== 开始的战报，和 ===NEW_MEMORY=== 提炼的一句话记事。
+2. 绝不准修改与指令无关文件！只有明确改代码时，才输出 ===FILE: 文件名=== 块。
 
 格式样例：
 ===SWARM_LOG===
-<简练专业答复>
+<简练答复>
 ===NEW_MEMORY===
 - [EVO-RECORD | ${primaryDept}]: <一句话提炼>
 ===FILE: 目标文件名.html=== (可选)`;
@@ -753,7 +811,7 @@
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [{ role: "system", content: "你是极简规范的智能体中枢。" }, { role: "user", content: prompt }],
+                        messages: [{ role: "system", content: "你是极简中枢。" }, { role: "user", content: prompt }],
                         temperature: 0.4
                     })
                 });
@@ -765,7 +823,7 @@
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
                 if (memParts.length < 2) throw new Error("无记事块");
 
-                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已完成。";
+                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "完成。";
                 const rawMemoryLine = memParts[1].split("===FILE:")[0].trim();
 
                 appendLog(`🤖 答复:\n${swarmLogText}`, "text-emerald-400 font-bold");
@@ -793,11 +851,12 @@
                 appendLog("❌ 错误: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 发射指令 / 蜂群协同 (V31)</span>";
+                btn.innerHTML = "<span>🚀 发射指令 / 蜂群协同 (V32)</span>";
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            initApexTooltip();
             initAdminTheme();
             if (localStorage.getItem("APEX_GH_TOKEN")) {
                 loadHistoryFromMemory();
