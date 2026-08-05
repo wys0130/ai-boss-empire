@@ -1,17 +1,14 @@
 /**
  * APEXWORK 驾驶舱模块化控制内核 (js/admin-core.js)
- * 功能特性：
- * 1. 严格判断 isCmdActive：没先点击输入框点击部门只做过滤不塞字，激活了输入框才精准插入词条。
- * 2. 高阶莫兰迪色彩配置动态赋予 9 大智能体部门按键。
- * 3. 悬浮 tooltip 卡片极速展示任务被截断背后的全文内容。
+ * 特性：
+ * 1. 完整在 DOMContentLoaded 调用 renderDeptButtons，保证 9 大部门正确渲染且绝对可点！
+ * 2. 严格遵循 isCmdActive 判断：未点输入框不塞字，点了才塞。
  */
 
 const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let rawManifestTasks = [];
 let currentManifestFilter = 'ALL';
-
-// 👑 【最严铁律标志位】：用于记录当前用户有没有用鼠标去点或者聚焦上面的输入框！
 let isCmdActive = false;
 
 const deptConfig = [
@@ -26,13 +23,13 @@ const deptConfig = [
     { name: "国际法务部", cls: "theme-teal" }
 ];
 
+// 👑 1. 核心修复：在这里显式执行 renderDeptButtons()，保证所有按钮顺畅渲染！
 window.addEventListener('DOMContentLoaded', () => {
     initApexTooltip();
     renderDeptButtons();
     
     const cmdBox = document.getElementById("cmd");
     if (cmdBox) {
-        // 👑 只有当你把鼠标点进输入框了，才打开开关：允许把点击部门的名字写成 @词条！
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
@@ -103,16 +100,14 @@ function renderDeptButtons() {
     });
 }
 
-// 👑 【点击核心判断规则】：这里保证你不点输入框就不会有字出现！
+// 👑 点击判断逻辑：没点击输入框点部门，绝不写一个字符到框里！
 function inspectDept(deptName, btnEl) {
     activeFilterDept = deptName;
-    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
+    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.45");
     btnEl.style.opacity = "1";
     document.getElementById("activeDeptLabel").innerText = `[${deptName}]`;
 
     const cmdBox = document.getElementById("cmd");
-
-    // 严厉检测：如果 isCmdActive 为 true（表示刚点击或聚焦过输入框），则写入词条
     if (isCmdActive) {
         cmdBox.focus();
         const tokenSpan = document.createElement("span");
@@ -139,8 +134,7 @@ function inspectDept(deptName, btnEl) {
         }
         appendLog(`🎯 插入词条 -> @${deptName}`);
     } else {
-        // 如果你从来没点过输入框：单纯点击部门，绝对不往框里塞半个字！
-        appendLog(`🔍 视图过滤 -> [${deptName}] (未激活输入框，仅筛选日志)`);
+        appendLog(`🔍 聚焦部门 -> [${deptName}] (未激活输入框，不写入词条)`);
     }
 
     loadHistoryFromMemory();
@@ -148,7 +142,7 @@ function inspectDept(deptName, btnEl) {
 
 function resetDeptFilter() {
     activeFilterDept = "";
-    isCmdActive = false; // 顺便把激活状态还原
+    isCmdActive = false;
     document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "1");
     document.getElementById("activeDeptLabel").innerText = `[全景视图]`;
     document.getElementById("cmd").innerHTML = "";
