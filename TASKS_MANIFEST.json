@@ -1,121 +1,98 @@
 {
-  "project_name": "APEXWORK ENTERPRISE SUITE STORE",
-  "updated_at": "2026-08-04",
+  "project_name": "APEXWORK ENTERPRISE SUITE STORE - 3-STAGE MASTER PLAN",
+  "updated_at": "2026-08-05",
   "rlff_engine": {
     "reward_signal": "daily_success_orders",
     "pruning_threshold": 7,
     "min_ctr": 0.005
   },
   "summary": {
-    "total_tasks": 13,
-    "completed": 10,
-    "in_progress": 2,
-    "todo": 1
+    "total_tasks": 9,
+    "completed": 0,
+    "in_progress": 1,
+    "todo": 8
   },
   "tasks": [
     {
-      "id": "TASK-001",
-      "title": "商城主门户页面 (index.html) 可视化排版与 1 秒响应",
-      "status": "DONE",
-      "department": "施工工程部 & 视觉策划部",
-      "revenue_impact": "HIGH",
-      "notes": "已去除枯燥大段文本，接入数据 KPI 卡片与极简展示卡"
+      "id": "TASK-101",
+      "stage": "STAGE_1_MVP_GLOBAL",
+      "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
+      "status": "IN_PROGRESS",
+      "department": "施工工程部 & 转化销售部",
+      "revenue_impact": "CRITICAL",
+      "notes": "绝不办国内营业执照。用最极简代码嵌入 Lemon Squeezy Checkout 直链，支持美元信用卡/Apple Pay。"
     },
     {
-      "id": "TASK-002",
-      "title": "PPT 演示可视化精修页面 (editor.html) V16 构建",
-      "status": "DONE",
+      "id": "TASK-102",
+      "stage": "STAGE_1_MVP_GLOBAL",
+      "title": "国内临时过渡方案：将内地 IP 访客引流至『爱发电』免签约通道",
+      "status": "TODO",
       "department": "施工工程部",
       "revenue_impact": "HIGH",
-      "notes": "已实现少字多图、折行居中，增加对齐WPS的 6 大排版操作条"
+      "notes": "不搞境内 ICP 备案。检测到中国大陆访客时，购买按钮自动变为 ¥69 爱发电赞助获取下载码模板。"
     },
     {
-      "id": "TASK-003",
-      "title": "Edge-Native WebP 边缘图像降维机制引入",
-      "status": "DONE",
-      "department": "施工工程部 & 视觉策划部",
-      "revenue_impact": "MEDIUM",
-      "notes": "实景图片请求自动带 w=1280&q=75&fm=webp，解决多图卡顿问题"
-    },
-    {
-      "id": "TASK-004",
-      "title": "多层架构地图 (PROJECT_MAP.json) 与按需读取落地",
-      "status": "DONE",
-      "department": "大脑中枢",
-      "revenue_impact": "HIGH",
-      "notes": "明确声明式数据 (/data/) 与局部页面模版 (/components/) 路由"
-    },
-    {
-      "id": "TASK-005",
-      "title": "85分多模态大模型视觉量化门槛与单幅文字极审",
-      "status": "DONE",
-      "department": "审核质量部",
-      "revenue_impact": "HIGH",
-      "notes": "低于 85 分设计与大量废话的布局自动废单"
-    },
-    {
-      "id": "TASK-006",
-      "title": "建立独立智能体目录 (/agents/) 拆分9大部门提示词与业务",
-      "status": "DONE",
-      "department": "大脑中枢 & 主动产品部",
-      "revenue_impact": "HIGH",
-      "notes": "9个部门的 Markdown 职责文件已全量挂载，支持各部独立 RAG 调用"
-    },
-    {
-      "id": "TASK-007",
-      "title": "打通 $9.99 结账与 Ed25519 签名发放链路",
-      "status": "DONE",
-      "department": "缺陷反馈部 & 转化销售部",
-      "revenue_impact": "CRITICAL",
-      "notes": "已通过 zero-auth.js 对接在线结账回跳，持久化写入 Ed25519 签名"
-    },
-    {
-      "id": "TASK-008",
-      "title": "Excel 财务模型线真实编辑功能建立 (excel-editor.html)",
-      "status": "DONE",
-      "department": "主动产品部 & 施工工程部",
-      "revenue_impact": "HIGH",
-      "notes": "Excel 模型 12 个月财务预测与 KPI 实时矩阵已上线，支持导出 XLSX"
-    },
-    {
-      "id": "TASK-009",
-      "title": "Word 智能排版合规文档专用页建立 (word-editor.html)",
-      "status": "DONE",
-      "department": "主动产品部 & 施工工程部",
-      "revenue_impact": "HIGH",
-      "notes": "已建立欧美 ATS 企业级合规九大章节编辑器，支持导出 DOCX"
-    },
-    {
-      "id": "TASK-010",
-      "title": "海外自动引流与出海适配 (i18n / Reddit / Pinterest 推广)",
-      "status": "IN_PROGRESS",
-      "department": "推广营销部 & 国际本地化部",
-      "revenue_impact": "HIGH",
-      "notes": "依赖支付上线后自动开跑全网引流文案"
-    },
-    {
-      "id": "TASK-011",
-      "title": "接入 GitHub Actions 每天 2 次云端永动机自主巡航优化",
-      "status": "IN_PROGRESS",
-      "department": "大脑中枢 & SRE容灾部",
-      "revenue_impact": "CRITICAL",
-      "notes": "通过 ai-autonomous-agent.yml 定时拉起 DeepSeek 自主精修 HTML 与代码"
-    },
-    {
-      "id": "TASK-012",
-      "title": "建立基于成交率的 RLFF 组件末位淘汰与算力池奖励",
-      "status": "DONE",
-      "department": "数据与AB测试部 & 算法提示词调优部",
-      "revenue_impact": "CRITICAL",
-      "notes": "连续7天无购买或展示点击率低于0.5%的卡片版式自动进冷宫"
-    },
-    {
-      "id": "TASK-013",
-      "title": "欧美本地化汇率与境内/海外支付无痕自适应匹配",
+      "id": "TASK-103",
+      "stage": "STAGE_1_MVP_GLOBAL",
+      "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广引流贴",
       "status": "TODO",
-      "department": "国际出海本地化部",
-      "revenue_impact": "MEDIUM",
-      "notes": "利用 IP 识别动态切换 ¥69(微信/支付宝) 与 $9.99(Stripe/Apple Pay) 网关"
+      "department": "推广营销部 & 国际本地化部",
+      "revenue_impact": "CRITICAL",
+      "notes": "生产关于 Excel 财务模型和 PPT 战略演示的高价值欧美干货文，内嵌商城链接，发入 marketing/campaigns/ 目录。"
+    },
+    {
+      "id": "TASK-104",
+      "stage": "STAGE_1_MVP_GLOBAL",
+      "title": "实现万里汇 (WorldFirst) 跨境数字服务贸易结汇与本地储蓄卡验证",
+      "status": "TODO",
+      "department": "董事长 & 国际法务部",
+      "revenue_impact": "HIGH",
+      "notes": "配合老板手动验证第一张外卡到账，以服务贸易规避外汇结汇卡脖子问题。"
+    },
+    {
+      "id": "TASK-201",
+      "stage": "STAGE_2_CN_UPGRADE",
+      "title": "国内正规军升级：接入广州网络经营个体户执照与对对公参数",
+      "status": "TODO",
+      "department": "董事长 & 国际法务部",
+      "revenue_impact": "HIGH",
+      "notes": "赚到第一笔美金且流水稳定后启动。办执照不租实体办公室，完成电子税务局核定。"
+    },
+    {
+      "id": "TASK-202",
+      "stage": "STAGE_2_CN_UPGRADE",
+      "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
+      "status": "TODO",
+      "department": "施工工程部 & 大脑中枢",
+      "revenue_impact": "CRITICAL",
+      "notes": "购买 .cn 备案小域。把前端主站中配置的 PAYMENT_GATEWAY_CN 无缝换成原生微信/支付宝官方扫码直连。"
+    },
+    {
+      "id": "TASK-203",
+      "stage": "STAGE_2_CN_UPGRADE",
+      "title": "智能判断多模态设计组，建立每日自动生成模版与 85 分质检流",
+      "status": "TODO",
+      "department": "主动产品部 & 审核质量部",
+      "revenue_impact": "CRITICAL",
+      "notes": "AI 每天印钞：自动研发多样式 PPT/Excel/Word 模板，得分低于 85 分直接重做，达到标准自动挂上架。"
+    },
+    {
+      "id": "TASK-301",
+      "stage": "STAGE_3_FULL_SCALE",
+      "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare 边缘",
+      "status": "TODO",
+      "department": "施工工程部",
+      "revenue_impact": "HIGH",
+      "notes": "全站不崩溃不白屏。海内外用户分流均保持 TTFB 50ms 极速加载。"
+    },
+    {
+      "id": "TASK-302",
+      "stage": "STAGE_3_FULL_SCALE",
+      "title": "部署 3 分钟有效期的 R2 私有预签名 (Presigned URL) 终极防盗链",
+      "status": "TODO",
+      "department": "施工工程部",
+      "revenue_impact": "CRITICAL",
+      "notes": "无论海外 Lemon Squeezy 还是国内收银台，付款成功通过 Edge 验证生成防伪直链，实现无人值守永动机。"
     }
   ]
 }
