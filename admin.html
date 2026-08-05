@@ -3,73 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK 驾驶舱 (高阶毛玻璃·莫兰迪美学版)</title>
+    <title>APEXWORK 驾驶舱 (结构解耦·莫兰迪美学版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { -webkit-font-smoothing: antialiased; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
-        
-        /* 👑 1. 顶层通透毛玻璃卡片美学 (Glassmorphism Effect) */
-        .glass-panel {
-            background: rgba(20, 20, 23, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.2s ease;
-        }
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
-        }
-
-        /* 👑 2. 低饱和度莫兰迪高级色彩 (Morandi Colors - 拒绝眼花彩虹) */
-        .dept-blue { border-color: rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.08); color: #a5b4fc; }
-        .dept-rose { border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.08); color: #fda4af; }
-        .dept-amber { border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.08); color: #fcd34d; }
-        .dept-cyan { border-color: rgba(6, 182, 212, 0.3); background: rgba(6, 182, 212, 0.08); color: #67e8f9; }
-        .dept-emerald { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.08); color: #6ee7b7; }
-        .dept-purple { border-color: rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.08); color: #d8b4fe; }
-        .dept-pink { border-color: rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.08); color: #f9a8d4; }
-        .dept-teal { border-color: rgba(20, 184, 166, 0.3); background: rgba(20, 184, 166, 0.08); color: #5eead4; }
-        .dept-zinc { border-color: rgba(113, 113, 122, 0.3); background: rgba(113, 113, 122, 0.08); color: #d4d4d8; }
-
-        .truncate-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-
-        /* 极客悬浮说明框 (Sleek Clean Tooltip) */
-        #apexTooltip {
-            position: fixed; z-index: 9999; pointer-events: none; display: none; max-width: 300px;
-            background: rgba(9, 9, 14, 0.96); backdrop-filter: blur(8px); border: 1px solid rgba(99, 102, 241, 0.4);
-            color: #f4f4f5; padding: 8px 12px; border-radius: 6px; font-size: 11px; font-family: monospace;
-            line-height: 1.6; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8); white-space: pre-wrap;
-        }
-
-        .dept-token {
-            display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); padding: 1px 6px;
-            border-radius: 4px; font-size: 11px; font-weight: 600; margin: 0 2px;
-        }
-        #mentionDropdown {
-            position: absolute; z-index: 100; display: none; width: 150px; max-height: 180px;
-            overflow-y: auto; border-radius: 6px; background: #141417; border: 1px solid #27272a;
-        }
-        .mention-item { padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: monospace; color: #f4f4f5; }
-        .mention-item:hover { background: #27272a; }
-    </style>
+    <!-- 👑 独立引入样式控制库 -->
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="bg-[#08080a] text-[#f4f4f5] min-h-screen flex flex-col justify-between p-3 font-sans">
 
+    <!-- 极速浮动气泡 -->
     <div id="apexTooltip"></div>
 
-    <!-- 顶栏 -->
+    <!-- 顶栏导航 -->
     <header class="max-w-7xl w-full mx-auto glass-panel rounded-lg px-4 py-2 mb-2 flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -92,7 +36,7 @@
         <button onclick="saveKeys()" class="mt-2 w-full bg-zinc-200 text-zinc-900 hover:bg-white text-xs font-bold py-1.5 rounded">保存配置</button>
     </div>
 
-    <!-- 历史快照弹窗 -->
+    <!-- 历史快照还原弹窗 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-panel max-w-lg w-full rounded-xl p-4 flex flex-col max-h-[70vh]">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2">
@@ -103,7 +47,7 @@
         </div>
     </div>
 
-    <!-- 👑 1. 执行清单看板：精美通透毛玻璃效果 (Glassmorphism) -->
+    <!-- 1. 执行清单看板 (通透毛玻璃卡片) -->
     <section class="max-w-7xl w-full mx-auto mb-2 glass-panel rounded-lg p-3">
         <div class="flex items-center justify-between mb-2 border-b border-zinc-800/80 pb-1.5">
             <div class="flex items-center gap-2">
@@ -120,7 +64,7 @@
         <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-2.5 max-h-[145px] overflow-y-auto custom-scrollbar pr-1"></div>
     </section>
 
-    <!-- 👑 2. 9 大主责部门：低饱和度莫兰迪调性标识色，好认不眼花！ -->
+    <!-- 2. 9 大部门聚焦栏 -->
     <section class="max-w-7xl w-full mx-auto mb-2 glass-panel rounded-lg p-2">
         <div class="flex items-center justify-between mb-1.5 border-b border-zinc-800/80 pb-1 text-[11px] font-mono">
             <div class="flex items-center gap-2">
@@ -129,9 +73,8 @@
             </div>
             <button onclick="resetDeptFilter()" class="text-[10px] text-zinc-500 hover:text-zinc-300 px-1.5 py-0.5">清空视图</button>
         </div>
-        <div class="grid grid-cols-3 lg:grid-cols-9 gap-1.5 text-center font-mono" id="deptButtonsContainer">
-            <!-- 由脚本生成专属莫兰迪色彩按键 -->
-        </div>
+        <!-- 自动渲染莫兰迪低饱和度按键 -->
+        <div class="grid grid-cols-3 lg:grid-cols-9 gap-1.5 text-center font-mono" id="deptButtonsContainer"></div>
     </section>
 
     <!-- 底部双栏工作区 -->
@@ -152,432 +95,23 @@
                     <span class="font-medium text-zinc-400">发送调度指令 (输入 @ 呼叫部门)</span>
                     <span class="text-[10px] text-zinc-600">Ctrl+Enter 快速发送</span>
                 </div>
-                
                 <div class="mb-1.5 relative">
                     <div id="cmd" contenteditable="true" 
                          class="w-full h-20 bg-[#0c0c0e]/80 border border-zinc-800 rounded p-2 text-xs text-zinc-200 font-mono focus:outline-none focus:border-indigo-500/50 overflow-y-auto custom-scrollbar"
                          placeholder="点击此处输入；如：@大脑中枢 @主动产品部 抓取公开合规热点设计一款新PPT..."></div>
                 </div>
-
                 <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 font-bold py-2 rounded text-xs transition flex items-center justify-center gap-1.5">
                     <span>🚀 提交至云端蜂群协同执行</span>
                 </button>
             </div>
 
             <div class="flex-1 mt-1.5 flex flex-col min-h-0">
-                <pre id="log" class="flex-1 text-[11px] font-mono text-zinc-400 p-2 bg-[#0c0c0e]/80 border border-zinc-800/80 rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱在线。极速鼠标悬浮说明及通透毛玻璃效果已激活。</pre>
+                <pre id="log" class="flex-1 text-[11px] font-mono text-zinc-400 p-2 bg-[#0c0c0e]/80 border border-zinc-800/80 rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱在线。严格点击插入模式与毛玻璃渲染生效中。</pre>
             </div>
         </section>
     </main>
 
-    <script>
-        const REPO = "wys0130/ai-boss-empire";
-        let activeFilterDept = "";
-        let rawManifestTasks = [];
-        let currentManifestFilter = 'ALL';
-        let isCmdActive = false; // 👑 控制没有点击过输入框绝对不可自动写字
-
-        // 👑 低饱和度莫兰迪调色字典
-        const deptConfig = [
-            { name: "大脑中枢", cls: "dept-blue" },
-            { name: "缺陷与QA质检部", cls: "dept-rose" },
-            { name: "主动产品部", cls: "dept-amber" },
-            { name: "施工工程部", cls: "dept-cyan" },
-            { name: "视觉策划部", cls: "dept-emerald" },
-            { name: "审核质量部", cls: "dept-purple" },
-            { name: "转化销售部", cls: "dept-pink" },
-            { name: "推广营销部", cls: "dept-teal" },
-            { name: "国际法务部", cls: "dept-zinc" }
-        ];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initApexTooltip();
-            renderDeptButtons();
-            
-            const cmdBox = document.getElementById("cmd");
-            if (cmdBox) {
-                cmdBox.addEventListener("focus", () => { isCmdActive = true; });
-                cmdBox.addEventListener("click", () => { isCmdActive = true; });
-
-                cmdBox.addEventListener("input", function() {
-                    const sel = window.getSelection();
-                    if (!sel.rangeCount) return;
-                    const text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
-                    const match = text.match(/@([^\s@]*)$/);
-                    if (match) showMentionDropdown(match[1]);
-                    else hideMentionDropdown();
-                });
-
-                cmdBox.addEventListener("keydown", function(e) {
-                    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                        e.preventDefault();
-                        triggerSwarmAutonomousAction();
-                    }
-                    if (e.key === "Escape") hideMentionDropdown();
-                });
-            }
-
-            if (localStorage.getItem("APEX_GH_TOKEN")) {
-                syncAllData();
-            }
-        });
-
-        function syncAllData() {
-            loadTasksManifest();
-            loadHistoryFromMemory();
-        }
-
-        function initApexTooltip() {
-            const tooltip = document.getElementById("apexTooltip");
-            document.addEventListener("mouseover", (e) => {
-                const target = e.target.closest("[data-tooltip]");
-                if (target) {
-                    tooltip.innerText = target.getAttribute("data-tooltip");
-                    tooltip.style.display = "block";
-                }
-            });
-            document.addEventListener("mousemove", (e) => {
-                if (tooltip.style.display === "block") {
-                    tooltip.style.left = (e.clientX + 14) + "px";
-                    tooltip.style.top = (e.clientY + 14) + "px";
-                }
-            });
-            document.addEventListener("mouseout", (e) => {
-                if (e.target.closest("[data-tooltip]")) {
-                    tooltip.style.display = "none";
-                }
-            });
-        }
-
-        // 👑 渲染专属低饱和莫兰迪按键
-        function renderDeptButtons() {
-            const container = document.getElementById("deptButtonsContainer");
-            if (!container) return;
-            container.innerHTML = "";
-            deptConfig.forEach(dept => {
-                const btn = document.createElement("button");
-                btn.className = `dept-btn border rounded p-1.5 text-left transition ${dept.cls}`;
-                btn.innerHTML = `<div class="text-[11px] font-semibold truncate">${dept.name}</div>`;
-                btn.onclick = () => inspectDept(dept.name, btn);
-                container.appendChild(btn);
-            });
-        }
-
-        // 👑 严格按光标触发：没先点击过输入框，点部门只做视图切换，决不往输入框里塞任何字！
-        function inspectDept(deptName, btnEl) {
-            activeFilterDept = deptName;
-            document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
-            btnEl.style.opacity = "1";
-            document.getElementById("activeDeptLabel").innerText = `[${deptName}]`;
-
-            const cmdBox = document.getElementById("cmd");
-            if (isCmdActive) {
-                cmdBox.focus();
-                const tokenSpan = document.createElement("span");
-                tokenSpan.className = "dept-token";
-                tokenSpan.contentEditable = "false";
-                tokenSpan.setAttribute("data-dept", deptName);
-                tokenSpan.innerText = `@${deptName}`;
-
-                const sel = window.getSelection();
-                if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                    const range = sel.getRangeAt(0);
-                    range.collapse(false);
-                    range.insertNode(tokenSpan);
-                    const space = document.createTextNode(" ");
-                    tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-                    range.setStartAfter(space);
-                    range.setEndAfter(space);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                } else {
-                    cmdBox.appendChild(tokenSpan);
-                    cmdBox.appendChild(document.createTextNode(" "));
-                    cmdBox.scrollTop = cmdBox.scrollHeight;
-                }
-                appendLog(`🎯 插入词条 -> @${deptName}`);
-            } else {
-                appendLog(`🔍 视图聚焦 -> [${deptName}] (未点击过输入框，只过滤不塞字)`);
-            }
-
-            loadHistoryFromMemory();
-        }
-
-        function resetDeptFilter() {
-            activeFilterDept = "";
-            isCmdActive = false;
-            document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "1");
-            document.getElementById("activeDeptLabel").innerText = `[全景视图]`;
-            document.getElementById("cmd").innerHTML = "";
-            appendLog(`🌐 恢复全景模式`);
-            loadHistoryFromMemory();
-        }
-
-        // 👑 计划进度加载与打勾
-        async function loadTasksManifest() {
-            const listEl = document.getElementById('manifestList');
-            try {
-                const keys = getKeys();
-                const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
-                if (!fileObj.content) {
-                    listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">未找到 TASKS_MANIFEST.json</div>`;
-                    return;
-                }
-                const manifest = JSON.parse(fileObj.content);
-                rawManifestTasks = manifest.tasks || [];
-                const sum = manifest.summary || { completed: 0, total_tasks: 0 };
-                document.getElementById('manifestSummaryBadge').innerText = `${sum.completed}/${sum.total_tasks}`;
-                renderManifestTasks();
-            } catch (err) {
-                listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取工单错误</div>`;
-            }
-        }
-
-        function filterManifest(stageKey) {
-            currentManifestFilter = stageKey;
-            document.querySelectorAll('.manifest-tab').forEach(btn => {
-                btn.className = "manifest-tab px-2 py-0.5 rounded text-zinc-500 hover:text-zinc-300";
-            });
-            event.target.className = "manifest-tab px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
-            renderManifestTasks();
-        }
-
-        function renderManifestTasks() {
-            const listEl = document.getElementById('manifestList');
-            listEl.innerHTML = "";
-
-            const filtered = currentManifestFilter === 'ALL' 
-                ? rawManifestTasks 
-                : rawManifestTasks.filter(t => t.stage === currentManifestFilter || (!t.stage && currentManifestFilter === 'ALL'));
-
-            if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="text-center text-xs text-zinc-500 py-4 col-span-full font-mono">该目标期暂无工单</div>`;
-                return;
-            }
-
-            filtered.forEach(task => {
-                const isDone = task.status === 'DONE';
-                const isInProg = task.status === 'IN_PROGRESS';
-                let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-zinc-600");
-                let statusText = isDone ? "已达成" : (isInProg ? "研发中" : "待处理");
-
-                listEl.innerHTML += `
-                    <div class="glass-card rounded-lg p-2.5 flex flex-col justify-between" 
-                         data-tooltip="【工单 #${task.id}】\n目标：${task.title}\n备注：${task.notes || '无'}\n责任人：${task.department}">
-                        <div>
-                            <div class="flex items-center justify-between text-[10px] font-mono mb-1 text-zinc-400">
-                                <span class="font-bold text-indigo-300">[${task.id}] · ${task.department.split('&')[0].trim()}</span>
-                                <span class="flex items-center gap-1.5 font-medium"><i class="w-1.5 h-1.5 rounded-full ${dotCls} inline-block"></i>${statusText}</span>
-                            </div>
-                            <span class="text-xs font-semibold text-zinc-200 font-mono truncate-line mb-0.5">${task.title}</span>
-                            <span class="text-[10px] text-zinc-500 font-mono truncate-line">${task.notes || '暂无说明'}</span>
-                        </div>
-                        <div class="mt-1.5 pt-1.5 border-t border-zinc-800/80 flex items-center justify-end text-[10px] font-mono">
-                            <button onclick="toggleTaskStatus('${task.id}')" class="px-2.5 py-0.5 rounded bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 font-medium transition">
-                                ${isDone ? '撤销' : '勾选完成'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        async function toggleTaskStatus(taskId) {
-            const task = rawManifestTasks.find(t => t.id === taskId);
-            if (!task) return;
-            task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
-            appendLog(`✏️ 提交进度变更 -> [${taskId}] ${task.status}`);
-            try {
-                const keys = getKeys();
-                const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
-                const manifest = JSON.parse(fileObj.content);
-                const targetInManifest = manifest.tasks.find(t => t.id === taskId);
-                if (targetInManifest) {
-                    targetInManifest.status = task.status;
-                    manifest.summary.completed = manifest.tasks.filter(t => t.status === 'DONE').length;
-                    manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
-                    manifest.updated_at = new Date().toISOString().slice(0, 10);
-                    await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
-                    appendLog(`✅ 进度书已写回 GitHub`);
-                    loadTasksManifest();
-                }
-            } catch (e) {
-                appendLog(`❌ 更新进度异常: ${e.message}`, "text-rose-500");
-            }
-        }
-
-        // 底层通信函数
-        function getKeys() {
-            const gh = localStorage.getItem("APEX_GH_TOKEN");
-            const ds = localStorage.getItem("APEX_DS_KEY");
-            if (!gh || !ds) { toggleConfig(); throw new Error("请先配置密钥!"); }
-            return { gh, ds };
-        }
-
-        function toggleConfig() { document.getElementById("configArea").classList.toggle("hidden"); }
-        function saveKeys() {
-            localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
-            localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
-            toggleConfig();
-            syncAllData();
-        }
-
-        function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-        function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-        function appendLog(msg, color = "") {
-            const log = document.getElementById("log");
-            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2 bg-[#0c0c0e]/80 border border-zinc-800/80 rounded whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
-            log.innerText += `\n>> ${msg}`;
-            log.scrollTop = log.scrollHeight;
-        }
-
-        async function getGithubFileSafe(path, token) {
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
-            if (!res.ok) return { content: "", sha: null };
-            const data = await res.json();
-            return { content: b64_to_utf8(data.content), sha: data.sha };
-        }
-
-        async function pushGithubFile(path, content, sha, message, token) {
-            const payload = { message: message, content: utf8_to_b64(content) };
-            if (sha) payload.sha = sha;
-            const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-                method: "PUT",
-                headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            if (!res.ok) throw new Error(`写回 ${path} 失败`);
-            return await res.json();
-        }
-
-        async function loadHistoryFromMemory() {
-            const feed = document.getElementById("historyFeed");
-            try {
-                const keys = getKeys();
-                const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                let lines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
-                if (activeFilterDept) lines = lines.filter(l => l.includes(activeFilterDept));
-                document.getElementById("historyCount").innerText = `${lines.length}条`;
-                if (lines.length === 0) {
-                    feed.innerHTML = `<div class="p-3 text-center text-xs text-zinc-600 font-mono">无记录</div>`;
-                    return;
-                }
-                feed.innerHTML = "";
-                lines.reverse().forEach((line, idx) => {
-                    const timeMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
-                    const timeStr = timeMatch ? timeMatch[1] : "归档";
-                    const cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
-                    feed.innerHTML += `
-                        <div class="border border-zinc-800/80 rounded p-1.5 bg-[#0c0c0e]/80">
-                            <div class="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-0.5 border-b border-zinc-800/60 pb-0.5">
-                                <span>⏱️ ${timeStr}</span><span>#${lines.length - idx}</span>
-                            </div>
-                            <div class="text-xs text-zinc-300 font-mono">${cleanText}</div>
-                        </div>
-                    `;
-                });
-            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取错误</div>`; }
-        }
-
-        function openRollbackModal() {
-            document.getElementById("rollbackModal").classList.remove("hidden");
-            fetchCommitHistory();
-        }
-        function closeRollbackModal() { document.getElementById("rollbackModal").classList.add("hidden"); }
-
-        async function fetchCommitHistory() {
-            const container = document.getElementById("commitListContainer");
-            container.innerHTML = `<div class="text-center text-xs text-zinc-500 py-4 font-mono">加载中...</div>`;
-            try {
-                const keys = getKeys();
-                const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
-                const commits = await res.json();
-                container.innerHTML = "";
-                commits.forEach((item, idx) => {
-                    const shaShort = item.sha.slice(0, 7);
-                    const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
-                    container.innerHTML += `
-                        <div class="border border-zinc-800 rounded p-1.5 flex items-center justify-between gap-2 bg-[#0c0c0e]/80">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-1.5 mb-0.5">
-                                    <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
-                                    <span class="text-[10px] text-zinc-500 font-mono">${timeStr}</span>
-                                </div>
-                                <div class="text-xs text-zinc-300 font-mono truncate">${item.commit.message}</div>
-                            </div>
-                            <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-2 py-0.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 rounded text-[10px] font-bold">
-                                ${idx === 0 ? '当前' : '还原'}
-                            </button>
-                        </div>
-                    `;
-                });
-            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取失败</div>`; }
-        }
-
-        async function revertToSelectedCommit(targetSha, shortSha) {
-            if (!confirm(`⏳ 确定还原至版本 [#${shortSha}] 吗？`)) return;
-            closeRollbackModal();
-            try {
-                const keys = getKeys();
-                const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
-                const treeData = await treeRes.json();
-                const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
-                for (const fileObj of filesToRestore) {
-                    const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
-                    const fileJson = await fileContentRes.json();
-                    await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
-                        method: "PUT",
-                        headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
-                    });
-                }
-                appendLog(`✅ 还原成功 [#${shortSha}]`);
-                loadHistoryFromMemory();
-            } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
-        }
-
-        async function triggerSwarmAutonomousAction() {
-            const btn = document.getElementById("runBtn");
-            const cmdBox = document.getElementById("cmd");
-            const rawText = cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规汇报";
-            btn.disabled = true;
-            btn.innerHTML = "<span>⚙️ 蜂群协同会商中...</span>";
-            try {
-                const keys = getKeys();
-                const [memoryFile, repoTreeRes] = await Promise.all([
-                    getGithubFileSafe("MEMORY.md", keys.gh),
-                    fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
-                ]);
-                const treeSummary = (repoTreeRes.tree || []).map(n => n.path).join("\n");
-
-                const prompt = `你是 APEXWORK 智能体中枢。
-目录树：\n${treeSummary}
-记忆：\n${memoryFile.content || "无"}
-董事长指令："${rawText}"
-要求：仅输出 ===SWARM_LOG=== 答复和 ===NEW_MEMORY=== 带有 [EVO-RECORD | 部门]: 的记忆。不准随性改代码。`;
-
-                const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        model: "deepseek-chat",
-                        messages: [{ role: "system", content: "极简架构中枢。" }, { role: "user", content: prompt }],
-                        temperature: 0.4
-                    })
-                });
-                const aiAnswer = (await dsRes.json()).choices[0].message.content;
-                const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "完毕。";
-                appendLog(`🤖 回复:\n${swarmLogText}`, "text-zinc-200");
-                cmdBox.innerHTML = "";
-                loadHistoryFromMemory();
-            } catch (err) {
-                appendLog("❌ 异常: " + err.message, "text-rose-500");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "<span>🚀 提交至云端蜂群协同执行</span>";
-            }
-        }
-    </script>
+    <!-- 👑 独立引入控制业务逻辑 -->
+    <script src="components/admin-core.js"></script>
 </body>
 </html>
