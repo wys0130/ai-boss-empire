@@ -6,14 +6,14 @@
 <title>APEXWORK · Word ATS 合规报告编辑器</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<!-- 👑 引入统一鉴权与弹窗组件 -->
 <script src="components/zero-auth.js"></script>
 <style>
   body { font-family: 'Inter', 'Segoe UI', sans-serif; background: #f1f5f9; }
   .bento-card { background: #ffffff; border-radius: 1.25rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04), 0 4px 6px -2px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; }
-  .nav-pill { transition: all 0.2s; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-weight: 600; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 0.75rem; text-align: left; display: flex; items-center: center; justify-content: space-between; }
+  .nav-pill { transition: all 0.2s; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-weight: 600; font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 0.75rem; text-align: left; display: flex; align-items: center; justify-content: space-between; }
   .nav-pill:hover { background: #e2e8f0; color: #0f172a; }
   .nav-pill.active { background: #0f172a; color: #ffffff; border-color: #0f172a; box-shadow: 0 4px 10px -2px rgba(15,23,42,0.3); }
-  /* 真实 A4 纸张排版投影 */
   .a4-paper { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 0.5rem; padding: 3.5rem 4rem; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1), 0 0 1px 1px rgba(0,0,0,0.05); min-height: 600px; }
   .doc-title { font-size: 1.85rem; font-weight: 800; color: #0f172a; margin-bottom: 1.5rem; border-bottom: 3px solid #0f172a; padding-bottom: 0.75rem; letter-spacing: -0.02em; }
   .doc-content { font-size: 1rem; color: #334155; line-height: 2; white-space: pre-wrap; font-family: 'Georgia', serif; }
@@ -42,6 +42,7 @@
       <span class="text-xs font-mono bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5">
         <span>📑 ATS 标准行高已锁定</span>
       </span>
+      <!-- 👑 一键呼叫中央模块 -->
       <button onclick="openCheckoutModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/20">
         立即解锁完整 .DOCX ($9.99)
       </button>
@@ -99,48 +100,18 @@
       <div class="p-6 bg-slate-900 rounded-2xl text-white shadow-xl border border-slate-800">
         <div class="flex justify-between items-center mb-3">
           <span class="text-xs font-bold text-indigo-400 font-mono uppercase tracking-wider">Commercial License</span>
-          <button onclick="togglePayRegion()" id="regionSwitchBtn" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-2.5 py-1 rounded-lg font-mono transition">
-            🌍 切换国内/海外
+          <button onclick="ApexAuth.openCheckout({title: 'APEXWORK 欧美 ATS 企业合规报告 (.DOCX)', onSuccess: () => executeDOCXExport()})" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-2.5 py-1 rounded-lg font-mono transition">
+            🌍 安全收银
           </button>
         </div>
-        <h3 class="font-bold text-base mb-1" id="payDesc">欧美 ATS 报告原件</h3>
-        <p class="text-3xl font-black mb-4 font-mono text-white" id="payPrice">$9.99 <span class="text-xs font-normal text-slate-400">/ 一次性</span></p>
+        <h3 class="font-bold text-base mb-1">欧美 ATS 报告原件</h3>
+        <p class="text-3xl font-black mb-4 font-mono text-white">$9.99 <span class="text-xs font-normal text-slate-400">/ 一次性</span></p>
         <button onclick="openCheckoutModal()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
           <span>⚡ 立即解锁下载原文件 (.DOCX)</span>
         </button>
         <p class="text-[11px] text-slate-400 mt-3 text-center">免注册账号 · 付后极速本地签发证书</p>
       </div>
     </aside>
-  </div>
-</div>
-
-<!-- 极速付款与核单弹窗 -->
-<div id="checkoutModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-slate-900">
-    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-        <span class="font-bold text-base">商业订单核查与授权</span>
-      </div>
-      <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">✕</button>
-    </div>
-    <div class="space-y-3 mb-6 text-sm">
-      <div class="flex justify-between py-1 border-b border-slate-100">
-        <span class="text-slate-500">商品名称</span>
-        <span class="font-semibold text-slate-800">APEXWORK 欧美 ATS 企业合规报告</span>
-      </div>
-      <div class="flex justify-between py-1 border-b border-slate-100">
-        <span class="text-slate-500">应付总计</span>
-        <span class="font-black text-lg text-indigo-600" id="modalPriceText">$9.99 USD</span>
-      </div>
-      <div class="flex justify-between py-1 border-b border-slate-100">
-        <span class="text-slate-500">排版标准</span>
-        <span class="font-semibold text-slate-800">OpenXML 企业格式无乱码</span>
-      </div>
-    </div>
-    <button onclick="handleSmartExport()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-indigo-500/20">
-      确认信息，直达收银台 →
-    </button>
   </div>
 </div>
 
@@ -158,42 +129,12 @@ const sections = [
 ];
 let currentSection = 0;
 
-const PAY_CONFIG = {
-      china: {
-        name: "爱发电 (Afdian) 极速直付",
-        price: "￥27.00 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
-        modalPrice: "￥27.00 RMB",
-        // // 面包多保留注释，审核通过后可随时放开：
-        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377" // 1. 换成 .com  2. 换成你的真实ID/方案链接
-      },
-      overseas: {
-        name: "海外快捷商用收银",
-        price: "$9.99 <span class='text-xs font-normal text-slate-400'>/ 全站三件套</span>",
-        modalPrice: "$9.99 USD",
-        // // url: "https://mbd.pub/o/bread/YZaUmJlpbQ==",
-        url: "https://afdian.com/a/d93595ce84e711f1bdfa52540025c377"
-      }
-};
-let currentRegion = 'overseas';
-
-function togglePayRegion() {
-  currentRegion = currentRegion === 'china' ? 'overseas' : 'china';
-  document.getElementById('payPrice').innerHTML = PAY_CONFIG[currentRegion].price;
-  document.getElementById('payDesc').textContent = PAY_CONFIG[currentRegion].name;
-  document.getElementById('modalPriceText').textContent = PAY_CONFIG[currentRegion].modalPrice;
-}
-
-function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); }
-function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
-
-function handleSmartExport() {
-  if (window.ApexAuth && window.ApexAuth.isPaidUser()) {
-    closeCheckoutModal();
-    executeDOCXExport();
-  } else {
-    window.location.href = PAY_CONFIG[currentRegion].url;
-  }
+// 👑 全局通用调用：唤出统一模块收银台，验证通过直接拉起 DOCX 导出
+function openCheckoutModal() {
+  ApexAuth.openCheckout({
+    title: "APEXWORK 欧美 ATS 企业合规报告 (.DOCX)",
+    onSuccess: () => executeDOCXExport()
+  });
 }
 
 function selectSection(index) {
@@ -248,7 +189,6 @@ function executeDOCXExport() {
 function generateDocumentXML() {
   let body = '';
   sections.forEach((sec) => {
-    // 注入大标题段落格式
     body += `<w:p><w:pPr><w:spacing w:before="280" w:after="160"/><w:rPr><w:b/><w:color w:val="0F172A"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="0F172A"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr><w:t>${sec.title}</w:t></w:r></w:p>`;
     const paragraphs = sec.content.split('\n');
     paragraphs.forEach(pText => {
@@ -288,4 +228,3 @@ selectSection(0);
 </script>
 </body>
 </html>
-
