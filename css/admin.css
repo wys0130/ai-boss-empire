@@ -1,18 +1,18 @@
-/* APEXWORK 驾驶舱模块化样式表 (V35 莫兰迪·毛玻璃) */
+/* APEXWORK 驾驶舱样式表 (V36 极客莫兰迪·防遮挡版) */
 body { -webkit-font-smoothing: antialiased; }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 .truncate-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 
-/* 1. 悬浮气泡解释框 (Tooltip) */
+/* 1. 悬浮说明气泡框 (必须带 pointer-events: none，绝不阻挡鼠标点击！) */
 #apexTooltip {
-    position: fixed; z-index: 9999; pointer-events: none; display: none; max-width: 310px;
+    position: fixed; z-index: 9999; pointer-events: none !important; display: none; max-width: 310px;
     background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(8px); border: 1px solid rgba(99, 102, 241, 0.4);
     color: #f8fafc; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-family: monospace;
     line-height: 1.6; box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8); white-space: pre-wrap;
 }
 
-/* 2. 部门专属莫兰迪高阶半透背光 (好认、有生命力且绝不辣眼) */
+/* 2. 部门专属莫兰迪高阶半透背光 */
 .theme-blue { background: rgba(99, 102, 241, 0.12); border-color: rgba(99, 102, 241, 0.35); color: #a5b4fc; }
 .theme-blue:hover { background: rgba(99, 102, 241, 0.25); border-color: rgba(99, 102, 241, 0.6); }
 
