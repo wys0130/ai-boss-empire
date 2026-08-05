@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork AI 驾驶舱 (V30 @战略看板版)</title>
+    <title>APEXWORK 驾驶舱 (V31 极简清爽版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
@@ -18,241 +18,186 @@
         .themed-text { color: var(--text-main); }
         .themed-subtext { color: var(--text-sub); }
 
-        /* 胶囊 Token 样式 */
+        /* 👑 文本截断与鼠标悬浮查看全貌 */
+        .text-ellipsis-1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
         .dept-token {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(99, 102, 241, 0.25);
-            color: #818cf8;
-            border: 1px solid rgba(99, 102, 241, 0.5);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: bold;
-            margin: 0 3px;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.25);
+            color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.5); padding: 2px 8px;
+            border-radius: 6px; font-size: 11px; font-weight: bold; margin: 0 3px;
+            cursor: pointer; user-select: none; white-space: nowrap; transition: all 0.2s;
         }
         .dept-token:hover { background: rgba(99, 102, 241, 0.4); }
 
-        /* @ 补全下拉菜单样式 */
         #mentionDropdown {
-            position: absolute;
-            z-index: 100;
-            display: none;
-            width: 200px;
-            max-height: 220px;
-            overflow-y: auto;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            position: absolute; z-index: 100; display: none; width: 180px; max-height: 200px;
+            overflow-y: auto; border-radius: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
-        .mention-item {
-            padding: 8px 12px;
-            font-size: 11px;
-            cursor: pointer;
-            font-family: monospace;
-            transition: background 0.15s;
-        }
-        .mention-item:hover, .mention-item.selected {
-            background: rgba(99, 102, 241, 0.3);
-            color: #ffffff;
-        }
+        .mention-item { padding: 6px 10px; font-size: 11px; cursor: pointer; font-family: monospace; }
+        .mention-item:hover, .mention-item.selected { background: rgba(99, 102, 241, 0.3); color: #ffffff; }
     </style>
 </head>
-<body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-4 font-sans">
+<body class="themed-body theme-dark min-h-screen flex flex-col justify-between p-3 font-sans">
 
-    <!-- 顶部导览 -->
-    <header class="max-w-7xl w-full mx-auto themed-card border rounded-xl px-5 py-2.5 mb-3 flex flex-wrap items-center justify-between gap-3 shadow-lg">
-        <div class="flex items-center gap-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <h1 class="font-bold font-mono text-sm tracking-wide themed-text">APEXWORK 智能体蜂群控制台</h1>
-            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V30 @战略看板版</span>
-            <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA GUARD ON</span>
+    <!-- 顶栏：极简干练 -->
+    <header class="max-w-7xl w-full mx-auto themed-card border rounded-xl px-4 py-2 mb-2.5 flex items-center justify-between gap-3 shadow-md">
+        <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h1 class="font-bold font-mono text-xs tracking-wide themed-text">APEXWORK 驾驶舱</h1>
+            <span class="text-[10px] font-mono px-2 py-0.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded font-bold">V31 极简</span>
+            <span id="qaStatusBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded font-bold">🛡️ QA ON</span>
         </div>
-        <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono font-bold px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition shadow-sm">
-                <span>🌞/🌙 换黑白</span>
+        <div class="flex items-center gap-1.5">
+            <button onclick="toggleAdminTheme()" id="themeBtn" class="text-xs font-mono px-2.5 py-1 themed-inner hover:opacity-80 border rounded-md">
+                <span>🌞/🌙</span>
             </button>
-            <button onclick="openRollbackModal()" class="text-xs font-mono font-bold px-3 py-1 bg-amber-600/20 hover:bg-amber-600/40 text-amber-500 border border-amber-500/40 rounded-lg transition shadow-sm">
-                <span>⏳ 一键回退</span>
+            <button onclick="openRollbackModal()" class="text-xs font-mono px-2.5 py-1 bg-amber-600/20 text-amber-500 border border-amber-500/40 rounded-md">
+                <span>⏳ 回退</span>
             </button>
-            <button onclick="loadTasksManifest()" class="text-xs font-mono px-3 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/40 rounded-lg transition font-bold">
+            <button onclick="loadTasksManifest()" class="text-xs font-mono px-2.5 py-1 bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 rounded-md font-bold">
                 <span>📋 刷新计划</span>
             </button>
-            <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-3 py-1 themed-inner hover:opacity-80 border rounded-lg transition">
-                <span>🔄 刷新记事</span>
+            <button onclick="loadHistoryFromMemory()" class="text-xs font-mono px-2.5 py-1 themed-inner hover:opacity-80 border rounded-md">
+                <span>🔄 战报</span>
             </button>
-            <button onclick="toggleConfig()" class="text-xs font-mono px-3 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/40 rounded-lg transition">
-                <span>🔑 授权密钥</span>
+            <button onclick="toggleConfig()" class="text-xs font-mono px-2.5 py-1 bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 rounded-md">
+                <span>🔑 密钥</span>
             </button>
         </div>
     </header>
 
-    <!-- 密钥配置区 -->
-    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-3 p-4 themed-card border border-indigo-500/50 rounded-xl shadow-2xl">
-        <div class="text-xs font-bold text-indigo-400 font-mono mb-2">⚡ 董事长本地密钥区</div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token (ghp_...)" class="w-full themed-inner border rounded-lg p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
-            <input id="dsKeyInput" type="password" placeholder="DeepSeek / OpenRouter API Key (sk-...)" class="w-full themed-inner border rounded-lg p-2 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500">
+    <!-- 密钥配置 -->
+    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-2 p-3 themed-card border border-indigo-500/50 rounded-xl shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full themed-inner border rounded p-1.5 text-xs font-mono">
+            <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full themed-inner border rounded p-1.5 text-xs font-mono">
         </div>
-        <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-lg transition">💾 保存授权</button>
+        <button onclick="saveKeys()" class="mt-2 w-full bg-indigo-600 text-white text-xs font-bold py-1.5 rounded">💾 保存</button>
     </div>
 
     <!-- 一键回退弹窗 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="themed-card border max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[80vh]">
-            <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-3">
-                <span class="font-bold text-sm font-mono themed-text">⏳ 选择历史好版本还原</span>
-                <button onclick="closeRollbackModal()" class="text-gray-400 hover:text-white text-lg font-bold px-2">✕</button>
+        <div class="themed-card border max-w-lg w-full rounded-xl p-4 flex flex-col max-h-[70vh]">
+            <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
+                <span class="font-bold text-xs font-mono">⏳ 历史快照还原</span>
+                <button onclick="closeRollbackModal()" class="text-gray-400 hover:text-white text-sm font-bold">✕</button>
             </div>
-            <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2">
-                <div class="text-center text-xs themed-subtext py-8 font-mono">载入全库快照中...</div>
-            </div>
+            <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-1.5 custom-scrollbar pr-1"></div>
         </div>
     </div>
 
-    <!-- 👑 战略工单与三期里程碑看板 (TASK MANIFEST DASHBOARD) -->
-    <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-4 shadow-xl">
-        <div class="flex items-center justify-between mb-3 border-b border-gray-500/20 pb-2">
+    <!-- 👑 三期目标看板：极简排版 + 单行截断 + 悬浮展示全称 -->
+    <section class="max-w-7xl w-full mx-auto mb-2.5 themed-card border rounded-xl p-3 shadow-md">
+        <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5">
             <div class="flex items-center gap-2">
-                <span class="text-amber-400 font-bold font-mono text-xs">📋 前·中·后三期战略工单看板 (TASKS MANIFEST):</span>
-                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-2 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 rounded">
-                    载入中...
-                </span>
+                <span class="text-amber-400 font-bold font-mono text-xs">📋 三期目标计划:</span>
+                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded">拉取中...</span>
             </div>
-            <div class="flex gap-1.5 font-mono text-[10px]">
-                <button onclick="filterManifest('ALL')" class="manifest-tab px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold">全景 (ALL)</button>
-                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white">前期 [MVP出海]</button>
-                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white">中期 [国内合规]</button>
-                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white">后期 [全面躺利]</button>
+            <div class="flex gap-1 font-mono text-[10px]">
+                <button onclick="filterManifest('ALL')" class="manifest-tab px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold">全部</button>
+                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">1.前期出海</button>
+                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">2.中期国内</button>
+                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white">3.后期躺利</button>
             </div>
         </div>
 
-        <!-- 任务列表容器 -->
-        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-            <div class="text-center text-xs themed-subtext py-6 font-mono col-span-full">正在拉取远端 TASKS_MANIFEST.json ...</div>
-        </div>
+        <!-- 任务列表容器 (单行截断，鼠标放置弹气泡) -->
+        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1"></div>
     </section>
 
-    <!-- 9 大部门按键 -->
-    <section class="max-w-7xl w-full mx-auto mb-3 themed-card border rounded-2xl p-3 shadow-xl">
-        <div class="flex items-center justify-between mb-2 border-b border-gray-500/20 pb-1.5 text-xs font-mono">
+    <!-- 9 大主责部门快捷筛选 -->
+    <section class="max-w-7xl w-full mx-auto mb-2.5 themed-card border rounded-xl p-2.5 shadow-md">
+        <div class="flex items-center justify-between mb-1.5 border-b border-gray-500/20 pb-1 text-[11px] font-mono">
             <div class="flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">🤖 智能部门按键 (点击生成 Token 胶囊，键盘输入 @ 自动弹出悬浮选择菜单):</span>
-                <span id="activeDeptLabel" class="text-indigo-400 font-bold">[当前视图: 全体部门]</span>
+                <span class="text-emerald-400 font-bold">🤖 智能部门:</span>
+                <span id="activeDeptLabel" class="text-indigo-400">[全景视图]</span>
             </div>
-            <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-0.5 rounded transition">
-                ↺ 清空关联视图
+            <button onclick="resetDeptFilter()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded">
+                ↺ 清空筛选
             </button>
         </div>
-        <div class="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-9 gap-1.5 text-center font-mono">
-            <button onclick="inspectDept('大脑中枢', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-indigo-400 group-hover:underline">🧠 大脑中枢</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">工单调度分发</div>
+        <div class="grid grid-cols-3 lg:grid-cols-9 gap-1 text-center font-mono">
+            <button onclick="inspectDept('大脑中枢', this)" class="dept-btn themed-inner border border-slate-700 hover:border-indigo-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-indigo-400 truncate">🧠 大脑中枢</div>
             </button>
-            <button onclick="inspectDept('缺陷与QA质检部', this)" class="dept-btn themed-inner border border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-rose-400 group-hover:underline">🐞 缺陷与QA部</div>
-                <div class="text-[9px] text-rose-300 truncate mt-0.5">BUG/自动自愈闭环</div>
+            <button onclick="inspectDept('缺陷与QA质检部', this)" class="dept-btn themed-inner border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-rose-400 truncate">🐞 缺陷QA部</div>
             </button>
-            <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-amber-400 group-hover:underline">🔧 主动产品部</div>
-                <div class="text-[9px] text-amber-300 truncate mt-0.5">主动扫盲补坑</div>
+            <button onclick="inspectDept('主动产品部', this)" class="dept-btn themed-inner border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-amber-400 truncate">🔧 主动产品</div>
             </button>
-            <button onclick="inspectDept('施工工程部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-blue-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-blue-400 group-hover:underline">🛠️ 施工工程部</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">1秒极致响应</div>
+            <button onclick="inspectDept('施工工程部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-blue-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-blue-400 truncate">🛠️ 施工工程</div>
             </button>
-            <button onclick="inspectDept('视觉策划部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-emerald-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-emerald-400 group-hover:underline">🎨 视觉策划部</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">少字多图排版</div>
+            <button onclick="inspectDept('视觉策划部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-emerald-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-emerald-400 truncate">🎨 视觉策划</div>
             </button>
-            <button onclick="inspectDept('审核质量部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-purple-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-purple-400 group-hover:underline">⚖️ 审核质量部</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">85分门槛把控</div>
+            <button onclick="inspectDept('审核质量部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-purple-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-purple-400 truncate">⚖️ 审核质量</div>
             </button>
-            <button onclick="inspectDept('转化销售部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-pink-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-pink-400 group-hover:underline">📈 转化销售部</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">$9.99营收绩效</div>
+            <button onclick="inspectDept('转化销售部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-pink-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-pink-400 truncate">📈 转化销售</div>
             </button>
-            <button onclick="inspectDept('推广营销部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-cyan-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-cyan-400 group-hover:underline">📢 推广营销部</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">海外公域搬砖</div>
+            <button onclick="inspectDept('推广营销部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-cyan-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-cyan-400 truncate">📢 推广营销</div>
             </button>
-            <button onclick="inspectDept('国际法务部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-teal-400 rounded-xl p-2 transition cursor-pointer text-left group">
-                <div class="text-[11px] font-bold text-teal-400 group-hover:underline">🛡️ 国际法务部</div>
-                <div class="text-[9px] text-gray-400 truncate mt-0.5">ATS/GDPR零注册</div>
+            <button onclick="inspectDept('国际法务部', this)" class="dept-btn themed-inner border border-slate-700 hover:border-teal-400 rounded-lg p-1.5 text-left group">
+                <div class="text-[11px] font-bold text-teal-400 truncate">🛡️ 国际法务</div>
             </button>
         </div>
     </section>
 
-    <!-- 核心两栏驾驶台 -->
-    <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start overflow-hidden">
+    <!-- 双栏工作台 -->
+    <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 items-start overflow-hidden">
         
-        <!-- 左栏：战报流水 -->
-        <aside class="lg:col-span-5 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl">
-            <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
-                <span class="text-xs font-bold font-mono tracking-wide themed-text">🕒 部门执行战报</span>
-                <span id="historyCount" class="text-[10px] font-mono themed-inner border px-2 py-0.5 rounded themed-subtext">0 RECORDS</span>
+        <!-- 左栏：执行日志 -->
+        <aside class="lg:col-span-5 themed-card border rounded-xl p-3 flex flex-col h-[480px] shadow-md">
+            <div class="flex items-center justify-between border-b border-gray-500/20 pb-1.5 mb-2">
+                <span class="text-xs font-bold font-mono themed-text">🕒 部门战报日志</span>
+                <span id="historyCount" class="text-[10px] font-mono themed-inner border px-1.5 py-0.5 rounded themed-subtext">0条</span>
             </div>
-            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-1.5">
-                <div class="text-center text-xs themed-subtext py-10 font-mono">加载日志中...</div>
-            </div>
+            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-1.5 custom-scrollbar pr-1"></div>
         </aside>
 
-        <!-- 右栏：董事长控制指令台 -->
-        <section class="lg:col-span-7 themed-card border rounded-2xl p-4 flex flex-col h-[560px] shadow-xl justify-between relative">
-            
-            <!-- @ 补全下拉菜单容器 -->
-            <div id="mentionDropdown" class="themed-card border shadow-2xl"></div>
+        <!-- 右栏：控制台指令 -->
+        <section class="lg:col-span-7 themed-card border rounded-xl p-3 flex flex-col h-[480px] shadow-md justify-between relative">
+            <div id="mentionDropdown" class="themed-card border shadow-xl"></div>
 
             <div>
-                <!-- BUG 报警与 QA 闭环栏 -->
-                <div id="bugAlertBanner" class="mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono" data-status="green">
-                    <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">✅ [QA 自动化检查]:</span>
-                        <span class="text-emerald-300">系统运行平稳，全站无 404 死链，智能 @ 补全引擎已激活。</span>
-                    </div>
-                    <span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>
+                <div id="bugAlertBanner" class="mb-2 bg-emerald-500/10 border border-emerald-500/40 rounded-lg p-1.5 flex items-center justify-between text-xs font-mono">
+                    <span class="text-emerald-300 font-bold">✅ 系统平稳运行中</span>
+                    <span class="text-[10px] text-slate-500 font-bold px-1.5 py-0.5 bg-slate-900 rounded">正常</span>
                 </div>
 
-                <div class="flex items-center justify-between border-b border-gray-500/20 pb-2 mb-2">
-                    <span class="text-xs font-bold font-mono text-indigo-400">董事长发令台 (双击胶囊可修改部门；键盘敲 @ 弹出智能补全)</span>
-                    <span class="text-[10px] font-mono themed-subtext">快捷触发: <strong class="themed-text">Ctrl + Enter</strong></span>
+                <div class="flex items-center justify-between border-b border-gray-500/20 pb-1.5 mb-1.5 text-xs font-mono">
+                    <span class="font-bold text-indigo-400">控制台指令区 (输入 @ 呼叫部门)</span>
+                    <span class="text-[10px] themed-subtext">快捷触发: <strong class="themed-text">Ctrl+Enter</strong></span>
                 </div>
                 
-                <!-- 富文本 Token 输入框 -->
-                <div class="mb-2.5 relative">
+                <div class="mb-2 relative">
                     <div id="cmd" contenteditable="true" 
-                         class="w-full h-24 themed-inner border rounded-xl p-3 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 shadow-inner overflow-y-auto custom-scrollbar"
-                         placeholder="在此输入指令；输入 @ 自动选择部门，或双击胶囊修改词条..."></div>
+                         class="w-full h-20 themed-inner border rounded-lg p-2.5 text-xs themed-text font-mono focus:outline-none focus:border-indigo-500 overflow-y-auto custom-scrollbar"
+                         placeholder="输入指令；敲 @ 唤出部门..."></div>
                 </div>
 
-                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
-                    <span>🚀 立即发车 / 蜂群智能协同 (V30 引擎)</span>
+                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg text-xs transition shadow flex items-center justify-center gap-1.5">
+                    <span>🚀 发射指令 / 蜂群协同 (V31)</span>
                 </button>
             </div>
 
-            <!-- 输出控制台 -->
-            <div class="flex-1 mt-2.5 flex flex-col min-h-0">
-                <div class="text-[10px] font-mono themed-subtext mb-1 flex justify-between">
-                    <span>SWARM TERMINAL:</span>
-                    <span class="text-emerald-500 font-mono">● READY</span>
-                </div>
-                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 驾驶舱 V30 在线。三期战略工单看板与全链路协同已激活。</pre>
+            <div class="flex-1 mt-2 flex flex-col min-h-0">
+                <pre id="log" class="flex-1 text-[11px] font-mono text-yellow-500 p-2.5 themed-inner border rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar">>> 控制台 V31 在线。文字展示已缩简，悬浮可查看完整描述。</pre>
             </div>
 
-            <div class="mt-2.5 pt-2 border-t border-gray-500/20 flex justify-between items-center text-xs">
-                <span class="themed-subtext font-mono text-[10px]">CACHE PURGE: ENABLED</span>
-                <button onclick="openLiveSiteForceBypass()" class="text-emerald-500 hover:text-emerald-400 font-mono font-bold flex items-center gap-1">
-                    🔥 强制无缓存直达主页 →
+            <div class="mt-2 pt-1.5 border-t border-gray-500/20 flex justify-between items-center text-xs">
+                <span class="themed-subtext font-mono text-[10px]">CACHE: OFF</span>
+                <button onclick="openLiveSiteForceBypass()" class="text-emerald-500 hover:text-emerald-400 font-mono font-bold text-xs">
+                    🔥 无缓存打开主页 →
                 </button>
             </div>
         </section>
     </main>
 
-    <!-- 👑 核心逻辑脚本 -->
     <script>
         const REPO = "wys0130/ai-boss-empire";
         let activeFilterDept = "";
@@ -268,21 +213,21 @@
 
         function initAdminTheme() {
             const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "theme-dark";
-            document.body.className = `themed-body ${savedTheme} min-h-screen flex flex-col justify-between p-4 font-sans`;
-            document.getElementById("themeBtn").innerHTML = savedTheme === "theme-light" ? "<span>🌙 黑间</span>" : "<span>🌞 白间</span>";
+            document.body.className = `themed-body ${savedTheme} min-h-screen flex flex-col justify-between p-3 font-sans`;
+            document.getElementById("themeBtn").innerHTML = savedTheme === "theme-light" ? "<span>🌙</span>" : "<span>🌞</span>";
         }
 
         function toggleAdminTheme() {
             const nextTheme = document.body.classList.contains("theme-dark") ? "theme-light" : "theme-dark";
-            document.body.className = `themed-body ${nextTheme} min-h-screen flex flex-col justify-between p-4 font-sans`;
+            document.body.className = `themed-body ${nextTheme} min-h-screen flex flex-col justify-between p-3 font-sans`;
             localStorage.setItem("APEX_ADMIN_THEME", nextTheme);
-            document.getElementById("themeBtn").innerHTML = nextTheme === "theme-light" ? "<span>🌙 黑间</span>" : "<span>🌞 白间</span>";
+            document.getElementById("themeBtn").innerHTML = nextTheme === "theme-light" ? "<span>🌙</span>" : "<span>🌞</span>";
         }
 
         function getKeys() {
             const gh = localStorage.getItem("APEX_GH_TOKEN");
             const ds = localStorage.getItem("APEX_DS_KEY");
-            if (!gh || !ds) { toggleConfig(); throw new Error("请在右上角【🔑 授权密钥】填入授权 Key!"); }
+            if (!gh || !ds) { toggleConfig(); throw new Error("请先点击【🔑 密钥】配置 Token!"); }
             return { gh, ds };
         }
 
@@ -291,7 +236,6 @@
             localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
             localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
             toggleConfig();
-            alert("✅ 密钥生效!");
             loadHistoryFromMemory();
             loadTasksManifest();
             startQAGuardLoop();
@@ -302,13 +246,13 @@
 
         function appendLog(msg, color = "") {
             const log = document.getElementById("log");
-            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-3 themed-inner border rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
+            if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2.5 themed-inner border rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
             log.innerText += `\n>> ${msg}`;
             log.scrollTop = log.scrollHeight;
         }
 
         function openLiveSiteForceBypass() {
-            window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}_${Math.random().toString(36).substring(7)}`, '_blank');
+            window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
         }
 
         function openRollbackModal() {
@@ -326,26 +270,14 @@
             tokenSpan.contentEditable = "false";
             tokenSpan.setAttribute("data-dept", deptName);
             tokenSpan.innerText = `@【${deptName}】`;
-
-            tokenSpan.addEventListener("dblclick", (e) => {
-                e.stopPropagation();
-                const newDept = prompt("修改关联的主责部门名称：", deptName);
-                if (newDept && newDept.trim()) {
-                    tokenSpan.setAttribute("data-dept", newDept.trim());
-                    tokenSpan.innerText = `@【${newDept.trim()}】`;
-                    appendLog(`✏️ 已将词条胶囊修改为【${newDept.trim()}】`, "text-indigo-400");
-                }
-            });
-
             return tokenSpan;
         }
 
         function inspectDept(deptName, btnEl) {
             activeFilterDept = deptName;
-            document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-500/10"));
-            btnEl.classList.add("ring-2", "ring-indigo-500", "bg-indigo-500/10");
-            
-            document.getElementById("activeDeptLabel").innerText = `[主责聚焦: ${deptName}]`;
+            document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-1", "ring-indigo-500", "bg-indigo-500/10"));
+            btnEl.classList.add("ring-1", "ring-indigo-500", "bg-indigo-500/10");
+            document.getElementById("activeDeptLabel").innerText = `[${deptName}]`;
             
             const cmdBox = document.getElementById("cmd");
             cmdBox.focus();
@@ -368,48 +300,47 @@
                 cmdBox.scrollTop = cmdBox.scrollHeight;
             }
 
-            appendLog(`🎯 董事长已追加【${deptName}】协同语块。`, "text-indigo-400 font-bold");
+            appendLog(`🎯 追加【${deptName}】协同`, "text-indigo-400 font-bold");
             loadHistoryFromMemory();
         }
 
         function resetDeptFilter() {
             activeFilterDept = "";
-            document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-2", "ring-indigo-500", "bg-indigo-500/10"));
-            document.getElementById("activeDeptLabel").innerText = `[当前视图: 全体部门]`;
+            document.querySelectorAll(".dept-btn").forEach(el => el.classList.remove("ring-1", "ring-indigo-500", "bg-indigo-500/10"));
+            document.getElementById("activeDeptLabel").innerText = `[全景视图]`;
             document.getElementById("cmd").innerHTML = "";
-            appendLog(`🌐 已清空控制台语块及全局过滤。`, "text-slate-400");
+            appendLog(`🌐 清空部门筛选`, "text-slate-400");
             loadHistoryFromMemory();
         }
 
-        // 👑 计划书与三期战略看板 (TASKS_MANIFEST.json 挂载引擎)
+        // 👑 计划书精简自绘：长文字自动 1 行截断 + title 悬浮气泡全景
         async function loadTasksManifest() {
             const listEl = document.getElementById('manifestList');
             try {
                 const keys = getKeys();
                 const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
                 if (!fileObj.content) {
-                    listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full">尚未在仓库根目录找到 TASKS_MANIFEST.json 文件</div>`;
+                    listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">未找到 TASKS_MANIFEST.json</div>`;
                     return;
                 }
                 const manifest = JSON.parse(fileObj.content);
                 rawManifestTasks = manifest.tasks || [];
                 
-                // 更新顶部概览角标
                 const sum = manifest.summary || { completed: 0, total_tasks: 0 };
-                document.getElementById('manifestSummaryBadge').innerText = `完成度: ${sum.completed}/${sum.total_tasks} | 考核日期: ${manifest.updated_at || '实时'}`;
+                document.getElementById('manifestSummaryBadge').innerText = `${sum.completed}/${sum.total_tasks}`;
                 
                 renderManifestTasks();
             } catch (err) {
-                listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full">拉取远端计划书异常: ${err.message}</div>`;
+                listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取任务失败</div>`;
             }
         }
 
         function filterManifest(stageKey) {
             currentManifestFilter = stageKey;
             document.querySelectorAll('.manifest-tab').forEach(btn => {
-                btn.className = "manifest-tab px-2.5 py-1 rounded themed-inner text-gray-400 hover:text-white";
+                btn.className = "manifest-tab px-2 py-0.5 rounded themed-inner text-gray-400 hover:text-white";
             });
-            event.target.className = "manifest-tab px-2.5 py-1 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
+            event.target.className = "manifest-tab px-2 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
             renderManifestTasks();
         }
 
@@ -422,7 +353,7 @@
                 : rawManifestTasks.filter(t => t.stage === currentManifestFilter || (!t.stage && currentManifestFilter === 'ALL'));
 
             if (filtered.length === 0) {
-                listEl.innerHTML = `<div class="text-center text-xs themed-subtext py-6 col-span-full font-mono">该目标阶段暂无下派工单</div>`;
+                listEl.innerHTML = `<div class="text-center text-xs themed-subtext py-4 col-span-full font-mono">暂无工单</div>`;
                 return;
             }
 
@@ -430,26 +361,27 @@
                 const isDone = task.status === 'DONE';
                 const isInProg = task.status === 'IN_PROGRESS';
                 
-                let borderCls = isDone ? "border-emerald-500/50 bg-emerald-500/5" : (isInProg ? "border-amber-500/50 bg-amber-500/5" : "border-slate-800 themed-inner");
-                let badgeTxt = isDone ? "✅ DONE" : (isInProg ? "🔥 推进中" : "📌 TODO");
+                let borderCls = isDone ? "border-emerald-500/40 bg-emerald-500/5" : (isInProg ? "border-amber-500/40 bg-amber-500/5" : "border-slate-800 themed-inner");
+                let badgeTxt = isDone ? "✅完成" : (isInProg ? "🔥推进" : "📌待办");
                 let badgeCls = isDone ? "bg-emerald-500/20 text-emerald-400" : (isInProg ? "bg-amber-500/20 text-amber-400" : "bg-slate-800 text-slate-400");
                 
-                let stageTag = task.stage === 'STAGE_1_MVP_GLOBAL' ? '前期[MVP出海]' : (task.stage === 'STAGE_2_CN_UPGRADE' ? '中期[国内合规]' : (task.stage === 'STAGE_3_FULL_SCALE' ? '后期[全能躺赢]' : '通用任务'));
+                let stageTag = task.stage === 'STAGE_1_MVP_GLOBAL' ? '1.出海' : (task.stage === 'STAGE_2_CN_UPGRADE' ? '2.国内' : '3.后期');
 
+                // 重点：卡片缩编，加入 title 悬浮气泡查看完整文字！
                 listEl.innerHTML += `
-                    <div class="border rounded-xl p-2.5 flex flex-col justify-between transition ${borderCls}">
+                    <div class="border rounded-lg p-2 flex flex-col justify-between transition ${borderCls}" title="【详细说明】\n任务：${task.title}\n备注：${task.notes || '无'}\n部门：${task.department}">
                         <div>
                             <div class="flex items-center justify-between text-[10px] font-mono mb-1">
-                                <span class="font-bold text-indigo-400">[${task.id}] · ${stageTag}</span>
-                                <span class="font-bold px-1.5 py-0.5 rounded ${badgeCls}">${badgeTxt}</span>
+                                <span class="font-bold text-indigo-400">[${task.id}] ${stageTag}</span>
+                                <span class="font-bold px-1 py-0.2 rounded ${badgeCls}">${badgeTxt}</span>
                             </div>
-                            <div class="text-xs font-bold themed-text font-mono truncate mb-1" title="${task.title}">${task.title}</div>
-                            <div class="text-[11px] themed-subtext font-mono line-clamp-2">${task.notes || '没有额外备注说明'}</div>
+                            <div class="text-xs font-bold themed-text font-mono text-ellipsis-1 mb-0.5">${task.title}</div>
+                            <div class="text-[10px] themed-subtext font-mono text-ellipsis-1">${task.notes || '无介绍'}</div>
                         </div>
-                        <div class="mt-2 pt-2 border-t border-gray-500/10 flex items-center justify-between text-[10px] font-mono">
-                            <span class="text-slate-400 truncate max-w-[130px]">👥 ${task.department}</span>
-                            <button onclick="toggleTaskStatus('${task.id}')" class="px-2 py-0.5 rounded border border-slate-700 hover:bg-slate-800 text-indigo-400 font-bold transition">
-                                ${isDone ? '撤销打勾' : '🎯 完成打勾'}
+                        <div class="mt-1.5 pt-1.5 border-t border-gray-500/10 flex items-center justify-between text-[10px] font-mono">
+                            <span class="text-slate-400 truncate max-w-[100px]">👥 ${task.department}</span>
+                            <button onclick="toggleTaskStatus('${task.id}')" class="px-2 py-0.5 rounded border border-slate-700 hover:bg-slate-800 text-indigo-400 font-bold">
+                                ${isDone ? '撤回' : '🎯打勾'}
                             </button>
                         </div>
                     </div>
@@ -461,9 +393,8 @@
             const task = rawManifestTasks.find(t => t.id === taskId);
             if (!task) return;
             
-            const prevStatus = task.status;
             task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
-            appendLog(`✏️ 董事长发起手动进度更新: [${taskId}] 状态自 "${prevStatus}" 变更为 "${task.status}"...`, "text-amber-400");
+            appendLog(`✏️ 更新进度 [${taskId}] 为: ${task.status}`, "text-amber-400");
             
             try {
                 const keys = getKeys();
@@ -476,12 +407,12 @@
                     manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
                     manifest.updated_at = new Date().toISOString().slice(0, 10);
                     
-                    await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Chairman: Check Milestone Task [${taskId}] -> ${task.status}`, keys.gh);
-                    appendLog(`✅ TASKS_MANIFEST.json 计划看板已同步更新至 GitHub 仓库！`, "text-emerald-500 font-bold");
+                    await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
+                    appendLog(`✅ 看板已推送更新`, "text-emerald-500 font-bold");
                     await loadTasksManifest();
                 }
             } catch (e) {
-                appendLog(`❌ 更新工单进度出现错误: ${e.message}`, "text-rose-500");
+                appendLog(`❌ 更新失败: ${e.message}`, "text-rose-500");
             }
         }
 
@@ -493,17 +424,10 @@
                 cmdBox.addEventListener("input", function(e) {
                     const selection = window.getSelection();
                     if (!selection.rangeCount) return;
-                    const textContent = selection.anchorNode.textContent || "";
-                    const cursorOffset = selection.anchorOffset;
-
-                    const textBeforeCursor = textContent.slice(0, cursorOffset);
+                    const textBeforeCursor = (selection.anchorNode.textContent || "").slice(0, selection.anchorOffset);
                     const match = textBeforeCursor.match(/@([^\s@]*)$/);
-
-                    if (match) {
-                        showMentionDropdown(match[1]);
-                    } else {
-                        hideMentionDropdown();
-                    }
+                    if (match) showMentionDropdown(match[1]);
+                    else hideMentionDropdown();
                 });
 
                 cmdBox.addEventListener("keydown", function(e) {
@@ -512,20 +436,15 @@
                         if (selection.rangeCount > 0) {
                             const range = selection.getRangeAt(0);
                             let prevNode = range.startContainer;
-                            if (prevNode.nodeType === Node.TEXT_NODE && range.startOffset === 0) {
-                                prevNode = prevNode.previousSibling;
-                            } else if (prevNode.nodeType === Node.ELEMENT_NODE && range.startOffset > 0) {
-                                prevNode = prevNode.childNodes[range.startOffset - 1];
-                            }
+                            if (prevNode.nodeType === Node.TEXT_NODE && range.startOffset === 0) prevNode = prevNode.previousSibling;
+                            else if (prevNode.nodeType === Node.ELEMENT_NODE && range.startOffset > 0) prevNode = prevNode.childNodes[range.startOffset - 1];
 
                             if (prevNode && prevNode.nodeType === Node.ELEMENT_NODE && prevNode.classList.contains("dept-token")) {
                                 e.preventDefault();
                                 prevNode.remove();
                             }
                         }
-                    } else if (e.key === "Escape") {
-                        hideMentionDropdown();
-                    }
+                    } else if (e.key === "Escape") hideMentionDropdown();
                 });
             }
         });
@@ -533,27 +452,20 @@
         function showMentionDropdown(query) {
             const dropdown = document.getElementById("mentionDropdown");
             const filtered = allDeptNames.filter(d => d.includes(query));
-
-            if (filtered.length === 0) {
-                hideMentionDropdown();
-                return;
-            }
+            if (filtered.length === 0) { hideMentionDropdown(); return; }
 
             dropdown.innerHTML = "";
             filtered.forEach(dept => {
                 const item = document.createElement("div");
                 item.className = "mention-item themed-text border-b border-gray-500/10 flex items-center justify-between";
-                item.innerHTML = `<span>@${dept}</span><span class="text-[9px] themed-subtext">主责部门</span>`;
-                item.onmousedown = (e) => {
-                    e.preventDefault();
-                    selectMentionDept(dept);
-                };
+                item.innerHTML = `<span>@${dept}</span><span class="text-[9px] themed-subtext">主责</span>`;
+                item.onmousedown = (e) => { e.preventDefault(); selectMentionDept(dept); };
                 dropdown.appendChild(item);
             });
 
             dropdown.style.display = "block";
-            dropdown.style.bottom = "110px";
-            dropdown.style.left = "20px";
+            dropdown.style.bottom = "90px";
+            dropdown.style.left = "15px";
         }
 
         function hideMentionDropdown() {
@@ -570,7 +482,6 @@
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
                 const textNode = range.startContainer;
-                
                 if (textNode.nodeType === Node.TEXT_NODE) {
                     const text = textNode.textContent;
                     const cursorOffset = range.startOffset;
@@ -581,7 +492,6 @@
                         range.deleteContents();
                     }
                 }
-
                 const tokenSpan = createDeptTokenElement(deptName);
                 range.insertNode(tokenSpan);
                 const spaceNode = document.createTextNode(" ");
@@ -591,7 +501,7 @@
                 selection.removeAllRanges();
                 selection.addRange(range);
             }
-            appendLog(`✨ 已选定【${deptName}】，无残留嵌入成功。`, "text-indigo-400");
+            appendLog(`✨ 已添加【${deptName}】`, "text-indigo-400");
         }
 
         function getRealStandardTime() {
@@ -613,12 +523,12 @@
 
         async function fetchCommitHistory() {
             const container = document.getElementById("commitListContainer");
-            container.innerHTML = `<div class="text-center text-xs themed-subtext py-6 font-mono">加载快照中...</div>`;
+            container.innerHTML = `<div class="text-center text-xs themed-subtext py-4 font-mono">拉取快照中...</div>`;
             try {
                 const keys = getKeys();
-                const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=15`, { headers: { "Authorization": `token ${keys.gh}` } });
+                const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
                 const commits = await res.json();
-                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-6">读取失败</div>`;
+                if (!Array.isArray(commits)) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取失败</div>`;
 
                 container.innerHTML = "";
                 commits.forEach((item, idx) => {
@@ -627,70 +537,61 @@
                     const isCurrent = idx === 0;
 
                     container.innerHTML += `
-                        <div class="themed-inner border rounded-xl p-2.5 flex items-center justify-between gap-3">
+                        <div class="themed-inner border rounded-lg p-2 flex items-center justify-between gap-2">
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1">
+                                <div class="flex items-center gap-1.5 mb-0.5">
                                     <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                                     <span class="text-[10px] themed-subtext font-mono">${timeStr}</span>
-                                    ${isCurrent ? '<span class="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded font-bold">当前版本</span>' : ''}
                                 </div>
                                 <div class="text-xs themed-text font-mono truncate">${item.commit.message}</div>
                             </div>
                             <div>
                                 ${isCurrent ? 
-                                    `<button disabled class="px-3 py-1 bg-gray-500/20 text-gray-400 text-[11px] rounded-lg">当前运行</button>` : 
-                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded-lg text-[11px] font-bold transition">选择回滚</button>`
+                                    `<button disabled class="px-2.5 py-1 bg-gray-500/20 text-gray-400 text-[10px] rounded">当前</button>` : 
+                                    `<button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-2.5 py-1 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/50 rounded text-[10px] font-bold">回写还原</button>`
                                 }
                             </div>
                         </div>
                     `;
                 });
-            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-6">异常：${err.message}</div>`; }
+            } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">异常</div>`; }
         }
 
         async function revertToSelectedCommit(targetSha, shortSha) {
-            if (!confirm(`⏳ 确定要将整座仓库的所有文件硬核回滚到历史版本 [#${shortSha}] 吗？`)) return;
+            if (!confirm(`⏳ 确定要将全库重置还原至版本 [#${shortSha}] 吗？`)) return;
             closeRollbackModal();
             try {
                 const keys = getKeys();
-                appendLog(`⏳ 正在获取历史版本 [#${shortSha}] 的全库文件树清单...`, "text-amber-500");
+                appendLog(`⏳ 正在获取 [#${shortSha}] 的快照树...`, "text-amber-500");
 
                 const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
-                if (!treeRes.ok) throw new Error("无法拉取历史版本的文件目录树");
+                if (!treeRes.ok) throw new Error("无法拉取目录树");
                 const treeData = await treeRes.json();
                 
                 const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
-                appendLog(`📦 扫描到历史版本共有 ${filesToRestore.length} 个文件需要回滚还原。`, "text-indigo-400");
-
                 for (const fileObj of filesToRestore) {
-                    appendLog(`🔄 还原文件: ${fileObj.path} ...`, "text-slate-400");
                     const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
                     const fileJson = await fileContentRes.json();
-                    const rawContentBase64 = fileJson.content;
                     const currentFile = await getGithubFileSafe(fileObj.path, keys.gh);
 
-                    const payload = {
-                        message: `⏳ VETO: True rollback whole repo to #${shortSha} for ${fileObj.path}`,
-                        content: rawContentBase64
-                    };
+                    const payload = { message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content };
                     if (currentFile.sha) payload.sha = currentFile.sha;
 
-                    const putRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+                    await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                         method: "PUT",
                         headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
                         body: JSON.stringify(payload)
                     });
-                    if (!putRes.ok) throw new Error(`还原文件 ${fileObj.path} 失败`);
                 }
 
                 const nowStr = getRealStandardTime();
                 const memoryFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 董事长执行真·全库回退，整仓完美还原至快照 #${shortSha}。`;
-                await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: True Rollback to #${shortSha}`, keys.gh);
+                const updatedMem = (memoryFile.content || "") + `\n- [VETO-RECORD | ${nowStr}]: 执行全库回退至 #${shortSha}。`;
+                await pushGithubFile("MEMORY.md", updatedMem, memoryFile.sha, `🤖 Memory: Rollback to #${shortSha}`, keys.gh);
 
-                appendLog(`✅ 一键回退成功！整座仓库已完美复原至 [#${shortSha}]。`, "text-emerald-500 font-bold");
+                appendLog(`✅ 一键回滚完成！[#${shortSha}]`, "text-emerald-500 font-bold");
                 await loadHistoryFromMemory();
-            } catch(err) { appendLog("❌ 一键回退异常: " + err.message, "text-rose-500"); }
+            } catch(err) { appendLog("❌ 回滚异常: " + err.message, "text-rose-500"); }
         }
 
         async function loadHistoryFromMemory() {
@@ -698,34 +599,16 @@
             try {
                 const keys = getKeys();
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                let allLines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
+                let lines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
                 
-                let lines = allLines;
                 if (activeFilterDept) {
-                    const deptKeywords = {
-                        "大脑中枢": ["中枢", "调度", "发单", "总控"],
-                        "缺陷与QA质检部": ["缺陷", "QA", "修复", "404", "报错", "自愈", "闭环"],
-                        "主动产品部": ["产品", "规划", "盲排", "补坑", "需求"],
-                        "施工工程部": ["工程", "重写", "落地", "代码", "JS", "HTML", "脚本", "推送"],
-                        "视觉策划部": ["视觉", "排版", "UI", "背景", "配色", "高精", "磨砂"],
-                        "审核质量部": ["质量", "审核", "门槛", "85分", "规范"],
-                        "转化销售部": ["销售", "转化", "$9.99", "授权", "支付", "收银", "ROI"],
-                        "推广营销部": ["营销", "推广", "海外", "公域", "流量", "曝光"],
-                        "国际法务部": ["法务", "ATS", "GDPR", "隐私", "安全", "加密"]
-                    };
-                    const keywords = deptKeywords[activeFilterDept] || [activeFilterDept];
-                    lines = allLines.filter(line => line.includes(activeFilterDept) || keywords.some(kw => line.includes(kw)));
+                    lines = lines.filter(line => line.includes(activeFilterDept));
                 }
 
-                document.getElementById("historyCount").innerText = `${lines.length} RECORDS`;
+                document.getElementById("historyCount").innerText = `${lines.length}条`;
 
                 if (lines.length === 0) {
-                    feed.innerHTML = `
-                        <div class="themed-inner border rounded-xl p-6 text-center space-y-2">
-                            <div class="text-xs text-indigo-400 font-bold">🔍 【${activeFilterDept}】当前暂无独立战报</div>
-                            <div class="text-[11px] themed-subtext">该部门近期未产生单独战报。您可以随时在右侧输入框向其派发专属任务！</div>
-                        </div>
-                    `;
+                    feed.innerHTML = `<div class="themed-inner border rounded-lg p-4 text-center text-xs themed-subtext font-mono">暂无独立战报，可在右侧向部门派单！</div>`;
                     return;
                 }
 
@@ -733,23 +616,21 @@
                 lines.reverse().forEach((line, idx) => {
                     const isLatest = idx === 0;
                     const exactDateMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
-                    const timeStr = exactDateMatch ? exactDateMatch[1] : "实时归档";
+                    const timeStr = exactDateMatch ? exactDateMatch[1] : "归档";
                     let cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
 
-                    let cardBorder = isLatest ? "border-emerald-500/60 themed-inner shadow-md ring-1 ring-emerald-500/20" : "border-gray-500/20 themed-inner opacity-75";
-                    let badge = isLatest ? `<span class="text-emerald-400 text-[10px] font-bold">🔥 LATEST</span>` : `<span class="themed-subtext text-[10px]">🕒 ARCHIVE</span>`;
-
+                    let cardBorder = isLatest ? "border-emerald-500/50 themed-inner" : "border-gray-500/20 themed-inner opacity-75";
                     feed.innerHTML += `
-                        <div class="border rounded-xl p-2.5 transition ${cardBorder}">
-                            <div class="flex items-center justify-between text-[10px] font-mono themed-subtext mb-1 border-b border-gray-500/20 pb-1">
+                        <div class="border rounded-lg p-2 transition ${cardBorder}">
+                            <div class="flex items-center justify-between text-[10px] font-mono themed-subtext mb-0.5 border-b border-gray-500/10 pb-0.5">
                                 <span class="themed-text font-bold">⏱️ ${timeStr}</span>
-                                <div class="flex items-center gap-2"><span>#${lines.length - idx}</span>${badge}</div>
+                                <span>#${lines.length - idx}</span>
                             </div>
                             <div class="text-xs ${isLatest ? 'themed-text font-medium' : 'themed-subtext'} leading-relaxed font-mono">${cleanText}</div>
                         </div>
                     `;
                 });
-            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-10">拉取战报日志出错</div>`; }
+            } catch (err) { feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-6">拉取错误</div>`; }
         }
 
         async function getGithubFileSafe(path, token) {
@@ -764,7 +645,7 @@
                 const res = await fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${token}` } });
                 if (!res.ok) return [];
                 const data = await res.json();
-                return data.tree.map(node => `${node.type === 'tree' ? '📁 [DIR]' : '📄 [FILE]'} ${node.path}`);
+                return data.tree.map(node => `${node.type === 'tree' ? '📁' : '📄'} ${node.path}`);
             } catch(e) { return []; }
         }
 
@@ -797,14 +678,11 @@
                 const url = `https://api.github.com/repos/${REPO}/actions/runs/${runId}/jobs`;
                 const res = await fetch(url, { headers: { "Authorization": `token ${keys.gh}` } });
                 const data = await res.json();
-                if (!data.jobs || data.jobs.length === 0) return "流水线异常退出";
-                
+                if (!data.jobs || data.jobs.length === 0) return "流水线异常";
                 const failedJob = data.jobs.find(j => j.conclusion === "failure");
-                if (!failedJob) return "持续集成未通过";
-                
-                const failedStep = failedJob.steps.find(s => s.conclusion === "failure");
-                return `[作业: ${failedJob.name}] 失败步骤 -> ${failedStep ? failedStep.name : '物理链接或语法校验异常'}`;
-            } catch (e) { return "无法获取构建异常堆栈"; }
+                const failedStep = failedJob?.steps.find(s => s.conclusion === "failure");
+                return `失败 -> ${failedStep ? failedStep.name : '未知'}`;
+            } catch (e) { return "获取堆栈错误"; }
         }
 
         async function startQAGuardLoop() {
@@ -813,27 +691,14 @@
                 const latestRun = await checkLatestQARun();
                 if (!latestRun) return;
 
-                if (latestRun.conclusion === "success") {
-                    const banner = document.getElementById("bugAlertBanner");
-                    if (banner) {
-                        banner.className = "mb-2.5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl p-2 flex items-center justify-between text-xs font-mono";
-                        banner.innerHTML = `<div class="flex items-center gap-2"><span class="text-emerald-400 font-bold">✅ [QA 自动化检查]:</span><span class="text-emerald-300">构建 #${latestRun.run_number} 全量绿色通过。</span></div><span class="text-[11px] text-slate-500 font-bold px-2 py-0.5 bg-slate-900 rounded">系统健康</span>`;
-                    }
-                    return;
-                }
-
                 if (latestRun.conclusion === "failure") {
                     isAutoHealing = true;
                     const errDetail = await fetchRunErrorLogs(latestRun.id);
                     const cmdBox = document.getElementById("cmd");
                     cmdBox.innerHTML = "";
                     cmdBox.appendChild(createDeptTokenElement("缺陷与QA质检部"));
-                    cmdBox.appendChild(document.createTextNode(` 紧急自愈：流水线报警 "${errDetail}"。`));
-                    try {
-                        await triggerSwarmAutonomousAction();
-                    } finally {
-                        isAutoHealing = false;
-                    }
+                    cmdBox.appendChild(document.createTextNode(` 自愈报警："${errDetail}"。`));
+                    try { await triggerSwarmAutonomousAction(); } finally { isAutoHealing = false; }
                 }
             }
             loopTask();
@@ -851,16 +716,13 @@
                 if (dept && !targetDepts.includes(dept)) targetDepts.push(dept);
             });
 
-            if (targetDepts.length === 0) {
-                targetDepts = [activeFilterDept || "大脑中枢"];
-            }
-
-            const rawText = cmdBox.innerText.replace(/@【[^】]+】/g, "").trim() || "请各大主责部门汇报近期工作进展。";
+            if (targetDepts.length === 0) targetDepts = [activeFilterDept || "大脑中枢"];
+            const rawText = cmdBox.innerText.replace(/@【[^】]+】/g, "").trim() || "汇报最新进展。";
             const primaryDept = targetDepts[0];
 
             btn.disabled = true;
-            btn.innerHTML = `<span>⚙️ 正在呼叫 [${targetDepts.join(", ")}] 多部门协同会商...</span>`;
-            appendLog(`🧠 [发单中枢]：已精准锁定多方协同部门：【 ${targetDepts.join("、")} 】...`);
+            btn.innerHTML = `<span>⚙️ 呼叫 [${targetDepts.join(", ")}] 协同中...</span>`;
+            appendLog(`🧠 协同部门：【 ${targetDepts.join("、")} 】...`);
 
             try {
                 const keys = getKeys();
@@ -869,53 +731,44 @@
                     fetchLiveRepoTree(keys.gh)
                 ]);
                 
-                const treeSummary = repoTree.join("\n");
-
                 const prompt = `你是 APEXWORK 企业智能体蜂群中枢。
-本次参与协同会商的主责部门：【${targetDepts.join(", ")}】
-项目物理文件树：
-${treeSummary}
+协同部门：【${targetDepts.join(", ")}】
+物理目录树：\n${repoTree.join("\n")}
+记忆：\n${memoryFile.content || "无"}
+董事长指令："${rawText}"
 
-【近期战报记忆】：
-${memoryFile.content || "无"}
+规则：
+1. 输出 ===SWARM_LOG=== 开始的战报，和 ===NEW_MEMORY=== 提炼的带有 [EVO-RECORD | 部门]: 的一句话记事。
+2. 绝不准修改与指令无关文件！只有要求改代码时，才允许输出 ===FILE: 文件名=== 块。
 
-【董事长（协同发单）的指令】：
-"${rawText}"
-
-【极重要硬规（绝对防错）】：
-1. 你代表上述被 @ 的部门共同进行专业、深度的多方对话与协同汇报。
-2. 绝不准擅自修改与指令无关的文件！只有当董事长明确下达修改代码任务时，才允许输出 ===FILE: 文件名=== 块。
-3. 必须输出 ===SWARM_LOG=== 开始的协同战报，和 ===NEW_MEMORY=== 提炼的带有 [EVO-RECORD | 协同部门]: 的记忆。
-
-格式结构标准样例：
+格式样例：
 ===SWARM_LOG===
-<多部门联合向董事长做出的专业汇报与答复>
+<简练专业答复>
 ===NEW_MEMORY===
-- [EVO-RECORD | ${primaryDept}]: <一句话简短提炼>
-===FILE: 目标文件名.html=== (若纯对话可省略此块)`;
+- [EVO-RECORD | ${primaryDept}]: <一句话提炼>
+===FILE: 目标文件名.html=== (可选)`;
 
                 const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model: "deepseek-chat",
-                        messages: [{ role: "system", content: "你是遵守规范的多部门蜂群协同智能体。" }, { role: "user", content: prompt }],
+                        messages: [{ role: "system", content: "你是极简规范的智能体中枢。" }, { role: "user", content: prompt }],
                         temperature: 0.4
                     })
                 });
 
-                if (!dsRes.ok) throw new Error("API 失败: " + dsRes.statusText);
+                if (!dsRes.ok) throw new Error("API 异常");
                 const aiAnswer = (await dsRes.json()).choices[0].message.content;
 
                 const swarmParts = aiAnswer.split("===SWARM_LOG===");
                 const memParts = aiAnswer.split("===NEW_MEMORY===");
+                if (memParts.length < 2) throw new Error("无记事块");
 
-                if (memParts.length < 2) throw new Error("模型响应未带记忆块");
-
-                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已完成多部门联合会商。";
+                const swarmLogText = swarmParts[1] ? swarmParts[1].split("===NEW_MEMORY===")[0].trim() : "已完成。";
                 const rawMemoryLine = memParts[1].split("===FILE:")[0].trim();
 
-                appendLog(`🤖 【多部门联合协同回复】:\n${swarmLogText}`, "text-emerald-400 font-bold");
+                appendLog(`🤖 答复:\n${swarmLogText}`, "text-emerald-400 font-bold");
 
                 const fileRegex = /===FILE:\s*([a-zA-Z0-9_\-\.\/]+)\s*===([\s\S]*?)(?=(===FILE:|$))/g;
                 let match;
@@ -924,24 +777,23 @@ ${memoryFile.content || "无"}
                     let newFileContent = match[2].trim().replace(/^```[a-z]*\n?/i, "").replace(/\n?```$/i, "").trim();
                     if (!targetFilePath) continue;
 
-                    appendLog(`📍 [定向落盘]: =>【 ${targetFilePath} 】...`, "text-indigo-400 font-bold");
                     const targetExisting = await getGithubFileSafe(targetFilePath, keys.gh);
-                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 [协同会商]: ${targetFilePath}`, keys.gh);
-                    appendLog(`✅ 文件 [ ${targetFilePath} ] 更新成功！`, "text-emerald-500");
+                    await pushGithubFile(targetFilePath, newFileContent, targetExisting.sha, `🤖 [协同]: ${targetFilePath}`, keys.gh);
+                    appendLog(`✅ 更新 [ ${targetFilePath} ]`, "text-emerald-500");
                 }
 
                 const cleanTimestampedLine = stripAndEnforceRealTime(`- [EVO-RECORD | ${targetDepts.join("+")}]: ` + rawMemoryLine.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, ""));
                 const updatedMemory = (memoryFile.content || "") + "\n" + cleanTimestampedLine;
                 await pushGithubFile("MEMORY.md", updatedMemory, memoryFile.sha, `🤖 Memory [${targetDepts.join("+")}]`, keys.gh);
 
-                appendLog(`🏆 多部门联合会商圆满交付！`, "text-emerald-400 font-black");
+                appendLog(`🏆 交付成功！`, "text-emerald-400 font-black");
                 cmdBox.innerHTML = "";
                 await loadHistoryFromMemory();
             } catch (err) {
-                appendLog("❌ 协同会商异常: " + err.message, "text-rose-500");
+                appendLog("❌ 错误: " + err.message, "text-rose-500");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = "<span>🚀 立即发车 / 多部门 Token 协同群聊 (V30 引擎)</span>";
+                btn.innerHTML = "<span>🚀 发射指令 / 蜂群协同 (V31)</span>";
             }
         }
 
