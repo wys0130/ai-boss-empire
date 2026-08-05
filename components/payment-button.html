@@ -1,0 +1,90 @@
+<!--
+  APEXWORK 通用支付按钮组件
+  用法：<apex-pay-button product="vip" lang="en"></apex-pay-button>
+-->
+<template id="apex-pay-button-template">
+  <style>
+    .apex-pay-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      min-width: 200px;
+    }
+    .apex-pay-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    .apex-pay-btn:active {
+      transform: translateY(0);
+    }
+    .apex-pay-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .apex-pay-btn .secure-icon {
+      font-size: 14px;
+    }
+    .apex-pay-btn .guarantee-text {
+      font-size: 12px;
+      opacity: 0.9;
+      display: block;
+      margin-top: 4px;
+    }
+    .apex-pay-btn .pay-methods {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+  </style>
+  <button class="apex-pay-btn" data-payment-button>
+    <span class="btn-content">
+      <span class="main-text">Unlock VIP Access</span>
+      <span class="secure-icon">🔒</span>
+      <span class="guarantee-text">30-Day Money-Back Guarantee</span>
+      <span class="pay-methods">💳 Visa · Mastercard · Apple Pay</span>
+    </span>
+  </button>
+</template>
+
+<script>
+  class ApexPayButton extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+      const template = document.getElementById('apex-pay-button-template');
+      this.shadowRoot.appendChild(template.content.cloneNode(true));
+    }
+
+    connectedCallback() {
+      const btn = this.shadowRoot.querySelector('.apex-pay-btn');
+      const lang = this.getAttribute('lang') || 'en';
+      const product = this.getAttribute('product') || 'vip';
+      
+      btn.dataset.lang = lang;
+      btn.dataset.product = product;
+      
+      // 多语言支持
+      if (lang === 'zh') {
+        btn.querySelector('.main-text').textContent = '立即解锁 VIP';
+        btn.querySelector('.guarantee-text').textContent = '30天无理由退款保障';
+        btn.querySelector('.pay-methods').textContent = '💳 Visa · Mastercard · Apple Pay';
+      }
+    }
+  }
+
+  customElements.define('apex-pay-button', ApexPayButton);
+</script>
+===FILE_END===
+
+---

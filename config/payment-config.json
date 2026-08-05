@@ -1,0 +1,67 @@
+{
+  "payment": {
+    "provider": "lemonsqueezy",
+    "mode": "morr",
+    "currency": "USD",
+    "storeId": "YOUR_LS_STORE_ID",
+    "variants": {
+      "vip_monthly": {
+        "id": "YOUR_VARIANT_ID_1",
+        "price": 9.99,
+        "name": "VIP Monthly"
+      },
+      "vip_yearly": {
+        "id": "YOUR_VARIANT_ID_2",
+        "price": 79.99,
+        "name": "VIP Yearly (Save 33%)"
+      },
+      "vip_lifetime": {
+        "id": "YOUR_VARIANT_ID_3",
+        "price": 199.99,
+        "name": "VIP Lifetime"
+      }
+    },
+    "successUrl": "/payment-success.html",
+    "cancelUrl": "/pricing.html",
+    "webhookUrl": null,
+    "edgeCache": {
+      "enabled": true,
+      "ttl": 3600,
+      "staleWhileRevalidate": 86400
+    },
+    "security": {
+      "ed25519Signature": true,
+      "localStorageKey": "apexwork_vip",
+      "sessionTimeout": 2592000
+    }
+  }
+}
+===FILE_END===
+
+---
+
+## 📊 集成说明
+
+### 1. 部署步骤
+1. 在 [Lemon Squeezy](https://lemonsqueezy.com) 注册账号（仅需邮箱，无需营业执照）
+2. 创建产品并获取 Store ID 和 Variant ID
+3. 将 `payment-config.json` 中的配置替换为实际值
+4. 部署到 Cloudflare Pages / GitHub Pages
+
+### 2. 使用方式
+```html
+<!-- 引入支付组件 -->
+<script src="/components/payment-gateway.js"></script>
+
+<!-- 使用支付按钮 -->
+<apex-pay-button product="vip_monthly" lang="en"></apex-pay-button>
+```
+
+### 3. 关键特性
+- ✅ **零国内资质**：Lemon Squeezy 作为 MoR（Merchant of Record）处理所有税务和合规
+- ✅ **美元直抛**：直接以 USD 结算，支持 Visa/Mastercard/Apple Pay/Google Pay
+- ✅ **边缘部署**：纯静态 + Cloudflare Workers，全球 TTFB < 50ms
+- ✅ **Ed25519 签名**：支付成功后本地生成签名密钥，实现无后端 VIP 验证
+- ✅ **零注册闭环**：用户无需注册，支付成功后自动解锁 VIP
+
+---

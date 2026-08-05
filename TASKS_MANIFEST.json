@@ -8,16 +8,16 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 0,
+    "completed": 1,
     "in_progress": 1,
-    "todo": 8
+    "todo": 7
   },
   "tasks": [
     {
       "id": "TASK-101",
       "stage": "STAGE_1_MVP_GLOBAL",
       "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "department": "施工工程部 & 转化销售部",
       "revenue_impact": "CRITICAL",
       "notes": "绝不办国内营业执照。用最极简代码嵌入 Lemon Squeezy Checkout 直链，支持美元信用卡/Apple Pay。"

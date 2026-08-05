@@ -1,0 +1,59 @@
+{
+  "decks": {
+    "pi_minimalism_edge_native": {
+      "key": "pi_minimalism_edge_native",
+      "brand": "APEXWORK",
+      "titleName": "Pi Minimalism: Less Code, More Value",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "minimal",
+      "slides": [
+        {
+          "id": 1,
+          "title": "Complexity Fails. Pi Wins.",
+          "sub": "Radical simplicity as your competitive moat.",
+          "kpi": "3.14x",
+          "label": "Simplicity Multiplier",
+          "progress": 100,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "Cut the Noise, Keep the Core",
+          "sub": "Eliminate 80% of features to unlock exponential growth.",
+          "kpi": "-80%",
+          "label": "Feature Reduction",
+          "progress": 80,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Pi-Powered Product Engine",
+          "sub": "A single elegant loop drives user retention and revenue.",
+          "kpi": "+45%",
+          "label": "Retention Lift",
+          "progress": 75,
+          "tag": "03. SOLUTION"
+        },
+        {
+          "id": 4,
+          "title": "Minimal Viable Market Fit",
+          "sub": "Deploy in days, not months. Iterate with precision.",
+          "kpi": "2wks",
+          "label": "Time to Market",
+          "progress": 60,
+          "tag": "04. TRACTION"
+        },
+        {
+          "id": 5,
+          "title": "Invest in the Essential",
+          "sub": "We turn constraints into compounding advantages.",
+          "kpi": "$10M",
+          "label": "Funding Ask",
+          "progress": 90,
+          "tag": "05. ASK"
+        }
+      ]
+    }
+  }
+}
