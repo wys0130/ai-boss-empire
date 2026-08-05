@@ -8,9 +8,9 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 1,
+    "completed": 2,
     "in_progress": 1,
-    "todo": 7
+    "todo": 6
   },
   "tasks": [
     {
@@ -26,7 +26,7 @@
       "id": "TASK-102",
       "stage": "STAGE_1_MVP_GLOBAL",
       "title": "国内临时过渡方案：将内地 IP 访客引流至『爱发电』免签约通道",
-      "status": "TODO",
+      "status": "DONE",
       "department": "施工工程部",
       "revenue_impact": "HIGH",
       "notes": "不搞境内 ICP 备案。检测到中国大陆访客时，购买按钮自动变为 ¥69 爱发电赞助获取下载码模板。"

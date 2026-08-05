@@ -1,0 +1,256 @@
+<!-- 中国大陆访客爱发电引流组件 v1.0 -->
+<div id="cn-payment-gateway" class="cn-pay-gateway" style="display:none;">
+  <div class="cn-pay-overlay">
+    <div class="cn-pay-modal">
+      <!-- 视觉冲击：渐变背景 + 动态光效 -->
+      <div class="cn-pay-hero">
+        <div class="cn-pay-badge">🇨🇳 国内专享通道</div>
+        <h2 class="cn-pay-title">极速获取模板</h2>
+        <div class="cn-pay-price-row">
+          <span class="cn-pay-price">¥69</span>
+          <span class="cn-pay-original">$9.99</span>
+          <span class="cn-pay-save">省 40%</span>
+        </div>
+        <div class="cn-pay-benefits">
+          <div class="benefit-item">
+            <svg class="benefit-icon" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span>秒发下载码</span>
+          </div>
+          <div class="benefit-item">
+            <svg class="benefit-icon" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+            </svg>
+            <span>全模板通用</span>
+          </div>
+          <div class="benefit-item">
+            <svg class="benefit-icon" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M13 2.05v3.03c3.39.49 6 3.39 6 6.92 0 .9-.18 1.75-.5 2.54l2.62 1.53c.55-1.3.88-2.73.88-4.07 0-5.18-3.95-9.45-9-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V2.05C5.94 2.55 2 6.81 2 12c0 5.52 4.47 10 9.99 10 3.31 0 6.24-1.61 8.06-4.09l-2.6-1.53C16.17 17.98 14.21 19 12 19z"/>
+            </svg>
+            <span>即时到账</span>
+          </div>
+        </div>
+        <button id="cn-pay-btn" class="cn-pay-btn">
+          <span class="btn-glow"></span>
+          <span class="btn-text">⚡ 爱发电赞助获取</span>
+        </button>
+        <div class="cn-pay-trust">
+          <span>🔒 安全支付</span>
+          <span>⚡ 极速发货</span>
+          <span>💎 永久有效</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.cn-pay-gateway {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cn-pay-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.cn-pay-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+  animation: slideUp 0.4s ease;
+}
+
+.cn-pay-modal::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+  animation: rotate 20s linear infinite;
+}
+
+.cn-pay-hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: white;
+}
+
+.cn-pay-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.cn-pay-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.cn-pay-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.cn-pay-price {
+  font-size: 48px;
+  font-weight: 800;
+  text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.cn-pay-original {
+  font-size: 20px;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.cn-pay-save {
+  background: #ff6b6b;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+.cn-pay-benefits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.benefit-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.benefit-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.cn-pay-btn {
+  width: 100%;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin: 20px 0;
+}
+
+.cn-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 87, 108, 0.4);
+}
+
+.btn-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shine 3s infinite;
+}
+
+.cn-pay-trust {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shine {
+  from { left: -100%; }
+  to { left: 200%; }
+}
+
+@media (max-width: 480px) {
+  .cn-pay-modal {
+    padding: 24px;
+  }
+  .cn-pay-title {
+    font-size: 24px;
+  }
+  .cn-pay-price {
+    font-size: 36px;
+  }
+  .cn-pay-benefits {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+```
+
+### 2. 中国大陆访客检测与路由配置

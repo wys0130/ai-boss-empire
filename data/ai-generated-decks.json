@@ -54,6 +54,61 @@
           "tag": "05. ASK"
         }
       ]
+    },
+    "stateless_mcp_velocity": {
+      "key": "stateless_mcp_velocity",
+      "brand": "APEXWORK",
+      "titleName": "Stateless MCP: Speed Without Strings",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "high-tech",
+      "slides": [
+        {
+          "id": 1,
+          "title": "No State. No Friction. Pure Velocity.",
+          "sub": "Stateless MCP redefines real-time data flow for edge-native operations.",
+          "kpi": "0ms",
+          "label": "State Overhead",
+          "progress": 100,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "The Friction Index: Why State Slows You Down",
+          "sub": "Every stateful handshake adds latency. Stateless removes it entirely.",
+          "kpi": "-78%",
+          "label": "Latency Cut",
+          "progress": 78,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Edge-Native Protocol: Deploy Anywhere, Instantly",
+          "sub": "Stateless MCP runs on any edge — no session, no sync, no wait.",
+          "kpi": "12k",
+          "label": "Edge Nodes",
+          "progress": 85,
+          "tag": "03. SOLUTION"
+        },
+        {
+          "id": 4,
+          "title": "Startup-Ready: Scale Without Stateful Costs",
+          "sub": "Pay only for compute, not for connection memory.",
+          "kpi": "3.2x",
+          "label": "Cost Efficiency",
+          "progress": 92,
+          "tag": "04. BUSINESS"
+        },
+        {
+          "id": 5,
+          "title": "Adopt Stateless MCP Today",
+          "sub": "Your next product iteration starts stateless. Join the edge-native wave.",
+          "kpi": "Now",
+          "label": "Deploy",
+          "progress": 100,
+          "tag": "05. CTA"
+        }
+      ]
     }
   }
 }

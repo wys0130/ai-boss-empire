@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "taskId": "TASK-102",
+  "name": "中国大陆爱发电引流方案",
+  "enabled": true,
+  "afdian": {
+    "url": "https://afdian.com/a/apexwork",
+    "price_cny": 69,
+    "price_usd": 9.99,
+    "discount": "40%",
+    "benefits": ["秒发下载码", "全模板通用", "即时到账"]
+  },
+  "detection": {
+    "primary": "cloudflare_trace",
+    "fallback": "ipapi.co",
+    "target_countries": ["CN", "HK", "MO", "TW"]
+  },
+  "ui": {
+    "modal_delay_ms": 2000,
+    "theme": "gradient_purple",
+    "animation": "slide_up"
+  },
+  "compliance": {
+    "icp_required": false,
+    "gdpr_compliant": true,
+    "data_minimal": true
+  }
+}
+```
+
+### 4. 集成到主页面
