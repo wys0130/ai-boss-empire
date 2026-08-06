@@ -49,7 +49,34 @@ window.ApexCompliance = {
   }
 };
 
-// 页面 DOM 就绪后即刻生效双语
+// /components/lang-and-policy.js (追加在现有代码底部)
+
+window.ApexPricing = {
+  // 👑 极客心理学定价公式：69元 -> $9.99, 139元 -> $19.99
+  convertRMBtoUSD: function(rmb) {
+    const rawUsd = Number(rmb) / 7.0;
+    const usdVal = (Math.floor(rawUsd) + 0.99).toFixed(2);
+    return usdVal;
+  },
+
+  // 👑 全站遍历渲染
+  applyDualPricing: function() {
+    document.querySelectorAll('[data-price-rmb]').forEach(el => {
+      const rmb = parseFloat(el.getAttribute('data-price-rmb')) || 69;
+      const usd = this.convertRMBtoUSD(rmb);
+      const isEn = window.ApexLang && window.ApexLang.current === 'en';
+      
+      if (isEn) {
+        el.innerHTML = `<span class="text-blue-600 font-bold">$${usd} USD</span> <span class="text-xs text-slate-400 font-normal">(￥${rmb} RMB)</span>`;
+      } else {
+        el.innerHTML = `<span class="text-slate-900 font-bold">￥${rmb} RMB</span> <span class="text-xs text-emerald-600 font-mono font-bold">($${usd} USD)</span>`;
+      }
+    });
+  }
+};
+
+// DOM 就绪后立刻自动重算全站价格
 document.addEventListener('DOMContentLoaded', () => {
-  window.ApexLang.apply();
+  window.ApexPricing.applyDualPricing();
 });
+
