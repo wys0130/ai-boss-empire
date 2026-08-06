@@ -1,60 +1,25 @@
 <!-- /components/compliance-footer.html -->
 <style>
   .audit-footer {
-    background: #0b0f19;
-    color: #64748b;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: 12px;
-    padding: 40px 20px;
-    border-top: 1px solid #1e293b;
-    margin-top: 60px;
+    background: #0b0f19; color: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 12px; padding: 40px 20px; border-top: 1px solid #1e293b; margin-top: 60px;
   }
   .audit-footer-content {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
+    max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap;
+    justify-content: space-between; align-items: center; gap: 20px;
   }
-  .audit-links {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
+  .audit-links { display: flex; gap: 20px; flex-wrap: wrap; }
   .audit-links button {
-    color: #94a3b8;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    transition: color 0.2s;
+    color: #94a3b8; background: none; border: none; cursor: pointer; font-size: 12px; transition: color 0.2s;
   }
-  .audit-links button:hover {
-    color: #f8fafc;
-    text-decoration: underline;
-  }
+  .audit-links button:hover { color: #f8fafc; text-decoration: underline; }
   .audit-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    z-index: 100000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px); z-index: 100000; align-items: center; justify-content: center; padding: 20px;
   }
   .audit-modal-card {
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 16px;
-    max-width: 540px;
-    width: 100%;
-    padding: 28px;
-    color: #f8fafc;
-    text-align: left;
+    background: #0f172a; border: 1px solid #334155; border-radius: 16px;
+    max-width: 540px; width: 100%; padding: 28px; color: #f8fafc; text-align: left;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   }
 </style>
@@ -66,30 +31,30 @@
       <p style="margin-top: 6px;" data-zh="商用软件授权与数字模版交付平台 | 单价: $9.99 USD / ￥69 RMB" data-en="Commercial Software License & Digital Template Delivery | Unit Price: $9.99 USD / ￥69 RMB">
         商用软件授权与数字模版交付平台 | 单价: $9.99 USD / ￥69 RMB
       </p>
-      <!-- 👑 采用分开写法或 CF 豁免属性，防止 1105630829@qq.com 被隐码成 [email protected] -->
+      <!-- 👑 利用 <span>@</span> 物理隔离，Cloudflare 绝对不可再将其隐码为 [email protected] -->
       <p style="margin-top: 4px;">
         <span data-zh="客服邮箱: " data-en="Support Email: ">Support Email: </span>
-        <a href="mailto:1105630829@qq.com" style="color: #38bdf8; text-decoration: underline;" data-cfemail-exempt="true">1105630829@qq.com</a>
+        <a href="mailto:1105630829@qq.com" style="color: #38bdf8; text-decoration: underline;">1105630829<span>@</span>qq.com</a>
       </p>
     </div>
     <div class="audit-links">
-      <button onclick="window.ApexCompliance.showPolicy('terms')" data-zh="服务条款" data-en="Terms of Service">Terms of Service</button>
-      <button onclick="window.ApexCompliance.showPolicy('privacy')" data-zh="隐私政策" data-en="Privacy Policy">Privacy Policy</button>
-      <button onclick="window.ApexCompliance.showPolicy('refund')" style="color: #fbbf24; font-weight: bold;" data-zh="退款政策" data-en="Refund Policy">Refund Policy</button>
+      <button onclick="window.ApexCompliance && window.ApexCompliance.showPolicy('terms')" data-zh="服务条款" data-en="Terms of Service">Terms of Service</button>
+      <button onclick="window.ApexCompliance && window.ApexCompliance.showPolicy('privacy')" data-zh="隐私政策" data-en="Privacy Policy">Privacy Policy</button>
+      <button onclick="window.ApexCompliance && window.ApexCompliance.showPolicy('refund')" style="color: #fbbf24; font-weight: bold;" data-zh="退款政策" data-en="Refund Policy">Refund Policy</button>
     </div>
   </div>
 </footer>
 
-<!-- 政策弹窗 (保证风控点击百分百直接展开) -->
+<!-- 欧美独立站出口必查：非 404 自包含协议弹窗 -->
 <div id="auditPolicyModal" class="audit-modal">
   <div class="audit-modal-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">
       <h3 id="auditModalTitle" style="font-size: 16px; font-weight: bold; color: #fff;"></h3>
-      <button onclick="window.ApexCompliance.closePolicy()" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">✕</button>
+      <button onclick="window.ApexCompliance && window.ApexCompliance.closePolicy()" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">✕</button>
     </div>
     <p id="auditModalText" style="font-size: 13px; color: #cbd5e1; line-height: 1.7; margin-bottom: 24px; white-space: pre-line; max-height: 350px; overflow-y: auto;"></p>
     <div style="text-align: right;">
-      <button onclick="window.ApexCompliance.closePolicy()" style="background: #3b82f6; color: #fff; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">我已了解 / I Understand</button>
+      <button onclick="window.ApexCompliance && window.ApexCompliance.closePolicy()" style="background: #3b82f6; color: #fff; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;">我已了解 / I Understand</button>
     </div>
   </div>
 </div>
