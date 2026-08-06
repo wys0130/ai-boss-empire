@@ -22,12 +22,37 @@ const deptConfig = [
     { name: "国际法务部", cls: "theme-teal" }
 ];
 
+// 👑 新增：汇率自动计算引擎
+window.convertRMBtoUSD = function(rmb) {
+    const rawUsd = Number(rmb) / 7.0;
+    return (Math.floor(rawUsd) + 0.99).toFixed(2);
+};
+
+window.updateDualPricePreview = function(pkgKey, rmbVal) {
+    const usdText = window.convertRMBtoUSD(rmbVal);
+    const previewEl = document.getElementById(`usdPreview-${pkgKey}`);
+    if (previewEl) previewEl.innerText = `$${usdText} USD`;
+};
+
+window.savePricingConfig = function() {
+    const config = {
+        bundle: { rmb: document.getElementById('priceInput-bundle').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-bundle').value) },
+        ppt: { rmb: document.getElementById('priceInput-ppt').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-ppt').value) },
+        excel: { rmb: document.getElementById('priceInput-excel').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-excel').value) },
+        word: { rmb: document.getElementById('priceInput-word').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-word').value) },
+        updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(config));
+    appendLog(`>> [定价中台] 同步基准价成功：三件套 ￥${config.bundle.rmb} = $${config.bundle.usd} USD`);
+    alert(`✅ 全站定价策略同步成功！`);
+};
+
 // 👑 全局直达主页
 window.openLiveSiteForceBypass = function() {
     window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
 };
 
-// 👑 自动执行加载函数 (避开 DOMContentLoaded 时差死坑)
+// 👑 自动执行加载函数
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
@@ -60,7 +85,6 @@ function initAdminEngine() {
     }
 }
 
-// 如果 DOM 已就绪立即执行，否则等待加载
 if (document.readyState === "loading") {
     window.addEventListener("DOMContentLoaded", initAdminEngine);
 } else {
