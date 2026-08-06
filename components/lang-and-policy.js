@@ -1,22 +1,25 @@
 // /components/lang-and-policy.js - 独立国际化与合规交互引擎
 
+// 👑 中英文切换
 window.ApexLang = {
   current: localStorage.getItem('APEX_LANG') || 'zh',
   toggle: function() {
     this.current = this.current === 'zh' ? 'en' : 'zh';
     localStorage.setItem('APEX_LANG', this.current);
     this.apply();
+    if (window.ApexPricing) window.ApexPricing.applyDualPricing(); // 切换语言时价格同步更新
   },
   apply: function() {
     document.querySelectorAll('[data-zh][data-en]').forEach(el => {
       const text = el.getAttribute(`data-${this.current}`);
-      if (text) el.innerText = text;
+      if (text) el.innerHTML = text;
     });
     const btn = document.getElementById('langToggleBtn');
     if (btn) btn.innerText = this.current === 'zh' ? '🌐 简/EN' : '🌐 EN/简';
   }
 };
 
+// 👑 万里汇/Lemon Squeezy 合规弹窗控制
 window.ApexCompliance = {
   showPolicy: function(type) {
     const modal = document.getElementById('auditPolicyModal');
@@ -28,8 +31,8 @@ window.ApexCompliance = {
     if (type === 'terms') {
       title.textContent = isEn ? 'Terms of Service' : '服务条款 (Terms of Service)';
       text.textContent = isEn 
-        ? '1. License: Purchasing an APEXWORK enterprise package grants a permanent non-exclusive Commercial License ($9.99 USD / ￥69 RMB).\n2. Restrictions: Redistributing or reselling raw template source files is strictly prohibited.\n3. Delivery: Files are delivered instantly via secure signed URLs.'
-        : '1. 商业授权：用户在 APEXWORK 支付成功后 ($9.99 USD / ￥69 RMB)，获得相关模板的永久非独占商用授权。\n2. 禁止转卖：严禁在公开市场将原始模板源文件二次转售或打包贩卖。\n3. 交付承诺：支付成功后，系统由安全链接于 3 分钟内签发原件下载。';
+        ? '1. License: Purchasing an APEXWORK enterprise package grants a permanent non-exclusive Commercial License.\n2. Restrictions: Redistributing or reselling raw template source files is strictly prohibited.\n3. Delivery: Files are delivered instantly via secure signed URLs.'
+        : '1. 商业授权：用户在 APEXWORK 支付成功后，获得相关模板的永久非独占商用授权。\n2. 禁止转卖：严禁在公开市场将原始模板源文件二次转售或打包贩卖。\n3. 交付承诺：支付成功后，系统由安全链接于 3 分钟内签发原件下载。';
     } else if (type === 'privacy') {
       title.textContent = isEn ? 'Privacy Policy' : '隐私政策 (Privacy Policy)';
       text.textContent = isEn 
@@ -49,17 +52,12 @@ window.ApexCompliance = {
   }
 };
 
-// /components/lang-and-policy.js (追加在现有代码底部)
-
+// 👑 人民币/美元 汇率自动精算
 window.ApexPricing = {
-  // 👑 极客心理学定价公式：69元 -> $9.99, 139元 -> $19.99
   convertRMBtoUSD: function(rmb) {
     const rawUsd = Number(rmb) / 7.0;
-    const usdVal = (Math.floor(rawUsd) + 0.99).toFixed(2);
-    return usdVal;
+    return (Math.floor(rawUsd) + 0.99).toFixed(2);
   },
-
-  // 👑 全站遍历渲染
   applyDualPricing: function() {
     document.querySelectorAll('[data-price-rmb]').forEach(el => {
       const rmb = parseFloat(el.getAttribute('data-price-rmb')) || 69;
@@ -67,16 +65,15 @@ window.ApexPricing = {
       const isEn = window.ApexLang && window.ApexLang.current === 'en';
       
       if (isEn) {
-        el.innerHTML = `<span class="text-blue-600 font-bold">$${usd} USD</span> <span class="text-xs text-slate-400 font-normal">(￥${rmb} RMB)</span>`;
+        el.innerHTML = `$${usd} USD <span class="text-xs font-normal opacity-60 ml-1">(￥${rmb} RMB)</span>`;
       } else {
-        el.innerHTML = `<span class="text-slate-900 font-bold">￥${rmb} RMB</span> <span class="text-xs text-emerald-600 font-mono font-bold">($${usd} USD)</span>`;
+        el.innerHTML = `￥${rmb} <span class="text-xs font-normal ml-1">/ $${usd} USD</span>`;
       }
     });
   }
 };
 
-// DOM 就绪后立刻自动重算全站价格
 document.addEventListener('DOMContentLoaded', () => {
+  window.ApexLang.apply();
   window.ApexPricing.applyDualPricing();
 });
-
