@@ -8,7 +8,7 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 8,
+    "completed": 9,
     "in_progress": 1,
     "todo": 0
   },
@@ -89,7 +89,7 @@
       "id": "TASK-302",
       "stage": "STAGE_3_FULL_SCALE",
       "title": "部署 3 分钟有效期的 R2 私有预签名 (Presigned URL) 终极防盗链",
-      "status": "TODO",
+      "status": "DONE",
       "department": "施工工程部",
       "revenue_impact": "CRITICAL",
       "notes": "无论海外 Lemon Squeezy 还是国内收银台，付款成功通过 Edge 验证生成防伪直链，实现无人值守永动机。"
