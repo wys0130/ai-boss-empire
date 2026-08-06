@@ -18,20 +18,22 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- 1. 顶部导航栏 (直读 assets/logo.webp + 顶尖智能商务办公平台) -->
+  <!-- 1. 顶部导航栏 (LOGO 双重保障 + 顶尖智能商务办公平台) -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
       <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
-        <img src="assets/logo.webp" alt="APEXWORK STUDIO" class="h-8 md:h-10 w-auto object-contain drop-shadow" />
+        <!-- 👑 高阶矢量机甲标徽 + WebP 图片直读：双重保险，永不破图 -->
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0">A</div>
+        <img src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-10 w-auto object-contain drop-shadow onerror-hide" onerror="this.style.display='none'" />
       </div>
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
 
-    <!-- Microsoft Office 专属三系配色：PPT橙红 / EXCEL绿 / WORD蓝 -->
+    <!-- 👑 导航精确更名：PPT演示 / EXCEL表格 / WORD文档 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
-      <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT 战略" data-en="PPT Decks">PPT 战略</a>
-      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 模型" data-en="EXCEL Models">EXCEL 模型</a>
-      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD 报告" data-en="WORD Reports">WORD 报告</a>
+      <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
+      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
+      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
       
       <button id="langToggleBtn" onclick="window.ApexLang && window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-300 font-bold transition">
@@ -48,10 +50,8 @@
   <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
     
-    <!-- 👑 动态轮播区：背景完全由管理员在后台指定的 颜色/渐变/图片 实时驱动 -->
+    <!-- 动态可配置背景轮播图 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
-      
-      <!-- 轮播内容挂载容器 -->
       <div id="dynamicHeroContainer" class="w-full z-10">
         <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
           <div>
@@ -59,22 +59,19 @@
             <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">破除低效传统冗长，全视觉商业交付新纪元</h2>
             <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
           </div>
-          <!-- 👑 修复及格：亮金色琥珀价格胶囊 (#FBBF24 / text-amber-300)，和深色底极高对比度 -->
           <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2 border border-blue-400/30">
             <span>⚡ 立即解锁商用三件套包</span> 
             <span data-price-rmb="139" class="text-amber-300 font-black text-sm drop-shadow-sm bg-black/30 px-3 py-1 rounded-lg border border-amber-400/40">￥139 RMB</span>
           </button>
         </div>
       </div>
-
-      <!-- 轮播指示灯 -->
       <div class="absolute bottom-3 right-5 flex gap-1.5 z-20">
         <span class="dot w-2 h-2 rounded-full bg-white cursor-pointer transition" onclick="ApexHeroSlider.jump(0)"></span>
         <span class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer transition" onclick="ApexHeroSlider.jump(1)"></span>
       </div>
     </div>
 
-    <!-- 第一板块：PPT 路演套件 (Microsoft Office PowerPoint 专属红橙色) -->
+    <!-- 第一板块：PPT演示 -->
     <section id="ppt-section">
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -87,10 +84,9 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- PPT 卡片 1 -->
         <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
           <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES · PPT</span>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES · PPT演示</span>
             <h4 class="text-base font-bold text-slate-900 mt-3">AeroTech 创投规划书</h4>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
           </div>
@@ -100,10 +96,9 @@
           </div>
         </div>
 
-        <!-- PPT 卡片 2 -->
         <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
           <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES · PPT</span>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES · PPT演示</span>
             <h4 class="text-base font-bold text-slate-900 mt-3">SaaS 增长指标盘点</h4>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
           </div>
@@ -113,10 +108,9 @@
           </div>
         </div>
 
-        <!-- PPT 卡片 3 -->
         <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
           <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES · PPT</span>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES · PPT演示</span>
             <h4 class="text-base font-bold text-slate-900 mt-3">FinTech A 轮融资方案</h4>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
           </div>
@@ -128,36 +122,36 @@
       </div>
     </section>
 
-    <!-- 第二板块：EXCEL 绿 与 WORD 蓝 -->
+    <!-- 第二板块：EXCEL表格 与 WORD文档 -->
     <section>
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h3 class="text-base md:text-lg font-bold text-slate-900">商务核心：EXCEL 模型与 WORD 合规</h3>
+          <h3 class="text-base md:text-lg font-bold text-slate-900">商务核心：EXCEL表格 与 WORD文档</h3>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30 hover:border-emerald-500 transition">
           <div>
-            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL · EXCEL</span>
+            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL · EXCEL表格</span>
             <h4 class="text-base font-bold text-slate-900 mt-3">全渠道 ROI 动态自适应测算模型</h4>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-emerald-600">￥69 RMB</div>
-            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 模型 →</a>
+            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 表格 →</a>
           </div>
         </div>
 
         <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30 hover:border-indigo-500 transition">
           <div>
-            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD · WORD</span>
+            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD · WORD文档</span>
             <h4 class="text-base font-bold text-slate-900 mt-3">欧美企业级 ATS 智能排版合规报告</h4>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-indigo-600">￥69 RMB</div>
-            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 报告 →</a>
+            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 文档 →</a>
           </div>
         </div>
       </div>
@@ -167,7 +161,6 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 👑 动态可配置背景的轮播图引擎 -->
   <script>
     window.ApexHeroSlider = {
       currentIndex: 0,
@@ -177,20 +170,8 @@
       init: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         const defaultSlides = [
-          { 
-            tag: "ADMIN BANNER 01", 
-            title: "破除低效传统冗长，全视觉商业交付新纪元", 
-            desc: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。",
-            bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)",
-            bgImg: ""
-          },
-          { 
-            tag: "GLOBAL COMPLIANCE 02", 
-            title: "零注册无缝收单，满足欧美 GDPR 与金融审计", 
-            desc: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。",
-            bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)",
-            bgImg: ""
-          }
+          { tag: "ADMIN BANNER 01", title: "破除低效传统冗长，全视觉商业交付新纪元", desc: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。", bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", bgImg: "" },
+          { tag: "GLOBAL COMPLIANCE 02", title: "零注册无缝收单，满足欧美 GDPR 与金融审计", desc: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。", bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", bgImg: "" }
         ];
         this.slidesData = saved ? JSON.parse(saved) : defaultSlides;
         
@@ -218,23 +199,15 @@
       jump: function(idx) {
         const total = document.querySelectorAll('.hero-slide').length;
         if (total === 0) return;
-        
         for (let i = 0; i < total; i++) {
           const el = document.getElementById(`hero-slide-${i}`);
           const dot = document.querySelectorAll('.dot')[i];
           if (el) {
-            if (i === idx) {
-              el.classList.remove('hidden');
-              el.classList.add('flex');
-            } else {
-              el.classList.remove('flex');
-              el.classList.add('hidden');
-            }
+            if (i === idx) { el.classList.remove('hidden'); el.classList.add('flex'); }
+            else { el.classList.remove('flex'); el.classList.add('hidden'); }
           }
           if (dot) dot.style.backgroundColor = i === idx ? '#ffffff' : 'rgba(255,255,255,0.4)';
         }
-        
-        // 👑 动态根据管理员填写的设置切换轮播区的外观（颜色/渐变 或 背景图）
         const currentData = this.slidesData[idx];
         const box = document.getElementById('heroBannerBox');
         if (box && currentData) {
@@ -245,7 +218,6 @@
             box.style.backgroundImage = currentData.bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
           }
         }
-        
         this.currentIndex = idx;
         if (window.ApexPricing) window.ApexPricing.applyPricing();
       },
@@ -258,46 +230,26 @@
         }, 5000);
       }
     };
-
-    document.addEventListener('DOMContentLoaded', () => {
-      ApexHeroSlider.init();
-    });
+    document.addEventListener('DOMContentLoaded', () => ApexHeroSlider.init());
   </script>
 
   <script>
-    fetch('components/compliance-footer.html')
-      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-      .then(html => {
-        const c = document.getElementById('compliance-footer-container');
-        if (c) {
-          c.innerHTML = html;
-          const s = document.createElement('script');
-          s.src = 'components/lang-and-policy.js';
-          document.body.appendChild(s);
-        }
-      })
-      .catch(() => {});
+    fetch('components/compliance-footer.html').then(r => r.text()).then(html => {
+      const c = document.getElementById('compliance-footer-container');
+      if (c) { c.innerHTML = html; const s = document.createElement('script'); s.src = 'components/lang-and-policy.js'; document.body.appendChild(s); }
+    }).catch(() => {});
 
-    fetch('components/payment/cn-paywall.html')
-      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-      .then(html => {
-        const c = document.getElementById('cn-paywall-container');
-        if (c) {
-          c.innerHTML = html;
-          const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1);
-          const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2);
-        }
-      })
-      .catch(() => {});
+    fetch('components/payment/cn-paywall.html').then(r => r.text()).then(html => {
+      const c = document.getElementById('cn-paywall-container');
+      if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
+    }).catch(() => {});
 
     let clicks = 0, timer = null;
     function checkChairmanStealthAccess() {
-      clicks++;
-      clearTimeout(timer);
+      clicks++; clearTimeout(timer);
       timer = setTimeout(() => { clicks = 0; }, 1500);
       if (clicks >= 3) {
-        clicks = 0;
-        const p = document.getElementById('adminSecretPortal');
+        clicks = 0; const p = document.getElementById('adminSecretPortal');
         if (p) p.classList.remove('hidden');
         alert("👑 [权限验证]：董事长驾驶舱通道已开启！");
       }
