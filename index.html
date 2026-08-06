@@ -18,18 +18,16 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- 1. 顶部导航栏 (精准直读 assets/logo.webp + 平台更名为：顶尖智能商务办公平台) -->
+  <!-- 1. 顶部导航栏 (直读 assets/logo.webp + 顶尖智能商务办公平台) -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
       <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
-        <!-- 👑 100% 优先显示你上传的 assets/logo.webp -->
         <img src="assets/logo.webp" alt="APEXWORK STUDIO" class="h-8 md:h-10 w-auto object-contain drop-shadow" />
       </div>
-      <!-- 👑 商城正式更名 -->
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
 
-    <!-- 👑 Microsoft Office 专属三配色导航：PPT红橙 / EXCEL绿 / WORD蓝 -->
+    <!-- Microsoft Office 专属三系配色：PPT橙红 / EXCEL绿 / WORD蓝 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
       <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT 战略" data-en="PPT Decks">PPT 战略</a>
       <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 模型" data-en="EXCEL Models">EXCEL 模型</a>
@@ -50,21 +48,21 @@
   <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
     
-    <!-- 👑 物理互斥双轮播横幅区 (任何时刻绝只有1张图独占展现，绝不挤在一块) -->
-    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[170px] flex items-center">
+    <!-- 👑 动态轮播区：背景完全由管理员在后台指定的 颜色/渐变/图片 实时驱动 -->
+    <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
       
-      <!-- 轮播幻灯片容器 (JS根据 flex / hidden 物理隔离每一帧) -->
-      <div id="dynamicHeroContainer" class="w-full">
-        <!-- 默认首屏，防止无 JS 时空白 -->
+      <!-- 轮播内容挂载容器 -->
+      <div id="dynamicHeroContainer" class="w-full z-10">
         <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
           <div>
             <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">ADMIN BANNER 01</span>
             <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">破除低效传统冗长，全视觉商业交付新纪元</h2>
             <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
           </div>
-          <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2">
+          <!-- 👑 修复及格：亮金色琥珀价格胶囊 (#FBBF24 / text-amber-300)，和深色底极高对比度 -->
+          <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2 border border-blue-400/30">
             <span>⚡ 立即解锁商用三件套包</span> 
-            <span data-price-rmb="139" class="text-emerald-300 font-black">￥139 RMB</span>
+            <span data-price-rmb="139" class="text-amber-300 font-black text-sm drop-shadow-sm bg-black/30 px-3 py-1 rounded-lg border border-amber-400/40">￥139 RMB</span>
           </button>
         </div>
       </div>
@@ -76,7 +74,7 @@
       </div>
     </div>
 
-    <!-- 👑 第一板块：PPT 路演套件 (全线替换为 Microsoft Office PowerPoint 专属红橙色) -->
+    <!-- 第一板块：PPT 路演套件 (Microsoft Office PowerPoint 专属红橙色) -->
     <section id="ppt-section">
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -169,39 +167,52 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 👑 物理无互斥单幅轮播引擎：确保时刻仅一个 slide 是 flex，其余必定 hidden -->
+  <!-- 👑 动态可配置背景的轮播图引擎 -->
   <script>
     window.ApexHeroSlider = {
       currentIndex: 0,
       timer: null,
+      slidesData: [],
       
       init: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         const defaultSlides = [
-          { tag: "ADMIN BANNER 01", title: "破除低效传统冗长，全视觉商业交付新纪元", desc: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。" },
-          { tag: "GLOBAL COMPLIANCE 02", title: "零注册无缝收单，满足欧美 GDPR 与金融审计", desc: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。" }
+          { 
+            tag: "ADMIN BANNER 01", 
+            title: "破除低效传统冗长，全视觉商业交付新纪元", 
+            desc: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。",
+            bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)",
+            bgImg: ""
+          },
+          { 
+            tag: "GLOBAL COMPLIANCE 02", 
+            title: "零注册无缝收单，满足欧美 GDPR 与金融审计", 
+            desc: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。",
+            bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)",
+            bgImg: ""
+          }
         ];
-        const slides = saved ? JSON.parse(saved) : defaultSlides;
+        this.slidesData = saved ? JSON.parse(saved) : defaultSlides;
         
         const container = document.getElementById('dynamicHeroContainer');
         if (!container) return;
         
-        // 渲染 HTML，只有第一条为 flex，其他全部 hidden 彻底隔离
-        container.innerHTML = slides.map((s, idx) => `
+        container.innerHTML = this.slidesData.map((s, idx) => `
           <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
             <div>
-              <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag}</span>
+              <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
               <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">${s.title}</h2>
               <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">${s.desc}</p>
             </div>
-            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2">
+            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2 border border-blue-400/30">
               <span>⚡ 立即解锁商用三件套包</span> 
-              <span data-price-rmb="139" class="text-emerald-300 font-black">￥139 RMB</span>
+              <span data-price-rmb="139" class="text-amber-300 font-black text-sm drop-shadow-sm bg-black/30 px-3 py-1 rounded-lg border border-amber-400/40">￥139 RMB</span>
             </button>
           </div>
         `).join('');
 
-        this.startAutoPlay(slides.length);
+        this.jump(0);
+        this.startAutoPlay(this.slidesData.length);
       },
 
       jump: function(idx) {
@@ -222,6 +233,19 @@
           }
           if (dot) dot.style.backgroundColor = i === idx ? '#ffffff' : 'rgba(255,255,255,0.4)';
         }
+        
+        // 👑 动态根据管理员填写的设置切换轮播区的外观（颜色/渐变 或 背景图）
+        const currentData = this.slidesData[idx];
+        const box = document.getElementById('heroBannerBox');
+        if (box && currentData) {
+          if (currentData.bgImg && currentData.bgImg.trim() !== "") {
+            box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.75), rgba(15,23,42,0.75)), url('${currentData.bgImg}')`;
+            box.style.backgroundSize = "cover";
+          } else {
+            box.style.backgroundImage = currentData.bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
+          }
+        }
+        
         this.currentIndex = idx;
         if (window.ApexPricing) window.ApexPricing.applyPricing();
       },
