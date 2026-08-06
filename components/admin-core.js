@@ -1,10 +1,3 @@
-/**
- * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. PPT 产品全部采用 Microsoft PowerPoint 专属橙红 (#D83B01 / orange-600) 显示！
- * 2. 支持后台可控设置 AI 自主运行北京时间段并同步至云端 config/ai-schedule.json。
- * 3. 严格遵循按需输入：聚焦文本框才追加 @词条，未聚焦仅仅筛选日记日志！
- */
-
 const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let rawManifestTasks = [];
