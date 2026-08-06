@@ -1,16 +1,22 @@
+/**
+ * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
+ * 1. PPT 产品全部采用 Microsoft PowerPoint 专属橙红 (#D83B01 / orange-600) 显示！
+ * 2. 轮播图管理对两幕幻灯片进行绝对互斥隔离保存。
+ * 3. 严格遵循按需输入：聚焦文本框才追加 @词条，未聚焦仅仅筛选日记日志！
+ */
+
 const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let rawManifestTasks = [];
 let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
-// 👑 1. 左侧菜单侧边栏卡片切签控制
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm'];
     const titles = {
         'audit': '业务控制台 / 作品风控审查与上架',
-        'config': '业务控制台 / 主页与多币种定价中心',
-        'overview': '业务控制台 / 大盘开发工单进度书',
+        'config': '业务控制台 / 主页轮播图与定价中心',
+        'overview': '业务控制台 / 阶段开发工单进度书',
         'swarm': '业务控制台 / AI 智能体调令中心'
     };
 
@@ -22,54 +28,59 @@ window.switchAdminTab = function(tabId) {
     });
 
     const headerTitle = document.getElementById('pageHeaderTitle');
-    if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK STUDIO';
+    if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK PRO';
 };
 
-// 👑 2. 稻壳儿 / 易企秀式 作品缩略图审核数据与渲染引擎
+// 👑 PPT 全部使用 Office PowerPoint 橙红色（orange-600 / #D83B01）
 const AUDIT_PRODUCTS = [
     {
         id: "aerotech",
         title: "AeroTech 创投规划书",
-        category: "15 SLIDES · 可视化 PPT 路演",
+        category: "15 SLIDES · Office PPT 战略套件",
         thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
+        colorCls: "text-orange-600 font-bold",
         status: true
     },
     {
         id: "saas",
         title: "SaaS 增长指标盘点",
-        category: "20 SLIDES · 企业级 OKR 可视化",
+        category: "20 SLIDES · Office PPT OKR战略",
         thumb: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
+        colorCls: "text-orange-600 font-bold",
         status: true
     },
     {
         id: "fintech",
         title: "FinTech A 轮融资方案",
-        category: "12 SLIDES · 金融全渠道方案",
+        category: "12 SLIDES · Office PPT 金融路演",
         thumb: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
+        colorCls: "text-orange-600 font-bold",
         status: true
     },
     {
         id: "excel",
         title: "全渠道 ROI 动态自适应测算模型",
-        category: "XLSX MODEL · 12个月现金流滚动",
+        category: "XLSX MODEL · Office Excel 财务测算",
         thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
+        colorCls: "text-emerald-600 font-bold",
         status: true
     },
     {
         id: "word",
         title: "欧美企业级 ATS 智能排版合规报告",
-        category: "DOCX STANDARD · 银行级安全双语",
+        category: "DOCX STANDARD · Office Word 合规",
         thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
+        colorCls: "text-indigo-600 font-bold",
         status: true
     }
 ];
@@ -94,8 +105,8 @@ window.renderAuditTable = function() {
                     <div class="font-bold text-sm">${item.title}</div>
                     <div class="text-xs text-slate-400 font-mono mt-0.5">${item.category}</div>
                 </td>
-                <td class="py-3 px-4 font-mono font-bold">
-                    <span class="text-emerald-600">￥${item.priceRmb}</span> / <span class="text-blue-600">$${item.priceUsd} USD</span>
+                <td class="py-3 px-4 font-mono">
+                    <span class="${item.colorCls}">￥${item.priceRmb}</span> / <span class="text-blue-600 font-bold">$${item.priceUsd} USD</span>
                 </td>
                 <td class="py-3 px-4">
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">
@@ -103,8 +114,8 @@ window.renderAuditTable = function() {
                     </button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 进入作品参数微调：[${item.title}]')" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                        编辑参数
+                    <button onclick="alert('✏️ 进入微调参数：[${item.title}]')" class="px-2.5 py-1 rounded-lg border border-slate-300 text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                        参数配置
                     </button>
                     <button onclick="forceRemoveProduct(${index})" class="px-2.5 py-1 rounded-lg border border-rose-500/50 text-rose-600 text-xs hover:bg-rose-500/10 transition font-bold">
                         强制销毁
@@ -118,7 +129,7 @@ window.renderAuditTable = function() {
 window.toggleAuditStatus = function(index) {
     AUDIT_PRODUCTS[index].status = !AUDIT_PRODUCTS[index].status;
     renderAuditTable();
-    appendLog(`>> [风控审查] 更改作品 [${AUDIT_PRODUCTS[index].title}] 状态 -> ${AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
+    appendLog(`>> [风控审查] 更改作品 [${AUDIT_PRODUCTS[index].title}] 上架状态 -> ${AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
 };
 
 window.forceRemoveProduct = function(index) {
@@ -126,22 +137,19 @@ window.forceRemoveProduct = function(index) {
     const title = AUDIT_PRODUCTS[index].title;
     AUDIT_PRODUCTS.splice(index, 1);
     renderAuditTable();
-    appendLog(`>> [风控审查] 强制销毁作品: ${title}`);
+    appendLog(`>> [风控审查] 已销毁作品: ${title}`);
 };
 
-// 👑 3. 白昼 / 极夜 模式
 window.toggleThemeMode = function() {
     const htmlEl = document.documentElement;
     const current = htmlEl.getAttribute("data-theme") || "light";
     const target = current === "light" ? "dark" : "light";
     htmlEl.setAttribute("data-theme", target);
     localStorage.setItem("APEX_ADMIN_THEME", target);
-    
     const btn = document.getElementById("themeToggleBtn");
     if (btn) btn.innerHTML = target === "dark" ? "<span>🌞 白昼模式</span>" : "<span>🌙 极夜模式</span>";
 };
 
-// 👑 4. 轮播图管理引擎
 window.ApexBannerManager = {
     saveBannerConfig: function() {
         const config = [
@@ -157,11 +165,10 @@ window.ApexBannerManager = {
             }
         ];
         localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(config));
-        alert('✅ 首页双幕大图文案同步成功！请返回前台刷新查看。');
+        alert('✅ 轮播图大图文案已成功保存！前台商城两张横幅将绝对独立、不并排地展示！');
     }
 };
 
-// 👑 5. 实时汇率引擎 (按周刷新，本地缓存 7 天)
 window.ApexFX = {
     currentRate: 7.18,
     initWeeklyRate: async function() {
@@ -187,11 +194,11 @@ window.ApexFX = {
                     timestamp: Date.now()
                 }));
                 this.updateBadge(this.currentRate, true);
-                appendLog(`>> [汇率中台] 获取最新中国外汇行情：1 USD = ${this.currentRate} CNY`);
+                appendLog(`>> [汇率中台] 抓取最新外汇：1 USD = ${this.currentRate} CNY`);
                 return;
             }
         } catch (err) {
-            appendLog(`>> [汇率中台] 在线抓取异常，沿用安全基准：1 USD = ${this.currentRate} CNY`);
+            appendLog(`>> [汇率中台] 查询超时，沿用缓存：1 USD = ${this.currentRate} CNY`);
         }
         this.updateBadge(this.currentRate, false);
     },
@@ -201,7 +208,6 @@ window.ApexFX = {
     }
 };
 
-// 👑 6. 定价关联/独立解耦与 .99 心理规则
 window.ApexPricing = {
     isLinked: true,
     use99Rule: true,
@@ -217,7 +223,7 @@ window.ApexPricing = {
                 const el = document.getElementById(`linkIcon-${k}`);
                 if (el) { el.innerText = "⇄"; el.className = "text-xs text-emerald-500 font-bold"; }
             });
-            appendLog(`>> [定价控制] 开启汇率关联：改变任一侧会按汇率 1 : ${ApexFX.currentRate} 折算对方。`);
+            appendLog(`>> [定价控制] 开启关联：任意修改将按汇率 1 : ${ApexFX.currentRate} 互转。`);
         } else {
             btn.className = "px-3 py-1.5 rounded-lg bg-slate-500/10 text-slate-400 border border-slate-500/30 transition";
             btn.innerText = "🔓 汇率关联: 已解绑";
@@ -225,7 +231,7 @@ window.ApexPricing = {
                 const el = document.getElementById(`linkIcon-${k}`);
                 if (el) { el.innerText = "‖"; el.className = "text-xs text-slate-400"; }
             });
-            appendLog(`>> [定价控制] 解绑关联！现在可自由分别设置 RMB 与 USD。`);
+            appendLog(`>> [定价控制] 关闭关联：双方完全独立填写。`);
         }
     },
 
@@ -265,7 +271,7 @@ window.ApexPricing = {
             updatedAt: new Date().toISOString()
         };
         localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(config));
-        alert('✅ 全站多币种商品报价锁存完毕！');
+        alert('✅ 商品定价已锁存完毕！');
     }
 };
 
@@ -288,9 +294,8 @@ window.openLiveSiteForceBypass = function() {
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
-    renderAuditTable(); // 渲染作品审核表
+    renderAuditTable();
     
-    // 初始化应用储存的日夜主题
     const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "light";
     document.documentElement.setAttribute("data-theme", savedTheme);
     const btn = document.getElementById("themeToggleBtn");
@@ -373,7 +378,6 @@ function renderDeptButtons() {
     });
 }
 
-// 👑 遵守你定下的最高铁律：先点击聚焦 #cmd，点击部门才插入词条！若无聚焦，绝不乱写词条，仅切换视图！
 window.inspectDept = function(deptName, btnEl) {
     activeFilterDept = deptName;
     document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
@@ -406,9 +410,9 @@ window.inspectDept = function(deptName, btnEl) {
             cmdBox.appendChild(document.createTextNode(" "));
             cmdBox.scrollTop = cmdBox.scrollHeight;
         }
-        appendLog(`🎯 指令台追加部门 @${deptName}`);
+        appendLog(`🎯 追加指令 @${deptName}`);
     } else {
-        appendLog(`🔍 视图筛选 -> [${deptName}] (提示：未点击激活文本框，无文字追加)`);
+        appendLog(`🔍 视图切换 -> [${deptName}] (未点击聚焦文本框，不追加词条)`);
     }
 
     loadHistoryFromMemory();
@@ -422,7 +426,7 @@ window.resetDeptFilter = function() {
     if (activeLabel) activeLabel.innerText = `[全景视图]`;
     const cmdBox = document.getElementById("cmd");
     if (cmdBox) cmdBox.innerHTML = "";
-    appendLog(`🌐 恢复全景观测日志`);
+    appendLog(`🌐 恢复全景视角`);
     loadHistoryFromMemory();
 };
 
@@ -440,7 +444,7 @@ async function loadTasksManifest() {
         rawManifestTasks = manifest.tasks || [];
         const sum = manifest.summary || { completed: 0, total_tasks: 0 };
         const badge = document.getElementById('manifestSummaryBadge');
-        if (badge) badge.innerText = `研发完成度: ${sum.completed}/${sum.total_tasks}`;
+        if (badge) badge.innerText = `完成度: ${sum.completed}/${sum.total_tasks}`;
         renderManifestTasks();
     } catch (err) {
         listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取错误: ${err.message}</div>`;
@@ -469,7 +473,7 @@ function renderManifestTasks() {
         : rawManifestTasks.filter(t => t.stage === currentManifestFilter || (!t.stage && currentManifestFilter === 'ALL'));
 
     if (filtered.length === 0) {
-        listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">本期暂无计划工单</div>`;
+        listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该阶段无对应任务</div>`;
         return;
     }
 
@@ -505,7 +509,7 @@ window.toggleTaskStatus = async function(taskId) {
     const task = rawManifestTasks.find(t => t.id === taskId);
     if (!task) return;
     task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
-    appendLog(`✏️ 进度调整 -> [${taskId}] ${task.status}`);
+    appendLog(`✏️ 变更任务 -> [${taskId}] ${task.status}`);
     try {
         const keys = getKeys();
         const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
@@ -517,18 +521,18 @@ window.toggleTaskStatus = async function(taskId) {
             manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
             manifest.updated_at = new Date().toISOString().slice(0, 10);
             await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
-            appendLog(`✅ 新版进度计划已直接推送回 GitHub 仓库`);
+            appendLog(`✅ 新版进度已直接推回 main 分支`);
             loadTasksManifest();
         }
     } catch (e) {
-        appendLog(`❌ 更新工单进度异常: ${e.message}`, "text-rose-500");
+        appendLog(`❌ 更新异常: ${e.message}`, "text-rose-500");
     }
 };
 
 function getKeys() {
     const gh = localStorage.getItem("APEX_GH_TOKEN");
     const ds = localStorage.getItem("APEX_DS_KEY");
-    if (!gh || !ds) { window.toggleConfig(); throw new Error("请先在顶栏按键填写并保存授权密钥!"); }
+    if (!gh || !ds) { window.toggleConfig(); throw new Error("请在右上角填写配置密钥!"); }
     return { gh, ds };
 }
 
@@ -585,7 +589,7 @@ async function loadHistoryFromMemory() {
         const countBadge = document.getElementById("historyCount");
         if (countBadge) countBadge.innerText = `${lines.length}条`;
         if (lines.length === 0) {
-            feed.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 font-mono">暂无相关归档日志</div>`;
+            feed.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 font-mono">暂无日志</div>`;
             return;
         }
         feed.innerHTML = "";
@@ -621,7 +625,7 @@ window.closeRollbackModal = function() {
 async function fetchCommitHistory() {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
-    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono">拉取 Git 发版版本中...</div>`;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono">获取发布快照中...</div>`;
     try {
         const keys = getKeys();
         const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
@@ -640,13 +644,13 @@ async function fetchCommitHistory() {
                         <div class="text-xs font-mono truncate">${item.commit.message}</div>
                     </div>
                     <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 saas-card rounded-lg text-xs font-mono font-bold hover:opacity-80">
-                        ${idx === 0 ? '当前发布' : '还原'}
+                        ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取历史记录异常</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常</div>`;
     }
 }
 
@@ -667,9 +671,9 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
                 body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
             });
         }
-        appendLog(`✅ 成功将主仓库版本还原至代码快照 [#${shortSha}]`);
+        appendLog(`✅ 成功还原主仓库到快照 [#${shortSha}]`);
         loadHistoryFromMemory();
-    } catch(err) { appendLog("❌ 快照还原异常: " + err.message, "text-rose-500"); }
+    } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
 };
 
 window.triggerSwarmAutonomousAction = async function() {
@@ -678,7 +682,7 @@ window.triggerSwarmAutonomousAction = async function() {
     const rawText = cmdBox ? (cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报") : "常规进展汇报";
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = "<span>⚙️ 云端中枢大模型推理中...</span>";
+        btn.innerHTML = "<span>⚙️ AI 智能体推演中...</span>";
     }
     try {
         const keys = getKeys();
@@ -699,7 +703,7 @@ window.triggerSwarmAutonomousAction = async function() {
             headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 model: "deepseek-chat",
-                messages: [{ role: "system", content: "极简企业后台架构中枢。" }, { role: "user", content: prompt }],
+                messages: [{ role: "system", content: "极简商务平台后台架构中枢。" }, { role: "user", content: prompt }],
                 temperature: 0.4
             })
         });
@@ -709,7 +713,7 @@ window.triggerSwarmAutonomousAction = async function() {
         if (cmdBox) cmdBox.innerHTML = "";
         loadHistoryFromMemory();
     } catch (err) {
-        appendLog("❌ 执行调度异常: " + err.message, "text-rose-500");
+        appendLog("❌ 调令执行异常: " + err.message, "text-rose-500");
     } finally {
         if (btn) {
             btn.disabled = false;
