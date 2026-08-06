@@ -1,4 +1,5 @@
-// /components/lang-and-policy.js
+// /components/lang-and-policy.js - 独立国际化与合规交互引擎
+
 window.ApexLang = {
   current: localStorage.getItem('APEX_LANG') || 'zh',
   toggle: function() {
@@ -8,10 +9,11 @@ window.ApexLang = {
   },
   apply: function() {
     document.querySelectorAll('[data-zh][data-en]').forEach(el => {
-      el.innerText = el.getAttribute(`data-${this.current}`);
+      const text = el.getAttribute(`data-${this.current}`);
+      if (text) el.innerText = text;
     });
     const btn = document.getElementById('langToggleBtn');
-    if (btn) btn.innerText = this.current === 'zh' ? '🌐 简 / EN' : '🌐 EN / 简';
+    if (btn) btn.innerText = this.current === 'zh' ? '🌐 简/EN' : '🌐 EN/简';
   }
 };
 
@@ -31,7 +33,7 @@ window.ApexCompliance = {
     } else if (type === 'privacy') {
       title.textContent = isEn ? 'Privacy Policy' : '隐私政策 (Privacy Policy)';
       text.textContent = isEn 
-        ? '1. Local Running: APEXWORK editors run locally in your browser and do not upload sensitive enterprise data.\n2. Security: Payments are processed via regulated gateways (Lemon Squeezy/WeChat/Alipay).\n3. Compliance: Fully compliant with GDPR and CCPA standards.'
+        ? '1. Local Running: APEXWORK editors run locally in your browser and do not upload sensitive enterprise data.\n2. Security: Payments are processed via regulated gateways.\n3. Compliance: Fully compliant with GDPR and CCPA standards.'
         : '1. 数据安全：在线编辑台全年在您本地浏览器运行，绝不私密上传企业文档到云端。\n2. 支付加密：交易信息由已备案与授权的清算网关处理，平台不存储银行账号。\n3. 合规：遵守欧洲 GDPR 与北美 CCPA 规范。';
     } else if (type === 'refund') {
       title.textContent = isEn ? 'Refund Policy (Digital Goods)' : '退款政策 (Refund Policy - Digital Goods)';
@@ -47,5 +49,7 @@ window.ApexCompliance = {
   }
 };
 
-// 页面加载完成后立刻生效当前语言
-document.addEventListener('DOMContentLoaded', () => { window.ApexLang.apply(); });
+// 页面 DOM 就绪后即刻生效双语
+document.addEventListener('DOMContentLoaded', () => {
+  window.ApexLang.apply();
+});
