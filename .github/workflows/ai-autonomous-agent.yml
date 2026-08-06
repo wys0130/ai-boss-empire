@@ -2,11 +2,10 @@ name: 7x24 AI Autonomous Evolving Agent (云端永动机)
 
 on:
   schedule:
-    # 每隔 4 小时静默巡检一次
-    - cron: '0 */4 * * *'
-  workflow_dispatch: # 支持网页端/控制台手动一键触发
+    # 每隔 1 小时在 GitHub 后台巡检一次（到达脚本内会精准判定北京时间区间）
+    - cron: '0 * * * *'
+  workflow_dispatch: # 保留网页端 / 控制台手动即时唤醒（无视时间区间）
 
-# 👑 核心优化 1：并发互斥控制 — 自动取消积压的旧任务，永远为新任务与老板手动提交让道
 concurrency:
   group: ai-autonomous-swarm-${{ github.ref }}
   cancel-in-progress: true
@@ -18,7 +17,7 @@ jobs:
   auto-evolve:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. 检出仓库全部代码与工单清单
+      - name: 1. 检出全部代码与配置
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -28,22 +27,61 @@ jobs:
         with:
           node-version: '20'
 
-      - name: 3. 唤醒大脑中枢 -> 分解不可拆分工单 -> 驱动部门落地 -> 自动打勾
+      - name: 3. 智能时段判定 -> 唤醒大脑中枢 -> 分解不可拆分工单
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
           cat << 'EOF' > run-swarm.js
           const fs = require("fs");
 
           async function runApexSwarm() {
+            // 👑 A. 读取老板在后台设定的自主排班时段 (默认北京时间 0:00 - 8:00)
+            let startHour = 0;
+            let endHour = 8;
+            let enabled = true;
+            
+            if (fs.existsSync("config/ai-schedule.json")) {
+              try {
+                const sched = JSON.parse(fs.readFileSync("config/ai-schedule.json", "utf8"));
+                startHour = Number(sched.start_hour) || 0;
+                endHour = Number(sched.end_hour) || 8;
+                enabled = sched.enabled !== false;
+              } catch (e) {}
+            }
+
+            // 👑 B. 计算当前准确的北京时间 (UTC+8) 小时数
+            const currentBeijingHour = (new Date().getUTCHours() + 8) % 24;
+            const isCronEvent = process.env.GITHUB_EVENT_NAME === "schedule";
+
+            console.log(`⏱️ [时钟校验]: 当前北京时间 -> ${currentBeijingHour}:00，自主施工许可区间 -> [${startHour}:00 - ${endHour}:00]`);
+
+            // 如果是定时自动触发，且不在老板允许的区间内、或者总开关关闭，立即让路退场！
+            if (isCronEvent) {
+              if (!enabled) {
+                console.log("🛑 [静默保护]: 老板在后台已闭锁 AI 自主巡检，本次跳过执行。");
+                return;
+              }
+              const inWindow = startHour <= endHour 
+                ? (currentBeijingHour >= startHour && currentBeijingHour < endHour)
+                : (currentBeijingHour >= startHour || currentBeijingHour < endHour);
+
+              if (!inWindow) {
+                console.log(`🌙 [静默模式]: 当前北京时间 (${currentBeijingHour}点) 不在预设自主施工时段内，主动为老板白天发版调试让路！`);
+                return;
+              }
+            } else {
+              console.log("⚡ [唤醒令触发]: 本次为老板手动发令或对话触发，无视夜间限制，立即强制响应！");
+            }
+
             const apiKey = process.env.DEEPSEEK_API_KEY;
             if (!apiKey) {
-              console.log("提示: 未检测到 DEEPSEEK_API_KEY，终止本次云端排班。");
+              console.log("提示: 未检测到 DEEPSEEK_API_KEY，终止本次调令。");
               return;
             }
 
             if (!fs.existsSync("AI-EMPIRE-CONSTITUTION.md") || !fs.existsSync("TASKS_MANIFEST.json")) {
-              console.log("提示: 核心目标文件不存在，跳过本次排班。");
+              console.log("提示: 核心目标清单文件不存在，跳过。");
               return;
             }
 
@@ -124,7 +162,7 @@ jobs:
             console.error("大脑中枢调度异常:", err.message);
           });
           EOF
-          node run-swarm.js || echo "⚠️ 大脑中枢脚本执行结束 (容错保护触发)"
+          node run-swarm.js || echo "⚠️ 大脑中枢脚本执行结束 (时段防护触发)"
           rm -f run-swarm.js
 
       - name: 4. 运行商业热点捕手与不重复模板自研脚本
@@ -137,15 +175,14 @@ jobs:
             echo "未找到 ai-trend-hunter.js，跳过执行"
           fi
 
-      - name: 5. 无冲突无构建写回仓库 (防 Pages 抢道与循环触发)
+      - name: 5. 零动静过滤推送 (杜绝无效的 GitHub Pages 抢道打包)
         run: |
           git config --global user.name "AI-Brain-Orchestrator"
           git config --global user.email "brain@apexwork.io"
           git add -A
           if git diff --staged --quiet; then
-            echo "没有新的工单成果或修改需要提交"
+            echo "当前没有生成新的代码或处于白天静默区间，零修改提交，彻底不产生 Pages 队列！"
           else
-            # 👑 核心优化 2：提交语句最后显式标注 [skip ci]，彻底阻断触发 GitHub Pages 网页构建队列！
             git commit -m "🤖 AI Brain: 自动落实工单与进度归档 [skip ci]"
             for i in {1..3}; do
               git pull --rebase origin main && git push origin main && break
