@@ -130,6 +130,7 @@ const AUDIT_PRODUCTS = [
 ];
 
 // 👑 在《作品风控审查与上架》表格里支持直接改价，及高对比按键
+// 2. 增强价格输入框的可见性
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
@@ -153,28 +154,18 @@ window.renderAuditTable = function() {
                 <td class="py-3 px-4 font-mono">
                     <div class="flex items-center gap-1.5">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="AUDIT_PRODUCTS[${index}].priceRmb=this.value" class="w-14 saas-input rounded px-1.5 py-1 text-xs font-bold text-center ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="AUDIT_PRODUCTS[${index}].priceRmb=this.value" class="w-16 border border-slate-300 rounded px-2 py-1 text-xs font-bold text-center ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
-                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="AUDIT_PRODUCTS[${index}].priceUsd=this.value" class="w-16 saas-input rounded px-1.5 py-1 text-xs font-bold text-center text-blue-600" />
+                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="AUDIT_PRODUCTS[${index}].priceUsd=this.value" class="w-20 border border-slate-300 rounded px-2 py-1 text-xs font-bold text-center text-blue-600" />
                     </div>
                 </td>
                 <td class="py-3 px-4">
-                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">
-                        ${badgeText}
-                    </button>
+                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <!-- 👑 修复及格：亮蓝边框白底高对比文字 -->
-                    <button onclick="alert('✏️ 进入系统微调参数：[${item.title}] (￥' + AUDIT_PRODUCTS[${index}].priceRmb + ' / $' + AUDIT_PRODUCTS[${index}].priceUsd + ')')" 
-                            class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">
-                        参数配置
-                    </button>
-                    <!-- 👑 修复及格：亮红色高警示强制销毁 -->
-                    <button onclick="forceRemoveProduct(${index})" 
-                            class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">
-                        强制销毁
-                    </button>
+                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 text-xs font-bold hover:bg-blue-50 transition">参数配置</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs transition font-bold">强制销毁</button>
                 </td>
             </tr>
         `;
@@ -368,8 +359,9 @@ const deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30" }
 ];
 
+// 1. 修正返回商城地址
 window.openLiveSiteForceBypass = function() {
-    window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
+    window.open(`https://apexwork.work/?nocache=${Date.now()}`, '_blank');
 };
 
 // 👑 内置默认 8 大保底工单库（绝不让进度书再变成“空白列表”）
