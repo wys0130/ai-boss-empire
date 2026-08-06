@@ -724,4 +724,3 @@ window.triggerSwarmAutonomousAction = async function() {
         }
     }
 };
-
