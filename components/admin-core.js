@@ -1,10 +1,3 @@
-/**
- * APEXWORK 商业级业务控制台驱动 (components/admin-core.js)
- * 1. 左侧卡片式模块导航视图路由 switchAdminTab()
- * 2. 稻壳儿 / 易企秀 缩略图作品风控审查功能，支持上架开关切换与强制下架！
- * 3. 7 天缓存的定期中国汇率抓取，支持单价关联/解耦开关，及主页大图文案持久化。
- */
-
 const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let rawManifestTasks = [];
