@@ -1,10 +1,3 @@
-/**
- * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格！
- * 2. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
- * 3. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
- */
-
 const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let currentManifestFilter = 'ALL';
