@@ -1,56 +1,39 @@
 {
-  "schemaVersion": "5.0",
-  "projectName": "APEXWORK AI 商务三件套极速商城",
-  "coreRedLines": {
-    "maxTTFBMs": 50,
-    "maxFirstScreenMs": 1000,
-    "monthlyHostingCostUSD": 0,
-    "registrationRequired": false,
-    "textDensity": "low",
-    "visualImpact": "maximum"
-  },
-  "routing": {
-    "index": "/index.html",
-    "pptEditor": "/ppt-editor.html",
-    "excelEditor": "/excel-editor.html",
-    "wordEditor": "/word-editor.html",
-    "components": {
-      "toolbar": "/components/toolbar.html",
-      "slideCard": "/components/slide-card.html",
-      "kpiCard": "/components/kpi-card.html",
-      "energyMeter": "/components/energy-meter.html",
-      "templateGallery": "/components/template-gallery.html"
-    },
-    "data": {
-      "templates": "/data/templates.json",
-      "themes": "/data/themes.json",
-      "projects": "/data/projects.json"
-    },
-    "assets": {
-      "images": "/assets/images/webp/",
-      "icons": "/assets/icons/svg/"
+  "project": "APEXWORK AI 员工天网",
+  "version": "5.0.0",
+  "taskId": "TASK-301",
+  "taskName": "智能 DNS 分流：国内境内镜像 / 海外 Cloudflare 边缘",
+  "status": "in_progress",
+  "components": {
+    "dns-router": {
+      "path": "/components/dns-router.js",
+      "minified": "/components/dns-router.min.js",
+      "type": "edge-native",
+      "description": "智能 DNS 分流路由器，实现国内/海外双线极速加载",
+      "dependencies": [],
+      "performance": {
+        "ttfb": "<50ms",
+        "timeout": "50ms",
+        "fallback": "自动降级"
+      }
     }
   },
-  "departments": [
-    "orchestrator",
-    "proactive-pm",
-    "frontend-construction",
-    "ui-ux-design",
-    "qa-multimodal",
-    "sales-growth",
-    "marketing",
-    "legal",
-    "sre-reliability",
-    "data-ab-testing",
-    "llm-tuning",
-    "i18n-localization"
-  ],
-  "activeTasks": [
-    {
-      "id": "TASK-203",
-      "objective": "智能判断多模态设计组，建立每日自动生成模版与 85 分质检流",
-      "status": "in-progress",
-      "assignedTo": ["proactive-pm", "qa-multimodal"]
+  "routes": {
+    "/": {
+      "component": "/index.html",
+      "description": "主入口，集成 DNS 分流",
+      "loadOrder": ["preconnect", "dns-router", "content"]
     }
-  ]
+  },
+  "deployment": {
+    "domestic": "https://apexwork.cn",
+    "overseas": "https://apexwork.workers.dev",
+    "fallback": "https://apexwork.github.io"
+  },
+  "compliance": {
+    "constitution": "V5.0",
+    "ttfb": "50ms",
+    "zeroCost": true,
+    "edgeNative": true
+  }
 }

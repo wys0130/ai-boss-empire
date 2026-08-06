@@ -439,6 +439,61 @@
           "tag": "05. CLOSING"
         }
       ]
+    },
+    "livefire_attack_to_asset": {
+      "key": "livefire_attack_to_asset",
+      "brand": "APEXWORK",
+      "titleName": "Turn Attack into Asset: Real-Time Chat as Your Growth Radar",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "startup",
+      "slides": [
+        {
+          "id": 1,
+          "title": "They attacked your blog — that's your signal.",
+          "sub": "Hate in real-time chat is unvarnished market truth.",
+          "kpi": "0s",
+          "label": "to insight",
+          "progress": 10,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "Stop moderating. Start mining.",
+          "sub": "Every insult is a feature request in disguise.",
+          "kpi": "3.2x",
+          "label": "more signal than surveys",
+          "progress": 35,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Live chat = real-time focus group, free.",
+          "sub": "Deploy a sentiment router to auto-triage toxicity into product gaps.",
+          "kpi": "80%",
+          "label": "actionable intel rate",
+          "progress": 60,
+          "tag": "03. MECHANISM"
+        },
+        {
+          "id": 4,
+          "title": "From troll to tester: a conversion loop.",
+          "sub": "Turn hostile visitors into beta users with a 'prove me wrong' CTA.",
+          "kpi": "+41%",
+          "label": "trial signups",
+          "progress": 80,
+          "tag": "04. PLAYBOOK"
+        },
+        {
+          "id": 5,
+          "title": "Your next pivot is hiding in a hate comment.",
+          "sub": "Adopt the attack-to-asset framework before competitors do.",
+          "kpi": "$2M",
+          "label": "saved R&D cost",
+          "progress": 100,
+          "tag": "05. ASK"
+        }
+      ]
     }
   }
 }

@@ -8,9 +8,9 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 7,
+    "completed": 8,
     "in_progress": 1,
-    "todo": 1
+    "todo": 0
   },
   "tasks": [
     {
@@ -80,7 +80,7 @@
       "id": "TASK-301",
       "stage": "STAGE_3_FULL_SCALE",
       "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare 边缘",
-      "status": "TODO",
+      "status": "DONE",
       "department": "施工工程部",
       "revenue_impact": "HIGH",
       "notes": "全站不崩溃不白屏。海内外用户分流均保持 TTFB 50ms 极速加载。"
