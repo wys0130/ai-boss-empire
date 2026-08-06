@@ -384,6 +384,61 @@
           "tag": "05. ASK"
         }
       ]
+    },
+    "gravity_shift_ceo_transition_deck": {
+      "key": "gravity_shift_ceo_transition_deck",
+      "brand": "APEXWORK",
+      "titleName": "Gravity Shift: Leadership as the New Edge",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "high-tech",
+      "slides": [
+        {
+          "id": 1,
+          "title": "When the CEO becomes Chair, gravity moves to the board.",
+          "sub": "DeepMind's structural shift redefines decision velocity.",
+          "kpi": "1.2x",
+          "label": "Decision Speed Multiplier",
+          "progress": 100,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "The chair is not a throne — it's a flywheel for vision.",
+          "sub": "Hassabis pivots to long-horizon strategy, not daily ops.",
+          "kpi": "10yr",
+          "label": "Horizon Shift",
+          "progress": 80,
+          "tag": "02. TREND"
+        },
+        {
+          "id": 3,
+          "title": "Jeff Dean's departure is a gravity well for talent.",
+          "sub": "Top AI researchers follow the edge, not the center.",
+          "kpi": "-40%",
+          "label": "Retention Risk at Legacy Layers",
+          "progress": 70,
+          "tag": "03. INSIGHT"
+        },
+        {
+          "id": 4,
+          "title": "Your org chart is a gravity map — redraw it.",
+          "sub": "Distributed leadership beats hierarchical drag in AI-native firms.",
+          "kpi": "3.5x",
+          "label": "Innovation Throughput",
+          "progress": 90,
+          "tag": "04. STRATEGY"
+        },
+        {
+          "id": 5,
+          "title": "Invest in the chair's orbit, not the CEO's desk.",
+          "sub": "Future-proof your governance for the post-founder era.",
+          "kpi": "$2.4B",
+          "label": "Market Value of Adaptive Governance",
+          "progress": 100,
+          "tag": "05. CLOSING"
+        }
+      ]
     }
   }
 }

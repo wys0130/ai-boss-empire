@@ -1,31 +1,56 @@
 {
-  "project": "APEXWORK",
-  "version": "5.0",
-  "taskId": "TASK-202",
-  "status": "in-progress",
-  "paymentGateway": {
-    "cn": {
-      "active": true,
-      "provider": "wechat_alipay_official",
-      "mode": "native_qr_direct",
-      "domain": "pay.apexwork.cn",
-      "fallback": "none"
+  "schemaVersion": "5.0",
+  "projectName": "APEXWORK AI 商务三件套极速商城",
+  "coreRedLines": {
+    "maxTTFBMs": 50,
+    "maxFirstScreenMs": 1000,
+    "monthlyHostingCostUSD": 0,
+    "registrationRequired": false,
+    "textDensity": "low",
+    "visualImpact": "maximum"
+  },
+  "routing": {
+    "index": "/index.html",
+    "pptEditor": "/ppt-editor.html",
+    "excelEditor": "/excel-editor.html",
+    "wordEditor": "/word-editor.html",
+    "components": {
+      "toolbar": "/components/toolbar.html",
+      "slideCard": "/components/slide-card.html",
+      "kpiCard": "/components/kpi-card.html",
+      "energyMeter": "/components/energy-meter.html",
+      "templateGallery": "/components/template-gallery.html"
     },
-    "intl": {
-      "active": true,
-      "provider": "stripe",
-      "mode": "checkout_session",
-      "domain": "pay.apexwork.com"
+    "data": {
+      "templates": "/data/templates.json",
+      "themes": "/data/themes.json",
+      "projects": "/data/projects.json"
+    },
+    "assets": {
+      "images": "/assets/images/webp/",
+      "icons": "/assets/icons/svg/"
     }
   },
-  "components": [
-    "/components/payment/cn-paywall.html",
-    "/components/payment/cn-qr-modal.html",
-    "/components/payment/cn-status-poll.js",
-    "/components/payment/cn-signature.js"
+  "departments": [
+    "orchestrator",
+    "proactive-pm",
+    "frontend-construction",
+    "ui-ux-design",
+    "qa-multimodal",
+    "sales-growth",
+    "marketing",
+    "legal",
+    "sre-reliability",
+    "data-ab-testing",
+    "llm-tuning",
+    "i18n-localization"
   ],
-  "data": {
-    "orders": "libsql://apexwork-orders.turso.io",
-    "products": "/data/products.json"
-  }
+  "activeTasks": [
+    {
+      "id": "TASK-203",
+      "objective": "智能判断多模态设计组，建立每日自动生成模版与 85 分质检流",
+      "status": "in-progress",
+      "assignedTo": ["proactive-pm", "qa-multimodal"]
+    }
+  ]
 }

@@ -1,0 +1,85 @@
+{
+  "generated": "2025-01-15T00:00:00Z",
+  "templateCategories": [
+    {
+      "id": "ppt-strategy",
+      "name": "PPT 路演战略",
+      "templates": [
+        {
+          "id": "ppt-q1-earnings",
+          "name": "Q1 Earnings Call Deck",
+          "score": 92,
+          "status": "published",
+          "priceUSD": 9.99,
+          "thumbnail": "/assets/images/webp/ppt-q1-earnings.webp",
+          "tags": ["earnings", "investor", "dark-theme"]
+        },
+        {
+          "id": "ppt-product-launch",
+          "name": "Product Launch Roadmap",
+          "score": 88,
+          "status": "published",
+          "priceUSD": 9.99,
+          "thumbnail": "/assets/images/webp/ppt-product-launch.webp",
+          "tags": ["launch", "roadmap", "bold"]
+        }
+      ]
+    },
+    {
+      "id": "excel-financial",
+      "name": "Excel 财务模型",
+      "templates": [
+        {
+          "id": "xls-dcf-valuation",
+          "name": "DCF Valuation Model",
+          "score": 90,
+          "status": "published",
+          "priceUSD": 9.99,
+          "thumbnail": "/assets/images/webp/xls-dcf-valuation.webp",
+          "tags": ["dcf", "valuation", "finance"]
+        },
+        {
+          "id": "xls-budget-tracker",
+          "name": "Annual Budget Tracker",
+          "score": 85,
+          "status": "published",
+          "priceUSD": 9.99,
+          "thumbnail": "/assets/images/webp/xls-budget-tracker.webp",
+          "tags": ["budget", "tracker", "clean"]
+        }
+      ]
+    },
+    {
+      "id": "word-compliance",
+      "name": "Word 合规报告",
+      "templates": [
+        {
+          "id": "doc-gdpr-report",
+          "name": "GDPR Compliance Report",
+          "score": 87,
+          "status": "published",
+          "priceUSD": 9.99,
+          "thumbnail": "/assets/images/webp/doc-gdpr-report.webp",
+          "tags": ["gdpr", "legal", "formal"]
+        },
+        {
+          "id": "doc-esg-summary",
+          "name": "ESG Annual Summary",
+          "score": 86,
+          "status": "published",
+          "priceUSD": 9.99,
+          "thumbnail": "/assets/images/webp/doc-esg-summary.webp",
+          "tags": ["esg", "sustainability", "modern"]
+        }
+      ]
+    }
+  ],
+  "qualityThreshold": 85,
+  "dailyAutoGeneration": {
+    "enabled": true,
+    "schedule": "0 2 * * *",
+    "targetPerDay": 3,
+    "autoPublishOnPass": true,
+    "retryOnFail": true
+  }
+}
