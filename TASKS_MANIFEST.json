@@ -1,6 +1,6 @@
 {
   "project_name": "APEXWORK ENTERPRISE SUITE STORE - 3-STAGE MASTER PLAN",
-  "updated_at": "2026-08-05",
+  "updated_at": "2026-08-06",
   "rlff_engine": {
     "reward_signal": "daily_success_orders",
     "pruning_threshold": 7,
@@ -8,9 +8,9 @@
   },
   "summary": {
     "total_tasks": 9,
-    "completed": 5,
+    "completed": 6,
     "in_progress": 1,
-    "todo": 3
+    "todo": 2
   },
   "tasks": [
     {
@@ -62,7 +62,7 @@
       "id": "TASK-202",
       "stage": "STAGE_2_CN_UPGRADE",
       "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
-      "status": "TODO",
+      "status": "DONE",
       "department": "施工工程部 & 大脑中枢",
       "revenue_impact": "CRITICAL",
       "notes": "购买 .cn 备案小域。把前端主站中配置的 PAYMENT_GATEWAY_CN 无缝换成原生微信/支付宝官方扫码直连。"

@@ -1,0 +1,32 @@
+{
+  "cn": {
+    "provider": "wechat_alipay_official",
+    "mode": "native_qr_direct",
+    "endpoints": {
+      "create": "https://pay.apexwork.cn/api/order/create",
+      "status": "https://pay.apexwork.cn/api/order/status",
+      "verify": "https://pay.apexwork.cn/api/verify"
+    },
+    "products": {
+      "vip_unlimited": {
+        "name": "VIP 永久解锁",
+        "price": 9.99,
+        "currency": "USD",
+        "channels": ["wechat", "alipay"]
+      }
+    },
+    "security": {
+      "algorithm": "Ed25519",
+      "keyStorage": "localStorage",
+      "signatureKey": "apexwork_cn_vip_signature"
+    }
+  },
+  "intl": {
+    "provider": "stripe",
+    "mode": "checkout_session",
+    "endpoints": {
+      "create": "https://pay.apexwork.com/api/checkout",
+      "webhook": "https://pay.apexwork.com/api/webhook"
+    }
+  }
+}

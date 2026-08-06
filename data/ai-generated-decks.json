@@ -329,6 +329,61 @@
           "tag": "05. CALL"
         }
       ]
+    },
+    "blade_runner_neo_noir_pitch": {
+      "key": "blade_runner_neo_noir_pitch",
+      "brand": "APEXWORK",
+      "titleName": "Neon Rain: Where Gravity Meets the Grid",
+      "badge": "5 SLIDES · TREND 2026",
+      "total": 5,
+      "defaultBg": "startup",
+      "slides": [
+        {
+          "id": 1,
+          "title": "The Future Is Not Written — It's Rendered in Neon",
+          "sub": "Blade Runner's title cards: a visual language for the post-text era",
+          "kpi": "+180%",
+          "label": "Visual Recall",
+          "progress": 20,
+          "tag": "01. COVER"
+        },
+        {
+          "id": 2,
+          "title": "Every Pixel a Promise, Every Grid a Gravity Well",
+          "sub": "Design for the eye that scans, not reads",
+          "kpi": "3.2x",
+          "label": "Attention Span",
+          "progress": 45,
+          "tag": "02. PROBLEM"
+        },
+        {
+          "id": 3,
+          "title": "Your Deck Is a City — Build Districts, Not Paragraphs",
+          "sub": "Modular slides as neon districts: instant orientation",
+          "kpi": "-60%",
+          "label": "Dwell Time",
+          "progress": 70,
+          "tag": "03. SOLUTION"
+        },
+        {
+          "id": 4,
+          "title": "Data Doesn't Speak — It Glows in the Dark",
+          "sub": "KPI as blade-runner signage: bold, sparse, unforgettable",
+          "kpi": "+240%",
+          "label": "Conversion Lift",
+          "progress": 85,
+          "tag": "04. PROOF"
+        },
+        {
+          "id": 5,
+          "title": "Close the Deal Under Neon Rain",
+          "sub": "One final frame: your ask, etched in light",
+          "kpi": "1.0",
+          "label": "Clear CTA",
+          "progress": 100,
+          "tag": "05. ASK"
+        }
+      ]
     }
   }
 }
