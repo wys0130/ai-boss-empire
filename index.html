@@ -3,235 +3,205 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APEXWORK - 极速商务三件套</title>
+  <title>APEXWORK 智能办公交付商城 (2026 RELEASE)</title>
   
   <!-- 预连接支付网关 -->
   <link rel="preconnect" href="https://pay.apexwork.cn">
   <link rel="dns-prefetch" href="https://pay.apexwork.cn">
   
-  <!-- 1. 引入 Tailwind CSS（解决手机/微信排版错乱核心） -->
+  <!-- 引入 Tailwind CSS 与通用鉴权 -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- 2. 引入鉴权与通用组件 -->
   <script src="components/zero-auth.js"></script>
   
-  <!-- 3. 卡片与全站基础美化样式 -->
   <style>
-    body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #ffffff; padding: 3rem 1.5rem; border-radius: 1.25rem; margin: 1.5rem auto; max-width: 80rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-    .card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: #cbd5e1; }
-    .price { font-size: 1.5rem; font-weight: 800; color: #0f172a; font-family: monospace; margin: 1rem 0; }
-    .btn { background: #2563eb; color: #ffffff; font-weight: 700; font-size: 0.875rem; padding: 0.75rem 1.25rem; border-radius: 0.75rem; border: none; cursor: pointer; transition: background 0.2s ease; width: 100%; text-align: center; }
-    .btn:hover { background: #1d4ed8; }
+    body { -webkit-font-smoothing: antialiased; }
+    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between font-sans">
 
-  <!-- 顶部导航栏：已完美适配手机/微信折行 + 加入中英切换胶囊 -->
-  <header class="bg-white border-b border-slate-200 px-3 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2 md:gap-3 sticky top-0 z-50 shadow-sm">
-    <!-- 左侧品牌 Logo 与标题 -->
+  <!-- 1. 顶部导航栏：全适应微信与手机小屏自动折行 -->
+  <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2 md:gap-3">
-      <span id="logoTrigger" onclick="checkChairmanStealthAccess()" class="bg-blue-600 text-white font-mono text-xs px-2.5 py-1 rounded-lg font-bold shadow-md cursor-pointer select-none shrink-0" title="APEXWORK ENTERPRISE">APEXWORK</span>
-      <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate max-w-[170px] sm:max-w-none" data-zh="智能办公交付商城 (2026)" data-en="Enterprise Digital Store (2026)">智能办公交付商城 (2026)</h1>
+      <span id="logoTrigger" onclick="checkChairmanStealthAccess()" class="bg-blue-600 text-white font-mono text-xs px-2.5 py-1 rounded-lg font-bold shadow-md cursor-pointer select-none" title="APEXWORK ENTERPRISE">APEXWORK</span>
+      <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate max-w-[160px] sm:max-w-none" data-zh="智能办公交付商城 (2026 RELEASE)" data-en="Enterprise Digital Store (2026)">智能办公交付商城 (2026 RELEASE)</h1>
     </div>
-
-    <!-- 右侧功能链接、中英切换与角色标签 -->
-    <div class="flex items-center flex-wrap gap-1.5 md:gap-5 text-xs font-medium text-slate-600">
-      <a href="#ppt-section" class="hover:text-blue-600 transition hidden sm:inline" data-zh="PPT 战略" data-en="PPT Decks">PPT 战略</a>
-      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 模型" data-en="EXCEL Models">EXCEL 模型</a>
-      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD 报告" data-en="WORD Reports">WORD 报告</a>
+    <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
+      <a href="#ppt-section" class="hover:text-blue-600 transition hidden sm:inline" data-zh="PPT 路演战略" data-en="PPT Decks">PPT 路演战略</a>
+      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 财务模型" data-en="EXCEL Models">EXCEL 财务模型</a>
+      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD 合规报告" data-en="WORD Reports">WORD 合规报告</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
       
-      <!-- 👑 中 / EN 双语一键切换按钮 -->
+      <!-- 👑 语言一键切换胶囊 -->
       <button id="langToggleBtn" onclick="window.ApexLang && window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-300 font-bold transition">
-        🌐 简/EN
+        🌐 简 / EN
       </button>
 
       <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs">👤 游客</span>
       <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
-        👑 驾驶舱 →
+        👑 董事长驾驶舱 →
       </a>
     </div>
   </header>
 
-  <!-- 主体工作区 -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Hero 区域 -->
-    <section class="hero flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+  <!-- 2. 主体核心区：完美还原你最傲人的 5 大商用组件卡片美学！ -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
+    <!-- 英雄大横幅 (适配电脑双栏、手机竖直叠放) -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-2xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
       <div>
-        <span class="bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">INSTANT DIGITAL DELIVERY</span>
-        <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mt-2 leading-tight" data-zh="⚡ 商务三件套极速交付" data-en="⚡ Executive Bundle Instant Delivery">⚡ 商务三件套<br class="hidden sm:inline">极速交付</h1>
-        <p class="text-xs sm:text-sm text-slate-300 mt-2" data-zh="PPT · Excel · Word — 1 秒生成，$9.99 即刻下载" data-en="PPT · Excel · Word — Instant Access for $9.99">PPT · Excel · Word — 1 秒生成，$9.99 即刻下载</p>
+        <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">COMMERCIAL ENTERPRISE LICENSE</span>
+        <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="破除低效传统冗长，全视觉商业交付新纪元" data-en="Visual Executive Delivery for Enterprise Leaders">破除低效传统冗长，全视觉商业交付新纪元</h2>
+        <p class="text-xs text-slate-300 mt-1 leading-relaxed" data-zh="覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。" data-en="Featuring PPT Strategic Decks, EXCEL Financial Models, and WORD ATS Compliance Reports.">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
       </div>
-      <button onclick="openBundleCheckout()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0">
-        ⚡ 立即解锁商用三件套 ($9.99 / ￥69)
+      <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2">
+        <span data-zh="⚡ 立即解锁商用三件套包 ($9.99 / ￥69)" data-en="⚡ Unlock Executive Bundle ($9.99 / ￥69)">⚡ 立即解锁商用三件套包 ($9.99 / ￥69)</span>
       </button>
+    </div>
+
+    <!-- 第一板块：PPT 路演套件 (100% 还原原样！拒绝英文占位垃圾卡片) -->
+    <section id="ppt-section">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="text-base md:text-lg font-bold text-slate-900" data-zh="PPT 可视化路演战略套件" data-en="PPT Visual Strategic Decks">PPT 可视化路演战略套件</h3>
+          <p class="text-xs text-slate-500" data-zh="视觉至上 · 大图表表现 · 告别枯燥段落" data-en="Visual-First · Data-Driven · Say Goodbye to Wordy Slides">视觉至上 · 大图表表现 · 告别枯燥段落</p>
+        </div>
+        <span class="text-xs font-mono text-blue-600 font-bold hidden sm:inline">VIEW ALL PPTX (3) →</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 卡片 1 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-slate-300 transition">
+          <div>
+            <span class="bg-blue-500/10 text-blue-600 border border-blue-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="AeroTech 创投规划书" data-en="AeroTech Venture Pitch Deck">AeroTech 创投规划书</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。" data-en="Global Venture & ROI strategic plan. High-res visuals, SVG charts, and custom backgrounds.">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+            <a href="editor.html?deck=aerotech" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入可视化修改 →" data-en="Edit Deck →">进入可视化修改 →</a>
+          </div>
+        </div>
+
+        <!-- 卡片 2 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-slate-300 transition">
+          <div>
+            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="SaaS 增长指标盘点" data-en="SaaS Growth OKR Dashboard">SaaS 增长指标盘点</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。" data-en="Enterprise OKR reconciliation. Dynamic chart rendering with custom visual palettes.">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+            <a href="editor.html?deck=saas" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入可视化修改 →" data-en="Edit Deck →">进入可视化修改 →</a>
+          </div>
+        </div>
+
+        <!-- 卡片 3 -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-slate-300 transition">
+          <div>
+            <span class="bg-amber-500/10 text-amber-600 border border-amber-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="FinTech A 轮融资方案" data-en="FinTech Series-A Financing Deck">FinTech A 轮融资方案</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。" data-en="Cross-border finance proposal deck. Luxury gold accent textures & financial chart grids.">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+            <a href="editor.html?deck=fintech" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入可视化修改 →" data-en="Edit Deck →">进入可视化修改 →</a>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 模板展示区 -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-8" id="template-grid">
-      <!-- 动态加载模板卡片 -->
+    <!-- 第二板块：EXCEL 与 WORD 专业三件套联动 (100% 原版呈现) -->
+    <section>
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="text-base md:text-lg font-bold text-slate-900" data-zh="商务核心：EXCEL 模型与 WORD 合规" data-en="Executive Core: EXCEL Models & WORD ATS Reports">商务核心：EXCEL 模型与 WORD 合规</h3>
+          <p class="text-xs text-slate-500" data-zh="满足欧美融资及财务测算全部硬核标准" data-en="Built to global financial institution & investment bank audit standards">满足欧美融资及财务测算全部硬核标准</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30 hover:border-emerald-500/60 transition">
+          <div>
+            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="全渠道 ROI 动态自适应测算模型" data-en="Omni-Channel ROI Adaptive Financial Model">全渠道 ROI 动态自适应测算模型</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。" data-en="Automated CAC vs LTV ratios with 12-month rolling cash flow projection tables.">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Excel 测算模型 →" data-en="Open Excel Studio →">进入 Excel 测算模型 →</a>
+          </div>
+        </div>
+
+        <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30 hover:border-indigo-500/60 transition">
+          <div>
+            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="欧美企业级 ATS 智能排版合规报告" data-en="EU/NA Corporate ATS Compliance Report">欧美企业级 ATS 智能排版合规报告</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。" data-en="Zero character corruption. ATS machine readable formatted for global banking audits.">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
+            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Word 合规精修 →" data-en="Open Word Studio →">进入 Word 合规精修 →</a>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <!-- 动态挂载合规说明底栏（欧美结汇审验必查点） -->
+  <!-- 3. 解耦底栏与收银台容器（清清爽爽，不再有长串 HTML 杂嵌在主页！） -->
   <div id="compliance-footer-container"></div>
-
-  <!-- 境内收银台组件挂载点 -->
   <div id="cn-paywall-container"></div>
 
-  <!-- 组件加载 -->
-  <script src="components/quality-scorer.js"></script>
-  <script src="components/template-auto-generator.js"></script>
-  
   <script>
-    // 👑 1. 中英双语轻量控制引擎
-    window.ApexLang = {
-      current: localStorage.getItem('APEX_LANG') || 'zh',
-      toggle: function() {
-        this.current = this.current === 'zh' ? 'en' : 'zh';
-        localStorage.setItem('APEX_LANG', this.current);
-        this.apply();
-      },
-      apply: function() {
-        document.querySelectorAll('[data-zh][data-en]').forEach(el => {
-          el.innerHTML = el.getAttribute(`data-${this.current}`);
-        });
-        const btn = document.getElementById('langToggleBtn');
-        if (btn) btn.innerText = this.current === 'zh' ? '🌐 简/EN' : '🌐 EN/简';
-      }
-    };
+    // 👑 A. 动态解耦加载合规底栏
+    fetch('components/compliance-footer.html')
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(html => {
+        const c = document.getElementById('compliance-footer-container');
+        if (c) {
+          c.innerHTML = html;
+          const s = document.createElement('script');
+          s.src = 'components/lang-and-policy.js';
+          document.body.appendChild(s);
+        }
+      })
+      .catch(() => {});
 
-    // 👑 2. 启动每日自动生成与数据渲染
-    window.addEventListener('DOMContentLoaded', () => {
-      window.ApexLang.apply();
-      if (window.APEXWORKTemplateGenerator && window.APEXWORKTemplateGenerator.startDailyGeneration) {
-        window.APEXWORKTemplateGenerator.startDailyGeneration();
-      }
-      loadTemplates();
-      loadDecoupledComponents();
-    });
+    // 👑 B. 动态解耦加载国内收银台
+    fetch('components/payment/cn-paywall.html')
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(html => {
+        const c = document.getElementById('cn-paywall-container');
+        if (c) {
+          c.innerHTML = html;
+          const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1);
+          const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2);
+        }
+      })
+      .catch(() => {});
 
-    // 👑 3. 加载模板列表
-    async function loadTemplates() {
-      try {
-        const response = await fetch('data/templates.json');
-        if (!response.ok) throw new Error('Data file missing');
-        const data = await response.json();
-        renderTemplates(data.templateCategories || []);
-      } catch (error) {
-        console.warn('正在使用演示卡片降级展示，原因:', error.message);
-        renderFallbackCards();
+    // 👑 C. 董事长权限隐身彩蛋
+    let clicks = 0, timer = null;
+    function checkChairmanStealthAccess() {
+      clicks++;
+      clearTimeout(timer);
+      timer = setTimeout(() => { clicks = 0; }, 1500);
+      if (clicks >= 3) {
+        clicks = 0;
+        const p = document.getElementById('adminSecretPortal');
+        if (p) p.classList.remove('hidden');
+        alert("👑 [权限验证]：董事长驾驶舱通道已开启！");
       }
     }
 
-    // 👑 4. 渲染模板卡片
-    function renderTemplates(categories) {
-      const grid = document.getElementById('template-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      
-      categories.forEach(category => {
-        (category.templates || []).forEach(template => {
-          if (template.status === 'published') {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-              <div>
-                <h3 class="font-bold text-base text-slate-900">${template.name}</h3>
-                <p class="text-xs text-slate-500 mt-1">${category.name}</p>
-              </div>
-              <div>
-                <div class="price">$${template.priceUSD}</div>
-                <button class="btn" onclick="purchaseTemplate('${template.id}')">立即购买 ($${template.priceUSD})</button>
-              </div>
-            `;
-            grid.appendChild(card);
-          }
-        });
-      });
-    }
-
-    // 👑 5. 容错保护：防止 templates.json 未提交时白屏
-    function renderFallbackCards() {
-      const grid = document.getElementById('template-grid');
-      if (!grid) return;
-      grid.innerHTML = `
-        <div class="card">
-          <div><h3 class="font-bold text-base">AeroTech 创投路演规划书</h3><p class="text-xs text-slate-500 mt-1">PPT 可视化路演战略</p></div>
-          <div><div class="price">$9.99</div><button class="btn" onclick="purchaseTemplate('aerotech')">立即购买 ($9.99)</button></div>
-        </div>
-        <div class="card">
-          <div><h3 class="font-bold text-base">全渠道 ROI 动态测算模型</h3><p class="text-xs text-slate-500 mt-1">Excel 财务测算矩阵</p></div>
-          <div><div class="price">$9.99</div><button class="btn" onclick="purchaseTemplate('roi_excel')">立即购买 ($9.99)</button></div>
-        </div>
-        <div class="card">
-          <div><h3 class="font-bold text-base">欧美 ATS 智能排版报告</h3><p class="text-xs text-slate-500 mt-1">Word 合规审查规范</p></div>
-          <div><div class="price">$9.99</div><button class="btn" onclick="purchaseTemplate('ats_word')">立即购买 ($9.99)</button></div>
-        </div>
-      `;
-    }
-
-    // 👑 6. 购买模板（零注册收单闭环）
-    function purchaseTemplate(templateId) {
+    // 👑 D. 一键唤起三件套购买
+    window.openBundleCheckout = function() {
       if (window.ApexAuth && window.ApexAuth.openCheckout) {
         ApexAuth.openCheckout({
-          title: "APEXWORK 企业商用模板授权 (.LICENSE)",
-          onSuccess: () => {
-            const signature = generateEd25519Signature(templateId);
-            localStorage.setItem('apexwork_license', signature);
-            alert('✅ 购买成功！模板授权签名已写入本地，开启无限授权。');
-          }
+          title: "APEXWORK 智能办公商用三件套企业包 (PPT/Excel/Word)",
+          onSuccess: () => alert("🎉 您已激活全站商用权限！请畅享三件套无限次下载包。")
         });
-      } else {
-        const signature = generateEd25519Signature(templateId);
-        localStorage.setItem('apexwork_license', signature);
-        alert('✅ 购买成功！已解锁本卡片永久非独占商用授权。');
       }
-    }
-
-    function generateEd25519Signature(templateId) {
-      return `ed25519_${templateId}_${Date.now()}`;
-    }
-
-    // 👑 7. 解耦读取底栏与收银台（已内置 .ok 校验，绝不向网页塞 404 页面）
-    function loadDecoupledComponents() {
-      fetch('components/compliance-footer.html')
-        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-        .then(html => {
-          const el = document.getElementById('compliance-footer-container');
-          if (el) el.innerHTML = html;
-        })
-        .catch(() => {});
-
-      fetch('components/payment/cn-paywall.html')
-        .then(r => { if (!r.ok) throw new Error(); return r.text(); })
-        .then(html => {
-          const el = document.getElementById('cn-paywall-container');
-          if (el) el.innerHTML = html;
-        })
-        .catch(() => {});
-    }
-
-    // 👑 8. 董事长隐身入口
-    let clickCount = 0, clickTimer = null;
-    function checkChairmanStealthAccess() {
-      clickCount++;
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(() => { clickCount = 0; }, 1500);
-      if (clickCount >= 3) {
-        clickCount = 0;
-        const portal = document.getElementById("adminSecretPortal");
-        if (portal) portal.classList.remove("hidden");
-        alert("👑 [权限验证]：已为您唤出集团董事长驾驶舱后台入口！");
-      }
-    }
-
-    // 👑 9. 三件套合并购买
-    function openBundleCheckout() {
-      purchaseTemplate("enterprise_bundle_all");
-    }
+    };
   </script>
 </body>
 </html>
