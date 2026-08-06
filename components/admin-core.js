@@ -1,7 +1,7 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
  * 1. PPT 产品全部采用 Microsoft PowerPoint 专属橙红 (#D83B01 / orange-600) 显示！
- * 2. 轮播图管理对两幕幻灯片进行绝对互斥隔离保存。
+ * 2. 支持后台可控设置 AI 自主运行北京时间段并同步至云端 config/ai-schedule.json。
  * 3. 严格遵循按需输入：聚焦文本框才追加 @词条，未聚焦仅仅筛选日记日志！
  */
 
@@ -17,7 +17,7 @@ window.switchAdminTab = function(tabId) {
         'audit': '业务控制台 / 作品风控审查与上架',
         'config': '业务控制台 / 主页轮播图与定价中心',
         'overview': '业务控制台 / 阶段开发工单进度书',
-        'swarm': '业务控制台 / AI 智能体调令中心'
+        'swarm': '业务控制台 / AI 智能体夜间排班与调令中心'
     };
 
     tabs.forEach(id => {
@@ -31,7 +31,53 @@ window.switchAdminTab = function(tabId) {
     if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK PRO';
 };
 
-// 👑 PPT 全部使用 Office PowerPoint 橙红色（orange-600 / #D83B01）
+// 👑 自动同步与读取云端排班时间表 (config/ai-schedule.json)
+window.ApexScheduleManager = {
+    loadScheduleFromCloud: async function() {
+        try {
+            const token = localStorage.getItem("APEX_GH_TOKEN");
+            if (!token) return;
+            const fileObj = await getGithubFileSafe("config/ai-schedule.json", token);
+            if (fileObj.content) {
+                const sched = JSON.parse(fileObj.content);
+                if (document.getElementById("sched-start")) document.getElementById("sched-start").value = sched.start_hour || 0;
+                if (document.getElementById("sched-end")) document.getElementById("sched-end").value = sched.end_hour || 8;
+                if (document.getElementById("sched-enabled")) document.getElementById("sched-enabled").value = String(sched.enabled !== false);
+            }
+        } catch (e) {
+            console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。");
+        }
+    },
+
+    saveScheduleToCloud: async function() {
+        const start = Number(document.getElementById("sched-start").value) || 0;
+        const end = Number(document.getElementById("sched-end").value) || 8;
+        const enabled = document.getElementById("sched-enabled").value === "true";
+        
+        const payload = {
+            start_hour: start,
+            end_hour: end,
+            enabled: enabled,
+            updated_at: new Date().toISOString()
+        };
+
+        try {
+            const keys = getKeys();
+            const fileObj = await getGithubFileSafe("config/ai-schedule.json", keys.gh);
+            await pushGithubFile(
+                "config/ai-schedule.json",
+                JSON.stringify(payload, null, 2),
+                fileObj.sha,
+                `⏱️ Config: 更新 AI 夜间自主排班时段 -> 北京时间 [${start}:00 - ${end}:00] [skip ci]`,
+                keys.gh
+            );
+            alert(`✅ 排班表写入成功！\n\nAI 自主运行区间已被限定为北京时间 [${start}:00 至 ${end}:00]。\n白天非此区间，自动定时器直接静默退场；你在网页对话或发号施令依旧可以全天候秒起！`);
+        } catch (e) {
+            alert("❌ 同步时间表失败: " + e.message);
+        }
+    }
+};
+
 const AUDIT_PRODUCTS = [
     {
         id: "aerotech",
@@ -295,6 +341,7 @@ function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
     renderAuditTable();
+    ApexScheduleManager.loadScheduleFromCloud(); // 👑 读取当前设定的夜间时段
     
     const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "light";
     document.documentElement.setAttribute("data-theme", savedTheme);
