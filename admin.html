@@ -30,13 +30,11 @@
     <!-- 1. 左侧卡片菜单栏 -->
     <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
         <div>
-            <!-- 👑 直读 assets/logo.webp 且更新品牌名字 -->
             <div class="h-16 flex items-center gap-2.5 px-5 border-b border-slate-800 bg-[#0b0f19]">
                 <img src="assets/logo.webp" alt="LOGO" class="h-7 w-auto object-contain" />
                 <span class="font-bold text-white font-mono text-xs tracking-wide truncate">顶尖智能商务办公平台</span>
             </div>
 
-            <!-- 导航菜单 -->
             <div class="p-4 space-y-1 text-xs">
                 <div class="px-3 py-1.5 text-[11px] font-mono font-bold text-slate-500 uppercase">后台业务管理</div>
                 <button onclick="switchAdminTab('audit')" id="nav-audit" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left">
@@ -58,7 +56,6 @@
             </div>
         </div>
 
-        <!-- 底部快捷操作 -->
         <div class="p-4 border-t border-slate-800 space-y-2 text-xs">
             <button onclick="openLiveSiteForceBypass()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-between transition">
                 <span>🏠 返回前台商城</span>
@@ -115,7 +112,7 @@
         <!-- 3. 卡片管理视图 -->
         <main class="flex-1 overflow-y-auto p-6 custom-scroll">
 
-            <!-- TAB 1: 作品风控审查 (所有 PPT 全线换成 Office 橙配色展示) -->
+            <!-- TAB 1: 作品风控审查 (Microsoft PowerPoint 专属橙配色展示) -->
             <section id="tab-audit" class="space-y-6">
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
@@ -145,7 +142,7 @@
                 </div>
             </section>
 
-            <!-- TAB 2: 主页与轮播图独立配置中台 (绝对隔离两组幻灯片编辑) -->
+            <!-- TAB 2: 主页与轮播图独立配置中台 -->
             <section id="tab-config" class="hidden space-y-6">
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex justify-between items-center mb-6 border-b pb-4">
@@ -158,9 +155,7 @@
                         </button>
                     </div>
 
-                    <!-- 两组独立编辑，杜绝任何混叠 -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- 轮播图 1 -->
                         <div class="saas-card rounded-xl p-5 space-y-3 border-l-4 border-l-blue-600">
                             <div class="flex justify-between items-center text-xs font-mono font-bold text-blue-600">
                                 <span>SLIDE 01 (首屏默认主打横幅)</span>
@@ -179,7 +174,6 @@
                             </div>
                         </div>
 
-                        <!-- 轮播图 2 -->
                         <div class="saas-card rounded-xl p-5 space-y-3 border-l-4 border-l-emerald-600">
                             <div class="flex justify-between items-center text-xs font-mono font-bold text-emerald-600">
                                 <span>SLIDE 02 (第二轮播合规专享横幅)</span>
@@ -239,7 +233,6 @@
                             </div>
                         </div>
 
-                        <!-- 👑 PPT 用 Microsoft PowerPoint 橙红显色 -->
                         <div class="saas-card rounded-xl p-4 flex flex-col justify-between border-l-2 border-l-orange-500">
                             <div>
                                 <span class="text-[10px] font-mono text-orange-600 font-bold bg-orange-500/10 px-2 py-0.5 rounded">PACKAGE 02 · PPT</span>
@@ -317,8 +310,44 @@
                 </div>
             </section>
 
-            <!-- TAB 4: AI 智能体调令中心 -->
+            <!-- TAB 4: AI 智能体调令中心 + 👑 自主运行区间时段控制器 -->
             <section id="tab-swarm" class="hidden space-y-6">
+                <!-- 👑 老板夜间自动静默施工时段控制卡片 -->
+                <div class="saas-card rounded-2xl p-5 border-l-4 border-l-purple-600">
+                    <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-3 mb-4">
+                        <div>
+                            <h3 class="font-bold text-sm text-purple-600 flex items-center gap-2">
+                                <span>⏳ AI 蜂群夜间自主运行北京时间段控制</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/30">NIGHT-SHIFT CONTROL</span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">预设时段内触发定时巡检才编写代码提交；其余白天时间自动静默，不抢发版队列（对话触发可随唤随到）</p>
+                        </div>
+                        <button onclick="ApexScheduleManager.saveScheduleToCloud()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition shadow-sm font-mono">
+                            💾 同步排班区间到 GitHub 云端
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-6 text-xs font-mono">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">开始执行点(0-23):</span>
+                            <input type="number" id="sched-start" min="0" max="23" value="0" class="w-16 saas-input rounded-lg px-2 py-1.5 font-bold text-center text-purple-600" />
+                            <span>点 (北京时间)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">静默退场点(1-24):</span>
+                            <input type="number" id="sched-end" min="1" max="24" value="8" class="w-16 saas-input rounded-lg px-2 py-1.5 font-bold text-center text-purple-600" />
+                            <span>点 (北京时间)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">自主施工许可:</span>
+                            <select id="sched-enabled" class="saas-input rounded-lg px-3 py-1.5 font-bold text-emerald-600">
+                                <option value="true">🟢 允许区间内自主运行</option>
+                                <option value="false">🔴 闭锁 (仅手动对话响应)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="saas-card rounded-2xl p-6 space-y-6">
                     <div>
                         <div class="flex items-center justify-between mb-3 border-b pb-2 text-xs font-mono">
@@ -364,4 +393,3 @@
     <script src="components/admin-core.js"></script>
 </body>
 </html>
-
