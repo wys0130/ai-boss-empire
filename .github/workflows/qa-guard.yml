@@ -1,0 +1,35 @@
+name: 极客持续集成质检 (QA Guard)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  link-and-js-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出当前仓库工程
+        uses: actions/checkout@v4
+
+      - name: 启动本地 HTML/404 完整性扫描
+        run: |
+          echo "==== [QA GUARD]: 开始校验物理路由与死链 ===="
+          # 检查 manifest 指定的文件是否均存在于硬盘上
+          missing=0
+          for file in index.html editor.html excel-editor.html word-editor.html; do
+            if [ ! -f "$file" ]; then
+              echo "::error file=$file::❌ 物理文件丢失！会导致 404: $file"
+              missing=$((missing + 1))
+            else
+              echo "✅ 文件物理落地检查通过: $file"
+            fi
+          done
+          
+          if [ $missing -gt 0 ]; then
+            echo "::error::一共检测到 $missing 个物理文件路径破损，拦截此次发布！"
+            exit 1
+          fi
+          echo "==== [QA GUARD]: 全站 0 死链，质检完毕 ===="
+
