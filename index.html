@@ -3,50 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APEXWORK 智能办公交付商城 (2026 RELEASE)</title>
+  <title>APEXWORK - 极速商务三件套</title>
   
-  <!-- 预连接支付网关 -->
   <link rel="preconnect" href="https://pay.apexwork.cn">
   <link rel="dns-prefetch" href="https://pay.apexwork.cn">
   
-  <!-- 引入 Tailwind CSS 与通用鉴权 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="components/zero-auth.js"></script>
   
   <style>
-    body { -webkit-font-smoothing: antialiased; }
+    body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between font-sans">
+<body class="min-h-screen flex flex-col justify-between">
 
-  <!-- 1. 顶部导航栏：全适应微信与手机小屏自动折行 -->
-  <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
+  <!-- 顶部导航栏 -->
+  <header class="bg-white border-b border-slate-200 px-3 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2 md:gap-3 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2 md:gap-3">
-      <span id="logoTrigger" onclick="checkChairmanStealthAccess()" class="bg-blue-600 text-white font-mono text-xs px-2.5 py-1 rounded-lg font-bold shadow-md cursor-pointer select-none" title="APEXWORK ENTERPRISE">APEXWORK</span>
-      <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate max-w-[160px] sm:max-w-none" data-zh="智能办公交付商城 (2026 RELEASE)" data-en="Enterprise Digital Store (2026)">智能办公交付商城 (2026 RELEASE)</h1>
+      <!-- 👑 极致秒开的金属 LOGO -->
+      <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK ENTERPRISE - 点击3次进入董事长驾驶舱">
+        <img src="images/logo.webp" alt="APEXWORK STUDIO" class="h-8 md:h-10 w-auto object-contain drop-shadow-md transition transform hover:scale-105" fetchpriority="high" loading="eager" decoding="sync"/>
+      </div>
+      <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate max-w-[170px] sm:max-w-none" data-zh="智能办公交付商城 (2026)" data-en="Enterprise Digital Store (2026)">智能办公交付商城 (2026)</h1>
     </div>
-    <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
-      <a href="#ppt-section" class="hover:text-blue-600 transition hidden sm:inline" data-zh="PPT 路演战略" data-en="PPT Decks">PPT 路演战略</a>
-      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 财务模型" data-en="EXCEL Models">EXCEL 财务模型</a>
-      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD 合规报告" data-en="WORD Reports">WORD 合规报告</a>
+
+    <div class="flex items-center flex-wrap gap-1.5 md:gap-5 text-xs font-medium text-slate-600">
+      <a href="#ppt-section" class="hover:text-blue-600 transition hidden sm:inline" data-zh="PPT 战略" data-en="PPT Decks">PPT 战略</a>
+      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 模型" data-en="EXCEL Models">EXCEL 模型</a>
+      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD 报告" data-en="WORD Reports">WORD 报告</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
       
-      <!-- 👑 语言一键切换胶囊 -->
       <button id="langToggleBtn" onclick="window.ApexLang && window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-300 font-bold transition">
-        🌐 简 / EN
+        🌐 简/EN
       </button>
 
       <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs">👤 游客</span>
       <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
-        👑 董事长驾驶舱 →
+        👑 驾驶舱 →
       </a>
     </div>
   </header>
 
-  <!-- 2. 主体核心区：完美还原你最傲人的 5 大商用组件卡片美学！ -->
-  <main class="max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
-    <!-- 英雄大横幅 (适配电脑双栏、手机竖直叠放) -->
+  <!-- 主体工作区 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
+    <!-- Hero 横幅 -->
     <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-2xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
       <div>
         <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">COMMERCIAL ENTERPRISE LICENSE</span>
@@ -54,18 +55,17 @@
         <p class="text-xs text-slate-300 mt-1 leading-relaxed" data-zh="覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。" data-en="Featuring PPT Strategic Decks, EXCEL Financial Models, and WORD ATS Compliance Reports.">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
       </div>
       <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2">
-        <span data-zh="⚡ 立即解锁商用三件套包 ($9.99 / ￥69)" data-en="⚡ Unlock Executive Bundle ($9.99 / ￥69)">⚡ 立即解锁商用三件套包 ($9.99 / ￥69)</span>
+        <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock Executive Bundle">⚡ 立即解锁商用三件套包</span> 
+        <span data-price-rmb="139">￥139 / $19.99 USD</span>
       </button>
     </div>
 
-    <!-- 第一板块：PPT 路演套件 (100% 还原原样！拒绝英文占位垃圾卡片) -->
     <section id="ppt-section">
       <div class="flex justify-between items-center mb-6">
         <div>
           <h3 class="text-base md:text-lg font-bold text-slate-900" data-zh="PPT 可视化路演战略套件" data-en="PPT Visual Strategic Decks">PPT 可视化路演战略套件</h3>
           <p class="text-xs text-slate-500" data-zh="视觉至上 · 大图表表现 · 告别枯燥段落" data-en="Visual-First · Data-Driven · Say Goodbye to Wordy Slides">视觉至上 · 大图表表现 · 告别枯燥段落</p>
         </div>
-        <span class="text-xs font-mono text-blue-600 font-bold hidden sm:inline">VIEW ALL PPTX (3) →</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -77,8 +77,8 @@
             <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。" data-en="Global Venture & ROI strategic plan. High-res visuals, SVG charts, and custom backgrounds.">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
-            <a href="editor.html?deck=aerotech" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入可视化修改 →" data-en="Edit Deck →">进入可视化修改 →</a>
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-slate-900">￥69 / $9.99 USD</div>
+            <a href="editor.html?deck=aerotech" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit →">进入修改 →</a>
           </div>
         </div>
 
@@ -90,8 +90,8 @@
             <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。" data-en="Enterprise OKR reconciliation. Dynamic chart rendering with custom visual palettes.">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
-            <a href="editor.html?deck=saas" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入可视化修改 →" data-en="Edit Deck →">进入可视化修改 →</a>
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-slate-900">￥69 / $9.99 USD</div>
+            <a href="editor.html?deck=saas" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit →">进入修改 →</a>
           </div>
         </div>
 
@@ -103,19 +103,18 @@
             <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。" data-en="Cross-border finance proposal deck. Luxury gold accent textures & financial chart grids.">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
-            <a href="editor.html?deck=fintech" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入可视化修改 →" data-en="Edit Deck →">进入可视化修改 →</a>
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-slate-900">￥69 / $9.99 USD</div>
+            <a href="editor.html?deck=fintech" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit →">进入修改 →</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 第二板块：EXCEL 与 WORD 专业三件套联动 (100% 原版呈现) -->
+    <!-- 第二板块：EXCEL 与 WORD -->
     <section>
       <div class="flex justify-between items-center mb-6">
         <div>
           <h3 class="text-base md:text-lg font-bold text-slate-900" data-zh="商务核心：EXCEL 模型与 WORD 合规" data-en="Executive Core: EXCEL Models & WORD ATS Reports">商务核心：EXCEL 模型与 WORD 合规</h3>
-          <p class="text-xs text-slate-500" data-zh="满足欧美融资及财务测算全部硬核标准" data-en="Built to global financial institution & investment bank audit standards">满足欧美融资及财务测算全部硬核标准</p>
         </div>
       </div>
 
@@ -127,8 +126,8 @@
             <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。" data-en="Automated CAC vs LTV ratios with 12-month rolling cash flow projection tables.">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
-            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Excel 测算模型 →" data-en="Open Excel Studio →">进入 Excel 测算模型 →</a>
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-slate-900">￥69 / $9.99 USD</div>
+            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Excel 模型 →" data-en="Open Excel →">进入 Excel 模型 →</a>
           </div>
         </div>
 
@@ -139,20 +138,18 @@
             <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。" data-en="Zero character corruption. ATS machine readable formatted for global banking audits.">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <span class="font-mono font-bold text-sm text-slate-900">$9.99</span>
-            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Word 合规精修 →" data-en="Open Word Studio →">进入 Word 合规精修 →</a>
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-slate-900">￥69 / $9.99 USD</div>
+            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Word 报告 →" data-en="Open Word →">进入 Word 报告 →</a>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- 3. 解耦底栏与收银台容器（清清爽爽，不再有长串 HTML 杂嵌在主页！） -->
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
   <script>
-    // 👑 A. 动态解耦加载合规底栏
     fetch('components/compliance-footer.html')
       .then(r => { if (!r.ok) throw new Error(); return r.text(); })
       .then(html => {
@@ -166,7 +163,6 @@
       })
       .catch(() => {});
 
-    // 👑 B. 动态解耦加载国内收银台
     fetch('components/payment/cn-paywall.html')
       .then(r => { if (!r.ok) throw new Error(); return r.text(); })
       .then(html => {
@@ -179,7 +175,6 @@
       })
       .catch(() => {});
 
-    // 👑 C. 董事长权限隐身彩蛋
     let clicks = 0, timer = null;
     function checkChairmanStealthAccess() {
       clicks++;
@@ -193,12 +188,11 @@
       }
     }
 
-    // 👑 D. 一键唤起三件套购买
     window.openBundleCheckout = function() {
       if (window.ApexAuth && window.ApexAuth.openCheckout) {
         ApexAuth.openCheckout({
           title: "APEXWORK 智能办公商用三件套企业包 (PPT/Excel/Word)",
-          onSuccess: () => alert("🎉 您已激活全站商用权限！请畅享三件套无限次下载包。")
+          onSuccess: () => alert("🎉 您已激活全站商用权限！")
         });
       }
     };
