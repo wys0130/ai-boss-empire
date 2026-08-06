@@ -1,7 +1,7 @@
 /**
- * APEXWORK 驾驶舱模块化内核 (components/admin-core.js)
- * 1. 自动挂载至全局 window，彻底解决 HTML onclick 点击无效问题
- * 2. 严格遵循 isCmdActive 判断：没点击输入框不塞字，点了再塞
+ * APEXWORK 智能体驾驶舱核心驱动 (components/admin-core.js)
+ * 1. 严格贯彻账本准则：只有点击聚焦过 #cmd 输入框，点击部门按键才会向输入框内添加词条！如果没聚焦输入框，单点仅过滤左下角日志！
+ * 2. 同步全站定价策略至 LocalStorage，与前台 /components/lang-and-policy.js 全面呼应。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -11,48 +11,39 @@ let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
 const deptConfig = [
-    { name: "大脑中枢", cls: "theme-blue" },
-    { name: "缺陷与QA质检部", cls: "theme-rose" },
-    { name: "主动产品部", cls: "theme-amber" },
-    { name: "施工工程部", cls: "theme-sky" },
-    { name: "视觉策划部", cls: "theme-emerald" },
-    { name: "审核质量部", cls: "theme-purple" },
-    { name: "转化销售部", cls: "theme-pink" },
-    { name: "推广营销部", cls: "theme-cyan" },
-    { name: "国际法务部", cls: "theme-teal" }
+    { name: "大脑中枢", cls: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30" },
+    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-300 border-rose-500/30" },
+    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
+    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-300 border-sky-500/30" },
+    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" },
+    { name: "审核质量部", cls: "bg-purple-500/10 text-purple-300 border-purple-500/30" },
+    { name: "转化销售部", cls: "bg-pink-500/10 text-pink-300 border-pink-500/30" },
+    { name: "推广营销部", cls: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30" },
+    { name: "国际法务部", cls: "bg-teal-500/10 text-teal-300 border-teal-500/30" }
 ];
 
-// 👑 新增：汇率自动计算引擎
-window.convertRMBtoUSD = function(rmb) {
-    const rawUsd = Number(rmb) / 7.0;
-    return (Math.floor(rawUsd) + 0.99).toFixed(2);
-};
-
-window.updateDualPricePreview = function(pkgKey, rmbVal) {
-    const usdText = window.convertRMBtoUSD(rmbVal);
-    const previewEl = document.getElementById(`usdPreview-${pkgKey}`);
-    if (previewEl) previewEl.innerText = `$${usdText} USD`;
-};
-
+// 👑 保存全域定价策略
 window.savePricingConfig = function() {
+    const calcUSD = (rmb) => {
+        const num = parseFloat(rmb) || 0;
+        return num > 0 ? (Math.floor(num / 7.0) + 0.99).toFixed(2) : "0.00";
+    };
     const config = {
-        bundle: { rmb: document.getElementById('priceInput-bundle').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-bundle').value) },
-        ppt: { rmb: document.getElementById('priceInput-ppt').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-ppt').value) },
-        excel: { rmb: document.getElementById('priceInput-excel').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-excel').value) },
-        word: { rmb: document.getElementById('priceInput-word').value, usd: window.convertRMBtoUSD(document.getElementById('priceInput-word').value) },
+        bundle: { rmb: document.getElementById('priceInput-bundle').value, usd: calcUSD(document.getElementById('priceInput-bundle').value) },
+        ppt: { rmb: document.getElementById('priceInput-ppt').value, usd: calcUSD(document.getElementById('priceInput-ppt').value) },
+        excel: { rmb: document.getElementById('priceInput-excel').value, usd: calcUSD(document.getElementById('priceInput-excel').value) },
+        word: { rmb: document.getElementById('priceInput-word').value, usd: calcUSD(document.getElementById('priceInput-word').value) },
         updatedAt: new Date().toISOString()
     };
     localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(config));
-    appendLog(`>> [定价中台] 同步基准价成功：三件套 ￥${config.bundle.rmb} = $${config.bundle.usd} USD`);
-    alert(`✅ 全站定价策略同步成功！`);
+    appendLog(`>> [定价中台] 汇率策略同步生效，商用三件套定价为：￥${config.bundle.rmb} RMB = $${config.bundle.usd} USD`);
+    alert(`✅ 全站定价策略写入成功！\n\n全套企业包：￥${config.bundle.rmb} = $${config.bundle.usd} USD\n请在前台主页查看实时生效情况。`);
 };
 
-// 👑 全局直达主页
 window.openLiveSiteForceBypass = function() {
     window.open(`https://wys0130.github.io/ai-boss-empire/?nocache=${Date.now()}`, '_blank');
 };
 
-// 👑 自动执行加载函数
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
@@ -125,14 +116,14 @@ function renderDeptButtons() {
     container.innerHTML = "";
     deptConfig.forEach(dept => {
         const btn = document.createElement("button");
-        btn.className = `dept-btn border rounded p-1.5 text-left transition ${dept.cls}`;
-        btn.innerHTML = `<div class="text-[11px] font-bold truncate">${dept.name}</div>`;
+        btn.className = `dept-btn border rounded-xl p-2 text-left transition hover:border-slate-500 ${dept.cls}`;
+        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
         btn.onclick = () => window.inspectDept(dept.name, btn);
         container.appendChild(btn);
     });
 }
 
-// 👑 点击判断规则：没先点过输入框，只筛选，绝对不写入文字！
+// 👑 遵守严格规约：点击输入框才给输入框追加 @词条；未点击只筛选日志
 window.inspectDept = function(deptName, btnEl) {
     activeFilterDept = deptName;
     document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
@@ -144,7 +135,7 @@ window.inspectDept = function(deptName, btnEl) {
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
         const tokenSpan = document.createElement("span");
-        tokenSpan.className = "dept-token";
+        tokenSpan.className = "dept-token bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-1.5 py-0.5 rounded";
         tokenSpan.contentEditable = "false";
         tokenSpan.setAttribute("data-dept", deptName);
         tokenSpan.innerText = `@${deptName}`;
@@ -165,9 +156,9 @@ window.inspectDept = function(deptName, btnEl) {
             cmdBox.appendChild(document.createTextNode(" "));
             cmdBox.scrollTop = cmdBox.scrollHeight;
         }
-        appendLog(`🎯 插入词条 -> @${deptName}`);
+        appendLog(`🎯 追加指令部门词条 -> @${deptName}`);
     } else {
-        appendLog(`🔍 聚焦部门 -> [${deptName}] (未点选输入框，仅作视图过滤)`);
+        appendLog(`🔍 切换视图筛选 -> [${deptName}] (提示：未点击输入框，已避免自动录入词条)`);
     }
 
     loadHistoryFromMemory();
@@ -181,7 +172,7 @@ window.resetDeptFilter = function() {
     if (activeLabel) activeLabel.innerText = `[全景视图]`;
     const cmdBox = document.getElementById("cmd");
     if (cmdBox) cmdBox.innerHTML = "";
-    appendLog(`🌐 恢复全景模式`);
+    appendLog(`🌐 恢复系统全景日志视图`);
     loadHistoryFromMemory();
 };
 
@@ -199,7 +190,7 @@ async function loadTasksManifest() {
         rawManifestTasks = manifest.tasks || [];
         const sum = manifest.summary || { completed: 0, total_tasks: 0 };
         const badge = document.getElementById('manifestSummaryBadge');
-        if (badge) badge.innerText = `完成度: ${sum.completed}/${sum.total_tasks}`;
+        if (badge) badge.innerText = `执行完成度: ${sum.completed}/${sum.total_tasks}`;
         renderManifestTasks();
     } catch (err) {
         listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 col-span-full font-mono">读取工单错误: ${err.message}</div>`;
@@ -209,11 +200,11 @@ async function loadTasksManifest() {
 window.filterManifest = function(stageKey) {
     currentManifestFilter = stageKey;
     document.querySelectorAll('.manifest-tab').forEach(btn => {
-        btn.className = "manifest-tab px-2.5 py-0.5 rounded text-slate-400 hover:text-white";
+        btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-white";
     });
     const targetBtn = window.event?.target;
     if (targetBtn) {
-        targetBtn.className = "manifest-tab px-2.5 py-0.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold";
+        targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold";
     }
     renderManifestTasks();
 };
@@ -228,31 +219,31 @@ function renderManifestTasks() {
         : rawManifestTasks.filter(t => t.stage === currentManifestFilter || (!t.stage && currentManifestFilter === 'ALL'));
 
     if (filtered.length === 0) {
-        listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该期暂无工单</div>`;
+        listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该开发期暂无对应工单</div>`;
         return;
     }
 
     filtered.forEach(task => {
         const isDone = task.status === 'DONE';
         const isInProg = task.status === 'IN_PROGRESS';
-        let borderCls = isDone ? "border-emerald-500/40 bg-emerald-500/5 opacity-60" : "border-slate-800 bg-[#0b0f19]";
+        let borderCls = isDone ? "border-emerald-500/30 bg-emerald-500/5 opacity-60" : "border-slate-800 bg-slate-900/60";
         let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-600");
         let statusText = isDone ? "已达成" : (isInProg ? "研发中" : "待落实");
 
         listEl.innerHTML += `
-            <div class="border rounded-lg p-2 flex flex-col justify-between transition hover:border-slate-600 ${borderCls}" 
-                 data-tooltip="【工单 #${task.id}】\n目标：${task.title}\n备注：${task.notes || '无'}\n责任人：${task.department}">
+            <div class="border rounded-xl p-3 flex flex-col justify-between transition hover:border-slate-700 ${borderCls}" 
+                 data-tooltip="【工单 #${task.id}】\n目标：${task.title}\n备注：${task.notes || '无'}\n责任部门：${task.department}">
                 <div>
-                    <div class="flex items-center justify-between text-[10px] font-mono mb-1 text-slate-400">
+                    <div class="flex items-center justify-between text-[10px] font-mono mb-1.5 text-slate-400">
                         <span class="font-bold text-indigo-400">[${task.id}] · ${task.department.split('&')[0].trim()}</span>
                         <span class="flex items-center gap-1 font-medium"><i class="w-1.5 h-1.5 rounded-full ${dotCls} inline-block"></i>${statusText}</span>
                     </div>
-                    <span class="text-xs font-semibold text-white font-mono truncate-line mb-0.5">${task.title}</span>
-                    <span class="text-[10px] text-slate-400 font-mono truncate-line">${task.notes || '暂无说明'}</span>
+                    <span class="text-xs font-semibold text-white font-mono truncate mb-1 block">${task.title}</span>
+                    <span class="text-[11px] text-slate-400 font-mono truncate block">${task.notes || '暂无详细说明'}</span>
                 </div>
-                <div class="mt-1.5 pt-1.5 border-t border-slate-800/80 flex items-center justify-end text-[10px] font-mono">
-                    <button onclick="toggleTaskStatus('${task.id}')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition">
-                        ${isDone ? '撤销' : '打勾完成'}
+                <div class="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-end text-[10px] font-mono">
+                    <button onclick="toggleTaskStatus('${task.id}')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition">
+                        ${isDone ? '撤销标志' : '打勾落实'}
                     </button>
                 </div>
             </div>
@@ -264,7 +255,7 @@ window.toggleTaskStatus = async function(taskId) {
     const task = rawManifestTasks.find(t => t.id === taskId);
     if (!task) return;
     task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
-    appendLog(`✏️ 进度变更 -> [${taskId}] ${task.status}`);
+    appendLog(`✏️ 工单状态更新 -> [${taskId}] ${task.status}`);
     try {
         const keys = getKeys();
         const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
@@ -276,18 +267,18 @@ window.toggleTaskStatus = async function(taskId) {
             manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
             manifest.updated_at = new Date().toISOString().slice(0, 10);
             await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
-            appendLog(`✅ 进度书已同步回 GitHub`);
+            appendLog(`✅ 进度书变更已同步回 GitHub Main 分支`);
             loadTasksManifest();
         }
     } catch (e) {
-        appendLog(`❌ 更新进度异常: ${e.message}`, "text-rose-500");
+        appendLog(`❌ 更新进度异常: ${e.message}`, "text-rose-400");
     }
 };
 
 function getKeys() {
     const gh = localStorage.getItem("APEX_GH_TOKEN");
     const ds = localStorage.getItem("APEX_DS_KEY");
-    if (!gh || !ds) { window.toggleConfig(); throw new Error("请先在顶栏配置密钥!"); }
+    if (!gh || !ds) { window.toggleConfig(); throw new Error("请先在顶栏按键配置 API 访问密钥!"); }
     return { gh, ds };
 }
 
@@ -309,7 +300,7 @@ function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str)));
 function appendLog(msg, color = "") {
     const log = document.getElementById("log");
     if (!log) return;
-    if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-2.5 bg-[#0b0f19] border border-slate-800 rounded-lg whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scrollbar`;
+    if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scroll`;
     log.innerText += `\n>> ${msg}`;
     log.scrollTop = log.scrollHeight;
 }
@@ -344,7 +335,7 @@ async function loadHistoryFromMemory() {
         const countBadge = document.getElementById("historyCount");
         if (countBadge) countBadge.innerText = `${lines.length}条`;
         if (lines.length === 0) {
-            feed.innerHTML = `<div class="p-3 text-center text-xs text-slate-500 font-mono">无记录</div>`;
+            feed.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 font-mono">暂无历史进化记录</div>`;
             return;
         }
         feed.innerHTML = "";
@@ -353,8 +344,8 @@ async function loadHistoryFromMemory() {
             const timeStr = timeMatch ? timeMatch[1] : "归档";
             const cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
             feed.innerHTML += `
-                <div class="border border-slate-800/80 rounded p-1.5 bg-[#0b0f19]">
-                    <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-0.5 border-b border-slate-800/60 pb-0.5">
+                <div class="border border-slate-800/80 rounded-xl p-2.5 bg-slate-900/40">
+                    <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1 border-b border-slate-800/60 pb-1">
                         <span>⏱️ ${timeStr}</span><span>#${lines.length - idx}</span>
                     </div>
                     <div class="text-xs text-slate-300 font-mono">${cleanText}</div>
@@ -362,7 +353,7 @@ async function loadHistoryFromMemory() {
             `;
         });
     } catch (err) {
-        feed.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">读取错误</div>`;
+        feed.innerHTML = `<div class="text-center text-xs text-rose-400 py-4 font-mono">读取战报异常</div>`;
     }
 }
 
@@ -380,7 +371,7 @@ window.closeRollbackModal = function() {
 async function fetchCommitHistory() {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
-    container.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 font-mono">加载中...</div>`;
+    container.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 font-mono">读取 Git 日志中...</div>`;
     try {
         const keys = getKeys();
         const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
@@ -390,27 +381,27 @@ async function fetchCommitHistory() {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             container.innerHTML += `
-                <div class="border border-slate-800 rounded p-1.5 flex items-center justify-between gap-2 bg-[#0b0f19]">
+                <div class="border border-slate-800/90 rounded-xl p-3 flex items-center justify-between gap-3 bg-slate-900/60">
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-1.5 mb-0.5">
-                            <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-mono text-xs font-bold text-amber-400">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
                         </div>
                         <div class="text-xs text-slate-300 font-mono truncate">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded text-[10px] font-bold">
-                        ${idx === 0 ? '当前' : '还原'}
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-mono font-bold transition">
+                        ${idx === 0 ? '当前最新' : '选择还原'}
                     </button>
                 </div>
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取失败</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-400 py-4 font-mono">拉取 Git 历史失败</div>`;
     }
 }
 
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定还原至快照 [#${shortSha}] 吗？`)) return;
+    if (!confirm(`⏳ 确定还原至快照 [#${shortSha}] 吗？\n\n警告：系统将把主分支物理文件全部倒回该节点的历史版本。`)) return;
     window.closeRollbackModal();
     try {
         const keys = getKeys();
@@ -426,9 +417,9 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
                 body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
             });
         }
-        appendLog(`✅ 快照还原成功 [#${shortSha}]`);
+        appendLog(`✅ 成功将整个仓库版本还原至节点 [#${shortSha}]`);
         loadHistoryFromMemory();
-    } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
+    } catch(err) { appendLog("❌ 快照还原异常: " + err.message, "text-rose-400"); }
 };
 
 window.triggerSwarmAutonomousAction = async function() {
@@ -437,7 +428,7 @@ window.triggerSwarmAutonomousAction = async function() {
     const rawText = cmdBox ? (cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报") : "常规进展汇报";
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = "<span>⚙️ 蜂群协同执行中...</span>";
+        btn.innerHTML = "<span>⚙️ AI 蜂群云端推演计算中...</span>";
     }
     try {
         const keys = getKeys();
@@ -463,16 +454,16 @@ window.triggerSwarmAutonomousAction = async function() {
             })
         });
         const aiAnswer = (await dsRes.json()).choices[0].message.content;
-        const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "完毕。";
+        const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "调令执行完毕。";
         appendLog(`🤖 回复:\n${swarmLogText}`, "text-white");
         if (cmdBox) cmdBox.innerHTML = "";
         loadHistoryFromMemory();
     } catch (err) {
-        appendLog("❌ 异常: " + err.message, "text-rose-500");
+        appendLog("❌ 调度异常: " + err.message, "text-rose-400");
     } finally {
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = "<span>🚀 提交至云端蜂群协同执行</span>";
+            btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>";
         }
     }
 };
