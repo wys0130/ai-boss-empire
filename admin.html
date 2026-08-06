@@ -16,12 +16,17 @@
         .saas-card { background-color: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
         .saas-input { background-color: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main); }
         .saas-input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-        .nav-item { transition: all 0.15s ease; }
-        .nav-item.active { background-color: #2563eb; color: #ffffff; font-weight: 700; }
-        .nav-item:not(.active):hover { background-color: rgba(255, 255, 255, 0.08); color: #ffffff; }
+        /* 左侧菜单：选中渐变，未选中保持透明 */
+        .nav-item { transition: all 0.2s ease; opacity: 0.7; color: #94a3b8; }
+        .nav-item.active { background: linear-gradient(to right, #2563eb, #4f46e5); color: #ffffff; opacity: 1; font-weight: 700; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+    
+        /* 悬浮框修复：深色背景，白字，拒绝全白 */
+        #apexTooltip { background-color: #1e293b; color: white; border: 1px solid #334155; }
 
-        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        /* 其他基础样式 */
+        body { background-color: var(--bg-app); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .saas-card { background-color: var(--bg-card); border: 1px solid var(--border-color); }
+        .saas-input { background-color: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main); }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden font-sans">
