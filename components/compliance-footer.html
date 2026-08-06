@@ -59,23 +59,28 @@
   }
 </style>
 
-<!-- 合规底栏：明文呈现产品单价与客服邮箱 -->
 <footer class="audit-footer">
   <div class="audit-footer-content">
     <div>
-      <strong style="color: #cbd5e1; font-size: 13px;">APEXWORK STUDIO</strong>
-      <p style="margin-top: 6px;">商用软件授权与数字模版交付平台 | Unit Price: $9.99 USD / ￥69 RMB</p>
-      <p style="margin-top: 4px;">Support Email: <a href="mailto:1105630829@qq.com" style="color: #38bdf8; text-decoration: underline;">1105630829@qq.com</a></p>
+      <strong style="color: #cbd5e1; font-size: 13px;" data-zh="APEXWORK STUDIO" data-en="APEXWORK STUDIO">APEXWORK STUDIO</strong>
+      <p style="margin-top: 6px;" data-zh="商用软件授权与数字模版交付平台 | 单价: $9.99 USD / ￥69 RMB" data-en="Commercial Software License & Digital Template Delivery | Unit Price: $9.99 USD / ￥69 RMB">
+        商用软件授权与数字模版交付平台 | 单价: $9.99 USD / ￥69 RMB
+      </p>
+      <!-- 👑 采用分开写法或 CF 豁免属性，防止 1105630829@qq.com 被隐码成 [email protected] -->
+      <p style="margin-top: 4px;">
+        <span data-zh="客服邮箱: " data-en="Support Email: ">Support Email: </span>
+        <a href="mailto:1105630829@qq.com" style="color: #38bdf8; text-decoration: underline;" data-cfemail-exempt="true">1105630829@qq.com</a>
+      </p>
     </div>
     <div class="audit-links">
-      <button onclick="window.ApexCompliance.showPolicy('terms')">Terms of Service</button>
-      <button onclick="window.ApexCompliance.showPolicy('privacy')">Privacy Policy</button>
-      <button onclick="window.ApexCompliance.showPolicy('refund')" style="color: #fbbf24; font-weight: bold;">Refund Policy</button>
+      <button onclick="window.ApexCompliance.showPolicy('terms')" data-zh="服务条款" data-en="Terms of Service">Terms of Service</button>
+      <button onclick="window.ApexCompliance.showPolicy('privacy')" data-zh="隐私政策" data-en="Privacy Policy">Privacy Policy</button>
+      <button onclick="window.ApexCompliance.showPolicy('refund')" style="color: #fbbf24; font-weight: bold;" data-zh="退款政策" data-en="Refund Policy">Refund Policy</button>
     </div>
   </div>
 </footer>
 
-<!-- 自包含政策弹窗：防止审核员点击跳转触发 404 -->
+<!-- 政策弹窗 (保证风控点击百分百直接展开) -->
 <div id="auditPolicyModal" class="audit-modal">
   <div class="audit-modal-card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #1e293b; padding-bottom: 10px;">
