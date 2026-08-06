@@ -27,12 +27,13 @@
 
     <div id="apexTooltip" class="hidden fixed z-50 px-2.5 py-1 text-xs bg-slate-900 text-white rounded shadow-lg pointer-events-none"></div>
 
-    <!-- 1. 左侧卡片菜单栏 -->
+    <!-- 1. 左侧菜单栏 (高阶标徽 + 原生 LOGO 双重防裂) -->
     <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
         <div>
             <div class="h-16 flex items-center gap-2.5 px-5 border-b border-slate-800 bg-[#0b0f19]">
-                <img src="assets/logo.webp" alt="LOGO" class="h-7 w-auto object-contain" />
-                <span class="font-bold text-white font-mono text-xs tracking-wide truncate">顶尖智能商务办公平台</span>
+                <div class="w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shrink-0">A</div>
+                <img src="assets/logo.webp" alt="LOGO" class="h-7 w-auto object-contain onerror-hide" onerror="this.style.display='none'" />
+                <span class="font-bold text-white font-mono text-xs tracking-wide truncate">顶尖商务平台</span>
             </div>
 
             <div class="p-4 space-y-1 text-xs">
@@ -68,7 +69,7 @@
         </div>
     </aside>
 
-    <!-- 2. 右侧主体工作区 -->
+    <!-- 2. 右侧工作区 -->
     <div class="flex-1 flex flex-col overflow-hidden">
         
         <header class="h-16 saas-card border-l-0 border-t-0 px-6 flex items-center justify-between z-20 shrink-0">
@@ -109,18 +110,19 @@
             </div>
         </div>
 
-        <!-- 3. 卡片管理视图 -->
         <main class="flex-1 overflow-y-auto p-6 custom-scroll">
 
-            <!-- TAB 1: 作品风控审查 (Microsoft PowerPoint 专属橙配色展示) -->
+            <!-- TAB 1: 作品风控审查 (👑 支持在表格里直接修改 RMB 与 USD 价格 + 高对比颜色按钮) -->
             <section id="tab-audit" class="space-y-6">
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
                         <div>
                             <h3 class="font-bold text-base">作品风控审查与上架清单</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">直接开关前台商城各个【Office PPT 专属套件 / EXCEL / WORD】卡片的展示状态</p>
+                            <p class="text-xs text-slate-400 mt-0.5">直接编辑每个 Office 办公卡片（PPT演示/EXCEL表格/WORD文档）的授权价格与上架状态</p>
                         </div>
-                        <span class="text-xs px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 font-bold border border-orange-500/20">作品列表在线</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 font-bold border border-orange-500/20">可调价清单在线</span>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -128,8 +130,8 @@
                             <thead>
                                 <tr class="border-b text-slate-400 font-mono">
                                     <th class="py-3 px-4 font-bold">快照缩略图</th>
-                                    <th class="py-3 px-4 font-bold">作品名 / Office 套件分类</th>
-                                    <th class="py-3 px-4 font-bold">商用授权价 (RMB / USD)</th>
+                                    <th class="py-3 px-4 font-bold">作品名 / Office 分类</th>
+                                    <th class="py-3 px-4 font-bold">商用授权价 (RMB / USD) · 可直接改</th>
                                     <th class="py-3 px-4 font-bold">当前状态</th>
                                     <th class="py-3 px-4 font-bold text-right">管理操作</th>
                                 </tr>
@@ -142,13 +144,13 @@
                 </div>
             </section>
 
-            <!-- TAB 2: 主页与轮播图独立配置中台 -->
+            <!-- TAB 2: 主页与轮播图配置中台 -->
             <section id="tab-config" class="hidden space-y-6">
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex justify-between items-center mb-6 border-b pb-4">
                         <div>
-                            <h3 class="font-bold text-base">顶尖智能商务办公平台 · 首页轮播图管理 (Hero Banners)</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">分别管理 2 张独立的轮播大图内容，彻底杜绝单图拥挤和并排显示</p>
+                            <h3 class="font-bold text-base">顶尖智能商务办公平台 · 首页轮播图与背景管理 (Hero Banners)</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">管理员可完全自定义每幕大图的文案、十六进制背景色/渐变及背景高清图片 URL</p>
                         </div>
                         <button onclick="ApexBannerManager.saveBannerConfig()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition shadow-sm">
                             💾 保存同步到商城前台
@@ -160,9 +162,19 @@
                             <div class="flex justify-between items-center text-xs font-mono font-bold text-blue-600">
                                 <span>SLIDE 01 (首屏默认主打横幅)</span>
                             </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">标签角标 (Badge)</label>
+                                    <input id="banner-tag-0" type="text" value="ADMIN BANNER 01" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">背景颜色 (CSS Background)</label>
+                                    <input id="banner-bg-0" type="text" value="linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)" placeholder="#0f172a 或 linear-gradient..." class="w-full saas-input rounded-lg px-3 py-2 text-xs font-mono">
+                                </div>
+                            </div>
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">标签角标 (Badge)</label>
-                                <input id="banner-tag-0" type="text" value="ADMIN BANNER 01" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
+                                <label class="block text-xs text-slate-400 mb-1">背景大图 URL (可选，填入网址立即覆盖颜色)</label>
+                                <input id="banner-img-0" type="text" value="" placeholder="https://images.unsplash.com/..." class="w-full saas-input rounded-lg px-3 py-2 text-xs font-mono text-blue-600">
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">主标文案</label>
@@ -178,9 +190,19 @@
                             <div class="flex justify-between items-center text-xs font-mono font-bold text-emerald-600">
                                 <span>SLIDE 02 (第二轮播合规专享横幅)</span>
                             </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">标签角标 (Badge)</label>
+                                    <input id="banner-tag-1" type="text" value="GLOBAL COMPLIANCE 02" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">背景颜色 (CSS Background)</label>
+                                    <input id="banner-bg-1" type="text" value="linear-gradient(135deg, #064e3b 0%, #0f172a 100%)" placeholder="#064e3b 或 linear-gradient..." class="w-full saas-input rounded-lg px-3 py-2 text-xs font-mono">
+                                </div>
+                            </div>
                             <div>
-                                <label class="block text-xs text-slate-400 mb-1">标签角标 (Badge)</label>
-                                <input id="banner-tag-1" type="text" value="GLOBAL COMPLIANCE 02" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
+                                <label class="block text-xs text-slate-400 mb-1">背景大图 URL (可选，填入网址立即覆盖颜色)</label>
+                                <input id="banner-img-1" type="text" value="" placeholder="https://images.unsplash.com/..." class="w-full saas-input rounded-lg px-3 py-2 text-xs font-mono text-emerald-600">
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">主标文案</label>
@@ -194,7 +216,6 @@
                     </div>
                 </div>
 
-                <!-- 汇率关联定价中心 -->
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
                         <div>
@@ -235,7 +256,7 @@
 
                         <div class="saas-card rounded-xl p-4 flex flex-col justify-between border-l-2 border-l-orange-500">
                             <div>
-                                <span class="text-[10px] font-mono text-orange-600 font-bold bg-orange-500/10 px-2 py-0.5 rounded">PACKAGE 02 · PPT</span>
+                                <span class="text-[10px] font-mono text-orange-600 font-bold bg-orange-500/10 px-2 py-0.5 rounded">PACKAGE 02 · PPT演示</span>
                                 <h4 class="font-bold text-sm mt-2">PPT 路演战略模版</h4>
                             </div>
                             <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
@@ -253,7 +274,7 @@
 
                         <div class="saas-card rounded-xl p-4 flex flex-col justify-between border-l-2 border-l-emerald-500">
                             <div>
-                                <span class="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">PACKAGE 03 · EXCEL</span>
+                                <span class="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">PACKAGE 03 · EXCEL表格</span>
                                 <h4 class="font-bold text-sm mt-2">Excel 12个月测算</h4>
                             </div>
                             <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
@@ -271,7 +292,7 @@
 
                         <div class="saas-card rounded-xl p-4 flex flex-col justify-between border-l-2 border-l-indigo-500">
                             <div>
-                                <span class="text-[10px] font-mono text-indigo-600 font-bold bg-indigo-500/10 px-2 py-0.5 rounded">PACKAGE 04 · WORD</span>
+                                <span class="text-[10px] font-mono text-indigo-600 font-bold bg-indigo-500/10 px-2 py-0.5 rounded">PACKAGE 04 · WORD文档</span>
                                 <h4 class="font-bold text-sm mt-2">Word 欧美合规报告</h4>
                             </div>
                             <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
@@ -290,7 +311,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: 大盘进度书 -->
+            <!-- TAB 3: 大盘进度书 (👑 永久拥有保底工单库，告别空白 + 蓝/绿高对比实心操作按钮) -->
             <section id="tab-overview" class="hidden space-y-6">
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-4 border-b pb-3">
@@ -301,18 +322,17 @@
                         <div class="flex items-center gap-2 font-mono text-xs">
                             <span id="manifestSummaryBadge" class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-600 font-bold border border-blue-500/20">载入中...</span>
                             <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold">全部</button>
-                            <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400">1.出海</button>
-                            <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400">2.国内</button>
-                            <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400">3.后期</button>
+                            <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">1.出海</button>
+                            <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">2.国内</button>
+                            <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">3.后期</button>
                         </div>
                     </div>
-                    <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto custom-scroll pr-1"></div>
+                    <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[420px] overflow-y-auto custom-scroll pr-1"></div>
                 </div>
             </section>
 
-            <!-- TAB 4: AI 智能体调令中心 + 👑 自主运行区间时段控制器 -->
+            <!-- TAB 4: AI 智能体调令中心 -->
             <section id="tab-swarm" class="hidden space-y-6">
-                <!-- 👑 老板夜间自动静默施工时段控制卡片 -->
                 <div class="saas-card rounded-2xl p-5 border-l-4 border-l-purple-600">
                     <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-3 mb-4">
                         <div>
@@ -320,7 +340,7 @@
                                 <span>⏳ AI 蜂群夜间自主运行北京时间段控制</span>
                                 <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/30">NIGHT-SHIFT CONTROL</span>
                             </h3>
-                            <p class="text-xs text-slate-400 mt-0.5">预设时段内触发定时巡检才编写代码提交；其余白天时间自动静默，不抢发版队列（对话触发可随唤随到）</p>
+                            <p class="text-xs text-slate-400 mt-0.5">预设时段内触发定时巡检才编写代码提交；其余白天时间自动静默，不抢发版队列</p>
                         </div>
                         <button onclick="ApexScheduleManager.saveScheduleToCloud()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition shadow-sm font-mono">
                             💾 同步排班区间到 GitHub 云端
@@ -329,7 +349,7 @@
 
                     <div class="flex flex-wrap items-center gap-6 text-xs font-mono">
                         <div class="flex items-center gap-2">
-                            <span class="text-slate-400">开始执行点(0-23):</span>
+                            <span class="text-slate-400">开始点(0-23):</span>
                             <input type="number" id="sched-start" min="0" max="23" value="0" class="w-16 saas-input rounded-lg px-2 py-1.5 font-bold text-center text-purple-600" />
                             <span>点 (北京时间)</span>
                         </div>
