@@ -2,52 +2,291 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APEXWORK - 极速商业交付 SaaS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>顶尖智能商务办公平台 (2026 RELEASE)</title>
   
-  <!-- 1. 预连接（立即执行，确保 50ms 红线） -->
-  <link rel="preconnect" href="https://apexwork.cn" crossorigin="anonymous">
-  <link rel="preconnect" href="https://apexwork.workers.dev" crossorigin="anonymous">
-  <link rel="preconnect" href="https://apexwork.github.io" crossorigin="anonymous">
+  <link rel="preconnect" href="https://pay.apexwork.cn">
+  <link rel="dns-prefetch" href="https://pay.apexwork.cn">
   
-  <!-- 2. DNS 分流路由器（核心） -->
-  <script src="/components/dns-router.min.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="components/zero-auth.js"></script>
   
-  <!-- 3. 关键 CSS（内联，避免阻塞） -->
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #fff; overflow-x: hidden; }
-    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .hero h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; margin-bottom: 1rem; }
-    .hero p { font-size: clamp(1rem, 2vw, 1.5rem); opacity: 0.9; margin-bottom: 2rem; }
-    .cta-btn { padding: 1rem 3rem; font-size: 1.2rem; background: #fff; color: #667eea; border: none; border-radius: 50px; cursor: pointer; font-weight: 600; transition: transform 0.3s; }
-    .cta-btn:hover { transform: scale(1.05); }
-    .status-badge { position: fixed; top: 20px; right: 20px; padding: 8px 16px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
   </style>
 </head>
-<body>
-  <!-- 状态徽章（实时显示分流状态） -->
-  <div class="status-badge" id="dns-status">
-    <div class="status-dot"></div>
-    <span id="dns-region">检测中...</span>
-  </div>
+<body class="min-h-screen flex flex-col justify-between">
 
-  <!-- 主视觉（少字多图原则） -->
-  <section class="hero">
-    <h1>⚡ 极速商业交付</h1>
-    <p>PPT · Excel · Word 三件套，1 秒极速生成</p>
-    <button class="cta-btn" onclick="window.location.href='/templates'">立即开始</button>
-  </section>
+  <!-- 1. 顶部导航栏 (精准直读 assets/logo.webp + 平台更名为：顶尖智能商务办公平台) -->
+  <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
+        <!-- 👑 100% 优先显示你上传的 assets/logo.webp -->
+        <img src="assets/logo.webp" alt="APEXWORK STUDIO" class="h-8 md:h-10 w-auto object-contain drop-shadow" />
+      </div>
+      <!-- 👑 商城正式更名 -->
+      <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
+    </div>
 
-  <!-- DNS 状态监听 -->
+    <!-- 👑 Microsoft Office 专属三配色导航：PPT红橙 / EXCEL绿 / WORD蓝 -->
+    <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
+      <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT 战略" data-en="PPT Decks">PPT 战略</a>
+      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL 模型" data-en="EXCEL Models">EXCEL 模型</a>
+      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD 报告" data-en="WORD Reports">WORD 报告</a>
+      <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
+      
+      <button id="langToggleBtn" onclick="window.ApexLang && window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-300 font-bold transition">
+        🌐 简 / EN
+      </button>
+
+      <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs">👤 游客</span>
+      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
+        👑 驾驶舱 →
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. 主体工作区 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
+    
+    <!-- 👑 物理互斥双轮播横幅区 (任何时刻绝只有1张图独占展现，绝不挤在一块) -->
+    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[170px] flex items-center">
+      
+      <!-- 轮播幻灯片容器 (JS根据 flex / hidden 物理隔离每一帧) -->
+      <div id="dynamicHeroContainer" class="w-full">
+        <!-- 默认首屏，防止无 JS 时空白 -->
+        <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
+          <div>
+            <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">ADMIN BANNER 01</span>
+            <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">破除低效传统冗长，全视觉商业交付新纪元</h2>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
+          </div>
+          <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2">
+            <span>⚡ 立即解锁商用三件套包</span> 
+            <span data-price-rmb="139" class="text-emerald-300 font-black">￥139 RMB</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 轮播指示灯 -->
+      <div class="absolute bottom-3 right-5 flex gap-1.5 z-20">
+        <span class="dot w-2 h-2 rounded-full bg-white cursor-pointer transition" onclick="ApexHeroSlider.jump(0)"></span>
+        <span class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer transition" onclick="ApexHeroSlider.jump(1)"></span>
+      </div>
+    </div>
+
+    <!-- 👑 第一板块：PPT 路演套件 (全线替换为 Microsoft Office PowerPoint 专属红橙色) -->
+    <section id="ppt-section">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-600 inline-block"></span>
+            <span data-zh="PPT 可视化路演战略套件" data-en="PPT Visual Strategic Decks">PPT 可视化路演战略套件</span>
+          </h3>
+          <p class="text-xs text-slate-500" data-zh="视觉至上 · 大图表表现 · 告别枯燥段落" data-en="Visual-First · Data-Driven · Say Goodbye to Wordy Slides">视觉至上 · 大图表表现 · 告别枯燥段落</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- PPT 卡片 1 -->
+        <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
+          <div>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES · PPT</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3">AeroTech 创投规划书</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
+            <a href="editor.html?deck=aerotech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+          </div>
+        </div>
+
+        <!-- PPT 卡片 2 -->
+        <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
+          <div>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES · PPT</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3">SaaS 增长指标盘点</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
+            <a href="editor.html?deck=saas" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+          </div>
+        </div>
+
+        <!-- PPT 卡片 3 -->
+        <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
+          <div>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES · PPT</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3">FinTech A 轮融资方案</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
+            <a href="editor.html?deck=fintech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第二板块：EXCEL 绿 与 WORD 蓝 -->
+    <section>
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h3 class="text-base md:text-lg font-bold text-slate-900">商务核心：EXCEL 模型与 WORD 合规</h3>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30 hover:border-emerald-500 transition">
+          <div>
+            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL · EXCEL</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3">全渠道 ROI 动态自适应测算模型</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-emerald-600">￥69 RMB</div>
+            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 模型 →</a>
+          </div>
+        </div>
+
+        <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30 hover:border-indigo-500 transition">
+          <div>
+            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD · WORD</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3">欧美企业级 ATS 智能排版合规报告</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-bold text-sm text-indigo-600">￥69 RMB</div>
+            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 报告 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="compliance-footer-container"></div>
+  <div id="cn-paywall-container"></div>
+
+  <!-- 👑 物理无互斥单幅轮播引擎：确保时刻仅一个 slide 是 flex，其余必定 hidden -->
   <script>
-    document.addEventListener('dns-routed', function(e) {
-      const region = e.detail.region === 'domestic' ? '🇨🇳 国内镜像' : '🌐 海外边缘';
-      const endpoint = e.detail.endpoint;
-      document.getElementById('dns-region').textContent = `${region} · ${new URL(endpoint).hostname}`;
+    window.ApexHeroSlider = {
+      currentIndex: 0,
+      timer: null,
+      
+      init: function() {
+        const saved = localStorage.getItem('APEX_BANNER_CONFIG');
+        const defaultSlides = [
+          { tag: "ADMIN BANNER 01", title: "破除低效传统冗长，全视觉商业交付新纪元", desc: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。" },
+          { tag: "GLOBAL COMPLIANCE 02", title: "零注册无缝收单，满足欧美 GDPR 与金融审计", desc: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。" }
+        ];
+        const slides = saved ? JSON.parse(saved) : defaultSlides;
+        
+        const container = document.getElementById('dynamicHeroContainer');
+        if (!container) return;
+        
+        // 渲染 HTML，只有第一条为 flex，其他全部 hidden 彻底隔离
+        container.innerHTML = slides.map((s, idx) => `
+          <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
+            <div>
+              <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag}</span>
+              <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">${s.title}</h2>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">${s.desc}</p>
+            </div>
+            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2">
+              <span>⚡ 立即解锁商用三件套包</span> 
+              <span data-price-rmb="139" class="text-emerald-300 font-black">￥139 RMB</span>
+            </button>
+          </div>
+        `).join('');
+
+        this.startAutoPlay(slides.length);
+      },
+
+      jump: function(idx) {
+        const total = document.querySelectorAll('.hero-slide').length;
+        if (total === 0) return;
+        
+        for (let i = 0; i < total; i++) {
+          const el = document.getElementById(`hero-slide-${i}`);
+          const dot = document.querySelectorAll('.dot')[i];
+          if (el) {
+            if (i === idx) {
+              el.classList.remove('hidden');
+              el.classList.add('flex');
+            } else {
+              el.classList.remove('flex');
+              el.classList.add('hidden');
+            }
+          }
+          if (dot) dot.style.backgroundColor = i === idx ? '#ffffff' : 'rgba(255,255,255,0.4)';
+        }
+        this.currentIndex = idx;
+        if (window.ApexPricing) window.ApexPricing.applyPricing();
+      },
+
+      startAutoPlay: function(total) {
+        if (this.timer) clearInterval(this.timer);
+        this.timer = setInterval(() => {
+          this.currentIndex = (this.currentIndex + 1) % total;
+          this.jump(this.currentIndex);
+        }, 5000);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      ApexHeroSlider.init();
     });
+  </script>
+
+  <script>
+    fetch('components/compliance-footer.html')
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(html => {
+        const c = document.getElementById('compliance-footer-container');
+        if (c) {
+          c.innerHTML = html;
+          const s = document.createElement('script');
+          s.src = 'components/lang-and-policy.js';
+          document.body.appendChild(s);
+        }
+      })
+      .catch(() => {});
+
+    fetch('components/payment/cn-paywall.html')
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(html => {
+        const c = document.getElementById('cn-paywall-container');
+        if (c) {
+          c.innerHTML = html;
+          const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1);
+          const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2);
+        }
+      })
+      .catch(() => {});
+
+    let clicks = 0, timer = null;
+    function checkChairmanStealthAccess() {
+      clicks++;
+      clearTimeout(timer);
+      timer = setTimeout(() => { clicks = 0; }, 1500);
+      if (clicks >= 3) {
+        clicks = 0;
+        const p = document.getElementById('adminSecretPortal');
+        if (p) p.classList.remove('hidden');
+        alert("👑 [权限验证]：董事长驾驶舱通道已开启！");
+      }
+    }
+
+    window.openBundleCheckout = function() {
+      if (window.ApexAuth && window.ApexAuth.openCheckout) {
+        ApexAuth.openCheckout({
+          title: "顶尖智能商务办公平台 · 商业企业全能包",
+          onSuccess: () => alert("🎉 您已激活全站商用权限！")
+        });
+      }
+    };
   </script>
 </body>
 </html>
