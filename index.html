@@ -18,18 +18,17 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- 1. 顶部导航栏 (LOGO 双重保障 + 顶尖智能商务办公平台) -->
+  <!-- 1. 顶部导航栏 (矢量标徽 + 真正高对白清晰导航) -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
       <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
-        <!-- 👑 高阶矢量机甲标徽 + WebP 图片直读：双重保险，永不破图 -->
         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0">A</div>
         <img src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-10 w-auto object-contain drop-shadow onerror-hide" onerror="this.style.display='none'" />
       </div>
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
 
-    <!-- 👑 导航精确更名：PPT演示 / EXCEL表格 / WORD文档 -->
+    <!-- PPT演示 / EXCEL表格 / WORD文档 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
       <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
       <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
@@ -50,7 +49,7 @@
   <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
     
-    <!-- 动态可配置背景轮播图 -->
+    <!-- 👑 动态轮播区 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
       <div id="dynamicHeroContainer" class="w-full z-10">
         <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
@@ -59,9 +58,10 @@
             <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">破除低效传统冗长，全视觉商业交付新纪元</h2>
             <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
           </div>
-          <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2 border border-blue-400/30">
-            <span>⚡ 立即解锁商用三件套包</span> 
-            <span data-price-rmb="139" class="text-amber-300 font-black text-sm drop-shadow-sm bg-black/30 px-3 py-1 rounded-lg border border-amber-400/40">￥139 RMB</span>
+          <!-- 👑 重构及格：纯蓝色高对比按键 + 纯白色通透文字 + 纯白色磨砂背景胶囊框 ￥139 RMB -->
+          <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2.5 border border-blue-400/40">
+            <span class="text-white font-bold">⚡ 立即解锁商用三件套包</span> 
+            <span data-price-rmb="139" class="text-white font-black text-sm bg-white/20 px-3 py-1 rounded-lg border border-white/40 shadow-inner">￥139 RMB</span>
           </button>
         </div>
       </div>
@@ -185,9 +185,10 @@
               <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">${s.title}</h2>
               <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">${s.desc}</p>
             </div>
-            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2 border border-blue-400/30">
-              <span>⚡ 立即解锁商用三件套包</span> 
-              <span data-price-rmb="139" class="text-amber-300 font-black text-sm drop-shadow-sm bg-black/30 px-3 py-1 rounded-lg border border-amber-400/40">￥139 RMB</span>
+            <!-- 👑 修复重点：白字、白标签框、蓝底按键 -->
+            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs md:text-sm px-6 py-3.5 rounded-xl shadow-lg transition shrink-0 flex items-center justify-center gap-2.5 border border-blue-400/40">
+              <span class="text-white font-bold">⚡ 立即解锁商用三件套包</span> 
+              <span data-price-rmb="139" class="text-white font-black text-sm bg-white/20 px-3 py-1 rounded-lg border border-white/40 shadow-inner">￥139 RMB</span>
             </button>
           </div>
         `).join('');
