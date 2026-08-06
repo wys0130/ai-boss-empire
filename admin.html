@@ -1,280 +1,395 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APEXWORK 商务驾驶舱 · 极客商用版 (2026 RELEASE)</title>
+    <title>APEXWORK 业务控制台 · 商业专业版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/admin.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; transition: background-color 0.25s ease, color 0.25s ease; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
         
-        /* 🌞 昼 / 🌙 夜 双态主题设计系统 */
-        [data-theme="dark"] { --bg-page: #0b0f19; --bg-card: #111827; --border-color: #1f2937; --text-main: #f8fafc; --text-sub: #94a3b8; --input-bg: #0b0f19; --pill-bg: #1e293b; }
-        [data-theme="light"] { --bg-page: #f1f5f9; --bg-card: #ffffff; --border-color: #cbd5e1; --text-main: #0f172a; --text-sub: #475569; --input-bg: #f8fafc; --pill-bg: #e2e8f0; }
+        /* 🌞 昼 / 🌙 夜 品牌设计规范 */
+        [data-theme="light"] { --bg-app: #f1f5f9; --bg-card: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --border-color: #e2e8f0; --hover-bg: #f8fafc; }
+        [data-theme="dark"] { --bg-app: #0b0f19; --bg-card: #111827; --text-main: #f8fafc; --text-sub: #94a3b8; --border-color: #1f2937; --hover-bg: #1e293b; }
 
-        body { background-color: var(--bg-page); color: var(--text-main); }
-        .theme-card { background-color: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
-        .theme-input { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); }
-        .theme-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
-        .theme-pill { background-color: var(--pill-bg); border: 1px solid var(--border-color); color: var(--text-main); }
-        
-        .custom-scroll::-webkit-scrollbar { width: 5px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        body { background-color: var(--bg-app); color: var(--text-main); }
+        .saas-card { background-color: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02); }
+        .saas-input { background-color: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main); }
+        .saas-input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+        .nav-item { transition: all 0.15s ease; }
+        .nav-item.active { background-color: #2563eb; color: #ffffff; font-weight: 700; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .nav-item:not(.active):hover { background-color: rgba(255, 255, 255, 0.08); color: #ffffff; }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 md:p-6 font-sans">
+<body class="h-screen flex overflow-hidden font-sans">
 
-    <!-- 说明气泡 -->
-    <div id="apexTooltip"></div>
+    <!-- 悬浮提示气泡 -->
+    <div id="apexTooltip" class="hidden fixed z-50 px-2.5 py-1 text-xs bg-slate-900 text-white rounded shadow-lg pointer-events-none"></div>
 
-    <!-- 1. 顶栏：全新昼夜模式 + 控制中心 -->
-    <header class="max-w-7xl w-full mx-auto theme-card rounded-2xl px-5 py-3.5 mb-5 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
-            <h1 class="font-bold text-sm md:text-base tracking-tight font-mono">APEXWORK / <span class="text-slate-400 font-normal">MANAGEMENT STUDIO</span></h1>
-            <span id="qaStatusBadge" class="text-[10px] font-mono px-2 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 rounded-full font-bold">QA: PASS</span>
+    <!-- 👑 1. 左侧深色工业级侧边栏 (稻壳/易企秀对标版式) -->
+    <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
+        <div>
+            <!-- 品牌 LOGO 头 -->
+            <div class="h-16 flex items-center gap-2.5 px-6 border-b border-slate-800 bg-[#0b0f19]">
+                <img src="assets/logo.webp" alt="LOGO" class="h-7 w-auto object-contain" 
+                     onerror="this.style.display='none'; document.getElementById('sidebarTextLogo').style.display='inline';" />
+                <span id="sidebarTextLogo" class="font-bold text-white font-mono text-sm tracking-wide">APEXWORK <span class="text-blue-500">PRO</span></span>
+            </div>
+
+            <!-- 导航菜单 -->
+            <div class="p-4 space-y-1 text-xs">
+                <div class="px-3 py-1.5 text-[11px] font-mono font-bold text-slate-500 uppercase">后台核心业务</div>
+                <button onclick="switchAdminTab('audit')" id="nav-audit" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left">
+                    <span>🛡️</span>
+                    <span>作品审核与上架</span>
+                </button>
+                <button onclick="switchAdminTab('config')" id="nav-config" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left">
+                    <span>⚙️</span>
+                    <span>主页与汇率定价</span>
+                </button>
+                <button onclick="switchAdminTab('overview')" id="nav-overview" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left">
+                    <span>📊</span>
+                    <span>大盘进度与研发</span>
+                </button>
+                <button onclick="switchAdminTab('swarm')" id="nav-swarm" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left">
+                    <span>🤖</span>
+                    <span>AI 智能体调度台</span>
+                </button>
+            </div>
         </div>
-        <div class="flex items-center gap-2.5 flex-wrap text-xs font-mono">
-            <!-- 👑 日夜模式一键切换 -->
-            <button onclick="toggleThemeMode()" id="themeToggleBtn" class="px-3 py-1.5 theme-pill rounded-xl font-bold transition flex items-center gap-1.5">
-                <span>🌙 极夜模式</span>
+
+        <!-- 底部快捷返回前台与授权 -->
+        <div class="p-4 border-t border-slate-800 space-y-2 text-xs">
+            <button onclick="openLiveSiteForceBypass()" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold flex items-center justify-between transition">
+                <span>🏠 返回前台商城</span>
+                <span class="text-[10px] text-slate-400">→</span>
             </button>
-            <button onclick="openRollbackModal()" class="px-3 py-1.5 theme-pill hover:opacity-80 rounded-xl transition">⏳ 历史快照</button>
-            <button onclick="syncAllData()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition shadow-md">🔄 同步数据</button>
-            <button onclick="toggleConfig()" class="px-3 py-1.5 theme-pill hover:opacity-80 rounded-xl transition">🔑 密钥</button>
+            <div class="px-3 py-2 rounded-lg bg-slate-900/80 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+                <span>状态: <strong class="text-emerald-400">NORMAL</strong></span>
+                <span>V2026.08</span>
+            </div>
         </div>
-    </header>
+    </aside>
 
-    <!-- 密钥配置区 -->
-    <div id="configArea" class="hidden max-w-7xl w-full mx-auto mb-5 p-4 theme-card rounded-2xl">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full theme-input rounded-xl p-2.5 text-xs font-mono">
-            <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full theme-input rounded-xl p-2.5 text-xs font-mono">
+    <!-- 👑 2. 右侧主体工作区 (明亮高阶卡片风) -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- 顶栏区域 -->
+        <header class="h-16 saas-card border-l-0 border-t-0 px-6 flex items-center justify-between z-20 shrink-0">
+            <div class="flex items-center gap-3">
+                <h2 id="pageHeaderTitle" class="font-bold text-base tracking-tight">业务控制台 / 作品风控审查</h2>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 font-bold border border-blue-500/20">实时同步中</span>
+            </div>
+
+            <!-- 右侧功能条 -->
+            <div class="flex items-center gap-3 text-xs font-mono">
+                <!-- 实时汇率标识 -->
+                <button onclick="ApexFX.forceRefreshRate()" class="px-3 py-1.5 saas-input rounded-xl flex items-center gap-1.5 hover:opacity-80">
+                    <span class="text-slate-400">💱 当前汇率:</span>
+                    <strong id="fxRateBadge" class="text-emerald-600 font-bold">查询中...</strong>
+                </button>
+
+                <!-- 🌞/🌙 昼夜模式切换 -->
+                <button onclick="toggleThemeMode()" id="themeToggleBtn" class="px-3 py-1.5 saas-input rounded-xl font-bold transition">
+                    <span>🌙 极夜模式</span>
+                </button>
+
+                <button onclick="openRollbackModal()" class="px-3 py-1.5 saas-input rounded-xl hover:opacity-80">⏳ 历史快照</button>
+                <button onclick="toggleConfig()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition shadow-sm">🔑 密钥设置</button>
+
+                <!-- 用户头像胶囊 -->
+                <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+                    <span class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">管</span>
+                    <span class="font-bold text-xs">超级管理员</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 密钥设置浮层卡片 -->
+        <div id="configArea" class="hidden absolute top-16 right-6 z-50 saas-card rounded-2xl p-5 w-96 shadow-2xl space-y-3">
+            <h4 class="font-bold text-xs text-slate-500 uppercase font-mono">系统 API 授权密钥设置</h4>
+            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full saas-input rounded-xl p-2.5 text-xs font-mono">
+            <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full saas-input rounded-xl p-2.5 text-xs font-mono">
+            <button onclick="saveKeys()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl transition">💾 保存密钥并刷新工作台</button>
         </div>
-        <button onclick="saveKeys()" class="mt-3 w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 rounded-xl transition">💾 保存并生效密钥配置</button>
+
+        <!-- 历史快照还原模态框 -->
+        <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="saas-card max-w-lg w-full rounded-2xl p-6 flex flex-col max-h-[75vh]">
+                <div class="flex items-center justify-between border-b pb-3 mb-3">
+                    <span class="font-bold text-sm">⏳ GitHub 历史发布版本快照</span>
+                    <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-slate-600 text-base font-bold">✕</button>
+                </div>
+                <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1"></div>
+            </div>
+        </div>
+
+        <!-- 👑 3. 核心内容渲染视图 (模块化切签) -->
+        <main class="flex-1 overflow-y-auto p-6 custom-scroll">
+
+            <!-- ======================= 视图 A：作品审核与上架 (100% 对标稻壳儿/易企秀排版) ======================= -->
+            <section id="tab-audit" class="space-y-6">
+                <div class="saas-card rounded-2xl p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
+                        <div>
+                            <h3 class="font-bold text-base">作品风控审查与上架清单</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">控制前台商城“可视化 PPT 套件”及“商务模型”的直接显示状态与参数</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/20">作品总数: 5 在线</span>
+                        </div>
+                    </div>
+
+                    <!-- 稻壳儿式：作品快照列表 table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b text-slate-400 font-mono">
+                                    <th class="py-3 px-4 font-bold">快照缩略图</th>
+                                    <th class="py-3 px-4 font-bold">作品名 / 分类</th>
+                                    <th class="py-3 px-4 font-bold">商用授权价 (RMB / USD)</th>
+                                    <th class="py-3 px-4 font-bold">当前状态</th>
+                                    <th class="py-3 px-4 font-bold text-right">管理操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- admin-core.js 自动生成缩略图行 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================= 视图 B：主页与汇率定价中心 ======================= -->
+            <section id="tab-config" class="hidden space-y-6">
+                <!-- 1. 首页轮播图文案配置卡片 -->
+                <div class="saas-card rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-6 border-b pb-4">
+                        <div>
+                            <h3 class="font-bold text-base">首页大剧幕轮播横幅 (Hero Banners)</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">自适应双屏轮播，直接控制首页两张大图标语与描述</p>
+                        </div>
+                        <button onclick="ApexBannerManager.saveBannerConfig()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition shadow-sm">
+                            💾 保存并同步前台轮播图
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 幻灯片 1 -->
+                        <div class="saas-card rounded-xl p-5 space-y-3">
+                            <div class="flex justify-between items-center text-xs font-mono font-bold text-blue-600">
+                                <span>SLIDE 01 (第一张企业品牌大幕)</span>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">标签角标 (Badge)</label>
+                                <input id="banner-tag-0" type="text" value="ADMIN BANNER 01" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">主标题文案</label>
+                                <input id="banner-title-0" type="text" value="破除低效传统冗长，全视觉商业交付新纪元" class="w-full saas-input rounded-lg px-3 py-2 text-xs font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">描述文案</label>
+                                <textarea id="banner-desc-0" rows="2" class="w-full saas-input rounded-lg px-3 py-2 text-xs">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</textarea>
+                            </div>
+                        </div>
+
+                        <!-- 幻灯片 2 -->
+                        <div class="saas-card rounded-xl p-5 space-y-3">
+                            <div class="flex justify-between items-center text-xs font-mono font-bold text-emerald-600">
+                                <span>SLIDE 02 (第二张合规审计专幕)</span>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">标签角标 (Badge)</label>
+                                <input id="banner-tag-1" type="text" value="GLOBAL COMPLIANCE 02" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">主标题文案</label>
+                                <input id="banner-title-1" type="text" value="零注册无缝收单，满足欧美 GDPR 与金融审计" class="w-full saas-input rounded-lg px-3 py-2 text-xs font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">描述文案</label>
+                                <textarea id="banner-desc-1" rows="2" class="w-full saas-input rounded-lg px-3 py-2 text-xs">一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 外汇与定价关联卡片 -->
+                <div class="saas-card rounded-2xl p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
+                        <div>
+                            <h3 class="font-bold text-base">国际多币种商品定价中台 (RMB & USD Linkage)</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">支持关联自动按汇率精算或单独改价，并由管理员勾选尾数规则</p>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs font-mono">
+                            <!-- .99 尾数开关 -->
+                            <button id="btnToggle99" onclick="ApexPricing.toggle99Rule()" class="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 font-bold border border-blue-500/30 transition">
+                                ✨ .99尾数: 开启
+                            </button>
+                            <!-- 🔗 关联开关 -->
+                            <button id="btnToggleLink" onclick="ApexPricing.toggleLinkage()" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/30 transition">
+                                🔗 汇率关联: 已绑定
+                            </button>
+                            <button onclick="ApexPricing.saveAllToStorage()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition shadow-sm">
+                                💾 保存全站报价
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- 套件 1 -->
+                        <div class="saas-card rounded-xl p-4 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-mono text-blue-600 font-bold bg-blue-500/10 px-2 py-0.5 rounded">PACKAGE 01</span>
+                                <h4 class="font-bold text-sm mt-2">商用三件套全量包</h4>
+                            </div>
+                            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">￥</span>
+                                    <input id="rmb-bundle" type="number" value="139" oninput="ApexPricing.onRMBChange('bundle', this.value)" class="w-16 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center">
+                                </div>
+                                <span id="linkIcon-bundle" class="text-xs text-emerald-500 font-bold">⇄</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">$</span>
+                                    <input id="usd-bundle" type="number" value="19.99" step="0.01" oninput="ApexPricing.onUSDChange('bundle', this.value)" class="w-20 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center text-emerald-600">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 套件 2 -->
+                        <div class="saas-card rounded-xl p-4 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-mono text-indigo-600 font-bold bg-indigo-500/10 px-2 py-0.5 rounded">PACKAGE 02</span>
+                                <h4 class="font-bold text-sm mt-2">PPT 路演战略模版</h4>
+                            </div>
+                            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">￥</span>
+                                    <input id="rmb-ppt" type="number" value="69" oninput="ApexPricing.onRMBChange('ppt', this.value)" class="w-16 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center">
+                                </div>
+                                <span id="linkIcon-ppt" class="text-xs text-emerald-500 font-bold">⇄</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">$</span>
+                                    <input id="usd-ppt" type="number" value="9.99" step="0.01" oninput="ApexPricing.onUSDChange('ppt', this.value)" class="w-20 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center text-emerald-600">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 套件 3 -->
+                        <div class="saas-card rounded-xl p-4 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">PACKAGE 03</span>
+                                <h4 class="font-bold text-sm mt-2">Excel 12个月测算</h4>
+                            </div>
+                            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">￥</span>
+                                    <input id="rmb-excel" type="number" value="69" oninput="ApexPricing.onRMBChange('excel', this.value)" class="w-16 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center">
+                                </div>
+                                <span id="linkIcon-excel" class="text-xs text-emerald-500 font-bold">⇄</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">$</span>
+                                    <input id="usd-excel" type="number" value="9.99" step="0.01" oninput="ApexPricing.onUSDChange('excel', this.value)" class="w-20 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center text-emerald-600">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 套件 4 -->
+                        <div class="saas-card rounded-xl p-4 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[10px] font-mono text-amber-600 font-bold bg-amber-500/10 px-2 py-0.5 rounded">PACKAGE 04</span>
+                                <h4 class="font-bold text-sm mt-2">Word 欧美合规报告</h4>
+                            </div>
+                            <div class="mt-4 pt-3 border-t flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">￥</span>
+                                    <input id="rmb-word" type="number" value="69" oninput="ApexPricing.onRMBChange('word', this.value)" class="w-16 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center">
+                                </div>
+                                <span id="linkIcon-word" class="text-xs text-emerald-500 font-bold">⇄</span>
+                                <div class="flex items-center gap-1">
+                                    <span class="text-slate-400 text-xs">$</span>
+                                    <input id="usd-word" type="number" value="9.99" step="0.01" oninput="ApexPricing.onUSDChange('word', this.value)" class="w-20 saas-input rounded-lg px-2 py-1 font-bold text-xs text-center text-emerald-600">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======================= 视图 C：大盘进度与研发 ======================= -->
+            <section id="tab-overview" class="hidden space-y-6">
+                <!-- 目标工单进度书 -->
+                <div class="saas-card rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-4 border-b pb-3">
+                        <div>
+                            <h3 class="font-bold text-base">阶段开发工单进度书 / TASKS MANIFEST</h3>
+                            <p class="text-xs text-slate-400 mt-0.5">全部研发及本地化营销工单完成状态实时同步</p>
+                        </div>
+                        <div class="flex items-center gap-2 font-mono text-xs">
+                            <span id="manifestSummaryBadge" class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-600 font-bold border border-blue-500/20">载入中...</span>
+                            <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold">全部</button>
+                            <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-700">1.出海</button>
+                            <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-700">2.国内</button>
+                            <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-700">3.后期</button>
+                        </div>
+                    </div>
+                    <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto custom-scroll pr-1"></div>
+                </div>
+            </section>
+
+            <!-- ======================= 视图 D：AI 智能体调度台 ======================= -->
+            <section id="tab-swarm" class="hidden space-y-6">
+                <div class="saas-card rounded-2xl p-6 space-y-6">
+                    <!-- 9 大部门按键 -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3 border-b pb-2 text-xs font-mono">
+                            <span class="font-bold">智能体协同部门 / AGENTS SWARM: <strong id="activeDeptLabel" class="text-blue-600 font-bold">[全景视图]</strong></span>
+                            <button onclick="resetDeptFilter()" class="px-3 py-1 rounded-lg border text-xs hover:opacity-80 transition">清空过滤视图</button>
+                        </div>
+                        <div class="grid grid-cols-3 lg:grid-cols-9 gap-2 text-center font-mono" id="deptButtonsContainer"></div>
+                    </div>
+
+                    <!-- 调度终端 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <aside class="lg:col-span-5 saas-card rounded-xl p-4 flex flex-col h-[380px]">
+                            <div class="flex items-center justify-between border-b pb-2 mb-2 text-xs font-mono font-bold">
+                                <span>系统战报日志 / EVOLUTION LOG</span>
+                                <span id="historyCount" class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">0条</span>
+                            </div>
+                            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1"></div>
+                        </aside>
+
+                        <div class="lg:col-span-7 saas-card rounded-xl p-4 flex flex-col h-[380px] justify-between relative">
+                            <div id="mentionDropdown"></div>
+                            <div>
+                                <div class="flex items-center justify-between border-b pb-2 mb-2 text-xs font-mono">
+                                    <span class="font-bold">智能中枢调令中心</span>
+                                    <span class="text-[11px] text-slate-400">点击文本框后按部门按键追加 @词条</span>
+                                </div>
+                                <div class="mb-3 relative">
+                                    <div id="cmd" contenteditable="true" class="w-full h-24 saas-input rounded-xl p-3 text-xs font-mono focus:outline-none overflow-y-auto custom-scroll" placeholder="点击激活输入后点选部门；如：@大脑中枢 @主动产品部 ..."></div>
+                                </div>
+                                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs font-mono transition shadow-md flex items-center justify-center gap-2">
+                                    <span>🚀 提交至云端 AI 协同执行</span>
+                                </button>
+                            </div>
+                            <div class="flex-1 mt-3 flex flex-col min-h-0">
+                                <pre id="log" class="flex-1 text-[11px] font-mono p-3 saas-input rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scroll">>> 控制台准备完毕。遵循“先聚焦文本框，后点选部门插入词条”规范。</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
 
-    <!-- 历史快照弹窗 -->
-    <div id="rollbackModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="theme-card max-w-lg w-full rounded-2xl p-5 flex flex-col max-h-[75vh]">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-3">
-                <span class="font-bold text-xs font-mono">⏳ GitHub 历史快照还原</span>
-                <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-white text-sm font-bold">✕</button>
-            </div>
-            <div id="commitListContainer" class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1"></div>
-        </div>
-    </div>
-
-    <!-- 👑 2. 国际化商品定价与实时外汇引擎 (稻壳/摄图先锋版面 + 汇率双向精算中台) -->
-    <section class="max-w-7xl w-full mx-auto mb-5 theme-card rounded-2xl p-5">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 border-b border-slate-700/60 pb-3">
-            <div class="flex items-center gap-2.5">
-                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                <span class="font-bold font-mono text-xs tracking-wide">全站商品定价中台 <span class="text-slate-400 font-normal">/ FX & PRICING ENGINE</span></span>
-            </div>
-            
-            <!-- 👑 汇率说明、关扣锁与尾数控制按键 -->
-            <div class="flex items-center flex-wrap gap-2.5 text-xs font-mono">
-                <!-- 汇率自动刷新 -->
-                <button onclick="ApexFX.forceRefreshRate()" class="px-2.5 py-1 rounded-lg theme-pill text-[11px] flex items-center gap-1 hover:opacity-80" title="点击立即强制抓取中国外汇实时行情">
-                    <span>💱 实时汇率: <strong id="fxRateBadge" class="text-emerald-500">查汇率中...</strong></span>
-                </button>
-
-                <!-- .99 尾数开关 -->
-                <button id="btnToggle99" onclick="ApexPricing.toggle99Rule()" class="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 text-[11px] font-bold transition">
-                    <span>✨ .99尾数: 开启</span>
-                </button>
-
-                <!-- 🔗 关联 / 独立开锁按键 (最大特色) -->
-                <button id="btnToggleLink" onclick="ApexPricing.toggleLinkage()" class="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 text-[11px] font-bold transition flex items-center gap-1">
-                    <span>🔗 汇率关联: 已绑定</span>
-                </button>
-
-                <!-- 保存数据 -->
-                <button onclick="ApexPricing.saveAllToStorage()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition shadow-md text-xs">
-                    💾 保存并发布
-                </button>
-            </div>
-        </div>
-
-        <!-- 4大商业产品包卡片 (RMB 与 USD 都支持手动输入！) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- 套件 1 -->
-            <div class="theme-card border rounded-xl p-4 flex flex-col justify-between transition hover:border-indigo-500/60">
-                <div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-blue-500 font-bold bg-blue-500/10 px-2 py-0.5 rounded">PACKAGE 01</span>
-                        <span class="text-[10px] font-mono text-slate-400">BUNDLED</span>
-                    </div>
-                    <h4 class="font-bold text-sm mt-2">商用三件套全量包</h4>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">￥</span>
-                        <input id="rmb-bundle" type="number" value="139" 
-                               oninput="ApexPricing.onRMBChange('bundle', this.value)" 
-                               class="w-16 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center">
-                    </div>
-                    <span id="linkIcon-bundle" class="text-xs text-slate-400">⇄</span>
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">$</span>
-                        <input id="usd-bundle" type="number" value="19.99" step="0.01" 
-                               oninput="ApexPricing.onUSDChange('bundle', this.value)" 
-                               class="w-20 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center text-emerald-500">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 套件 2 -->
-            <div class="theme-card border rounded-xl p-4 flex flex-col justify-between transition hover:border-indigo-500/60">
-                <div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-indigo-500 font-bold bg-indigo-500/10 px-2 py-0.5 rounded">PACKAGE 02</span>
-                        <span class="text-[10px] font-mono text-slate-400">PPTX</span>
-                    </div>
-                    <h4 class="font-bold text-sm mt-2">PPT 路演战略模版</h4>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">￥</span>
-                        <input id="rmb-ppt" type="number" value="69" 
-                               oninput="ApexPricing.onRMBChange('ppt', this.value)" 
-                               class="w-16 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center">
-                    </div>
-                    <span id="linkIcon-ppt" class="text-xs text-slate-400">⇄</span>
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">$</span>
-                        <input id="usd-ppt" type="number" value="9.99" step="0.01" 
-                               oninput="ApexPricing.onUSDChange('ppt', this.value)" 
-                               class="w-20 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center text-emerald-500">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 套件 3 -->
-            <div class="theme-card border rounded-xl p-4 flex flex-col justify-between transition hover:border-indigo-500/60">
-                <div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">PACKAGE 03</span>
-                        <span class="text-[10px] font-mono text-slate-400">XLSX</span>
-                    </div>
-                    <h4 class="font-bold text-sm mt-2">Excel 12个月财务测算</h4>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">￥</span>
-                        <input id="rmb-excel" type="number" value="69" 
-                               oninput="ApexPricing.onRMBChange('excel', this.value)" 
-                               class="w-16 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center">
-                    </div>
-                    <span id="linkIcon-excel" class="text-xs text-slate-400">⇄</span>
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">$</span>
-                        <input id="usd-excel" type="number" value="9.99" step="0.01" 
-                               oninput="ApexPricing.onUSDChange('excel', this.value)" 
-                               class="w-20 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center text-emerald-500">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 套件 4 -->
-            <div class="theme-card border rounded-xl p-4 flex flex-col justify-between transition hover:border-indigo-500/60">
-                <div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded">PACKAGE 04</span>
-                        <span class="text-[10px] font-mono text-slate-400">DOCX</span>
-                    </div>
-                    <h4 class="font-bold text-sm mt-2">Word 欧美合规报告</h4>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">￥</span>
-                        <input id="rmb-word" type="number" value="69" 
-                               oninput="ApexPricing.onRMBChange('word', this.value)" 
-                               class="w-16 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center">
-                    </div>
-                    <span id="linkIcon-word" class="text-xs text-slate-400">⇄</span>
-                    <div class="flex items-center gap-1">
-                        <span class="text-slate-400 text-xs font-mono">$</span>
-                        <input id="usd-word" type="number" value="9.99" step="0.01" 
-                               oninput="ApexPricing.onUSDChange('word', this.value)" 
-                               class="w-20 theme-input rounded-lg px-2 py-1 font-bold text-xs font-mono text-center text-emerald-500">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. 三期目标工单进度看板 -->
-    <section class="max-w-7xl w-full mx-auto mb-5 theme-card rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-700/60 pb-2.5">
-            <div class="flex items-center gap-2.5">
-                <span class="text-amber-500 font-bold font-mono text-xs">📋 阶段开发进度书 <span class="text-slate-400 font-normal">/ TASKS MANIFEST</span></span>
-                <span id="manifestSummaryBadge" class="text-[10px] font-mono px-2.5 py-0.5 theme-pill rounded-lg">载入中...</span>
-            </div>
-            <div class="flex gap-1 font-mono text-xs">
-                <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 font-bold">全部</button>
-                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:opacity-80">1.出海</button>
-                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:opacity-80">2.国内</button>
-                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:opacity-80">3.后期</button>
-            </div>
-        </div>
-        <div id="manifestList" class="grid grid-cols-1 md:grid-cols-3 gap-3 max-h-[180px] overflow-y-auto custom-scroll pr-1"></div>
-    </section>
-
-    <!-- 4. 9 大莫兰迪色阶部门聚焦栏 -->
-    <section class="max-w-7xl w-full mx-auto mb-5 theme-card rounded-2xl p-4">
-        <div class="flex items-center justify-between mb-2.5 border-b border-slate-700/60 pb-2 text-xs font-mono">
-            <div class="flex items-center gap-2">
-                <span class="text-slate-400 font-medium">智能体协同部门 <span class="text-slate-500">/ AGENTS SWARM</span>:</span>
-                <span id="activeDeptLabel" class="text-indigo-400 font-bold">[全景视图]</span>
-            </div>
-            <button onclick="resetDeptFilter()" class="text-xs text-slate-400 hover:opacity-80 px-2.5 py-1 rounded-lg transition">清空过滤视图</button>
-        </div>
-        <div class="grid grid-cols-3 lg:grid-cols-9 gap-2 text-center font-mono" id="deptButtonsContainer">
-            <!-- admin-core.js 自动生成 -->
-        </div>
-    </section>
-
-    <!-- 5. 底部双栏控制中心 (战报日志 + 调令下发) -->
-    <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start overflow-hidden">
-        <aside class="lg:col-span-5 theme-card rounded-2xl p-4 flex flex-col h-[420px]">
-            <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5 mb-2.5">
-                <span class="text-xs font-bold font-mono">系统进化战报 <span class="text-slate-400 font-normal">/ EVOLUTION LOG</span></span>
-                <span id="historyCount" class="text-xs font-mono text-slate-400 theme-pill px-2 py-0.5 rounded">0条</span>
-            </div>
-            <div id="historyFeed" class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1"></div>
-        </aside>
-
-        <section class="lg:col-span-7 theme-card rounded-2xl p-4 flex flex-col h-[420px] justify-between relative">
-            <div id="mentionDropdown"></div>
-            <div>
-                <div class="flex items-center justify-between border-b border-slate-700/60 pb-2.5 mb-2.5 text-xs font-mono">
-                    <span class="font-bold">智能中枢调令中心 <span class="text-slate-400 font-normal">/ COMMAND CONSOLE</span></span>
-                    <span class="text-[11px] text-slate-400">支持 @ 呼叫部门 · Ctrl+Enter 发送</span>
-                </div>
-                <div class="mb-2.5 relative">
-                    <div id="cmd" contenteditable="true" 
-                         class="w-full h-20 theme-input rounded-xl p-3 text-xs font-mono focus:outline-none overflow-y-auto custom-scroll" 
-                         placeholder="点击输入框后点选部门按钮插入词条；如：@大脑中枢 @主动产品部 升级前端卡片交互..."></div>
-                </div>
-                <button onclick="triggerSwarmAutonomousAction()" id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs font-mono transition shadow-md flex items-center justify-center gap-2">
-                    <span>🚀 提交至云端 AI 协同执行</span>
-                </button>
-            </div>
-            <div class="flex-1 mt-2.5 flex flex-col min-h-0">
-                <pre id="log" class="flex-1 text-[11px] font-mono text-slate-300 p-3 theme-input rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scroll">>> 驾驶舱在线。昼夜双态切换、每周实时外汇精算引擎及双向解耦操作已开启。</pre>
-            </div>
-            <div class="mt-2.5 pt-2.5 border-t border-slate-700/60 flex justify-between items-center text-xs">
-                <span class="text-slate-400 font-mono text-[10px] flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> AUTO-EVOLVE: ACTIVE</span>
-                <button onclick="openLiveSiteForceBypass()" class="px-3.5 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold font-mono shadow-md transition flex items-center gap-1.5 text-xs">
-                    <span>🏠 强制无缓存直达商城主页 →</span>
-                </button>
-            </div>
-        </section>
-    </main>
-
+    <!-- 脚本主入口 -->
     <script src="components/admin-core.js"></script>
 </body>
 </html>
