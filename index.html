@@ -37,11 +37,12 @@
       <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
       
-      <button id="langToggleBtn" onclick="window.ApexLang && window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-300 font-bold transition">
-        🌐 简 / EN
+      <!-- 👑 修复截图 5：一键切换中英全站翻译 -->
+      <button id="langToggleBtn" onclick="window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-3 py-1 rounded-lg border border-slate-300 font-bold transition">
+        🌐 EN / 简
       </button>
 
-      <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs">👤 游客</span>
+      <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
       <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
         👑 驾驶舱 →
       </a>
@@ -57,11 +58,11 @@
         <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
           <div>
             <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">ADMIN BANNER 01</span>
-            <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">破除低效传统冗长，全视觉商业交付新纪元</h2>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
+            <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="破除低效传统冗长，全视觉商业交付新纪元" data-en="Break traditional inefficiencies, start a visual business delivery era">破除低效传统冗长，全视觉商业交付新纪元</h2>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。" data-en="Covering PPT strategies, EXCEL financial models, and WORD compliance reports, passing ATS tests.">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
           </div>
           <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-              <span>⚡ 立即解锁商用三件套包</span>
+              <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
               <span class="text-white font-black">¥139 RMB</span>
           </button>
         </div>
@@ -87,37 +88,37 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
           <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES · PPT演示</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3">AeroTech 创投规划书</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES · PPT</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="AeroTech 创投规划书" data-en="AeroTech Pitch Deck">AeroTech 创投规划书</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。" data-en="Global venture & ROI plan. Large charts, SVG progress metrics, high-res backgrounds.">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="editor.html?deck=aerotech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+            <a href="editor.html?deck=aerotech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit Deck →">进入修改 →</a>
           </div>
         </div>
 
         <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
           <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES · PPT演示</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3">SaaS 增长指标盘点</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES · PPT</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="SaaS 增长指标盘点" data-en="SaaS Growth Metrics">SaaS 增长指标盘点</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。" data-en="Enterprise OKR reconciliation. Focused on data charts, dynamic palette adjustment.">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="editor.html?deck=saas" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+            <a href="editor.html?deck=saas" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit Deck →">进入修改 →</a>
           </div>
         </div>
 
         <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
           <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES · PPT演示</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3">FinTech A 轮融资方案</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
+            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES · PPT</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="FinTech A 轮融资方案" data-en="FinTech Series A Deck">FinTech A 轮融资方案</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。" data-en="FinTech visual business plan. Gold foil textures, custom financial statements & charts.">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="editor.html?deck=fintech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+            <a href="editor.html?deck=fintech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit Deck →">进入修改 →</a>
           </div>
         </div>
       </div>
@@ -127,32 +128,32 @@
     <section>
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h3 class="text-base md:text-lg font-bold text-slate-900">商务核心：EXCEL表格 与 WORD文档</h3>
+          <h3 class="text-base md:text-lg font-bold text-slate-900" data-zh="商务核心：EXCEL表格 与 WORD文档" data-en="Core Business: EXCEL Models & WORD Reports">商务核心：EXCEL表格 与 WORD文档</h3>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30 hover:border-emerald-500 transition">
           <div>
-            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL · EXCEL表格</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3">全渠道 ROI 动态自适应测算模型</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
+            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL · EXCEL</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="全渠道 ROI 动态自适应测算模型" data-en="Omnichannel ROI Adaptive Model">全渠道 ROI 动态自适应测算模型</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。" data-en="Compare CAC vs LTV intelligently, includes 12-month rolling cash flow matrix.">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-emerald-600">￥69 RMB</div>
-            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 表格 →</a>
+            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Excel 表格 →" data-en="Open Excel Model →">进入 Excel 表格 →</a>
           </div>
         </div>
 
         <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30 hover:border-indigo-500 transition">
           <div>
-            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD · WORD文档</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3">欧美企业级 ATS 智能排版合规报告</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
+            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD · WORD</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="欧美企业级 ATS 智能排版合规报告" data-en="US/EU ATS Intelligent Compliance Report">欧美企业级 ATS 智能排版合规报告</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。" data-en="Zero OS encoding issues, bilingual standard presentation, passes institutional ATS bots.">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-indigo-600">￥69 RMB</div>
-            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 文档 →</a>
+            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Word 文档 →" data-en="Open Word Report →">进入 Word 文档 →</a>
           </div>
         </div>
       </div>
@@ -161,6 +162,30 @@
 
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
+
+  <!-- 👑 修复截图 5：原生中英双语切换内核，确保主页每一次文案都精准随动 -->
+  <script>
+    window.ApexLang = {
+      currentLang: localStorage.getItem('APEX_LANG') || 'zh',
+      init: function() {
+        this.apply(this.currentLang);
+      },
+      toggle: function() {
+        this.currentLang = this.currentLang === 'zh' ? 'en' : 'zh';
+        localStorage.setItem('APEX_LANG', this.currentLang);
+        this.apply(this.currentLang);
+      },
+      apply: function(lang) {
+        document.querySelectorAll('[data-zh][data-en]').forEach(el => {
+          const text = el.getAttribute(`data-${lang}`);
+          if (text) el.innerText = text;
+        });
+        const btn = document.getElementById('langToggleBtn');
+        if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => window.ApexLang.init());
+  </script>
 
   <script>
     window.ApexHeroSlider = {
@@ -187,7 +212,7 @@
               <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">${s.desc}</p>
             </div>
             <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-                <span>⚡ 立即解锁商用三件套包</span>
+                <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
                 <span class="text-white font-black">¥139 RMB</span>
             </button>
           </div>
@@ -195,6 +220,7 @@
 
         this.jump(0);
         this.startAutoPlay(this.slidesData.length);
+        if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
       },
 
       jump: function(idx) {
