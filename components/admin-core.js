@@ -37,14 +37,18 @@ window.switchAdminTab = function(tabId) {
 // ==========================================
 // 2. 👑 新增：企业 LOGO 上传本地自动压缩转 WebP 引擎
 // ==========================================
+// 👑 完整替换：LOGO 本地压缩 WebP 转换与多标签互斥引擎
 window.ApexLogoManager = {
     initLogo: function() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
         if (!customLogo) return;
-        document.querySelectorAll('.brand-logo-img').forEach(img => {
-            img.src = customLogo;
-            img.style.display = 'block';
-        });
+        const adminLogoEl = document.getElementById('adminBrandLogo');
+        const adminBadgeEl = document.getElementById('adminFallbackBadge');
+        if (adminLogoEl) {
+            adminLogoEl.src = customLogo;
+            adminLogoEl.style.display = 'block';
+            if (adminBadgeEl) adminBadgeEl.classList.add('hidden'); // 👑 图片成功时，强行关掉后边的 A
+        }
     },
     uploadLogo: function() {
         const fileInput = document.createElement('input');
@@ -59,7 +63,7 @@ window.ApexLogoManager = {
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const maxSize = 240; // LOGO 控制在精致的 240px 内
+                    const maxSize = 240;
                     let w = img.width, h = img.height;
                     if (w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
                     canvas.width = w; canvas.height = h;
@@ -178,7 +182,7 @@ const AUDIT_PRODUCTS = [
 ];
 
 // 👑 在《作品风控审查与上架》表格里支持直接改价，及高对比按键
-// 2. 增强价格输入框的可见性
+// 👑 完整替换：作品风控审查与上架表格渲染 (全面升级高清晰强对比度字号颜色)
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
@@ -191,29 +195,30 @@ window.renderAuditTable = function() {
         const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
 
         tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+            <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-3 px-4">
-                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
                 </td>
                 <td class="py-3 px-4">
-                    <div class="font-bold text-sm">${item.title}</div>
-                    <div class="text-xs text-slate-400 font-mono mt-0.5">${item.category}</div>
+                    <!-- 👑 采用最清爽刺眼的纯黑/纯白 text-slate-900 / text-slate-100，绝对清晰 -->
+                    <div class="font-extrabold text-sm text-slate-900 dark:text-slate-100 tracking-wide">${item.title}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
                 <td class="py-3 px-4 font-mono">
                     <div class="flex items-center gap-1.5">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="AUDIT_PRODUCTS[${index}].priceRmb=this.value" class="w-16 border border-slate-300 rounded px-2 py-1 text-xs font-bold text-center ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
-                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="AUDIT_PRODUCTS[${index}].priceUsd=this.value" class="w-20 border border-slate-300 rounded px-2 py-1 text-xs font-bold text-center text-blue-600" />
+                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
                     </div>
                 </td>
                 <td class="py-3 px-4">
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 text-xs font-bold hover:bg-blue-50 transition">参数配置</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs transition font-bold">强制销毁</button>
+                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">参数配置</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">强制销毁</button>
                 </td>
             </tr>
         `;
