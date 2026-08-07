@@ -1,9 +1,10 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格！
- * 2. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
- * 3. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
- * 4. 👑 全新加入：管理员口令安全与注册用户邮箱中心！
+ * 1. 0元秒开：集成 jsDelivr 全球加速 CDN 引擎，自动转化 assets/ 相对路径为 CDN 极速节点！
+ * 2. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格，并接入 WebP CDN 转换！
+ * 3. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
+ * 4. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
+ * 5. 管理员口令安全与注册用户邮箱中心！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -12,7 +13,7 @@ let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
 // ==========================================
-// 1. 👑 侧边栏高亮逻辑
+// 1. 👑 侧边栏高亮与切换逻辑
 // ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
@@ -40,7 +41,89 @@ window.switchAdminTab = function(tabId) {
 };
 
 // ==========================================
-// 2. 👑 企业 LOGO 上传本地自动压缩转 WebP + GitHub 仓库双份持久化推送
+// 2. 👑 全站图片 CDN 与 WebP 转换引擎 (jsDelivr 0元秒开)
+// ==========================================
+window.ApexImageEngine = {
+    cdn: {
+        owner: "wys0130",
+        repo: "ai-boss-empire",
+        branch: "main"
+    },
+
+    // 自动转化为 jsDelivr 全球加速 CDN 网址
+    toCDN: function(path) {
+        if (!path || path.trim() === "") return null;
+        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) {
+            return path;
+        }
+        const cleanPath = path.replace(/^\//, "");
+        return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
+    },
+
+    // 3层图片解析器：本地缓冲 -> jsDelivr全球CDN -> 默认兜底图
+    resolve: function(assetKey, cloudPath, defaultFallback) {
+        const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
+        if (local && local.startsWith("data:image")) return local;
+
+        const cdnUrl = this.toCDN(cloudPath);
+        if (cdnUrl) return cdnUrl;
+
+        return defaultFallback || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
+    },
+
+    // 上传图片 -> 压缩转 WebP -> 双写本地与 GitHub 仓库
+    uploadAndBackup: function(assetKey, repoPath, callback) {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const maxW = 1280;
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+                    canvas.width = w; canvas.height = h;
+                    
+                    const webpDataUrl = canvas.toDataURL("image/webp", 0.85);
+                    localStorage.setItem("APEX_IMG_CACHE_" + assetKey, webpDataUrl);
+                    if (callback) callback(webpDataUrl, repoPath);
+
+                    try {
+                        const keys = getKeysSafe();
+                        if (keys && keys.gh) {
+                            const rawBase64 = webpDataUrl.replace(/^data:image\/webp;base64,/, "");
+                            const fileObj = await getGithubFileSafe(repoPath, keys.gh);
+                            await pushGithubBinaryFile(
+                                repoPath, 
+                                rawBase64, 
+                                fileObj.sha, 
+                                `🖼️ Asset: Backup WebP image [${assetKey}] to ${repoPath} [skip ci]`, 
+                                keys.gh
+                            );
+                            alert(`✅ 图片已转 WebP 并成功备份！\n\n全球CDN秒开链接：\n${ApexImageEngine.toCDN(repoPath)}`);
+                            return;
+                        }
+                    } catch (err) {
+                        console.warn("提交 GitHub 云端异常，保持设备缓存生效:", err);
+                    }
+                    alert("✅ 图片已压缩为 WebP 并写入本地缓存！（配置密钥后可同步推往云端）");
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+        fileInput.click();
+    }
+};
+
+// ==========================================
+// 3. 👑 企业 LOGO 上传本地自动压缩转 WebP + GitHub 仓库持久化
 // ==========================================
 window.ApexLogoManager = {
     initLogo: function() {
@@ -55,54 +138,15 @@ window.ApexLogoManager = {
         }
     },
     uploadLogo: function() {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = async () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const maxSize = 240;
-                    let w = img.width, h = img.height;
-                    if (w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
-                    canvas.width = w; canvas.height = h;
-                    ctx.drawImage(img, 0, 0, w, h);
-                    const webpUrl = canvas.toDataURL('image/webp', 0.90);
-                    
-                    // 1. 本地立即生效
-                    localStorage.setItem('APEX_CUSTOM_LOGO', webpUrl);
-                    this.initLogo();
-                    
-                    // 2. 👑 云端 GitHub 仓库同时持久化推送，换任意电脑均有正式 LOGO
-                    try {
-                        const keys = getKeysSafe();
-                        if (keys && keys.gh) {
-                            const rawBase64 = webpUrl.replace(/^data:image\/webp;base64,/, "");
-                            const fileObj = await getGithubFileSafe("assets/logo.webp", keys.gh);
-                            await pushGithubBinaryFile("assets/logo.webp", rawBase64, fileObj.sha, "🖼️ Update Enterprise Logo (WebP) via Dashboard [skip ci]", keys.gh);
-                            alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！已同步覆盖至云端 GitHub 仓库 assets/logo.webp！");
-                            return;
-                        }
-                    } catch(err) {
-                        console.warn("未连接 GitHub 或 Token 权限受限，仅维持设备本地存储:", err);
-                    }
-                    alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！（如需换新电脑依然可见，请在右上角保存 GitHub 密钥）");
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-        fileInput.click();
+        ApexImageEngine.uploadAndBackup("custom_logo", "assets/logo.webp", (webpUrl) => {
+            localStorage.setItem('APEX_CUSTOM_LOGO', webpUrl);
+            this.initLogo();
+        });
     }
 };
 
 // ==========================================
-// 3. 👑 用户与权限管理中台 (3层加载同步 + 检索 + EmailJS 真实发信)
+// 4. 👑 用户与权限管理中台 (3层同步 + 邮箱核对 + EmailJS 真实发信)
 // ==========================================
 window.ApexUserManager = {
     defaultUsers: [
@@ -115,11 +159,9 @@ window.ApexUserManager = {
     currentVerifyIdx: -1,
 
     loadUsers: async function() {
-        // Tier 1: 先快速读本地缓存
         const saved = localStorage.getItem('APEX_USER_LIST');
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
         
-        // Tier 2: 静默从 GitHub 仓库云同步用户清单，保证多设备持久一致
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -147,7 +189,6 @@ window.ApexUserManager = {
     initUserSection: async function() {
         await this.loadUsers();
         
-        // 👑 修复图2：3层加载管理员口令与 EmailJS 参数
         let savedPwd = localStorage.getItem("APEX_ADMIN_PWD");
         let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
         let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
@@ -190,18 +231,17 @@ window.ApexUserManager = {
         localStorage.setItem("APEX_EMAILJS_TID", tid);
         localStorage.setItem("APEX_EMAILJS_KEY", pkey);
 
-        // 👑 立即推送至 GitHub 云端仓库 config/security.json，跨设备随时用！
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
                 const fileObj = await getGithubFileSafe("config/security.json", keys.gh);
                 const payload = { pwd, emailjs_sid: sid, emailjs_tid: tid, emailjs_key: pkey, updated_at: new Date().toISOString() };
                 await pushGithubJsonFile("config/security.json", payload, fileObj.sha, "🛡️ Update admin security & EmailJS configs [skip ci]", keys.gh);
-                alert(`✅ 安全口令及邮箱发信配置已更新，同步推入 GitHub 仓库！\n\n主页进入驾驶舱口令：【 ${pwd} 】`);
+                alert(`✅ 安全口令及发信配置已同步推入 GitHub 仓库！\n\n主页进入驾驶舱口令：【 ${pwd} 】`);
                 return;
             }
         } catch(e) {}
-        alert(`✅ 安全配置已在当前电脑设备中更新生效！\n\n主页驾驶舱通行口令为：【 ${pwd} 】`);
+        alert(`✅ 安全配置在当前设备中更新生效！\n\n主页驾驶舱口令为：【 ${pwd} 】`);
     },
 
     sendRealVerifyEmail: function(idx) {
@@ -221,12 +261,12 @@ window.ApexUserManager = {
                 alert(`📧 【真实发信成功】\n已向 [${targetEmail}] 成功投递真实邮件码！请查收邮件后填入校验框。`);
                 this.openVerifyModal();
             })
-            .catch((err) => {
+            .catch(() => {
                 alert(`⚠️ EmailJS 接口连接失败，已启用标准安全信道。\n为方便演示核验，当前生成验证码为：【 ${code} 】`);
                 this.openVerifyModal();
             });
         } else {
-            alert(`📧 【发信网关已触发】\n当前系统尚未填入第三方 EmailJS 接口参数，但已启用安全校验链路！\n\n请在收件码校验框输入本次生成验证码：【 ${code} 】`);
+            alert(`📧 【发信网关已触发】\n当前系统尚未填入 EmailJS 接口参数，已启用安全校验链路！\n\n本次验证码为：【 ${code} 】`);
             this.openVerifyModal();
         }
     },
@@ -369,7 +409,7 @@ window.ApexUserManager = {
 };
 
 // ==========================================
-// 4. 👑 AI 智能体排班区间配置中台
+// 5. 👑 AI 智能体排班区间配置中台
 // ==========================================
 window.ApexScheduleManager = {
     loadScheduleFromCloud: async function() {
@@ -418,14 +458,16 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 5. 👑 作品审核与定价表 (含独立行内联动 / 脱钩开关)
+// 6. 👑 作品审核与定价表 (支持 WebP CDN 与价格联动)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
         id: "aerotech",
         title: "AeroTech 创投规划书",
         category: "15 SLIDES · Office PPT演示",
-        thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_aerotech",
+        thumbCloudPath: "assets/products/aerotech.webp",
+        thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -436,7 +478,9 @@ const AUDIT_PRODUCTS = [
         id: "saas",
         title: "SaaS 增长指标盘点",
         category: "20 SLIDES · Office PPT演示",
-        thumb: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_saas",
+        thumbCloudPath: "assets/products/saas.webp",
+        thumbDefault: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -447,7 +491,9 @@ const AUDIT_PRODUCTS = [
         id: "fintech",
         title: "FinTech A 轮融资方案",
         category: "12 SLIDES · Office PPT演示",
-        thumb: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_fintech",
+        thumbCloudPath: "assets/products/fintech.webp",
+        thumbDefault: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -458,7 +504,9 @@ const AUDIT_PRODUCTS = [
         id: "excel",
         title: "全渠道 ROI 动态自适应测算模型",
         category: "XLSX MODEL · Office EXCEL表格",
-        thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_excel",
+        thumbCloudPath: "assets/products/excel.webp",
+        thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-emerald-600 font-bold",
@@ -469,7 +517,9 @@ const AUDIT_PRODUCTS = [
         id: "word",
         title: "欧美企业级 ATS 智能排版合规报告",
         category: "DOCX STANDARD · Office WORD文档",
-        thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_word",
+        thumbCloudPath: "assets/products/word.webp",
+        thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-indigo-600 font-bold",
@@ -477,6 +527,14 @@ const AUDIT_PRODUCTS = [
         status: true
     }
 ];
+
+window.uploadProductThumb = function(index) {
+    const item = AUDIT_PRODUCTS[index];
+    ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
+        renderAuditTable();
+        if (typeof appendLog === "function") appendLog(`>> [产品缩略图] [${item.title}] WebP转换完成，已绑定CDN！`);
+    });
+};
 
 window.toggleRowLinkage = function(index) {
     AUDIT_PRODUCTS[index].isLinked = !AUDIT_PRODUCTS[index].isLinked;
@@ -509,6 +567,7 @@ window.renderAuditTable = function() {
     tbody.innerHTML = "";
 
     AUDIT_PRODUCTS.forEach((item, index) => {
+        const finalThumbUrl = ApexImageEngine.resolve(item.thumbKey, item.thumbCloudPath, item.thumbDefault);
         const badgeCls = item.status 
             ? "bg-emerald-500 text-white font-bold shadow-sm" 
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
@@ -520,7 +579,10 @@ window.renderAuditTable = function() {
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-3 px-4">
-                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
+                    <div class="relative group w-14 h-18">
+                        <img src="${finalThumbUrl}" alt="快照" class="w-14 h-18 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
+                        <button onclick="uploadProductThumb(${index})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold">📤 转WebP</button>
+                    </div>
                 </td>
                 <td class="py-3 px-4">
                     <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] tracking-wide">${item.title}</div>
@@ -545,8 +607,8 @@ window.renderAuditTable = function() {
                     </button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
+                    <button onclick="uploadProductThumb(${index})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition">上传WebP图</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
             </tr>
         `;
@@ -578,7 +640,7 @@ window.toggleThemeMode = function() {
 };
 
 // ==========================================
-// 6. 👑 首页轮播图配置管理 (支持色块预设应用与 3层云同步)
+// 7. 👑 首页轮播图配置管理 (支持 WebP 上传与 CDN 地址)
 // ==========================================
 window.ApexBannerManager = {
     setPreset: function(idx, gradientStr) {
@@ -587,6 +649,16 @@ window.ApexBannerManager = {
             inputEl.value = gradientStr;
             appendLog(`>> [视觉渐变] 已为第 ${idx + 1} 幕横幅快速应用配色方案 -> ${gradientStr}`);
         }
+    },
+
+    uploadBannerImg: function(idx) {
+        const assetKey = "banner_slide_" + idx;
+        const repoPath = `assets/banners/slide-${idx}.webp`;
+        ApexImageEngine.uploadAndBackup(assetKey, repoPath, (webpUrl, finalCloudPath) => {
+            const imgInput = document.getElementById(`banner-img-${idx}`);
+            if (imgInput) imgInput.value = finalCloudPath;
+            appendLog(`>> [轮播图云备份] 幻灯片 #${idx + 1} 绑定实体路径 -> ${finalCloudPath}`);
+        });
     },
 
     loadBannerConfig: async function() {
@@ -649,12 +721,12 @@ window.ApexBannerManager = {
                 await pushGithubJsonFile("config/banner.json", config, fileObj.sha, "🎨 Update homepage banners via Dashboard [skip ci]", keys.gh);
             }
         } catch(e) {}
-        alert('✅ 首页双幕大图文案与背景配置已保存并同步至云端！');
+        alert('✅ 首页轮播图配置与图片地址已保存并同步至云端！');
     }
 };
 
 // ==========================================
-// 7. 👑 汇率与商品定价中心 (3层加载云同步)
+// 8. 👑 汇率与商品定价中心 (3层云同步)
 // ==========================================
 window.ApexFX = {
     currentRate: 7.18,
@@ -790,9 +862,9 @@ const DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-102", title: "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-103", title: "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广", notes: "内嵌商城高单价干货图文导流链接", stage: "STAGE_1_MVP_GLOBAL", department: "推广营销部", status: "DONE" },
     { id: "TASK-104", title: "实现万里汇 (WorldFirst) 跨境结汇与对公打款", notes: "配合老板手动验证第一张外卡到账", stage: "STAGE_1_MVP_GLOBAL", department: "董事长", status: "DONE" },
-    { id: "TASK-201", title: "国内正规军升级：接入广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
+    { id: "TASK-201", title: "国内正规军升级：广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
     { id: "TASK-202", title: "构建境内专属隔离收银台，替换前期『爱发电』通道", notes: "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝", stage: "STAGE_2_CN_UPGRADE", department: "施工工程部", status: "TODO" },
-    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版推文流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" },
+    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" },
     { id: "TASK-301", title: "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare", notes: "保持全球 TTFB < 50ms", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" },
     { id: "TASK-302", title: "部署 3 分钟有效期的私有预签名下载链接防止盗链", notes: "无论海外还是国内收银台，付款成功签发临时链接", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" }
 ];
@@ -800,7 +872,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 8. 👑 进度书与工单管理 (3层备援同步)
+// 9. 👑 进度书与工单管理 (3层同步)
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -861,11 +933,11 @@ window.resetManifestToDefault = async function() {
                 updated_at: new Date().toISOString().slice(0, 10)
             };
             await pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, "🔄 Reset tasks to realistic default [skip ci]", keys.gh);
-            alert("✅ 云端 GitHub 仓库及页面工单已全部洗回初始待办状态！");
+            alert("✅ 云端 GitHub 仓库及页面工单已全部重置！");
             return;
         }
     } catch(e) {}
-    alert("✅ 本地与控制台工单已完成初始状态重置！");
+    alert("✅ 本地工单已完成重置！");
 };
 
 window.filterManifest = function(stageKey) {
@@ -961,7 +1033,7 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 9. 👑 智能中枢调令台与 @部门提及菜单 (Swarm Command Center)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (Swarm Command Center)
 // ==========================================
 window.showMentionDropdown = function(query) {
     const dropEl = document.getElementById("mentionDropdown");
@@ -1059,7 +1131,7 @@ window.inspectDept = function(deptName, btnEl) {
         }
         appendLog(`🎯 追加指令 @${deptName}`);
     } else {
-        appendLog(`🔍 视图切换 -> [${deptName}] (未点击聚焦文本框，不追加词条)`);
+        appendLog(`🔍 视图切换 -> [${deptName}] (未聚焦文本框，不追加词条)`);
     }
 
     loadHistoryFromMemory();
@@ -1078,7 +1150,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 10. 👑 启动函数与 GitHub 仓库全能推拉工具 (JSON + 二进制)
+// 11. 👑 启动函数与 GitHub 仓库操作工具
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1218,7 +1290,6 @@ async function getGithubFileSafe(path, token) {
     return { content: b64_to_utf8(data.content), sha: data.sha };
 }
 
-// 👑 GitHub 仓库普通文本与 JSON 格式写入通用方法
 async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
     const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
     const payload = { message: message, content: utf8_to_b64(contentStr) };
@@ -1232,7 +1303,6 @@ async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
     return await res.json();
 }
 
-// 👑 GitHub 仓库 WebP 图像等二进制 Base64 数据直接推送方法
 async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
     const payload = { message: message, content: base64Raw };
     if (sha) payload.sha = sha;
