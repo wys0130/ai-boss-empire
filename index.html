@@ -21,7 +21,8 @@
   <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员身份校验">
+      <!-- 双击 LOGO 触发安全口令校验 -->
+      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击左上角进行管理员身份口令验证">
         <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
              onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
         <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
@@ -40,7 +41,8 @@
         🌐 EN / 简
       </button>
 
-      <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
+      <!-- 👑 修复：访客/管理员身份徽章 -->
+      <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs transition" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
       <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">
         👑 驾驶舱 →
       </a>
@@ -149,11 +151,8 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 👑 完整覆盖替换 index.html 底部的多向双语联动与多币种定价脚本块 -->
+  <!-- 1. 👑 前台多币种定价智能折算中台 -->
   <script>
-    // ==========================================
-    // 1. 👑 前台多币种定价智能折算中台 (强制绑定中英货币符号)
-    // ==========================================
     window.ApexPricing = {
       getConfig: function() {
         const saved = localStorage.getItem('APEX_PRICING_CONFIG');
@@ -176,57 +175,41 @@
           return defaultConfig;
         }
       },
-  
-      applyPricing: function(lang) {
-        const currentLang = lang || (window.ApexLang ? window.ApexLang.currentLang : 'zh');
+
+      applyPricing: function(lang = 'zh') {
         const config = this.getConfig();
-        const isEn = currentLang === 'en';
-  
-        // 1. 强制双绑轮播图三件套按钮的 RMB / USD 价格
+        const isEn = lang === 'en';
+
         document.querySelectorAll('.hero-bundle-price').forEach(el => {
-          const zhText = `¥${config.bundle.rmb} RMB`;
-          const enText = `$${config.bundle.usd} USD`;
-          el.setAttribute('data-zh', zhText);
-          el.setAttribute('data-en', enText);
-          el.innerText = isEn ? enText : zhText;
+          el.innerText = isEn ? `$${config.bundle.usd} USD` : `¥${config.bundle.rmb} RMB`;
         });
-  
-        // 2. 强制双绑下方 PPT / EXCEL / WORD 卡片的 RMB / USD 价格
-        document.querySelectorAll('#ppt-section [data-price-rmb]').forEach(el => {
-          const zhText = `￥${config.ppt.rmb} RMB`;
-          const enText = `$${config.ppt.usd} USD`;
-          el.setAttribute('data-zh', zhText);
-          el.setAttribute('data-en', enText);
-          el.innerText = isEn ? enText : zhText;
+
+        const pptPrices = document.querySelectorAll('#ppt-section [data-price-rmb]');
+        pptPrices.forEach(el => {
+          el.innerText = isEn ? `$${config.ppt.usd} USD` : `￥${config.ppt.rmb} RMB`;
         });
-  
-        document.querySelectorAll('a[href*="excel-editor"]').forEach(btn => {
+
+        const excelPrices = document.querySelectorAll('a[href*="excel-editor"]');
+        excelPrices.forEach(btn => {
           const priceContainer = btn.previousElementSibling;
           if (priceContainer && priceContainer.hasAttribute('data-price-rmb')) {
-            const zhText = `￥${config.excel.rmb} RMB`;
-            const enText = `$${config.excel.usd} USD`;
-            priceContainer.setAttribute('data-zh', zhText);
-            priceContainer.setAttribute('data-en', enText);
-            priceContainer.innerText = isEn ? enText : zhText;
+            priceContainer.innerText = isEn ? `$${config.excel.usd} USD` : `￥${config.excel.rmb} RMB`;
           }
         });
-  
-        document.querySelectorAll('a[href*="word-editor"]').forEach(btn => {
+
+        const wordPrices = document.querySelectorAll('a[href*="word-editor"]');
+        wordPrices.forEach(btn => {
           const priceContainer = btn.previousElementSibling;
           if (priceContainer && priceContainer.hasAttribute('data-price-rmb')) {
-            const zhText = `￥${config.word.rmb} RMB`;
-            const enText = `$${config.word.usd} USD`;
-            priceContainer.setAttribute('data-zh', zhText);
-            priceContainer.setAttribute('data-en', enText);
-            priceContainer.innerText = isEn ? enText : zhText;
+            priceContainer.innerText = isEn ? `$${config.word.usd} USD` : `￥${config.word.rmb} RMB`;
           }
         });
       }
     };
-  
-    // ==========================================
-    // 2. 👑 全站中英双语实时翻译引擎 (语言切动必定全站随动)
-    // ==========================================
+  </script>
+
+  <!-- 2. 👑 全站中英双语即时翻译引擎 -->
+  <script>
     window.ApexLang = {
       currentLang: localStorage.getItem('APEX_LANG') || 'zh',
       init: function() {
@@ -238,24 +221,26 @@
         this.apply(this.currentLang);
       },
       apply: function(lang) {
-        // 1. 优先触发价格计算和双币种字段绑定
-        if (window.ApexPricing) {
-          window.ApexPricing.applyPricing(lang);
-        }
-        // 2. 翻转整站所有带 [data-zh][data-en] 属性的内容
         document.querySelectorAll('[data-zh][data-en]').forEach(el => {
           const text = el.getAttribute(`data-${lang}`);
           if (text) el.innerText = text;
         });
-        // 3. 切换右端导航按钮状态提示
         const btn = document.getElementById('langToggleBtn');
         if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
+        
+        document.querySelectorAll('#dynamicHeroContainer .hero-slide-title, #dynamicHeroContainer .hero-slide-desc').forEach(el => {
+          const text = el.getAttribute(`data-${lang}`);
+          if (text) el.innerText = text;
+        });
+        if (window.ApexPricing) {
+          window.ApexPricing.applyPricing(lang);
+        }
       }
     };
-  
-    // ==========================================
-    // 3. 👑 首页轮播图智能驱动引擎
-    // ==========================================
+  </script>
+
+  <!-- 3. 👑 首页轮播图管理引擎 -->
+  <script>
     window.ApexHeroSlider = {
       currentIndex: 0,
       timer: null,
@@ -283,7 +268,7 @@
             bgImg: "" 
           }
         ];
-  
+
         let rawData = saved ? JSON.parse(saved) : defaultSlides;
         
         this.slidesData = rawData.map((s, i) => {
@@ -301,7 +286,7 @@
         if (!container) return;
         
         const config = window.ApexPricing ? window.ApexPricing.getConfig() : { bundle: { rmb: 139, usd: 19.99 } };
-  
+
         container.innerHTML = this.slidesData.map((s, idx) => {
           const titleZh = s.titleZh;
           const titleEn = s.titleEn;
@@ -321,12 +306,12 @@
             </div>
           `;
         }).join('');
-  
+
         this.jump(0);
         this.startAutoPlay(this.slidesData.length);
         if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
       },
-  
+
       jump: function(idx) {
         const total = document.querySelectorAll('.hero-slide').length;
         if (total === 0) return;
@@ -353,7 +338,7 @@
         if (window.ApexPricing) window.ApexPricing.applyPricing(window.ApexLang.currentLang);
         if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
       },
-  
+
       startAutoPlay: function(total) {
         if (this.timer) clearInterval(this.timer);
         this.timer = setInterval(() => {
@@ -362,10 +347,23 @@
         }, 5000);
       }
     };
-  
+
+    // 4. 👑 修复：自检并渲染登录后的“👑 董事长 [ADMIN]”荣耀徽章
+    function initUserRoleBadge() {
+      const badge = document.getElementById('userRoleBadge');
+      const portalBtn = document.getElementById('adminSecretPortal');
+      const role = localStorage.getItem('APEX_USER_ROLE');
+      if (role === 'ADMIN' && badge) {
+        badge.innerText = '👑 董事长 [ADMIN]';
+        badge.className = "bg-gradient-to-r from-amber-500 to-blue-600 text-white border border-amber-400 px-3 py-1 rounded-lg font-black text-xs shadow-md";
+        if (portalBtn) portalBtn.classList.remove('hidden');
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       ApexHeroSlider.init();
       window.ApexLang.init();
+      initUserRoleBadge();
     });
   </script>
 
@@ -380,6 +378,7 @@
       if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
     }).catch(() => {});
 
+    // 5. 👑 LOGO 加载与在线 fallback
     (function initFrontLogo() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
         const frontLogoEl = document.getElementById('frontBrandLogo');
@@ -391,12 +390,13 @@
         }
     })();
 
+    // 6. 👑 口令网关：校验成功即刻改变右上角身份为 👑 董事长 [ADMIN]
     function checkChairmanStealthAccess() {
         const validPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         const pwd = prompt("👑 [安全防护网关] 请输入管理员身份口令：", "");
         if (pwd === validPwd) {
-            const p = document.getElementById('adminSecretPortal');
-            if (p) p.classList.remove('hidden');
+            localStorage.setItem("APEX_USER_ROLE", "ADMIN");
+            initUserRoleBadge();
             alert("✅ 身份校验成功！驾驶舱通道已激活，点击右上角【👑 驾驶舱 →】进入。");
         } else if (pwd !== null) {
             alert("❌ 口令错误，系统拦截进入！");
