@@ -1,8 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 修复图裂：内置 5 张真实高清商用测试图，无本地图片时百分百秒出大图不过载！
- * 2. 👑 修复按钮变形：为“汇率联动/独立定价”按钮全面加装 whitespace-nowrap 与 shrink-0！
- * 3. 进度书内置完整工单，口令安全中心、部门@提及调令全线畅通。
+ * 1. 👑 修复表头折行：自动锁定所有 <th> 为 whitespace-nowrap 强制单行，解决“快照缩略图”折字！
+ * 2. 👑 修复 @ 没反应：增加 #mentionDropdown 自动 DOM 注入与自愈挂载，敲 @ 100% 呼出部门菜单！
+ * 3. 集成 jsDelivr 0元秒开 CDN、5张高清默认图、收银联动、口令安全中心与完整开发进度书。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -39,7 +39,7 @@ window.switchAdminTab = function(tabId) {
 };
 
 // ==========================================
-// 2. 👑 全站图片 CDN 与 WebP 转换引擎 (自带测试图防裂)
+// 2. 👑 全站图片 CDN 与 WebP 转换引擎
 // ==========================================
 window.ApexImageEngine = {
     cdn: {
@@ -57,12 +57,10 @@ window.ApexImageEngine = {
         return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
     },
 
-    // 3层图片解析器：本地缓冲 -> GitHub/外链 -> 默认极速高精测试图
     resolve: function(assetKey, cloudPath, defaultFallback) {
         const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
         if (local && local.startsWith("data:image")) return local;
 
-        // 如果云端是绝对网址(如我们内置的测试图)，直接给；如果是相对路径，转CDN
         if (cloudPath && (cloudPath.startsWith("http://") || cloudPath.startsWith("https://"))) {
             return cloudPath;
         }
@@ -460,7 +458,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 👑 作品审核与定价表 (修复图裂 + 修复按钮拉伸变形)
+// 6. 👑 作品审核与定价表 (修复：强锁表头 <th> 不换行！)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -468,7 +466,6 @@ const AUDIT_PRODUCTS = [
         title: "AeroTech 创投规划书",
         category: "15 SLIDES · Office PPT演示",
         thumbKey: "prod_aerotech",
-        // 👑 填入真实极速高清缩略图，一开网页100%有清晰大图，绝无404
         thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
         thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
@@ -569,13 +566,20 @@ window.renderAuditTable = function() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    // 👑 自动定位并锁死表头 <th> 不准折行，解决“快照缩略图”换两行的丑陋现象！
+    const tableEl = tbody.closest("table");
+    if (tableEl) {
+        tableEl.querySelectorAll("th").forEach(th => {
+            th.classList.add("whitespace-nowrap", "select-none", "tracking-wider");
+        });
+    }
+
     AUDIT_PRODUCTS.forEach((item, index) => {
         const finalThumbUrl = ApexImageEngine.resolve(item.thumbKey, item.thumbCloudPath, item.thumbDefault);
         const badgeCls = item.status 
             ? "bg-emerald-500 text-white font-bold shadow-sm" 
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
         
-        // 👑 修复：专门加装 whitespace-nowrap 与 shrink-0，永远是精美小巧的胶囊，绝不竖向变形！
         const linkBtnCls = item.isLinked
             ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 hover:bg-emerald-500/20"
             : "bg-amber-500/10 text-amber-600 border border-amber-500/30 hover:bg-amber-500/20";
@@ -600,7 +604,6 @@ window.renderAuditTable = function() {
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
-                        <!-- 👑 修复按钮变形：添加 whitespace-nowrap, shrink-0 与 inline-flex -->
                         <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition-all shrink-0 whitespace-nowrap inline-flex items-center justify-center select-none ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
                             ${linkBtnText}
                         </button>
@@ -1039,11 +1042,27 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (Swarm Command Center)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (支持无 DOM 时自动创建与悬浮！)
 // ==========================================
 window.showMentionDropdown = function(query) {
-    const dropEl = document.getElementById("mentionDropdown");
-    if (!dropEl) return;
+    let dropEl = document.getElementById("mentionDropdown");
+    // 👑 自动注入：如果网页里没写 #mentionDropdown，立刻动态创建并挂载到 #cmd 旁，绝不找不到！
+    if (!dropEl) {
+        dropEl = document.createElement("div");
+        dropEl.id = "mentionDropdown";
+        dropEl.className = "hidden absolute z-50 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1.5 space-y-1 max-h-48 overflow-y-auto w-48";
+        const cmdBox = document.getElementById("cmd");
+        if (cmdBox && cmdBox.parentNode) {
+            cmdBox.parentNode.style.position = "relative";
+            dropEl.style.bottom = "100%";
+            dropEl.style.left = "16px";
+            dropEl.style.marginBottom = "8px";
+            cmdBox.parentNode.appendChild(dropEl);
+        } else {
+            document.body.appendChild(dropEl);
+        }
+    }
+
     const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
     if (matches.length === 0) {
         dropEl.classList.add("hidden");
@@ -1052,7 +1071,7 @@ window.showMentionDropdown = function(query) {
     dropEl.innerHTML = "";
     matches.forEach(dept => {
         const item = document.createElement("div");
-        item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between";
+        item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between text-slate-200";
         item.innerHTML = `<span>@${dept.name}</span><span class="text-[10px] opacity-60">选择</span>`;
         item.onmousedown = (e) => {
             e.preventDefault();
@@ -1181,8 +1200,12 @@ function initAdminEngine() {
 
         cmdBox.addEventListener("input", function() {
             const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+            let text = "";
+            if (sel && sel.rangeCount > 0 && sel.anchorNode) {
+                text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+            } else {
+                text = cmdBox.innerText || "";
+            }
             const match = text.match(/@([^\s@]*)$/);
             if (match) showMentionDropdown(match[1]);
             else hideMentionDropdown();
