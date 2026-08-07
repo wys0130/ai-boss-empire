@@ -51,13 +51,14 @@
     <!-- 1. 左侧菜单栏 (高阶标徽 + 原生 LOGO 双重防裂) -->
     <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
         <div>
-            <div class="h-16 flex items-center gap-2.5 px-5 border-b border-slate-800 bg-[#0b0f19]">
-              <!-- 1. 默认优先展示图片 LOGO -->
-              <img src="assets/logo.webp" alt="LOGO" class="h-7 w-auto object-contain" 
-                   onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
-              <!-- 2. 默认 hidden，作为加载失败后的备用 A 徽章 -->
-              <div class="hidden w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 items-center justify-center text-white font-black text-xs shrink-0">A</div>
-              <span class="font-bold text-white font-mono text-xs tracking-wide truncate">顶尖商务平台</span>
+            <div class="h-16 flex items-center justify-between px-4 border-b border-slate-800 bg-[#0b0f19]">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP)">
+                    <img src="assets/logo.webp" alt="LOGO" class="brand-logo-img h-7 w-auto object-contain" 
+                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
+                    <div class="hidden w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shrink-0">A</div>
+                    <span class="font-bold text-white font-mono text-xs tracking-wide truncate">顶尖商务平台</span>
+                </div>
+                <button onclick="ApexLogoManager.uploadLogo()" class="text-[10px] text-slate-400 hover:text-white px-1.5 py-0.5 border border-slate-700 rounded" title="更改企业LOGO">📤</button>
             </div>
 
             <div class="p-4 space-y-1 text-xs">
@@ -358,7 +359,10 @@
                             <p class="text-xs text-slate-400 mt-0.5">研发与多语言市场投放清单</p>
                         </div>
                         <div class="flex items-center gap-2 font-mono text-xs">
+                            <!-- 👑 这里正是新增的「重置待办」按钮：点一下就能把工单状态洗回理性的 TODO -->
+                            <button onclick="resetManifestToDefault()" class="px-3 py-1 rounded-lg bg-rose-500/10 text-rose-600 font-bold border border-rose-500/20 hover:bg-rose-500/20 transition">🔄 重置待办</button>
                             <span id="manifestSummaryBadge" class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-600 font-bold border border-blue-500/20">载入中...</span>
+                            <!-- 下面这 4 个就是所谓的“筛选过滤按钮” -->
                             <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold">全部</button>
                             <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">1.出海</button>
                             <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">2.国内</button>
