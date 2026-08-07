@@ -518,7 +518,16 @@ window.toggleThemeMode = function() {
 // ==========================================
 // 6. 👑 首页轮播图配置管理
 // ==========================================
+// 👑 完整替换：支持预设色块吸取与轮播图配置保存的 Banner 管理引擎
 window.ApexBannerManager = {
+    setPreset: function(idx, gradientStr) {
+        const inputEl = document.getElementById(`banner-bg-${idx}`);
+        if (inputEl) {
+            inputEl.value = gradientStr;
+            appendLog(`>> [视觉背景] 已选取并应用第 ${idx + 1} 幕横幅渐变配色 -> ${gradientStr}`);
+        }
+    },
+
     loadBannerConfig: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         if (!saved) return;
@@ -559,7 +568,7 @@ window.ApexBannerManager = {
             }
         ];
         localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(config));
-        alert('✅ 首页双幕大图文案与背景配置已保存！\n\n如果填入了【背景大图 URL】，前台轮播自动展示高清大图背景；如果未填，则按指定的【颜色/渐变】展现！');
+        alert('✅ 首页双幕大图文案与渐变配色已保存！\n\n如果填入了【背景大图 URL】，前台轮播自动展示高清大图背景；如果未填，则按指定的渐变配色直接显现！');
     }
 };
 
