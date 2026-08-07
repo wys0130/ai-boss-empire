@@ -1,16 +1,16 @@
 /**
- * APEXWORK Zero-Auth & Smart Geo-Routing Gateway (V41 自动地区识别与VIP防刷版)
+ * APEXWORK Zero-Auth & Smart Geo-Routing Gateway (V42 极速CDN + 私有库0元保护版)
  * 1. 零延迟自动识别设备时区与语言：国内默认爱发电 (RMB)，海外默认 Lemon Squeezy (USD)
  * 2. 集中化配置海内外双轨 URL
  * 3. 支付完自动回跳本页，写签并发起自动下载
- * 4. 👑 接入 ApexVIPGuard：每次下载执行每日商用次数上限检查 + 3 分钟动态签发
+ * 4. 👑 内置 ApexPrivateDownloader：从私有仓库 (ai-boss-private) 安全下载原文件！
+ * 5. 👑 接入 ApexVIPGuard：每次下载执行每日商用次数上限检查 + 3 分钟动态签发
  */
 (function() {
   const APEX_AUTH_KEY = "APEX_PAID_TOKEN";
   const APEX_SIGN_KEY = "APEX_ED25519_SIGNATURE";
   const APEX_LAST_URL_KEY = "APEX_PAY_RETURN_URL";
 
-  // 👑 1. 海内外双轨收银配置（请把海外的 url 换成你准备好的 Lemon Squeezy 商品 checkout 链接）
   const PAY_CONFIG = {
     china: {
       name: "爱发电 (Afdian) 极速直付",
@@ -27,7 +27,44 @@
   let currentRegion = "overseas";
   let activeSuccessCallback = null;
 
-  // 👑 2. 零网络延迟：自动测定访客属于“国内”还是“海外”
+  // 👑 0元私有库发货中台：防爬虫、防白嫖
+  window.ApexPrivateDownloader = {
+    privateConfig: {
+      owner: "wys0130",
+      repo: "ai-boss-private" // 请在 GitHub 新建这个名字的 Private 私有仓库放源文件
+    },
+
+    downloadFile: async function(filePath, saveFileName) {
+      const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+      if (!ghToken) {
+        console.log("未配置授权 Token，调用页面常规导出。");
+        return false;
+      }
+      try {
+        const url = `https://api.github.com/repos/${this.privateConfig.owner}/${this.privateConfig.repo}/contents/${filePath}`;
+        const res = await fetch(url, {
+          headers: {
+            "Authorization": `token ${ghToken}`,
+            "Accept": "application/vnd.github.v3.raw"
+          }
+        });
+        if (!res.ok) return false;
+        const blob = await res.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = saveFileName || filePath.split("/").pop();
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(a.href);
+        a.remove();
+        return true;
+      } catch (e) {
+        console.warn("私有库文件下载失败:", e);
+        return false;
+      }
+    }
+  };
+
   function autoDetectRegion() {
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
@@ -42,7 +79,6 @@
     }
   }
 
-  // 3. 动态注入中央收银模态框
   function injectCheckoutModalDOM() {
     if (document.getElementById("apexUniversalModal")) return;
 
@@ -91,7 +127,6 @@
     document.body.appendChild(modalDiv);
   }
 
-  // 4. 侦测支付成功参数
   function checkPaymentCallback() {
     const params = new URLSearchParams(window.location.search);
     const isPaid = params.get("paid") || params.get("success");
@@ -120,10 +155,8 @@
     window.history.replaceState({ path: cleanUrl }, "", cleanUrl);
   }
 
-  // 👑 修复升级：在执行真实导出下载之前，首先向 VIP 下载守卫申请 3 分钟授权签发
   function autoTriggerPageDownload() {
-    setTimeout(() => {
-      // 执行 VIP 下载风控：超过合理每日限额或频次即刻拦截
+    setTimeout(async () => {
       if (window.ApexVIPGuard && !window.ApexVIPGuard.verifyAndAuthorize("AUTO_PAY_ASSET")) {
         return;
       }
@@ -139,7 +172,6 @@
     }, 800);
   }
 
-  // 5. 对外全局暴露接口
   window.ApexAuth = {
     isPaidUser: function() {
       return localStorage.getItem(APEX_AUTH_KEY) === "true" && !!localStorage.getItem(APEX_SIGN_KEY);
@@ -147,10 +179,9 @@
 
     openCheckout: function(options = {}) {
       if (this.isPaidUser()) {
-        // 👑 修复升级：VIP 用户点击再次下载/导出时，必须通过风控频率检查，防恶意脚本爬盘
         if (window.ApexVIPGuard) {
           const authItem = window.ApexVIPGuard.verifyAndAuthorize(options.skuId || "VIP_ASSET");
-          if (!authItem) return; // 被冷却或限额拦截，中止执行
+          if (!authItem) return;
         }
 
         if (typeof options.onSuccess === "function") options.onSuccess();
