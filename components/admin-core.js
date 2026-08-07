@@ -1,5 +1,5 @@
 /**
- * APEXWORK 商业控制台驱动内核 (admin-core/admin-core.js)
+ * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
  * 1. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格！
  * 2. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
  * 3. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
@@ -293,7 +293,7 @@ const AUDIT_PRODUCTS = [
 ];
 
 // ==========================================
-// 3. 👑 修复：作品风控表（剔除左侧边白线、字样全数高黑白反差）
+// 3. 👑 修复：作品风控表（彻底提升所有文字反差与按键高亮清晰度）
 // ==========================================
 window.onAuditPriceChange = function(index, field, val) {
     const num = parseFloat(val) || 0;
@@ -347,7 +347,7 @@ window.renderAuditTable = function() {
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
+                    <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
                     <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
             </tr>
@@ -542,8 +542,9 @@ const deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30" }
 ];
 
+// 👑 返回商城首页不再 404，直接打开 index.html
 window.openLiveSiteForceBypass = function() {
-    window.open(`https://apexwork.work/?nocache=${Date.now()}`, '_blank');
+    window.open('index.html', '_blank');
 };
 
 const DEFAULT_MANIFEST_TASKS = [
