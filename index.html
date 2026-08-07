@@ -150,125 +150,141 @@
   <div id="cn-paywall-container"></div>
 
   <!-- 多语言双语切换引擎 -->
-  <script>
-    window.ApexLang = {
-      currentLang: localStorage.getItem('APEX_LANG') || 'zh',
-      init: function() {
-        this.apply(this.currentLang);
-      },
-      toggle: function() {
-        this.currentLang = this.currentLang === 'zh' ? 'en' : 'zh';
-        localStorage.setItem('APEX_LANG', this.currentLang);
-        this.apply(this.currentLang);
-      },
-      apply: function(lang) {
-        document.querySelectorAll('[data-zh][data-en]').forEach(el => {
-          const text = el.getAttribute(`data-${lang}`);
-          if (text) el.innerText = text;
-        });
-        const btn = document.getElementById('langToggleBtn');
-        if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
+  <!-- 精准替换：index.html 底部的 ApexLang 和 ApexHeroSlider 脚本块 -->
+<script>
+  window.ApexLang = {
+    currentLang: localStorage.getItem('APEX_LANG') || 'zh',
+    init: function() {
+      this.apply(this.currentLang);
+    },
+    toggle: function() {
+      this.currentLang = this.currentLang === 'zh' ? 'en' : 'zh';
+      localStorage.setItem('APEX_LANG', this.currentLang);
+      this.apply(this.currentLang);
+    },
+    apply: function(lang) {
+      // 1. 翻译普通静态 DOM
+      document.querySelectorAll('[data-zh][data-en]').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) el.innerText = text;
+      });
+      // 2. 更新切换按钮文案
+      const btn = document.getElementById('langToggleBtn');
+      if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
+      // 3. 核心修复：每次切换语言时，强制刷新一次轮播图当前文字
+      if (window.ApexHeroSlider && typeof window.ApexHeroSlider.updateSlideLang === 'function') {
+        window.ApexHeroSlider.updateSlideLang(lang);
       }
-    };
-  </script>
+    }
+  };
 
-  <script>
-    window.ApexHeroSlider = {
-      currentIndex: 0,
-      timer: null,
-      slidesData: [],
+  window.ApexHeroSlider = {
+    currentIndex: 0,
+    timer: null,
+    slidesData: [],
+    
+    init: function() {
+      const saved = localStorage.getItem('APEX_BANNER_CONFIG');
+      // 核心修复：预置完整的中英双语配置
+      const defaultSlides = [
+        { 
+          tag: "ADMIN BANNER 01", 
+          titleZh: "破除低效传统冗长，全视觉商业交付新纪元", 
+          titleEn: "Break traditional inefficiencies, start a visual business delivery era",
+          descZh: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。", 
+          descEn: "Covering PPT strategies, EXCEL financial models, and WORD compliance reports, passing institutional ATS tests.",
+          bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", 
+          bgImg: "" 
+        },
+        { 
+          tag: "GLOBAL COMPLIANCE 02", 
+          titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", 
+          titleEn: "Zero-Registration Seamless Checkout, Compliant with EU/US GDPR & Audits",
+          descZh: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。", 
+          descEn: "One-click export of standard .pptx / .xlsx / .docx assets, supporting global automated settlement.",
+          bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", 
+          bgImg: "" 
+        }
+      ];
+      this.slidesData = saved ? JSON.parse(saved) : defaultSlides;
       
-      init: function() {
-        const saved = localStorage.getItem('APEX_BANNER_CONFIG');
-        const defaultSlides = [
-          { 
-            tag: "ADMIN BANNER 01", 
-            titleZh: "破除低效传统冗长，全视觉商业交付新纪元", 
-            titleEn: "Break traditional inefficiencies, start a visual business delivery era",
-            descZh: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。", 
-            descEn: "Covering PPT strategies, EXCEL financial models, and WORD compliance reports, passing institutional ATS tests.",
-            bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", 
-            bgImg: "" 
-          },
-          { 
-            tag: "GLOBAL COMPLIANCE 02", 
-            titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", 
-            titleEn: "Zero-Registration Seamless Checkout, Compliant with EU/US GDPR & Audits",
-            descZh: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。", 
-            descEn: "One-click export of standard .pptx / .xlsx / .docx assets, supporting global automated settlement.",
-            bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", 
-            bgImg: "" 
-          }
-        ];
-        this.slidesData = saved ? JSON.parse(saved) : defaultSlides;
-        
-        const container = document.getElementById('dynamicHeroContainer');
-        if (!container) return;
-        
-        container.innerHTML = this.slidesData.map((s, idx) => {
-          const titleZh = s.titleZh || s.title || "";
-          const titleEn = s.titleEn || s.title || "";
-          const descZh = s.descZh || s.desc || "";
-          const descEn = s.descEn || s.desc || "";
-          return `
-            <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
-              <div>
-                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
-                <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${titleZh}" data-en="${titleEn}">${titleZh}</h2>
-                <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${descZh}" data-en="${descEn}">${descZh}</p>
-              </div>
-              <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-                  <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
-                  <span class="text-white font-black">¥139 RMB</span>
-              </button>
+      const container = document.getElementById('dynamicHeroContainer');
+      if (!container) return;
+      
+      // 动态生成时，给 h2 和 p 加上明确的 data-zh / data-en 属性
+      container.innerHTML = this.slidesData.map((s, idx) => {
+        const titleZh = s.titleZh || s.title || "";
+        const titleEn = s.titleEn || s.title || "";
+        const descZh = s.descZh || s.desc || "";
+        const descEn = s.descEn || s.desc || "";
+        return `
+          <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
+            <div>
+              <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
+              <h2 class="hero-title text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${titleZh}" data-en="${titleEn}">${titleZh}</h2>
+              <p class="hero-desc text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${descZh}" data-en="${descEn}">${descZh}</p>
             </div>
-          `;
-        }).join('');
+            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
+                <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
+                <span class="text-white font-black">¥139 RMB</span>
+            </button>
+          </div>
+        `;
+      }).join('');
 
-        this.jump(0);
-        this.startAutoPlay(this.slidesData.length);
-        if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
-      },
+      this.jump(0);
+      this.startAutoPlay(this.slidesData.length);
+      this.updateSlideLang(window.ApexLang.currentLang);
+    },
 
-      jump: function(idx) {
-        const total = document.querySelectorAll('.hero-slide').length;
-        if (total === 0) return;
-        for (let i = 0; i < total; i++) {
-          const el = document.getElementById(`hero-slide-${i}`);
-          const dot = document.querySelectorAll('.dot')[i];
-          if (el) {
-            if (i === idx) { el.classList.remove('hidden'); el.classList.add('flex'); }
-            else { el.classList.remove('flex'); el.classList.add('hidden'); }
-          }
-          if (dot) dot.style.backgroundColor = i === idx ? '#ffffff' : 'rgba(255,255,255,0.4)';
+    updateSlideLang: function(lang) {
+      document.querySelectorAll('#dynamicHeroContainer [data-zh][data-en]').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) el.innerText = text;
+      });
+    },
+
+    jump: function(idx) {
+      const total = document.querySelectorAll('.hero-slide').length;
+      if (total === 0) return;
+      for (let i = 0; i < total; i++) {
+        const el = document.getElementById(`hero-slide-${i}`);
+        const dot = document.querySelectorAll('.dot')[i];
+        if (el) {
+          if (i === idx) { el.classList.remove('hidden'); el.classList.add('flex'); }
+          else { el.classList.remove('flex'); el.classList.add('hidden'); }
         }
-        const currentData = this.slidesData[idx];
-        const box = document.getElementById('heroBannerBox');
-        if (box && currentData) {
-          if (currentData.bgImg && currentData.bgImg.trim() !== "") {
-            box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.75), rgba(15,23,42,0.75)), url('${currentData.bgImg}')`;
-            box.style.backgroundSize = "cover";
-          } else {
-            box.style.backgroundImage = currentData.bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
-          }
-        }
-        this.currentIndex = idx;
-        if (window.ApexPricing) window.ApexPricing.applyPricing();
-      },
-
-      startAutoPlay: function(total) {
-        if (this.timer) clearInterval(this.timer);
-        this.timer = setInterval(() => {
-          this.currentIndex = (this.currentIndex + 1) % total;
-          this.jump(this.currentIndex);
-        }, 5000);
+        if (dot) dot.style.backgroundColor = i === idx ? '#ffffff' : 'rgba(255,255,255,0.4)';
       }
-    };
-    document.addEventListener('DOMContentLoaded', () => {
-      ApexHeroSlider.init();
-      window.ApexLang.init();
-    });
-  </script>
+      const currentData = this.slidesData[idx];
+      const box = document.getElementById('heroBannerBox');
+      if (box && currentData) {
+        if (currentData.bgImg && currentData.bgImg.trim() !== "") {
+          box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.75), rgba(15,23,42,0.75)), url('${currentData.bgImg}')`;
+          box.style.backgroundSize = "cover";
+        } else {
+          box.style.backgroundImage = currentData.bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
+        }
+      }
+      this.currentIndex = idx;
+      if (window.ApexPricing) window.ApexPricing.applyPricing();
+      this.updateSlideLang(window.ApexLang.currentLang);
+    },
+
+    startAutoPlay: function(total) {
+      if (this.timer) clearInterval(this.timer);
+      this.timer = setInterval(() => {
+        this.currentIndex = (this.currentIndex + 1) % total;
+        this.jump(this.currentIndex);
+      }, 5000);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    ApexHeroSlider.init();
+    window.ApexLang.init();
+  });
+</script>
 
   <script>
     fetch('components/compliance-footer.html').then(r => r.text()).then(html => {
