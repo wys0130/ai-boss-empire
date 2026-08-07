@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="components/version-vault.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
         [data-theme="light"] { --bg-app: #f1f5f9; --bg-card: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --border-color: #e2e8f0; --hover-bg: #f8fafc; }
@@ -139,6 +140,76 @@
                 <button onclick="toggleConfig()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition shadow-sm">🔑 密钥设置</button>
             </div>
         </header>
+
+        <!-- 👑 跨云独立存档版控制台弹窗 (GitHub + Gitee 物理隔离库) -->
+        <div id="vaultModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="saas-card max-w-2xl w-full rounded-2xl p-6 flex flex-col max-h-[85vh] shadow-2xl border border-blue-500/30">
+                <div class="flex items-center justify-between border-b pb-3 mb-4">
+                    <div>
+                        <h3 class="font-bold text-base text-blue-600 flex items-center gap-2">
+                            <span>🗄️ 独立跨云金库 · 版本管理与防灾备份</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/30 font-mono">MAX: 20 LIMIT</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">存档文件物理存放在独立的备份库，支持自定义备注与 20 个限额过期预警</p>
+                    </div>
+                    <button onclick="closeVaultModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+                </div>
+        
+                <!-- 跨云独立仓库参数快速配置区 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-xs font-mono">
+                    <div>
+                        <label class="block text-slate-400 mb-1">GitHub 独立备份仓库名</label>
+                        <input id="vault-gh-repo" type="text" placeholder="默认: ai-boss-archive" class="w-full saas-input rounded-lg px-3 py-1.5 font-bold text-blue-600" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">Gitee (码云) Access Token</label>
+                        <input id="vault-gitee-token" type="password" placeholder="填写码云 Token 同步写入" class="w-full saas-input rounded-lg px-3 py-1.5 font-bold text-emerald-600" />
+                    </div>
+                    <div class="md:col-span-2 flex justify-end">
+                        <button onclick="ApexVersionVault.saveVaultConfig(document.getElementById('vault-gh-repo').value, document.getElementById('vault-gitee-token').value)" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs">
+                            💾 绑定备份仓库参数
+                        </button>
+                    </div>
+                </div>
+        
+                <!-- 当前版本列表 -->
+                <div class="flex items-center justify-between mb-2 text-xs font-mono font-bold">
+                    <span>独立金库版本快照清单 (最多保留 20 个，超量请删除)</span>
+                    <button onclick="ApexVersionVault.renderVaultList('vault-snapshots-list')" class="px-2.5 py-1 rounded bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
+                        🔄 重新获取
+                    </button>
+                </div>
+        
+                <div id="vault-snapshots-list" class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1 min-h-[220px]">
+                    <div class="p-4 text-center text-xs text-slate-400 font-mono">点击重新获取加载快照...</div>
+                </div>
+        
+                <div class="mt-4 pt-3 border-t flex justify-between items-center">
+                    <span class="text-[11px] text-slate-400 font-mono">💡 建议重大调整前点击一键备份</span>
+                    <button onclick="ApexVersionVault.createSnapshot()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-md">
+                        ✨ + 新建当前全站跨云独立存档
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            window.openVaultModal = function() {
+                const modal = document.getElementById("vaultModal");
+                if (modal) {
+                    modal.classList.remove("hidden");
+                    if (window.ApexVersionVault) {
+                        document.getElementById("vault-gh-repo").value = localStorage.getItem("APEX_VAULT_GH_REPO") || "ai-boss-archive";
+                        document.getElementById("vault-gitee-token").value = localStorage.getItem("APEX_GITEE_TOKEN") || "";
+                        ApexVersionVault.renderVaultList("vault-snapshots-list");
+                    }
+                }
+            };
+            window.closeVaultModal = function() {
+                const modal = document.getElementById("vaultModal");
+                if (modal) modal.classList.add("hidden");
+            };
+        </script>
 
         <!-- 👑 修复：密钥设置区，填入 GitHub Token 与 DeepSeek API 即可让换电脑云端同步全部畅通 -->
         <div id="configArea" class="hidden absolute top-16 right-6 z-50 saas-card rounded-2xl p-5 w-96 shadow-2xl space-y-3">
