@@ -69,8 +69,8 @@
     <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
         <div>
             <div class="h-16 flex items-center justify-between px-4 border-b border-slate-800 bg-[#0b0f19]">
-                <!-- 👑 修复图1/图3：点击上传 LOGO，自动双写存储并提交 GitHub -->
-                <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP并推送云端)">
+                <!-- 👑 点击上传 LOGO，触发 WebP 本地与 GitHub 云端仓库双重写回 -->
+                <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP并推送云端GitHub)">
                     <img id="adminBrandLogo" src="assets/logo.webp" alt="LOGO" class="brand-logo-img h-7 w-auto object-contain" 
                          onerror="this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');" />
                     <div id="adminFallbackBadge" class="hidden w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shrink-0 aspect-square">A</div>
@@ -140,7 +140,7 @@
             </div>
         </header>
 
-        <!-- 👑 修复图2：密钥输入板，输入后全部通过权限认证 -->
+        <!-- 👑 修复：密钥设置区，填入 GitHub Token 与 DeepSeek API 即可让换电脑云端同步全部畅通 -->
         <div id="configArea" class="hidden absolute top-16 right-6 z-50 saas-card rounded-2xl p-5 w-96 shadow-2xl space-y-3">
             <h4 class="font-bold text-xs text-slate-500 uppercase font-mono">系统 API 授权密钥设置</h4>
             <input id="ghTokenInput" type="password" placeholder="GitHub Access Token (需 repo 权限)" class="w-full saas-input rounded-xl p-2.5 text-xs font-mono">
