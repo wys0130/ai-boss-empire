@@ -12,7 +12,7 @@ let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
 // ==========================================
-// 1. 👑 侧边栏高亮逻辑
+// 1. 👑 侧边栏高亮与导航切换逻辑
 // ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
@@ -87,7 +87,7 @@ window.ApexLogoManager = {
 };
 
 // ==========================================
-// 👑 新增：【用户与权限管理中台】(持久化 + 真实邮件验证码引擎)
+// 3. 👑 用户与权限管理中台 (持久化 + 检索 + 真实邮件验证码引擎)
 // ==========================================
 window.ApexUserManager = {
     defaultUsers: [
@@ -96,6 +96,7 @@ window.ApexUserManager = {
         { id: "U-1003", email: "product_pm@saas-growth.org", role: "PPT 战略套件订阅 [CLIENT]", verified: false, date: "2026-08-01", status: true }
     ],
     userList: [],
+    searchQuery: "",
     currentVerifyIdx: -1,
 
     loadUsers: function() {
@@ -134,7 +135,6 @@ window.ApexUserManager = {
         alert(`✅ 安全配置已更新！\n\n主页驾驶舱通行口令为：【 ${pwd} 】\nEmailJS 发信接口已绑定！`);
     },
 
-    // 👑 修复截图 7：发送真正可交互的验证码并调起绑定校验框
     sendRealVerifyEmail: function(idx) {
         this.currentVerifyIdx = idx;
         const targetEmail = this.userList[idx].email;
@@ -145,7 +145,6 @@ window.ApexUserManager = {
         const tid = localStorage.getItem("APEX_EMAILJS_TID");
         const pkey = localStorage.getItem("APEX_EMAILJS_KEY");
 
-        // 如果设置了真实 EmailJS 密钥，发送真实邮件
         if (sid && tid && pkey && window.emailjs) {
             emailjs.init(pkey);
             emailjs.send(sid, tid, { to_email: targetEmail, verification_code: code })
@@ -158,7 +157,6 @@ window.ApexUserManager = {
                 this.openVerifyModal();
             });
         } else {
-            // 未填发信 SDK 时，提供清楚引导并给出演示验证码
             alert(`📧 【发信网关已触发】\n当前系统尚未填入第三方 EmailJS 接口参数，但已启用安全校验链路！\n\n请在收件码校验框输入本次生成验证码：【 ${code} 】`);
             this.openVerifyModal();
         }
@@ -193,14 +191,41 @@ window.ApexUserManager = {
         }
     },
 
-    // 👑 修复截图 3、4：具备清晰可见高反差实色按键 + 真正从 localStorage 读取与永久删除
+    filterUsers: function(val) {
+        this.searchQuery = val.trim();
+        const clearBtn = document.getElementById("user-search-clear");
+        if (clearBtn) {
+            if (this.searchQuery) clearBtn.classList.remove("hidden");
+            else clearBtn.classList.add("hidden");
+        }
+        this.renderUserTable();
+    },
+
+    clearSearch: function() {
+        this.searchQuery = "";
+        const input = document.getElementById("user-search-input");
+        const clearBtn = document.getElementById("user-search-clear");
+        if (input) input.value = "";
+        if (clearBtn) clearBtn.classList.add("hidden");
+        this.renderUserTable();
+    },
+
     renderUserTable: function() {
         const tbody = document.getElementById("userTableBody");
         if (!tbody) return;
         tbody.innerHTML = "";
 
-        this.userList.forEach((user, idx) => {
-            // 👑 修复截图 4：封禁/解封选用明亮纯实底，无论什么底色清晰万分
+        const list = this.searchQuery 
+            ? this.userList.filter(u => u.email.toLowerCase().includes(this.searchQuery.toLowerCase()) || u.id.toLowerCase().includes(this.searchQuery.toLowerCase()))
+            : this.userList;
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有找到相关匹配的用户记录</td></tr>`;
+            return;
+        }
+
+        list.forEach((user) => {
+            const realIdx = this.userList.findIndex(item => item.id === user.id);
             const statusBtnCls = user.status 
                 ? "bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-sm" 
                 : "bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-sm";
@@ -217,16 +242,18 @@ window.ApexUserManager = {
                     <td class="py-3 px-4 font-mono text-blue-600 font-bold">${user.role}</td>
                     <td class="py-3 px-4 font-mono">${verifyText}</td>
                     <td class="py-3 px-4 font-mono text-slate-400">${user.date}</td>
-                    <td class="py-3 px-4 text-right space-x-1.5">
-                        <button onclick="ApexUserManager.toggleUserStatus(${idx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${statusBtnCls}">
-                            ${user.status ? '封禁账号' : '立即解封'}
-                        </button>
-                        <button onclick="ApexUserManager.sendRealVerifyEmail(${idx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm">
-                            发送验证码
-                        </button>
-                        <button onclick="ApexUserManager.deleteUser(${idx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm">
-                            销毁账号
-                        </button>
+                    <td class="py-3 px-4 text-right whitespace-nowrap min-w-[240px]">
+                        <div class="inline-flex items-center justify-end gap-1.5 flex-wrap">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${statusBtnCls}">
+                                ${user.status ? '封禁账号' : '立即解封'}
+                            </button>
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm">
+                                发送验证码
+                            </button>
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm">
+                                销毁账号
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -240,9 +267,8 @@ window.ApexUserManager = {
         appendLog(`>> [用户中心] 账号 [${this.userList[idx].email}] 状态变更 -> ${this.userList[idx].status ? '正常' : '封禁'}`);
     },
 
-    // 👑 修复截图 3：点击销毁直接写本地存储，刷新再看绝对不复活
     deleteUser: function(idx) {
-        if (!confirm(`确定彻底销毁客户 [${this.userList[idx].email}] 的授权账号与记录吗？`)) return;
+        if (!confirm(`确定彻底销毁客户 [${this.userList[idx].email}] 的授权凭证与记录吗？`)) return;
         this.userList.splice(idx, 1);
         this.saveUsers();
         this.renderUserTable();
@@ -273,6 +299,9 @@ window.ApexUserManager = {
     }
 };
 
+// ==========================================
+// 4. 👑 AI 智能体排班区间配置中台
+// ==========================================
 window.ApexScheduleManager = {
     loadScheduleFromCloud: async function() {
         try {
@@ -319,6 +348,9 @@ window.ApexScheduleManager = {
     }
 };
 
+// ==========================================
+// 5. 👑 作品审核与定价表 (含独立行内联动 / 脱钩开关)
+// ==========================================
 const AUDIT_PRODUCTS = [
     {
         id: "aerotech",
@@ -328,6 +360,7 @@ const AUDIT_PRODUCTS = [
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
+        isLinked: true,
         status: true
     },
     {
@@ -338,6 +371,7 @@ const AUDIT_PRODUCTS = [
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
+        isLinked: true,
         status: true
     },
     {
@@ -348,6 +382,7 @@ const AUDIT_PRODUCTS = [
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
+        isLinked: true,
         status: true
     },
     {
@@ -358,6 +393,7 @@ const AUDIT_PRODUCTS = [
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-emerald-600 font-bold",
+        isLinked: true,
         status: true
     },
     {
@@ -368,22 +404,29 @@ const AUDIT_PRODUCTS = [
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-indigo-600 font-bold",
+        isLinked: true,
         status: true
     }
 ];
+
+window.toggleRowLinkage = function(index) {
+    AUDIT_PRODUCTS[index].isLinked = !AUDIT_PRODUCTS[index].isLinked;
+    renderAuditTable();
+    appendLog(`>> [风控审查] 作品 [${AUDIT_PRODUCTS[index].title}] 定价模式 -> ${AUDIT_PRODUCTS[index].isLinked ? '汇率联动' : '行内独立定价'}`);
+};
 
 window.onAuditPriceChange = function(index, field, val) {
     const num = parseFloat(val) || 0;
     if (field === 'rmb') {
         AUDIT_PRODUCTS[index].priceRmb = num;
-        if (ApexPricing && ApexPricing.isLinked) {
+        if (AUDIT_PRODUCTS[index].isLinked) {
             let usd = num / ApexFX.currentRate;
-            usd = (ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
+            usd = (ApexPricing && ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
             AUDIT_PRODUCTS[index].priceUsd = usd > 0 ? usd : "0.00";
         }
     } else if (field === 'usd') {
         AUDIT_PRODUCTS[index].priceUsd = num;
-        if (ApexPricing && ApexPricing.isLinked) {
+        if (AUDIT_PRODUCTS[index].isLinked) {
             const rmb = Math.round(num * ApexFX.currentRate);
             AUDIT_PRODUCTS[index].priceRmb = rmb > 0 ? rmb : 0;
         }
@@ -401,6 +444,10 @@ window.renderAuditTable = function() {
             ? "bg-emerald-500 text-white font-bold shadow-sm" 
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
         const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
+        const linkBtnCls = item.isLinked
+            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+            : "bg-amber-500/10 text-amber-600 border-amber-500/30";
+        const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 已脱钩";
 
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
@@ -418,13 +465,16 @@ window.renderAuditTable = function() {
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="切换行内汇率联动/独立定额">
+                            ${linkBtnText}
+                        </button>
                     </div>
                 </td>
                 <td class="py-3 px-4">
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
+                    <button onclick="alert('✏️ 正在调校参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
                     <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
             </tr>
@@ -456,6 +506,9 @@ window.toggleThemeMode = function() {
     if (btn) btn.innerHTML = target === "dark" ? "<span>🌞 白昼模式</span>" : "<span>🌙 极夜模式</span>";
 };
 
+// ==========================================
+// 6. 👑 首页轮播图配置管理 (Hero Banner Configuration)
+// ==========================================
 window.ApexBannerManager = {
     loadBannerConfig: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
@@ -501,6 +554,9 @@ window.ApexBannerManager = {
     }
 };
 
+// ==========================================
+// 7. 👑 汇率与商品定价中心 (RMB & USD Linkage)
+// ==========================================
 window.ApexFX = {
     currentRate: 7.18,
     initWeeklyRate: async function() {
@@ -637,222 +693,13 @@ const DEFAULT_MANIFEST_TASKS = [
 
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
-function initAdminEngine() {
-    initApexTooltip();
-    renderDeptButtons();
-    renderAuditTable();
-    ApexScheduleManager.loadScheduleFromCloud();
-    ApexBannerManager.loadBannerConfig();
-    if (window.ApexLogoManager) ApexLogoManager.initLogo();
-    if (window.ApexUserManager) ApexUserManager.initUserSection();
-    
-    const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "light";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-    const btn = document.getElementById("themeToggleBtn");
-    if (btn) btn.innerHTML = savedTheme === "dark" ? "<span>🌞 白昼模式</span>" : "<span>🌙 极夜模式</span>";
-
-    ApexFX.initWeeklyRate();
-    
-    const cmdBox = document.getElementById("cmd");
-    if (cmdBox) {
-        cmdBox.addEventListener("focus", () => { isCmdActive = true; });
-        cmdBox.addEventListener("click", () => { isCmdActive = true; });
-
-        // 👑 修复截图 2：支持按 @ 弹出真实下拉提示菜单
-        cmdBox.addEventListener("input", function() {
-            const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
-            const match = text.match(/@([^\s@]*)$/);
-            if (match) showMentionDropdown(match[1]);
-            else hideMentionDropdown();
-        });
-
-        cmdBox.addEventListener("keydown", function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                e.preventDefault();
-                window.triggerSwarmAutonomousAction();
-            }
-            if (e.key === "Escape") hideMentionDropdown();
-        });
-    }
-
-    if (localStorage.getItem("APEX_GH_TOKEN")) {
-        window.syncAllData();
-    } else {
-        renderManifestTasks();
-    }
-}
-
-if (document.readyState === "loading") {
-    window.addEventListener("DOMContentLoaded", initAdminEngine);
-} else {
-    initAdminEngine();
-}
-
-window.syncAllData = function() {
-    loadTasksManifest();
-    loadHistoryFromMemory();
-};
-
-function initApexTooltip() {
-    const tooltip = document.getElementById("apexTooltip");
-    if (!tooltip) return;
-    document.addEventListener("mouseover", (e) => {
-        const target = e.target.closest("[data-tooltip]");
-        if (target) {
-            tooltip.innerText = target.getAttribute("data-tooltip");
-            tooltip.classList.remove("hidden");
-        }
-    });
-    document.addEventListener("mousemove", (e) => {
-        if (!tooltip.classList.contains("hidden")) {
-            tooltip.style.left = (e.clientX + 14) + "px";
-            tooltip.style.top = (e.clientY + 14) + "px";
-        }
-    });
-    document.addEventListener("mouseout", (e) => {
-        if (e.target.closest("[data-tooltip]")) {
-            tooltip.classList.add("hidden");
-        }
-    });
-}
-
-function renderDeptButtons() {
-    const container = document.getElementById("deptButtonsContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    deptConfig.forEach(dept => {
-        const btn = document.createElement("button");
-        btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
-        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
-        btn.onclick = () => window.inspectDept(dept.name, btn);
-        container.appendChild(btn);
-    });
-}
-
-// 👑 修复截图 2：完整实现 @部门 下拉弹窗渲染与选取插入
-window.showMentionDropdown = function(query) {
-    const dropEl = document.getElementById("mentionDropdown");
-    if (!dropEl) return;
-    const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
-    if (matches.length === 0) {
-        dropEl.classList.add("hidden");
-        return;
-    }
-    dropEl.innerHTML = "";
-    matches.forEach(dept => {
-        const item = document.createElement("div");
-        item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between";
-        item.innerHTML = `<span>@${dept.name}</span><span class="text-[10px] opacity-60">选择</span>`;
-        item.onmousedown = (e) => {
-            e.preventDefault();
-            window.selectMentionDept(dept.name);
-        };
-        dropEl.appendChild(item);
-    });
-    dropEl.classList.remove("hidden");
-};
-
-window.hideMentionDropdown = function() {
-    const dropEl = document.getElementById("mentionDropdown");
-    if (dropEl) dropEl.classList.add("hidden");
-};
-
-window.selectMentionDept = function(deptName) {
-    const cmdBox = document.getElementById("cmd");
-    if (!cmdBox) return;
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    
-    // 定位并替换当前输入的 @关键词
-    const textNode = range.startContainer;
-    if (textNode.nodeType === Node.TEXT_NODE) {
-        const val = textNode.textContent;
-        const atIdx = val.lastIndexOf('@', range.startOffset);
-        if (atIdx !== -1) {
-            range.setStart(textNode, atIdx);
-            range.deleteContents();
-        }
-    }
-    
-    // 渲染带有高阶样式属性的部门徽章标签
-    const tokenSpan = document.createElement("span");
-    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
-    tokenSpan.contentEditable = "false";
-    tokenSpan.setAttribute("data-dept", deptName);
-    tokenSpan.innerText = `@${deptName}`;
-
-    range.insertNode(tokenSpan);
-    const space = document.createTextNode(" ");
-    tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-    range.setStartAfter(space);
-    range.setEndAfter(space);
-    sel.removeAllRanges();
-    sel.addRange(range);
-    
-    hideMentionDropdown();
-    appendLog(`🎯 追加指令 @${deptName}`);
-};
-
-window.inspectDept = function(deptName, btnEl) {
-    activeFilterDept = deptName;
-    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
-    if (btnEl) btnEl.style.opacity = "1";
-    const activeLabel = document.getElementById("activeDeptLabel");
-    if (activeLabel) activeLabel.innerText = `[${deptName}]`;
-
-    const cmdBox = document.getElementById("cmd");
-    if (isCmdActive && cmdBox) {
-        cmdBox.focus();
-        const tokenSpan = document.createElement("span");
-        tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
-        tokenSpan.contentEditable = "false";
-        tokenSpan.setAttribute("data-dept", deptName);
-        tokenSpan.innerText = `@${deptName}`;
-
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-            const range = sel.getRangeAt(0);
-            range.collapse(false);
-            range.insertNode(tokenSpan);
-            const space = document.createTextNode(" ");
-            tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-            range.setStartAfter(space);
-            range.setEndAfter(space);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        } else {
-            cmdBox.appendChild(tokenSpan);
-            cmdBox.appendChild(document.createTextNode(" "));
-            cmdBox.scrollTop = cmdBox.scrollHeight;
-        }
-        appendLog(`🎯 追加指令 @${deptName}`);
-    } else {
-        appendLog(`🔍 视图切换 -> [${deptName}] (未点击聚焦文本框，不追加词条)`);
-    }
-
-    loadHistoryFromMemory();
-};
-
-window.resetDeptFilter = function() {
-    activeFilterDept = "";
-    isCmdActive = false;
-    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "1");
-    const activeLabel = document.getElementById("activeDeptLabel");
-    if (activeLabel) activeLabel.innerText = `[全景视图]`;
-    const cmdBox = document.getElementById("cmd");
-    if (cmdBox) cmdBox.innerHTML = "";
-    appendLog(`🌐 恢复全景视角`);
-    loadHistoryFromMemory();
-};
-
+// ==========================================
+// 8. 👑 进度书与工单管理 (Tasks Manifest)
+// ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
     try {
-        // 👑 优先读取本地持久化进度的最新工单，确保任何网络条件下重置与修改绝对生效
         const localCache = localStorage.getItem("APEX_TASKS_CACHE");
         if (localCache) {
             rawManifestTasks = JSON.parse(localCache);
@@ -891,13 +738,12 @@ function getKeysSafe() {
     };
 }
 
-// 👑 修复截图 6：深拷贝初始工单表，同时覆盖内存、本地 LocalStorage 与 GitHub，不管有无 API Key 都 100% 成功重置
 window.resetManifestToDefault = async function() {
     if (!confirm("确定将所有阶段工单重置为初始待办进度 (TODO) 吗？")) return;
     rawManifestTasks = JSON.parse(JSON.stringify(DEFAULT_MANIFEST_TASKS));
     localStorage.setItem("APEX_TASKS_CACHE", JSON.stringify(rawManifestTasks));
     renderManifestTasks();
-    appendLog(">> [进度书] 已将工单洗平并重置为初始待办进度！", "text-emerald-500");
+    appendLog(">> [进度书] 已将工单重置为初始待办进度！", "text-emerald-500");
     
     try {
         const keys = getKeysSafe();
@@ -1000,7 +846,6 @@ window.toggleTaskStatus = async function(taskId) {
     }
 };
 
-// 👑 修复截图 1：提供清除日志记录战报的真实接口
 window.clearHistoryLog = function() {
     const feed = document.getElementById("historyFeed");
     const countBadge = document.getElementById("historyCount");
@@ -1008,6 +853,221 @@ window.clearHistoryLog = function() {
     if (countBadge) countBadge.innerText = `0条`;
     appendLog(">> [系统战报] 已手动清除页面日志信息。");
 };
+
+// ==========================================
+// 9. 👑 智能中枢调令台与 @部门提及菜单 (Swarm Command Center)
+// ==========================================
+window.showMentionDropdown = function(query) {
+    const dropEl = document.getElementById("mentionDropdown");
+    if (!dropEl) return;
+    const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
+    if (matches.length === 0) {
+        dropEl.classList.add("hidden");
+        return;
+    }
+    dropEl.innerHTML = "";
+    matches.forEach(dept => {
+        const item = document.createElement("div");
+        item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between";
+        item.innerHTML = `<span>@${dept.name}</span><span class="text-[10px] opacity-60">选择</span>`;
+        item.onmousedown = (e) => {
+            e.preventDefault();
+            window.selectMentionDept(dept.name);
+        };
+        dropEl.appendChild(item);
+    });
+    dropEl.classList.remove("hidden");
+};
+
+window.hideMentionDropdown = function() {
+    const dropEl = document.getElementById("mentionDropdown");
+    if (dropEl) dropEl.classList.add("hidden");
+};
+
+window.selectMentionDept = function(deptName) {
+    const cmdBox = document.getElementById("cmd");
+    if (!cmdBox) return;
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    
+    const textNode = range.startContainer;
+    if (textNode.nodeType === Node.TEXT_NODE) {
+        const val = textNode.textContent;
+        const atIdx = val.lastIndexOf('@', range.startOffset);
+        if (atIdx !== -1) {
+            range.setStart(textNode, atIdx);
+            range.deleteContents();
+        }
+    }
+    
+    const tokenSpan = document.createElement("span");
+    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
+    tokenSpan.contentEditable = "false";
+    tokenSpan.setAttribute("data-dept", deptName);
+    tokenSpan.innerText = `@${deptName}`;
+
+    range.insertNode(tokenSpan);
+    const space = document.createTextNode(" ");
+    tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
+    range.setStartAfter(space);
+    range.setEndAfter(space);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    
+    hideMentionDropdown();
+    appendLog(`🎯 追加指令 @${deptName}`);
+};
+
+window.inspectDept = function(deptName, btnEl) {
+    activeFilterDept = deptName;
+    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "0.4");
+    if (btnEl) btnEl.style.opacity = "1";
+    const activeLabel = document.getElementById("activeDeptLabel");
+    if (activeLabel) activeLabel.innerText = `[${deptName}]`;
+
+    const cmdBox = document.getElementById("cmd");
+    if (isCmdActive && cmdBox) {
+        cmdBox.focus();
+        const tokenSpan = document.createElement("span");
+        tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
+        tokenSpan.contentEditable = "false";
+        tokenSpan.setAttribute("data-dept", deptName);
+        tokenSpan.innerText = `@${deptName}`;
+
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+            const range = sel.getRangeAt(0);
+            range.collapse(false);
+            range.insertNode(tokenSpan);
+            const space = document.createTextNode(" ");
+            tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
+            range.setStartAfter(space);
+            range.setEndAfter(space);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else {
+            cmdBox.appendChild(tokenSpan);
+            cmdBox.appendChild(document.createTextNode(" "));
+            cmdBox.scrollTop = cmdBox.scrollHeight;
+        }
+        appendLog(`🎯 追加指令 @${deptName}`);
+    } else {
+        appendLog(`🔍 视图切换 -> [${deptName}] (未点击聚焦文本框，不追加词条)`);
+    }
+
+    loadHistoryFromMemory();
+};
+
+window.resetDeptFilter = function() {
+    activeFilterDept = "";
+    isCmdActive = false;
+    document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "1");
+    const activeLabel = document.getElementById("activeDeptLabel");
+    if (activeLabel) activeLabel.innerText = `[全景视图]`;
+    const cmdBox = document.getElementById("cmd");
+    if (cmdBox) cmdBox.innerHTML = "";
+    appendLog(`🌐 恢复全景视角`);
+    loadHistoryFromMemory();
+};
+
+// ==========================================
+// 10. 👑 启动函数与 GitHub Repo 操作工具 API
+// ==========================================
+function initAdminEngine() {
+    initApexTooltip();
+    renderDeptButtons();
+    renderAuditTable();
+    ApexScheduleManager.loadScheduleFromCloud();
+    ApexBannerManager.loadBannerConfig();
+    if (window.ApexLogoManager) ApexLogoManager.initLogo();
+    if (window.ApexUserManager) ApexUserManager.initUserSection();
+    
+    const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    const btn = document.getElementById("themeToggleBtn");
+    if (btn) btn.innerHTML = savedTheme === "dark" ? "<span>🌞 白昼模式</span>" : "<span>🌙 极夜模式</span>";
+
+    ApexFX.initWeeklyRate();
+    
+    const cmdBox = document.getElementById("cmd");
+    if (cmdBox) {
+        cmdBox.addEventListener("focus", () => { isCmdActive = true; });
+        cmdBox.addEventListener("click", () => { isCmdActive = true; });
+
+        cmdBox.addEventListener("input", function() {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+            const match = text.match(/@([^\s@]*)$/);
+            if (match) showMentionDropdown(match[1]);
+            else hideMentionDropdown();
+        });
+
+        cmdBox.addEventListener("keydown", function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                window.triggerSwarmAutonomousAction();
+            }
+            if (e.key === "Escape") hideMentionDropdown();
+        });
+    }
+
+    if (localStorage.getItem("APEX_GH_TOKEN")) {
+        window.syncAllData();
+    } else {
+        renderManifestTasks();
+    }
+}
+
+if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initAdminEngine);
+} else {
+    initAdminEngine();
+}
+
+window.syncAllData = function() {
+    loadTasksManifest();
+    loadHistoryFromMemory();
+};
+
+function initApexTooltip() {
+    const tooltip = document.getElementById("apexTooltip");
+    if (!tooltip) return;
+    document.addEventListener("mouseover", (e) => {
+        const target = e.target.closest("[data-tooltip]");
+        if (target) {
+            tooltip.innerText = target.getAttribute("data-tooltip");
+            tooltip.classList.remove("hidden");
+        }
+    });
+    document.addEventListener("mousemove", (e) => {
+        if (!tooltip.classList.contains("hidden")) {
+            tooltip.style.left = (e.clientX + 14) + "px";
+            tooltip.style.top = (e.clientY + 14) + "px";
+        }
+    });
+    document.addEventListener("mouseout", (e) => {
+        if (e.target.closest("[data-tooltip]")) {
+            tooltip.classList.add("hidden");
+        }
+    });
+}
+
+function renderDeptButtons() {
+    const container = document.getElementById("deptButtonsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    deptConfig.forEach(dept => {
+        const btn = document.createElement("button");
+        btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
+        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
+        // 👑 阻止鼠标点击按钮抢走文本框光标，保证按需聚焦插入可用
+        btn.onmousedown = (e) => e.preventDefault();
+        btn.onclick = () => window.inspectDept(dept.name, btn);
+        container.appendChild(btn);
+    });
+}
 
 function getKeys() {
     const gh = localStorage.getItem("APEX_GH_TOKEN");
