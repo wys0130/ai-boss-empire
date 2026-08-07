@@ -26,7 +26,6 @@ window.switchAdminTab = function(tabId) {
         const sectionEl = document.getElementById(`tab-${id}`);
         const navEl = document.getElementById(`nav-${id}`);
         if (sectionEl) sectionEl.classList.toggle('hidden', id !== tabId);
-        // 👑 必须是 ===！只有选中的那个才高亮
         if (navEl) navEl.classList.toggle('active', id === tabId);
     });
 
@@ -37,7 +36,6 @@ window.switchAdminTab = function(tabId) {
 // ==========================================
 // 2. 👑 新增：企业 LOGO 上传本地自动压缩转 WebP 引擎
 // ==========================================
-// 👑 完整替换：LOGO 本地压缩 WebP 转换与多标签互斥引擎
 window.ApexLogoManager = {
     initLogo: function() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
@@ -47,7 +45,7 @@ window.ApexLogoManager = {
         if (adminLogoEl) {
             adminLogoEl.src = customLogo;
             adminLogoEl.style.display = 'block';
-            if (adminBadgeEl) adminBadgeEl.classList.add('hidden'); // 👑 图片成功时，强行关掉后边的 A
+            if (adminBadgeEl) adminBadgeEl.classList.add('hidden');
         }
     },
     uploadLogo: function() {
@@ -63,7 +61,7 @@ window.ApexLogoManager = {
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const maxSize = 240;
+                    const maxSize = 240; // LOGO 控制在精致的 240px 内
                     let w = img.width, h = img.height;
                     if (w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
                     canvas.width = w; canvas.height = h;
@@ -181,8 +179,28 @@ const AUDIT_PRODUCTS = [
     }
 ];
 
-// 👑 在《作品风控审查与上架》表格里支持直接改价，及高对比按键
-// 👑 完整替换：作品风控审查与上架表格渲染 (全面升级高清晰强对比度字号颜色)
+// ==========================================
+// 3. 👑 修复：作品风控表（彻底去除左边缘丑怪白条 + 强力亮白文字）
+// ==========================================
+window.onAuditPriceChange = function(index, field, val) {
+    const num = parseFloat(val) || 0;
+    if (field === 'rmb') {
+        AUDIT_PRODUCTS[index].priceRmb = num;
+        if (ApexPricing && ApexPricing.isLinked) {
+            let usd = num / ApexFX.currentRate;
+            usd = (ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
+            AUDIT_PRODUCTS[index].priceUsd = usd > 0 ? usd : "0.00";
+        }
+    } else if (field === 'usd') {
+        AUDIT_PRODUCTS[index].priceUsd = num;
+        if (ApexPricing && ApexPricing.isLinked) {
+            const rmb = Math.round(num * ApexFX.currentRate);
+            AUDIT_PRODUCTS[index].priceRmb = rmb > 0 ? rmb : 0;
+        }
+    }
+    renderAuditTable();
+};
+
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
@@ -195,19 +213,20 @@ window.renderAuditTable = function() {
         const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
 
         tbody.innerHTML += `
-            <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+            <!-- 👑 彻底去除 border-l-4 白条，采用干练下边框，字体强制设为最明亮的纯黑与亮白 -->
+            <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
                 <td class="py-3 px-4">
                     <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
                 </td>
                 <td class="py-3 px-4">
-                    <!-- 👑 采用最清爽刺眼的纯黑/纯白 text-slate-900 / text-slate-100，绝对清晰 -->
-                    <div class="font-extrabold text-sm text-slate-900 dark:text-slate-100 tracking-wide">${item.title}</div>
+                    <!-- 👑 font-extrabold + text-slate-900 dark:text-white 保证任何背景下清晰见字 -->
+                    <div class="font-extrabold text-sm text-slate-900 dark:text-white tracking-wide">${item.title}</div>
                     <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
                 <td class="py-3 px-4 font-mono">
                     <div class="flex items-center gap-1.5">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
@@ -217,7 +236,7 @@ window.renderAuditTable = function() {
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">参数配置</button>
+                    <button onclick="alert('✏️ 正在深度调控: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">参数配置</button>
                     <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">强制销毁</button>
                 </td>
             </tr>
@@ -412,12 +431,10 @@ const deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30" }
 ];
 
-// 1. 修正返回商城地址
 window.openLiveSiteForceBypass = function() {
     window.open(`https://apexwork.work/?nocache=${Date.now()}`, '_blank');
 };
 
-// 👑 内置默认工单库（合理分配 DONE / IN_PROGRESS / TODO 真实进度，不再全部被打勾）
 const DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout，不办国内营业执照", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-102", title: "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
@@ -432,7 +449,6 @@ const DEFAULT_MANIFEST_TASKS = [
 
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
-// 👑 完整替换：系统启动引擎 (内置了 Logo、排班、轮播、汇率及全场状态初始化)
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
@@ -612,8 +628,6 @@ window.filterManifest = function(stageKey) {
     renderManifestTasks();
 };
 
-// 👑 修复及格：将白底按键全部升级为高对比度靛蓝底或翠绿实底按钮！
-// 👑 替换：将工单操作键升级为精炼干练的文案「↩ 撤销」与「✓ 达成」
 function renderManifestTasks() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
@@ -634,7 +648,6 @@ function renderManifestTasks() {
         let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-400");
         let statusText = isDone ? "已达成" : (isInProg ? "执行中" : "待落实");
         
-        // 👑 极简操作按钮（高对比底色 + 干净干练短文案）
         let btnCls = isDone 
             ? "bg-slate-700 hover:bg-slate-600 text-slate-200" 
             : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
@@ -693,16 +706,31 @@ function getKeys() {
     return { gh, ds };
 }
 
+// 👑 完整更新：支持面板打开自动回填密码口令
 window.toggleConfig = function() {
     const el = document.getElementById("configArea");
-    if (el) el.classList.toggle("hidden");
+    if (el) {
+        el.classList.toggle("hidden");
+        if (!el.classList.contains("hidden")) {
+            if (document.getElementById("ghTokenInput")) document.getElementById("ghTokenInput").value = localStorage.getItem("APEX_GH_TOKEN") || "";
+            if (document.getElementById("dsKeyInput")) document.getElementById("dsKeyInput").value = localStorage.getItem("APEX_DS_KEY") || "";
+            if (document.getElementById("adminPwdInput")) document.getElementById("adminPwdInput").value = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
+        }
+    }
 };
 
+// 👑 完整更新：同时保存管理员设定的自定义密码
 window.saveKeys = function() {
     localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
     localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
+    
+    const pwdVal = document.getElementById("adminPwdInput") ? document.getElementById("adminPwdInput").value.trim() : "";
+    const finalPwd = pwdVal || "8888";
+    localStorage.setItem("APEX_ADMIN_PWD", finalPwd);
+    
     window.toggleConfig();
     window.syncAllData();
+    alert(`✅ 密钥与通行配置已保存生效！\n\n当前驾驶舱通行口令已设为：【 ${finalPwd} 】\n请牢记该口令密码！`);
 };
 
 function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
@@ -777,148 +805,6 @@ window.openRollbackModal = function() {
 window.closeRollbackModal = function() {
     const el = document.getElementById("rollbackModal");
     if (el) el.classList.add("hidden");
-};
-
-// ==========================================
-// 3. 👑 修复：作品审查表 (白昼模式仅左边框高亮 + 自主可调非锁死)
-// ==========================================
-window.onAuditPriceChange = function(index, field, val) {
-    const num = parseFloat(val) || 0;
-    if (field === 'rmb') {
-        AUDIT_PRODUCTS[index].priceRmb = num;
-        // 只有当用户在定价中心开启了关联时，才联动换算；否则允许自主写死
-        if (ApexPricing && ApexPricing.isLinked) {
-            let usd = num / ApexFX.currentRate;
-            usd = (ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
-            AUDIT_PRODUCTS[index].priceUsd = usd > 0 ? usd : "0.00";
-        }
-    } else if (field === 'usd') {
-        AUDIT_PRODUCTS[index].priceUsd = num;
-        if (ApexPricing && ApexPricing.isLinked) {
-            const rmb = Math.round(num * ApexFX.currentRate);
-            AUDIT_PRODUCTS[index].priceRmb = rmb > 0 ? rmb : 0;
-        }
-    }
-    renderAuditTable();
-};
-
-window.renderAuditTable = function() {
-    const tbody = document.getElementById("auditTableBody");
-    if (!tbody) return;
-    tbody.innerHTML = "";
-
-    AUDIT_PRODUCTS.forEach((item, index) => {
-        const badgeCls = item.status 
-            ? "bg-emerald-500 text-white font-bold shadow-sm" 
-            : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
-        const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
-
-        tbody.innerHTML += `
-            <!-- 👑 白昼模式下拒绝黑灰底，采用纯银边框与左边缘高亮，字体极其清晰 -->
-            <tr class="border-l-4 border-transparent hover:border-blue-600 hover:bg-blue-50/40 dark:hover:bg-slate-800/40 transition">
-                <td class="py-3 px-4">
-                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 shadow-sm" />
-                </td>
-                <td class="py-3 px-4">
-                    <div class="font-bold text-sm text-slate-900 dark:text-slate-100">${item.title}</div>
-                    <div class="text-xs text-slate-400 font-mono mt-0.5">${item.category}</div>
-                </td>
-                <td class="py-3 px-4 font-mono">
-                    <div class="flex items-center gap-1.5">
-                        <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center ${item.colorCls}" />
-                        <span class="text-slate-400">/</span>
-                        <span class="text-blue-600 font-bold">$</span>
-                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center text-blue-600" />
-                    </div>
-                </td>
-                <td class="py-3 px-4">
-                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
-                </td>
-                <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 transition shadow-sm">参数配置</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">强制销毁</button>
-                </td>
-            </tr>
-        `;
-    });
-};
-// ==========================================
-// 4. 👑 工单管理：新增一键重置按钮 + 干练文字
-// ==========================================
-window.resetManifestToDefault = async function() {
-    if (!confirm("确定将所有阶段工单重置为初始待办状态 (TODO) 吗？")) return;
-    rawManifestTasks = DEFAULT_MANIFEST_TASKS;
-    renderManifestTasks();
-    try {
-        const keys = getKeys();
-        const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
-        const manifest = {
-            summary: { completed: 4, todo: 5, total_tasks: 9 },
-            tasks: DEFAULT_MANIFEST_TASKS,
-            updated_at: new Date().toISOString().slice(0, 10)
-        };
-        await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, "🔄 Reset tasks to realistic default", keys.gh);
-        alert("✅ 云端工单已重置为理性的初始待办进度！");
-    } catch(e) {
-        alert("页面工单已重置（写入云端请设置顶部 GitHub 密钥）");
-    }
-};
-// ==========================================
-// 2. 👑 原生 WebP 轮播图高清压缩引擎 (零后端、零 API 依赖)
-// ==========================================
-window.ApexWebPConverter = {
-    triggerUpload: function(targetInputId) {
-        // 创建隐藏的本地文件选择控件
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            this.convertToWebP(file, targetInputId);
-        };
-        fileInput.click();
-    },
-
-    convertToWebP: function(file, targetInputId) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                // 针对主页 Banner 轮播图做标准尺寸自适应上限 (例如最大 1600 宽度，保持比例)
-                const maxWidth = 1600;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-
-                // 在 Canvas 渲染图片并导出为质量 0.8 的高清 WebP
-                ctx.drawImage(img, 0, 0, width, height);
-                const webpDataUrl = canvas.toDataURL('image/webp', 0.80);
-
-                // 填入目标 URL 输入框
-                const inputEl = document.getElementById(targetInputId);
-                if (inputEl) {
-                    inputEl.value = webpDataUrl;
-                    inputEl.focus();
-                }
-
-                alert(`✅ 压缩与格式转换成功！\n\n图片已自动压缩分辨率至 ${width}x${height}，并转换成高效的 .WEBP 轮播图格式！\n点击页面顶部的【保存同步到商城前台】即可生效。`);
-            };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
 };
 
 async function fetchCommitHistory() {
