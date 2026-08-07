@@ -21,8 +21,7 @@
   <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <!-- 双击 LOGO 触发安全口令校验 -->
-      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击左上角进行管理员身份口令验证">
+      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员口令安全验证">
         <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
              onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
         <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
@@ -41,9 +40,9 @@
         🌐 EN / 简
       </button>
 
-      <!-- 👑 修复：访客/管理员身份徽章 -->
-      <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs transition" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
-      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">
+      <!-- 👑 修复：全新石墨青冷灰与高定皇家蓝靛蓝徽章，绝不屎黄，也绝不闪退 -->
+      <span id="userRoleBadge" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-1 rounded-lg font-bold text-xs shadow-sm transition select-none" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
+      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black shadow-md hover:opacity-95 transition text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">
         👑 驾驶舱 →
       </a>
     </div>
@@ -151,7 +150,36 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 1. 👑 前台多币种定价智能折算中台 -->
+  <!-- 1. 👑 前台云端同步自检中台 (Tier1: Local ➔ Tier2: GitHub Cloud ➔ Tier3: Default) -->
+  <script>
+    window.ApexCloudSync = {
+      init: async function() {
+        try {
+          const resSec = await fetch('config/security.json?nocache=' + Date.now());
+          if (resSec.ok) {
+            const secData = await resSec.json();
+            if (secData.pwd) localStorage.setItem('APEX_ADMIN_PWD', secData.pwd);
+          }
+          const resPrice = await fetch('config/pricing.json?nocache=' + Date.now());
+          if (resPrice.ok) {
+            const priceData = await resPrice.json();
+            localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(priceData));
+            if (window.ApexPricing) window.ApexPricing.applyPricing(window.ApexLang.currentLang);
+          }
+          const resBanner = await fetch('config/banner.json?nocache=' + Date.now());
+          if (resBanner.ok) {
+            const bannerData = await resBanner.json();
+            localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(bannerData));
+            if (window.ApexHeroSlider) window.ApexHeroSlider.init();
+          }
+        } catch(e) {
+          console.log("云端配置文件未创建或网络脱机，沿用当前设备本地存储。");
+        }
+      }
+    };
+  </script>
+
+  <!-- 2. 👑 前台多币种定价智能折算中台 -->
   <script>
     window.ApexPricing = {
       getConfig: function() {
@@ -181,34 +209,47 @@
         const isEn = lang === 'en';
 
         document.querySelectorAll('.hero-bundle-price').forEach(el => {
-          el.innerText = isEn ? `$${config.bundle.usd} USD` : `¥${config.bundle.rmb} RMB`;
+          const zhText = `¥${config.bundle.rmb} RMB`;
+          const enText = `$${config.bundle.usd} USD`;
+          el.setAttribute('data-zh', zhText);
+          el.setAttribute('data-en', enText);
+          el.innerText = isEn ? enText : zhText;
         });
 
-        const pptPrices = document.querySelectorAll('#ppt-section [data-price-rmb]');
-        pptPrices.forEach(el => {
-          el.innerText = isEn ? `$${config.ppt.usd} USD` : `￥${config.ppt.rmb} RMB`;
+        document.querySelectorAll('#ppt-section [data-price-rmb]').forEach(el => {
+          const zhText = `￥${config.ppt.rmb} RMB`;
+          const enText = `$${config.ppt.usd} USD`;
+          el.setAttribute('data-zh', zhText);
+          el.setAttribute('data-en', enText);
+          el.innerText = isEn ? enText : zhText;
         });
 
-        const excelPrices = document.querySelectorAll('a[href*="excel-editor"]');
-        excelPrices.forEach(btn => {
+        document.querySelectorAll('a[href*="excel-editor"]').forEach(btn => {
           const priceContainer = btn.previousElementSibling;
           if (priceContainer && priceContainer.hasAttribute('data-price-rmb')) {
-            priceContainer.innerText = isEn ? `$${config.excel.usd} USD` : `￥${config.excel.rmb} RMB`;
+            const zhText = `￥${config.excel.rmb} RMB`;
+            const enText = `$${config.excel.usd} USD`;
+            priceContainer.setAttribute('data-zh', zhText);
+            priceContainer.setAttribute('data-en', enText);
+            priceContainer.innerText = isEn ? enText : zhText;
           }
         });
 
-        const wordPrices = document.querySelectorAll('a[href*="word-editor"]');
-        wordPrices.forEach(btn => {
+        document.querySelectorAll('a[href*="word-editor"]').forEach(btn => {
           const priceContainer = btn.previousElementSibling;
           if (priceContainer && priceContainer.hasAttribute('data-price-rmb')) {
-            priceContainer.innerText = isEn ? `$${config.word.usd} USD` : `￥${config.word.rmb} RMB`;
+            const zhText = `￥${config.word.rmb} RMB`;
+            const enText = `$${config.word.usd} USD`;
+            priceContainer.setAttribute('data-zh', zhText);
+            priceContainer.setAttribute('data-en', enText);
+            priceContainer.innerText = isEn ? enText : zhText;
           }
         });
       }
     };
   </script>
 
-  <!-- 2. 👑 全站中英双语即时翻译引擎 -->
+  <!-- 3. 👑 全站中英双语即时翻译引擎 -->
   <script>
     window.ApexLang = {
       currentLang: localStorage.getItem('APEX_LANG') || 'zh',
@@ -239,7 +280,7 @@
     };
   </script>
 
-  <!-- 3. 👑 首页轮播图管理引擎 -->
+  <!-- 4. 👑 首页轮播图管理引擎 -->
   <script>
     window.ApexHeroSlider = {
       currentIndex: 0,
@@ -348,15 +389,23 @@
       }
     };
 
-    // 4. 👑 修复：自检并渲染登录后的“👑 董事长 [ADMIN]”荣耀徽章
+    // 5. 👑 彻底修复：无论加载、切语言还是反复刷新，只要是董事长，属性与文本全部双绑锁定，绝对不再闪回游客！
     function initUserRoleBadge() {
       const badge = document.getElementById('userRoleBadge');
       const portalBtn = document.getElementById('adminSecretPortal');
       const role = localStorage.getItem('APEX_USER_ROLE');
       if (role === 'ADMIN' && badge) {
-        badge.innerText = '👑 董事长 [ADMIN]';
-        badge.className = "bg-gradient-to-r from-amber-500 to-blue-600 text-white border border-amber-400 px-3 py-1 rounded-lg font-black text-xs shadow-md";
+        badge.setAttribute('data-zh', '👑 董事长 [ADMIN]');
+        badge.setAttribute('data-en', '👑 Chairman [ADMIN]');
+        badge.className = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black text-xs shadow-md transition select-none";
+        badge.innerText = window.ApexLang && window.ApexLang.currentLang === 'en' ? '👑 Chairman [ADMIN]' : '👑 董事长 [ADMIN]';
         if (portalBtn) portalBtn.classList.remove('hidden');
+      } else if (badge) {
+        badge.setAttribute('data-zh', '👤 游客');
+        badge.setAttribute('data-en', '👤 Visitor');
+        badge.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-1 rounded-lg font-bold text-xs shadow-sm transition select-none";
+        badge.innerText = window.ApexLang && window.ApexLang.currentLang === 'en' ? '👤 Visitor' : '👤 游客';
+        if (portalBtn) portalBtn.classList.add('hidden');
       }
     }
 
@@ -364,6 +413,7 @@
       ApexHeroSlider.init();
       window.ApexLang.init();
       initUserRoleBadge();
+      window.ApexCloudSync.init();
     });
   </script>
 
@@ -378,7 +428,7 @@
       if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
     }).catch(() => {});
 
-    // 5. 👑 LOGO 加载与在线 fallback
+    // 6. 👑 LOGO 三层架构渲染：本地 Cache ➔ GitHub assets/logo.webp ➔ 默认矢量 A 徽章
     (function initFrontLogo() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
         const frontLogoEl = document.getElementById('frontBrandLogo');
@@ -390,7 +440,7 @@
         }
     })();
 
-    // 6. 👑 口令网关：校验成功即刻改变右上角身份为 👑 董事长 [ADMIN]
+    // 7. 👑 董事长口令安全网关：输入口令成功立刻锁存状态为 ADMIN
     function checkChairmanStealthAccess() {
         const validPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         const pwd = prompt("👑 [安全防护网关] 请输入管理员身份口令：", "");
