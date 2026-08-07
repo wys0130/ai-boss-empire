@@ -1,123 +1,141 @@
-# APEXWORK 商业模板协同中枢 | 施工工程部  
-**任务 ID**: TASK-302  
-**优先级**: P0（核心资产保护）  
-**状态**: 已部署 / 已验证  
+# APEXWORK 商业模板协同中枢 — TASK-302 交付说明
+
+## 任务概述
+- **任务ID**: TASK-302  
+- **部门**: 施工工程部  
+- **目标**: 部署 3 分钟有效期的私有预签名下载链接，防止盗链与未授权访问  
+- **交付形式**: 技术实施方案 + 可直接落地的代码模板 + 运维检查清单
 
 ---
 
-## 1. 执行摘要  
-针对施工工程部图纸、BIM 模型、现场影像等私有资产，已上线 **R2 私有桶 + 3 分钟有效期预签名 URL** 终极防盗链方案。  
-- **时效控制**: 3 分钟（180 秒）自动失效，杜绝长期链接外泄。  
-- **访问控制**: 仅允许通过 APEXWORK 内部鉴权网关生成的签名请求，拒绝一切裸链 / 热链 / 爬虫。  
-- **审计追踪**: 每次签名生成与访问均记录至施工工程部专属日志流。  
+## 一、业务背景与安全需求
+
+施工工程部需要向分包商、监理方、现场负责人分发大体积图纸、BIM 模型、材料清单等敏感文件。  
+传统静态链接存在以下风险：
+
+- 链接永久有效，可被转发、爬取、盗链
+- 无身份绑定，无法追溯下载者
+- 无过期机制，文件长期暴露在公网
+
+**解决方案**：采用 **AWS S3 + CloudFront + Lambda@Edge（或 S3 Presigned URL）** 生成 3 分钟有效期的私有预签名链接。
 
 ---
 
-## 2. 技术实现（核心代码片段）  
+## 二、架构设计
 
-### 2.1 生成预签名 URL（Node.js / AWS SDK v3）  
+```
+[施工工程部用户] → [APEXWORK 控制台] → [后端服务] → 生成预签名URL（有效期180秒）
+        ↓
+[分包商/监理] → 点击链接 → S3/CloudFront 校验签名与过期时间
+        ↓
+  通过 → 下载文件（限速、审计日志）
+  失败 → 403 拒绝访问
+```
+
+---
+
+## 三、核心实现（Python + Boto3 示例）
+
+### 1. 生成预签名链接（有效期 180 秒）
+
+```python
+import boto3
+from datetime import datetime, timedelta
+
+s3_client = boto3.client('s3', region_name='ap-southeast-1')
+
+def generate_presigned_url(bucket: str, object_key: str, expires_in: int = 180) -> str:
+    """
+    生成私有预签名下载链接
+    :param bucket: S3 桶名
+    :param object_key: 对象键（如 'engineering/dwg/floor_plan_v2.dwg'）
+    :param expires_in: 有效期（秒），默认180秒（3分钟）
+    :return: 完整URL
+    """
+    url = s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={'Bucket': bucket, 'Key': object_key},
+        ExpiresIn=expires_in
+    )
+    return url
+
+# 使用示例
+if __name__ == '__main__':
+    download_url = generate_presigned_url(
+        bucket='apexwork-construction-private',
+        object_key='engineering/dwg/floor_plan_v2.dwg',
+        expires_in=180
+    )
+    print(f"3分钟内有效：{download_url}")
+```
+
+### 2. 服务端校验与审计（可选增强）
+
+```python
+# 在 API Gateway 或 Lambda 中校验请求头中的用户身份
+def validate_and_log(user_id: str, file_key: str):
+    # 记录下载日志到 CloudWatch / DynamoDB
+    # 可绑定用户ID，防止二次转发
+    pass
+```
+
+### 3. 前端调用（APEXWORK 控制台）
+
 ```javascript
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-const r2 = new S3Client({
-  region: "auto",
-  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: R2_ACCESS_KEY,
-    secretAccessKey: R2_SECRET_KEY,
-  },
-});
-
-export async function generatePresignedUrl(objectKey) {
-  const command = new GetObjectCommand({
-    Bucket: "construction-private-assets",
-    Key: objectKey,
+// 用户点击“生成下载链接”按钮
+async function generateDownloadLink(fileId) {
+  const resp = await fetch('/api/generate-download', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileId, userId: currentUser.id })
   });
-
-  // 3 分钟有效期 = 180 秒
-  const url = await getSignedUrl(r2, command, { expiresIn: 180 });
-
-  // 写入审计日志（含用户、时间、对象）
-  await auditLog("PRESIGN_GENERATED", { objectKey, expiresIn: 180 });
-
-  return url;
-}
-```
-
-### 2.2 防盗链强制策略（Cloudflare Worker 中间层）  
-```javascript
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const signature = url.searchParams.get("X-Amz-Signature");
-
-    // 1. 无签名 → 拒绝
-    if (!signature) {
-      return new Response("Forbidden: Missing Signature", { status: 403 });
-    }
-
-    // 2. 签名过期（由 AWS 自动校验，但额外加一层时钟检查）
-    const expires = url.searchParams.get("X-Amz-Date");
-    if (!expires || isExpired(expires, 180)) {
-      return new Response("Forbidden: URL Expired", { status: 403 });
-    }
-
-    // 3. 检查 Referer / Origin（仅允许 APEXWORK 内部域名）
-    const referer = request.headers.get("Referer") || "";
-    if (!referer.includes("apexwork.internal")) {
-      return new Response("Forbidden: Invalid Referer", { status: 403 });
-    }
-
-    // 4. 通过 → 转发到 R2
-    return fetch(request);
-  },
-};
-
-function isExpired(amzDate, maxAgeSeconds) {
-  const date = new Date(amzDate);
-  const now = new Date();
-  return (now - date) / 1000 > maxAgeSeconds;
+  const data = await resp.json();
+  // 显示链接，并提示3分钟内有效
+  showLink(data.url, 180);
 }
 ```
 
 ---
 
-## 3. 部署验证清单  
+## 四、安全加固建议
 
-| 测试项 | 预期结果 | 实测结果 |  
-|--------|----------|----------|  
-| 生成 URL 后立即访问 | 200 OK | ✅ 通过 |  
-| 等待 3 分钟后访问 | 403 AccessDenied | ✅ 通过 |  
-| 修改签名任意字符 | 403 SignatureDoesNotMatch | ✅ 通过 |  
-| 无 Referer 头访问 | 403 Forbidden | ✅ 通过 |  
-| 外部域名 Referer 访问 | 403 Forbidden | ✅ 通过 |  
-| 内部域名 + 有效签名 | 200 OK | ✅ 通过 |  
-
----
-
-## 4. 运维说明  
-- **失效时间**: 180 秒，可在 `generatePresignedUrl` 中调整（不建议超过 300 秒）。  
-- **日志查询**:  
-  ```bash
-  wrangler tail construction-presign-worker --format pretty
-  ```  
-- **紧急吊销**: 若怀疑密钥泄露，立即轮换 `R2_ACCESS_KEY` 并重启 Worker（自动失效所有旧签名）。  
+| 措施 | 说明 |
+|------|------|
+| **强制 HTTPS** | 预签名 URL 必须使用 HTTPS 传输 |
+| **最小权限 IAM** | 生成签名的 IAM 用户仅授予 `s3:GetObject` 权限 |
+| **禁止公开读** | S3 桶策略设置为 `BlockPublicAccess` |
+| **限速下载** | 通过 CloudFront 设置下载速率限制 |
+| **日志审计** | 开启 S3 Server Access Log，记录 IP、时间、UA |
+| **链接水印** | 在文件内嵌入下载者身份水印（PDF/图片） |
 
 ---
 
-## 5. 风险与缓解  
-| 风险 | 缓解措施 |  
-|------|----------|  
-| 签名 URL 被截获后 3 分钟内盗用 | 已启用 TLS 1.3 + 内部网络隔离，且每次访问记录 IP 与 UA |  
-| 内部人员恶意分享 | 审计日志实时告警，异常高频访问触发自动封禁 |  
-| 时钟偏差导致提前过期 | 使用 AWS 标准时间戳，容忍 ±60 秒偏差 |  
+## 五、运维检查清单（部署后必检）
+
+- [ ] S3 桶策略确认无 `*` 公开读权限  
+- [ ] 预签名 URL 在 180 秒后访问返回 `403 AccessDenied`  
+- [ ] 下载日志已写入审计系统  
+- [ ] 链接不可被浏览器直接缓存（设置 `Cache-Control: no-store`）  
+- [ ] 已通知施工工程部使用新链接格式，废弃旧静态链接  
 
 ---
 
-## 6. 结论  
-终极防盗链已生效。施工工程部所有私有对象现在只能通过 **APEXWORK 内部鉴权 → 3 分钟预签名 → 单次有效** 链接触达，外部裸链、热链、爬虫全部拦截。  
+## 六、回滚方案
 
-**部署人**: 施工工程部 · 架构组  
-**验证人**: 安全合规组  
-**时间**: 2025-06-04 14:30 UTC
+若出现异常，立即：
+1. 在 APEXWORK 控制台关闭预签名功能开关
+2. 临时启用旧链接（仅限内网）
+3. 排查原因后重新灰度发布
+
+---
+
+## 七、交付确认
+
+本方案已满足：
+- ✅ 3 分钟有效期  
+- ✅ 私有访问（需签名）  
+- ✅ 防盗链（签名绑定URL+时间）  
+- ✅ 可审计（日志留存）  
+- ✅ 可扩展（支持多部门、多文件类型）
+
+---
