@@ -9,7 +9,7 @@
   <link rel="dns-prefetch" href="https://pay.apexwork.cn">
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="../components/zero-auth.js"></script>
+  <script src="components/zero-auth.js"></script>
   
   <style>
     body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -21,9 +21,9 @@
   <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <!-- 👑 双击 LOGO 触发口令校验，绝对防变形 -->
+      <!-- 双击 LOGO 触发口令校验 -->
       <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员身份校验">
-        <img id="frontBrandLogo" src="../assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
+        <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
              onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
         <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
       </div>
@@ -33,8 +33,8 @@
     <!-- PPT演示 / EXCEL表格 / WORD文档 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
       <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
-      <a href="../excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
-      <a href="../word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
+      <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
+      <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
       
       <button id="langToggleBtn" onclick="window.ApexLang && window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-2.5 py-1 rounded-lg border border-slate-300 font-bold transition">
@@ -42,7 +42,7 @@
       </button>
 
       <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs">👤 游客</span>
-      <a id="adminSecretPortal" href="../admin/admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
+      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
         👑 驾驶舱 →
       </a>
     </div>
@@ -51,7 +51,7 @@
   <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
     
-    <!-- 👑 动态轮播区 -->
+    <!-- 动态轮播区 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
       <div id="dynamicHeroContainer" class="w-full z-10">
         <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
@@ -93,7 +93,7 @@
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="../editor.html?deck=aerotech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+            <a href="editor.html?deck=aerotech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
           </div>
         </div>
 
@@ -105,7 +105,7 @@
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="../editor.html?deck=saas" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+            <a href="editor.html?deck=saas" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
           </div>
         </div>
 
@@ -117,7 +117,7 @@
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="../editor.html?deck=fintech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
+            <a href="editor.html?deck=fintech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition">进入修改 →</a>
           </div>
         </div>
       </div>
@@ -140,7 +140,7 @@
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-emerald-600">￥69 RMB</div>
-            <a href="../excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 表格 →</a>
+            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Excel 表格 →</a>
           </div>
         </div>
 
@@ -152,7 +152,7 @@
           </div>
           <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
             <div data-price-rmb="69" class="font-mono font-bold text-sm text-indigo-600">￥69 RMB</div>
-            <a href="../word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 文档 →</a>
+            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md">进入 Word 文档 →</a>
           </div>
         </div>
       </div>
@@ -235,14 +235,14 @@
   </script>
 
   <script>
-    fetch('../components/compliance-footer.html').then(r => r.text()).then(html => {
+    fetch('components/compliance-footer.html').then(r => r.text()).then(html => {
       const c = document.getElementById('compliance-footer-container');
-      if (c) { c.innerHTML = html; const s = document.createElement('script'); s.src = '../components/lang-and-policy.js'; document.body.appendChild(s); }
+      if (c) { c.innerHTML = html; const s = document.createElement('script'); s.src = 'components/lang-and-policy.js'; document.body.appendChild(s); }
     }).catch(() => {});
 
-    fetch('../components/payment/cn-paywall.html').then(r => r.text()).then(html => {
+    fetch('components/payment/cn-paywall.html').then(r => r.text()).then(html => {
       const c = document.getElementById('cn-paywall-container');
-      if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = '../components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = '../components/payment/cn-signature.js'; document.body.appendChild(s2); }
+      if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
     }).catch(() => {});
 
     (function initFrontLogo() {
