@@ -10,6 +10,9 @@ let activeFilterDept = "";
 let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
+// ==========================================
+// 1. 👑 修复：侧边栏高亮逻辑 (彻底纠正 !== 为 ===)
+// ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm'];
     const titles = {
@@ -23,11 +26,56 @@ window.switchAdminTab = function(tabId) {
         const sectionEl = document.getElementById(`tab-${id}`);
         const navEl = document.getElementById(`nav-${id}`);
         if (sectionEl) sectionEl.classList.toggle('hidden', id !== tabId);
-        if (navEl) navEl.classList.toggle('active', id !== tabId);
+        // 👑 必须是 ===！只有选中的那个才高亮
+        if (navEl) navEl.classList.toggle('active', id === tabId);
     });
 
     const headerTitle = document.getElementById('pageHeaderTitle');
     if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK PRO';
+};
+
+// ==========================================
+// 2. 👑 新增：企业 LOGO 上传本地自动压缩转 WebP 引擎
+// ==========================================
+window.ApexLogoManager = {
+    initLogo: function() {
+        const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
+        if (!customLogo) return;
+        document.querySelectorAll('.brand-logo-img').forEach(img => {
+            img.src = customLogo;
+            img.style.display = 'block';
+        });
+    },
+    uploadLogo: function() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxSize = 240; // LOGO 控制在精致的 240px 内
+                    let w = img.width, h = img.height;
+                    if (w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
+                    canvas.width = w; canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const webpUrl = canvas.toDataURL('image/webp', 0.90);
+                    
+                    localStorage.setItem('APEX_CUSTOM_LOGO', webpUrl);
+                    this.initLogo();
+                    alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！");
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+        fileInput.click();
+    }
 };
 
 window.ApexScheduleManager = {
@@ -725,12 +773,13 @@ window.closeRollbackModal = function() {
 };
 
 // ==========================================
-// 1. // 👑 新增：支持模块1作品单独调价，且自动遵循系统汇率联动与 .99 规则互转
+// 3. 👑 修复：作品审查表 (白昼模式仅左边框高亮 + 自主可调非锁死)
 // ==========================================
 window.onAuditPriceChange = function(index, field, val) {
     const num = parseFloat(val) || 0;
     if (field === 'rmb') {
         AUDIT_PRODUCTS[index].priceRmb = num;
+        // 只有当用户在定价中心开启了关联时，才联动换算；否则允许自主写死
         if (ApexPricing && ApexPricing.isLinked) {
             let usd = num / ApexFX.currentRate;
             usd = (ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
@@ -746,7 +795,6 @@ window.onAuditPriceChange = function(index, field, val) {
     renderAuditTable();
 };
 
-// 👑 替换：在《作品风控审查与上架》表格里绑定价格联动输入框与高对比操作按键
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
@@ -759,12 +807,13 @@ window.renderAuditTable = function() {
         const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
 
         tbody.innerHTML += `
-            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+            <!-- 👑 白昼模式下拒绝黑灰底，采用纯银边框与左边缘高亮，字体极其清晰 -->
+            <tr class="border-l-4 border-transparent hover:border-blue-600 hover:bg-blue-50/40 dark:hover:bg-slate-800/40 transition">
                 <td class="py-3 px-4">
                     <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 shadow-sm" />
                 </td>
                 <td class="py-3 px-4">
-                    <div class="font-bold text-sm">${item.title}</div>
+                    <div class="font-bold text-sm text-slate-900 dark:text-slate-100">${item.title}</div>
                     <div class="text-xs text-slate-400 font-mono mt-0.5">${item.category}</div>
                 </td>
                 <td class="py-3 px-4 font-mono">
@@ -777,25 +826,37 @@ window.renderAuditTable = function() {
                     </div>
                 </td>
                 <td class="py-3 px-4">
-                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">
-                        ${badgeText}
-                    </button>
+                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 进入系统微调参数：[${item.title}] (￥' + AUDIT_PRODUCTS[${index}].priceRmb + ' / $' + AUDIT_PRODUCTS[${index}].priceUsd + ')')" 
-                            class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">
-                        参数配置
-                    </button>
-                    <button onclick="forceRemoveProduct(${index})" 
-                            class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">
-                        强制销毁
-                    </button>
+                    <button onclick="alert('✏️ 正在编辑参数: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 transition shadow-sm">参数配置</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">强制销毁</button>
                 </td>
             </tr>
         `;
     });
 };
-
+// ==========================================
+// 4. 👑 工单管理：新增一键重置按钮 + 干练文字
+// ==========================================
+window.resetManifestToDefault = async function() {
+    if (!confirm("确定将所有阶段工单重置为初始待办状态 (TODO) 吗？")) return;
+    rawManifestTasks = DEFAULT_MANIFEST_TASKS;
+    renderManifestTasks();
+    try {
+        const keys = getKeys();
+        const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+        const manifest = {
+            summary: { completed: 4, todo: 5, total_tasks: 9 },
+            tasks: DEFAULT_MANIFEST_TASKS,
+            updated_at: new Date().toISOString().slice(0, 10)
+        };
+        await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, "🔄 Reset tasks to realistic default", keys.gh);
+        alert("✅ 云端工单已重置为理性的初始待办进度！");
+    } catch(e) {
+        alert("页面工单已重置（写入云端请设置顶部 GitHub 密钥）");
+    }
+};
 // ==========================================
 // 2. 👑 原生 WebP 轮播图高清压缩引擎 (零后端、零 API 依赖)
 // ==========================================
