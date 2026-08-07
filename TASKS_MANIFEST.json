@@ -1,7 +1,7 @@
 {
   "summary": {
-    "completed": 9,
-    "todo": 0,
+    "completed": 8,
+    "todo": 1,
     "total_tasks": 9
   },
   "tasks": [
@@ -11,7 +11,7 @@
       "notes": "用极简代码嵌入 Checkout，不办国内营业执照",
       "stage": "STAGE_1_MVP_GLOBAL",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-102",
