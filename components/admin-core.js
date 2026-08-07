@@ -434,52 +434,57 @@ window.onAuditPriceChange = function(index, field, val) {
     renderAuditTable();
 };
 
+// 精准替换：components/admin-core.js 中的 renderAuditTable 函数
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
     tbody.innerHTML = "";
 
     AUDIT_PRODUCTS.forEach((item, index) => {
+        // 极简紧凑 SaaS 状态微标签样式 (告别肥胖臃肿)
         const badgeCls = item.status 
-            ? "bg-emerald-500 text-white font-bold shadow-sm" 
-            : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
+            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold" 
+            : "bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/30";
+        const badgeText = item.status ? "已上架" : "已隐藏";
+
         const linkBtnCls = item.isLinked
-            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-            : "bg-amber-500/10 text-amber-600 border-amber-500/30";
-        const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 已脱钩";
+            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-bold"
+            : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30";
+        const linkBtnText = item.isLinked ? "🔗 联动" : "🔓 独立";
 
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                <td class="py-3 px-4">
-                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
+                <td class="py-2.5 px-4">
+                    <img src="${item.thumb}" alt="快照" class="w-10 h-14 object-cover rounded border border-slate-200 dark:border-slate-700 shadow-sm" />
                 </td>
-                <td class="py-3 px-4">
-                    <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] tracking-wide">${item.title}</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
+                <td class="py-2.5 px-4">
+                    <div class="font-bold text-sm text-[#0f172a] dark:text-[#f8fafc] tracking-wide">${item.title}</div>
+                    <div class="text-[11px] text-slate-400 font-mono mt-0.5">${item.category}</div>
                 </td>
-                <td class="py-3 px-4 font-mono">
+                <td class="py-2.5 px-4 font-mono">
                     <div class="flex items-center gap-1.5">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-[#0f172a] dark:text-[#f8fafc] ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-14 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-0.5 text-xs font-bold text-center bg-white dark:bg-slate-900 text-[#0f172a] dark:text-[#f8fafc] ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
-                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
-                        <!-- 👑 点击按钮自由切换该行的「联动计算 / 独立定额」模式 -->
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="点击切换行内联动或独立脱钩定价">
+                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-0.5 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
+                        
+                        <!-- 精简紧凑版：联动/独立 切换微标签 -->
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-0.5 rounded text-[11px] transition tracking-tight ${linkBtnCls}" title="切换该行汇率联动/独立定额">
                             ${linkBtnText}
                         </button>
                     </div>
                 </td>
-                <!-- 👑 小圆点移到了文字左边，水平居中对齐，杜绝错位和换行！ -->
-                <td class="py-3 px-4">
-                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap inline-flex items-center gap-1.5 transition ${badgeCls}">
-                        <span>●</span>
-                        <span>${item.status ? '已上架' : '已隐藏'}</span>
+                <td class="py-2.5 px-4">
+                    <!-- 精简紧凑版：上架/下架 状态微标签 -->
+                    <button onclick="toggleAuditStatus(${index})" class="px-2 py-0.5 rounded text-[11px] transition inline-flex items-center gap-1 ${badgeCls}">
+                        <span class="w-1.5 h-1.5 rounded-full ${item.status ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+                        <span>${badgeText}</span>
                     </button>
                 </td>
-                <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
+                <td class="py-2.5 px-4 text-right space-x-1">
+                    <button onclick="alert('✏️ 正在调校参数: ${item.title}')" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">配置</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-2.5 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">销毁</button>
                 </td>
             </tr>
         `;
