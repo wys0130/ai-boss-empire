@@ -3,6 +3,7 @@
  * 1. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格！
  * 2. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
  * 3. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
+ * 4. 👑 全新加入：管理员口令安全与注册用户邮箱中心！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -14,12 +15,13 @@ let isCmdActive = false;
 // 1. 👑 修复：侧边栏高亮逻辑 (彻底纠正 !== 为 ===)
 // ==========================================
 window.switchAdminTab = function(tabId) {
-    const tabs = ['audit', 'config', 'overview', 'swarm'];
+    const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
     const titles = {
         'audit': '业务控制台 / 作品风控审查与上架',
         'config': '业务控制台 / 主页轮播图与定价中心',
         'overview': '业务控制台 / 阶段开发工单进度书',
-        'swarm': '业务控制台 / AI 智能体夜间排班与调令中心'
+        'swarm': '业务控制台 / AI 智能体夜间排班与调令中心',
+        'users': '业务控制台 / 用户与权限管理中心'
     };
 
     tabs.forEach(id => {
@@ -31,6 +33,10 @@ window.switchAdminTab = function(tabId) {
 
     const headerTitle = document.getElementById('pageHeaderTitle');
     if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK PRO';
+    
+    if (tabId === 'users' && window.ApexUserManager) {
+        ApexUserManager.initUserSection();
+    }
 };
 
 // ==========================================
@@ -61,7 +67,7 @@ window.ApexLogoManager = {
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const maxSize = 240; // LOGO 控制在精致的 240px 内
+                    const maxSize = 240;
                     let w = img.width, h = img.height;
                     if (w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
                     canvas.width = w; canvas.height = h;
@@ -77,6 +83,113 @@ window.ApexLogoManager = {
             reader.readAsDataURL(file);
         };
         fileInput.click();
+    }
+};
+
+// ==========================================
+// 👑 新增：第 5 大模块【用户与权限管理中台】(包含修改口令、邮箱绑定与找回)
+// ==========================================
+window.ApexUserManager = {
+    mockUsers: [
+        { id: "U-1001", email: "wys0130@apexwork.cn", role: "企业高级合伙人", verified: true, date: "2026-06-12", status: true },
+        { id: "U-1002", email: "founder@invest-tech.com", role: "商业三件套终身版", verified: true, date: "2026-07-03", status: true },
+        { id: "U-1003", email: "product_pm@saas-growth.org", role: "PPT 战略套件订阅", verified: false, date: "2026-08-01", status: true }
+    ],
+
+    initUserSection: function() {
+        const savedPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
+        const savedEmail = localStorage.getItem("APEX_ADMIN_EMAIL") || "admin@apexwork.cn";
+        const pwdInput = document.getElementById("pwd-new-admin");
+        const emailInput = document.getElementById("email-admin-bind");
+        if (pwdInput) pwdInput.value = savedPwd;
+        if (emailInput) emailInput.value = savedEmail;
+        this.renderUserTable();
+    },
+
+    saveAdminSecurity: function() {
+        const pwd = document.getElementById("pwd-new-admin").value.trim() || "8888";
+        const email = document.getElementById("email-admin-bind").value.trim() || "admin@apexwork.cn";
+        localStorage.setItem("APEX_ADMIN_PWD", pwd);
+        localStorage.setItem("APEX_ADMIN_EMAIL", email);
+        alert(`✅ 安全配置已更新！\n\n主页进入驾驶舱口令更新为：【 ${pwd} 】\n管理员绑定邮箱为：【 ${email} 】`);
+    },
+
+    sendRecoveryCode: function() {
+        const email = document.getElementById("email-admin-bind").value.trim() || "admin@apexwork.cn";
+        const code = Math.floor(100000 + Math.random() * 900000);
+        alert(`📧 [模拟验证邮件发往 ${email}]\n\n【APEXWORK 安全中心】您申请了管理员身份验证或密码找回，校验码为：${code} (3分钟内有效)。`);
+    },
+
+    renderUserTable: function() {
+        const tbody = document.getElementById("userTableBody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        this.mockUsers.forEach((user, idx) => {
+            const badgeCls = user.status 
+                ? "bg-emerald-500 text-white font-bold" 
+                : "bg-rose-500 text-white font-bold";
+            const badgeText = user.status ? "正常可用 ●" : "已封禁 ○";
+            const verifyText = user.verified 
+                ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
+                : '<span class="text-amber-500 font-bold">⚠ 待验证码补签</span>';
+
+            tbody.innerHTML += `
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
+                    <td class="py-3 px-4">
+                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc]">${user.email}</div>
+                        <div class="text-[11px] text-slate-400 font-mono mt-0.5">USER ID: ${user.id}</div>
+                    </td>
+                    <td class="py-3 px-4 font-mono text-blue-600 font-bold">${user.role}</td>
+                    <td class="py-3 px-4 font-mono">${verifyText}</td>
+                    <td class="py-3 px-4 font-mono text-slate-400">${user.date}</td>
+                    <td class="py-3 px-4 text-right space-x-1.5">
+                        <button onclick="ApexUserManager.toggleUserStatus(${idx})" class="px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                            ${user.status ? '封禁' : '解封'}
+                        </button>
+                        <button onclick="ApexUserManager.resetUserPwd(${idx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm">
+                            发送找回邮件
+                        </button>
+                        <button onclick="ApexUserManager.deleteUser(${idx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm">
+                            销毁账号
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    },
+
+    toggleUserStatus: function(idx) {
+        this.mockUsers[idx].status = !this.mockUsers[idx].status;
+        this.renderUserTable();
+        appendLog(`>> [用户管理] 更改账号 [${this.mockUsers[idx].email}] 权限 -> ${this.mockUsers[idx].status ? '正常' : '封禁'}`);
+    },
+
+    resetUserPwd: function(idx) {
+        const email = this.mockUsers[idx].email;
+        alert(`📧 已成功向用户 [${email}] 绑定的邮箱发送 6 位数安全重置密码链接！`);
+        appendLog(`>> [用户管理] 发送密码重置及验证码邮件至 -> ${email}`);
+    },
+
+    deleteUser: function(idx) {
+        if (!confirm(`确定彻底销毁客户 [${this.mockUsers[idx].email}] 的授权凭证吗？`)) return;
+        this.mockUsers.splice(idx, 1);
+        this.renderUserTable();
+    },
+
+    addNewMockUser: function() {
+        const em = prompt("请输入新授权客户的绑定邮箱：", "client@apexwork.cn");
+        if (!em) return;
+        this.mockUsers.unshift({
+            id: "U-" + Math.floor(1000 + Math.random() * 9000),
+            email: em,
+            role: "商业授权套件",
+            verified: true,
+            date: new Date().toISOString().slice(0, 10),
+            status: true
+        });
+        this.renderUserTable();
+        appendLog(`>> [用户管理] 新增授权用户账号 -> ${em}`);
     }
 };
 
@@ -180,7 +293,7 @@ const AUDIT_PRODUCTS = [
 ];
 
 // ==========================================
-// 3. 👑 修复：作品风控表（彻底去除左边缘丑怪白条 + 强力亮白文字）
+// 3. 👑 修复：作品风控表（彻底提升所有文字反差与按键高亮清晰度）
 // ==========================================
 window.onAuditPriceChange = function(index, field, val) {
     const num = parseFloat(val) || 0;
@@ -213,20 +326,19 @@ window.renderAuditTable = function() {
         const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
 
         tbody.innerHTML += `
-            <!-- 👑 彻底去除 border-l-4 白条，采用干练下边框，字体强制设为最明亮的纯黑与亮白 -->
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
                 <td class="py-3 px-4">
                     <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
                 </td>
                 <td class="py-3 px-4">
-                    <!-- 👑 font-extrabold + text-slate-900 dark:text-white 保证任何背景下清晰见字 -->
-                    <div class="font-extrabold text-sm text-slate-900 dark:text-white tracking-wide">${item.title}</div>
+                    <!-- 👑 采用最高对比度的 #0f172a 与 #f8fafc，彻底杜绝看不清字的问题 -->
+                    <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] tracking-wide">${item.title}</div>
                     <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
                 <td class="py-3 px-4 font-mono">
                     <div class="flex items-center gap-1.5">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-[#0f172a] dark:text-[#f8fafc] ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
@@ -236,8 +348,9 @@ window.renderAuditTable = function() {
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在深度调控: ${item.title}')" class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">参数配置</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">强制销毁</button>
+                    <!-- 👑 全部改为纯蓝实底白字按键 bg-blue-600 text-white font-bold，永不发暗，100分清晰！ -->
+                    <button onclick="alert('✏️ 正在调校参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
             </tr>
         `;
@@ -456,6 +569,7 @@ function initAdminEngine() {
     ApexScheduleManager.loadScheduleFromCloud();
     ApexBannerManager.loadBannerConfig();
     if (window.ApexLogoManager) ApexLogoManager.initLogo();
+    if (window.ApexUserManager) ApexUserManager.initUserSection();
     
     const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "light";
     document.documentElement.setAttribute("data-theme", savedTheme);
@@ -490,7 +604,7 @@ function initAdminEngine() {
     if (localStorage.getItem("APEX_GH_TOKEN")) {
         window.syncAllData();
     } else {
-        renderManifestTasks(); // 即使没有 API Token 也渲染底库，永不出现空白！
+        renderManifestTasks();
     }
 }
 
@@ -706,7 +820,6 @@ function getKeys() {
     return { gh, ds };
 }
 
-// 👑 完整更新：支持面板打开自动回填密码口令
 window.toggleConfig = function() {
     const el = document.getElementById("configArea");
     if (el) {
@@ -714,23 +827,16 @@ window.toggleConfig = function() {
         if (!el.classList.contains("hidden")) {
             if (document.getElementById("ghTokenInput")) document.getElementById("ghTokenInput").value = localStorage.getItem("APEX_GH_TOKEN") || "";
             if (document.getElementById("dsKeyInput")) document.getElementById("dsKeyInput").value = localStorage.getItem("APEX_DS_KEY") || "";
-            if (document.getElementById("adminPwdInput")) document.getElementById("adminPwdInput").value = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         }
     }
 };
 
-// 👑 完整更新：同时保存管理员设定的自定义密码
 window.saveKeys = function() {
     localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
     localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
-    
-    const pwdVal = document.getElementById("adminPwdInput") ? document.getElementById("adminPwdInput").value.trim() : "";
-    const finalPwd = pwdVal || "8888";
-    localStorage.setItem("APEX_ADMIN_PWD", finalPwd);
-    
     window.toggleConfig();
     window.syncAllData();
-    alert(`✅ 密钥与通行配置已保存生效！\n\n当前驾驶舱通行口令已设为：【 ${finalPwd} 】\n请牢记该口令密码！`);
+    alert("✅ API 密钥已保存生效！");
 };
 
 function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
