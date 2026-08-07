@@ -21,12 +21,13 @@
   <!-- 1. 顶部导航栏 (矢量标徽 + 真正高对白清晰导航) -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
-        <!-- 1. 默认优先展示图片 LOGO；若失败则隐藏图片并把 fallback 的 "A" 亮出来 -->
-        <img src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
-             onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
-        <!-- 2. 默认 hidden，作为加载图片失败时的保底标徽 -->
-        <div class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 items-center justify-center text-white font-black text-sm shadow-md shrink-0">A</div>
+      <!-- 👑 完整替换：index.html 顶部左上角 LOGO 区域 -->
+      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
+          <!-- 1. 优先展示图片 LOGO -->
+          <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
+               onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
+          <!-- 2. 备用 "A" 标徽：默认 hidden，且加了 shrink-0 aspect-square 永远不变形 -->
+          <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
       </div>
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
@@ -249,14 +250,35 @@
     }).catch(() => {});
 
     let clicks = 0, timer = null;
+    // 👑 完整替换：主页安全验证与企业 LOGO 自动同步完整脚本 (替换 index.html 底部原 checkChairmanStealthAccess 脚本)
+    (function initFrontLogo() {
+        const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
+        const frontLogoEl = document.getElementById('frontBrandLogo');
+        const badgeEl = document.getElementById('frontFallbackBadge');
+        if (customLogo && frontLogoEl) {
+            frontLogoEl.src = customLogo;
+            frontLogoEl.style.display = 'block';
+            if (badgeEl) badgeEl.classList.add('hidden');
+        }
+    })();
+    
+    let clicks = 0, timer = null;
     function checkChairmanStealthAccess() {
-      clicks++; clearTimeout(timer);
-      timer = setTimeout(() => { clicks = 0; }, 1500);
-      if (clicks >= 3) {
-        clicks = 0; const p = document.getElementById('adminSecretPortal');
-        if (p) p.classList.remove('hidden');
-        alert("👑 [权限验证]：董事长驾驶舱通道已开启！");
-      }
+        clicks++;
+        clearTimeout(timer);
+        timer = setTimeout(() => { clicks = 0; }, 1500);
+        if (clicks >= 3) {
+            clicks = 0;
+            // 👑 安全防线：必须要输口令密码才能揭开驾驶舱按钮（默认口令：apex2026 或 8888）
+            const pwd = prompt("👑 [安全网关] 请输入董事长驾驶舱通行口令：", "");
+            if (pwd === "apex2026" || pwd === "8888" || pwd === localStorage.getItem("APEX_ADMIN_PWD")) {
+                const p = document.getElementById('adminSecretPortal');
+                if (p) p.classList.remove('hidden');
+                alert("✅ 身份验证通过！管理通道已亮起，点击右上角【👑 驾驶舱】进入。");
+            } else if (pwd !== null) {
+                alert("❌ 验证通行码错误，拒绝访问后台通道！");
+            }
+        }
     }
 
     window.openBundleCheckout = function() {
