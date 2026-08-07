@@ -18,16 +18,14 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- 1. 顶部导航栏 (矢量标徽 + 真正高对白清晰导航) -->
+  <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <!-- 👑 完整替换：index.html 顶部左上角 LOGO 区域 -->
-      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
-          <!-- 1. 优先展示图片 LOGO -->
-          <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
-               onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
-          <!-- 2. 备用 "A" 标徽：默认 hidden，且加了 shrink-0 aspect-square 永远不变形 -->
-          <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
+      <!-- 👑 双击 LOGO 触发验证，且保证 "A" 徽章永不变形 -->
+      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员口令验证">
+        <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
+             onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
+        <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
       </div>
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
@@ -62,7 +60,6 @@
             <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">破除低效传统冗长，全视觉商业交付新纪元</h2>
             <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
           </div>
-          <!-- 👑 重构及格：纯蓝色高对比按键 + 纯白色通透文字 + 纯白色磨砂背景胶囊框 ￥139 RMB -->
           <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
               <span>⚡ 立即解锁商用三件套包</span>
               <span class="text-white font-black">¥139 RMB</span>
@@ -189,10 +186,9 @@
               <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">${s.title}</h2>
               <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">${s.desc}</p>
             </div>
-            <!-- 👑 修复重点：白字、白标签框、蓝底按键 -->
             <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-                    <span>⚡ 立即解锁商用三件套包</span>
-                    <span class="text-white font-black">¥139 RMB</span>
+                <span>⚡ 立即解锁商用三件套包</span>
+                <span class="text-white font-black">¥139 RMB</span>
             </button>
           </div>
         `).join('');
@@ -249,8 +245,7 @@
       if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
     }).catch(() => {});
 
-    let clicks = 0, timer = null;
-    // 👑 完整替换：主页安全验证与企业 LOGO 自动同步完整脚本 (替换 index.html 底部原 checkChairmanStealthAccess 脚本)
+    // 👑 彻底纠正变量重复声明冲突，单次声明保证全屏按钮正常点击
     (function initFrontLogo() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
         const frontLogoEl = document.getElementById('frontBrandLogo');
@@ -261,23 +256,17 @@
             if (badgeEl) badgeEl.classList.add('hidden');
         }
     })();
-    
-    let clicks = 0, timer = null;
+
+    // 👑 严谨的口令校验函数：支持读取管理后台自定义设定的新口令，未设默认匹配 8888
     function checkChairmanStealthAccess() {
-        clicks++;
-        clearTimeout(timer);
-        timer = setTimeout(() => { clicks = 0; }, 1500);
-        if (clicks >= 3) {
-            clicks = 0;
-            // 👑 安全防线：必须要输口令密码才能揭开驾驶舱按钮（默认口令：apex2026 或 8888）
-            const pwd = prompt("👑 [安全网关] 请输入董事长驾驶舱通行口令：", "");
-            if (pwd === "apex2026" || pwd === "8888" || pwd === localStorage.getItem("APEX_ADMIN_PWD")) {
-                const p = document.getElementById('adminSecretPortal');
-                if (p) p.classList.remove('hidden');
-                alert("✅ 身份验证通过！管理通道已亮起，点击右上角【👑 驾驶舱】进入。");
-            } else if (pwd !== null) {
-                alert("❌ 验证通行码错误，拒绝访问后台通道！");
-            }
+        const validPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
+        const pwd = prompt("👑 [安全网关] 请输入董事长驾驶舱通行口令 (默认: 8888)：", "");
+        if (pwd === validPwd) {
+            const p = document.getElementById('adminSecretPortal');
+            if (p) p.classList.remove('hidden');
+            alert("✅ 身份验证通过！管理通道已亮起，点击右上角【👑 驾驶舱 →】进入。");
+        } else if (pwd !== null) {
+            alert("❌ 验证错误，口令不匹配，无法开放权限！");
         }
     }
 
