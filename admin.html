@@ -69,7 +69,8 @@
     <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
         <div>
             <div class="h-16 flex items-center justify-between px-4 border-b border-slate-800 bg-[#0b0f19]">
-                <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP)">
+                <!-- 👑 修复图1/图3：点击上传 LOGO，自动双写存储并提交 GitHub -->
+                <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP并推送云端)">
                     <img id="adminBrandLogo" src="assets/logo.webp" alt="LOGO" class="brand-logo-img h-7 w-auto object-contain" 
                          onerror="this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');" />
                     <div id="adminFallbackBadge" class="hidden w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shrink-0 aspect-square">A</div>
@@ -139,9 +140,10 @@
             </div>
         </header>
 
+        <!-- 👑 修复图2：密钥输入板，输入后全部通过权限认证 -->
         <div id="configArea" class="hidden absolute top-16 right-6 z-50 saas-card rounded-2xl p-5 w-96 shadow-2xl space-y-3">
             <h4 class="font-bold text-xs text-slate-500 uppercase font-mono">系统 API 授权密钥设置</h4>
-            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token" class="w-full saas-input rounded-xl p-2.5 text-xs font-mono">
+            <input id="ghTokenInput" type="password" placeholder="GitHub Access Token (需 repo 权限)" class="w-full saas-input rounded-xl p-2.5 text-xs font-mono">
             <input id="dsKeyInput" type="password" placeholder="DeepSeek API Key" class="w-full saas-input rounded-xl p-2.5 text-xs font-mono">
             <button onclick="saveKeys()" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl transition">💾 保存密钥并生效</button>
         </div>
@@ -190,7 +192,7 @@
                 </div>
             </section>
 
-            <!-- TAB 2: 主页与轮播图配置中台 (👑 内置精美渐变色吸色卡片，点击即选) -->
+            <!-- TAB 2: 主页与轮播图配置中台 -->
             <section id="tab-config" class="hidden space-y-6">
                 <div class="saas-card rounded-2xl p-6">
                     <div class="flex justify-between items-center mb-6 border-b pb-4">
@@ -214,7 +216,6 @@
                                 <input id="banner-tag-0" type="text" value="ADMIN BANNER 01" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
                             </div>
                             
-                            <!-- 👑 人性化视觉吸取：4组预设卡片点击回填 -->
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1.5">渐变主题方案 (点击卡片直接吸取应用)</label>
                                 <div class="grid grid-cols-2 gap-2 mb-2">
@@ -263,7 +264,6 @@
                                 <input id="banner-tag-1" type="text" value="GLOBAL COMPLIANCE 02" class="w-full saas-input rounded-lg px-3 py-2 text-xs">
                             </div>
                             
-                            <!-- 👑 人性化视觉吸取：4组预设卡片点击回填 -->
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1.5">渐变主题方案 (点击卡片直接吸取应用)</label>
                                 <div class="grid grid-cols-2 gap-2 mb-2">
