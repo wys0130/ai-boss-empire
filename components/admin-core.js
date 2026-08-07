@@ -364,16 +364,16 @@ window.openLiveSiteForceBypass = function() {
     window.open(`https://apexwork.work/?nocache=${Date.now()}`, '_blank');
 };
 
-// 👑 内置默认 8 大保底工单库（绝不让进度书再变成“空白列表”）
+// 👑 内置默认工单库（合理分配 DONE / IN_PROGRESS / TODO 真实进度，不再全部被打勾）
 const DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout，不办国内营业执照", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-102", title: "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-103", title: "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广", notes: "内嵌商城高单价干货图文导流链接", stage: "STAGE_1_MVP_GLOBAL", department: "推广营销部", status: "DONE" },
     { id: "TASK-104", title: "实现万里汇 (WorldFirst) 跨境结汇与对公打款", notes: "配合老板手动验证第一张外卡到账", stage: "STAGE_1_MVP_GLOBAL", department: "董事长", status: "DONE" },
-    { id: "TASK-201", title: "国内正规军升级：接入广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "DONE" },
-    { id: "TASK-202", title: "构建境内专属隔离收银台，替换前期『爱发电』通道", notes: "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝", stage: "STAGE_2_CN_UPGRADE", department: "施工工程部", status: "DONE" },
-    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版推文流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "DONE" },
-    { id: "TASK-301", title: "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare", notes: "保持全球 TTFB < 50ms", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "DONE" },
+    { id: "TASK-201", title: "国内正规军升级：接入广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
+    { id: "TASK-202", title: "构建境内专属隔离收银台，替换前期『爱发电』通道", notes: "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝", stage: "STAGE_2_CN_UPGRADE", department: "施工工程部", status: "TODO" },
+    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版推文流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" },
+    { id: "TASK-301", title: "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare", notes: "保持全球 TTFB < 50ms", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" },
     { id: "TASK-302", title: "部署 3 分钟有效期的私有预签名下载链接防止盗链", notes: "无论海外还是国内收银台，付款成功签发临时链接", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" }
 ];
 
@@ -558,6 +558,7 @@ window.filterManifest = function(stageKey) {
 };
 
 // 👑 修复及格：将白底按键全部升级为高对比度靛蓝底或翠绿实底按钮！
+// 👑 替换：将工单操作键升级为精炼干练的文案「↩ 撤销」与「✓ 达成」
 function renderManifestTasks() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
@@ -575,14 +576,14 @@ function renderManifestTasks() {
     filtered.forEach(task => {
         const isDone = task.status === 'DONE';
         const isInProg = task.status === 'IN_PROGRESS';
-        let borderCls = isDone ? "border-emerald-500/40 bg-emerald-500/5 opacity-80" : "border-slate-200 dark:border-slate-800";
         let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-400");
         let statusText = isDone ? "已达成" : (isInProg ? "执行中" : "待落实");
         
-        // 👑 高对比度操作按钮
+        // 👑 极简操作按钮（高对比底色 + 干净干练短文案）
         let btnCls = isDone 
             ? "bg-slate-700 hover:bg-slate-600 text-slate-200" 
             : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
+        let btnText = isDone ? "↩ 撤销" : "✓ 达成";
 
         listEl.innerHTML += `
             <div class="saas-card rounded-xl p-4 flex flex-col justify-between transition hover:border-blue-500" 
@@ -596,8 +597,8 @@ function renderManifestTasks() {
                     <span class="text-[11px] text-slate-500 font-mono truncate block">${task.notes || '暂无说明'}</span>
                 </div>
                 <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end text-xs font-mono">
-                    <button onclick="toggleTaskStatus('${task.id}')" class="px-3.5 py-1.5 rounded-lg font-bold transition ${btnCls}">
-                        ${isDone ? '撤销打勾 ✕' : '完成落实 ✓'}
+                    <button onclick="toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">
+                        ${btnText}
                     </button>
                 </div>
             </div>
@@ -724,8 +725,28 @@ window.closeRollbackModal = function() {
 };
 
 // ==========================================
-// 1. 👑 彻底解决“重复了”：风控审查表格改为纯展示，调价统一在 Tab 2
+// 1. // 👑 新增：支持模块1作品单独调价，且自动遵循系统汇率联动与 .99 规则互转
 // ==========================================
+window.onAuditPriceChange = function(index, field, val) {
+    const num = parseFloat(val) || 0;
+    if (field === 'rmb') {
+        AUDIT_PRODUCTS[index].priceRmb = num;
+        if (ApexPricing && ApexPricing.isLinked) {
+            let usd = num / ApexFX.currentRate;
+            usd = (ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
+            AUDIT_PRODUCTS[index].priceUsd = usd > 0 ? usd : "0.00";
+        }
+    } else if (field === 'usd') {
+        AUDIT_PRODUCTS[index].priceUsd = num;
+        if (ApexPricing && ApexPricing.isLinked) {
+            const rmb = Math.round(num * ApexFX.currentRate);
+            AUDIT_PRODUCTS[index].priceRmb = rmb > 0 ? rmb : 0;
+        }
+    }
+    renderAuditTable();
+};
+
+// 👑 替换：在《作品风控审查与上架》表格里绑定价格联动输入框与高对比操作按键
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
@@ -746,13 +767,14 @@ window.renderAuditTable = function() {
                     <div class="font-bold text-sm">${item.title}</div>
                     <div class="text-xs text-slate-400 font-mono mt-0.5">${item.category}</div>
                 </td>
-                <!-- 👑 去掉重复的输入框，改为干净的定价读取展示，去重完美 -->
                 <td class="py-3 px-4 font-mono">
-                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs">
-                        <span class="${item.colorCls}">￥${item.priceRmb}</span>
-                        <span class="text-slate-400 mx-1">/</span>
-                        <span class="text-blue-600">$${item.priceUsd} USD</span>
-                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="${item.colorCls}">￥</span>
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center ${item.colorCls}" />
+                        <span class="text-slate-400">/</span>
+                        <span class="text-blue-600 font-bold">$</span>
+                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center text-blue-600" />
+                    </div>
                 </td>
                 <td class="py-3 px-4">
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">
@@ -760,8 +782,8 @@ window.renderAuditTable = function() {
                     </button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 提示：修改售价请在【主页与轮播图配置 -> 定价中心】统一设定！')" 
-                            class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 transition shadow-sm">
+                    <button onclick="alert('✏️ 进入系统微调参数：[${item.title}] (￥' + AUDIT_PRODUCTS[${index}].priceRmb + ' / $' + AUDIT_PRODUCTS[${index}].priceUsd + ')')" 
+                            class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition shadow-sm">
                         参数配置
                     </button>
                     <button onclick="forceRemoveProduct(${index})" 
