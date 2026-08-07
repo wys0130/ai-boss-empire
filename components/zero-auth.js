@@ -1,8 +1,9 @@
 /**
- * APEXWORK Zero-Auth & Smart Geo-Routing Gateway (V41 自动地区识别版)
+ * APEXWORK Zero-Auth & Smart Geo-Routing Gateway (V41 自动地区识别与VIP防刷版)
  * 1. 零延迟自动识别设备时区与语言：国内默认爱发电 (RMB)，海外默认 Lemon Squeezy (USD)
  * 2. 集中化配置海内外双轨 URL
  * 3. 支付完自动回跳本页，写签并发起自动下载
+ * 4. 👑 接入 ApexVIPGuard：每次下载执行每日商用次数上限检查 + 3 分钟动态签发
  */
 (function() {
   const APEX_AUTH_KEY = "APEX_PAID_TOKEN";
@@ -19,7 +20,6 @@
     overseas: {
       name: "Lemon Squeezy 海外商用收银 (MoR)",
       priceLabel: "$9.99 USD",
-      // 此处请替换为你实操申请到的 Lemon Squeezy 真实链接，例如: "https://apexwork.lemonsqueezy.com/buy/xxxx"
       url: "https://ifdian.net/order/create?product_type=1&plan_id=ebe4b892902911f18a1b52540025c377&sku=%5B%7B%22sku_id%22%3A%22ebec30a4902911f1acc852540025c377%22%2C%22count%22%3A1%7D%5D&viokrz_ex=0&fr=afcom"
     }
   };
@@ -32,7 +32,6 @@
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
       const lang = navigator.language || navigator.userLanguage || "";
-      // 只要是东八区、中国时区或中文系统，直接默认选定中国区 (china)
       if (timeZone.includes("Shanghai") || timeZone.includes("Chongqing") || timeZone.includes("Hong_Kong") || lang.toLowerCase().includes("zh")) {
         currentRegion = "china";
       } else {
@@ -121,8 +120,14 @@
     window.history.replaceState({ path: cleanUrl }, "", cleanUrl);
   }
 
+  // 👑 修复升级：在执行真实导出下载之前，首先向 VIP 下载守卫申请 3 分钟授权签发
   function autoTriggerPageDownload() {
     setTimeout(() => {
+      // 执行 VIP 下载风控：超过合理每日限额或频次即刻拦截
+      if (window.ApexVIPGuard && !window.ApexVIPGuard.verifyAndAuthorize("AUTO_PAY_ASSET")) {
+        return;
+      }
+
       const path = window.location.pathname;
       if (path.includes("editor.html") && typeof window.exportPPT === "function") {
         window.exportPPT();
@@ -142,6 +147,12 @@
 
     openCheckout: function(options = {}) {
       if (this.isPaidUser()) {
+        // 👑 修复升级：VIP 用户点击再次下载/导出时，必须通过风控频率检查，防恶意脚本爬盘
+        if (window.ApexVIPGuard) {
+          const authItem = window.ApexVIPGuard.verifyAndAuthorize(options.skuId || "VIP_ASSET");
+          if (!authItem) return; // 被冷却或限额拦截，中止执行
+        }
+
         if (typeof options.onSuccess === "function") options.onSuccess();
         return;
       }
@@ -187,7 +198,7 @@
   };
 
   window.addEventListener("DOMContentLoaded", () => {
-    autoDetectRegion(); // 👑 页面载入即判断国家与时区
+    autoDetectRegion();
     injectCheckoutModalDOM();
     checkPaymentCallback();
   });
