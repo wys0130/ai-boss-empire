@@ -6,7 +6,6 @@
     <title>顶尖智能商务办公平台 · 后台控制中台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/admin.css">
-    <!-- 接入 EmailJS 官方客户端邮件发送 SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; -webkit-font-smoothing: antialiased; }
@@ -41,7 +40,7 @@
 
     <div id="apexTooltip" class="hidden fixed z-50 px-2.5 py-1 text-xs bg-slate-900 text-white rounded shadow-lg pointer-events-none"></div>
 
-    <!-- 👑 修复截图 7：真实验证码交互校验与绑定邮箱弹窗 -->
+    <!-- 真实邮箱验证校验弹窗 -->
     <div id="emailVerifyModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="saas-card max-w-md w-full rounded-2xl p-6 space-y-4 shadow-2xl border border-blue-500/30">
             <div class="flex items-center justify-between border-b pb-3">
@@ -165,7 +164,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
                         <div>
                             <h3 class="font-bold text-base">作品风控审查与上架清单</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">直接编辑每个 Office 办公卡片（PPT演示/EXCEL表格/WORD文档）的授权价格与上架状态</p>
+                            <p class="text-xs text-slate-400 mt-0.5">编辑价格与上架状态，支持每一行的【🔗汇率联动 / 🔓独立定价】切换</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 font-bold border border-orange-500/20">可调价清单在线</span>
@@ -178,7 +177,7 @@
                                 <tr class="border-b text-slate-400 font-mono">
                                     <th class="py-3 px-4 font-bold">快照缩略图</th>
                                     <th class="py-3 px-4 font-bold">作品名 / Office 分类</th>
-                                    <th class="py-3 px-4 font-bold">商用授权价 (RMB / USD) · 可直接改</th>
+                                    <th class="py-3 px-4 font-bold">商用授权价 (RMB / USD) · 可行内独立脱钩</th>
                                     <th class="py-3 px-4 font-bold">当前状态</th>
                                     <th class="py-3 px-4 font-bold text-right">管理操作</th>
                                 </tr>
@@ -436,20 +435,20 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <!-- 👑 修复截图 1：战报右上角高亮深色按键，彻底告别看不见文字 -->
                         <aside class="lg:col-span-5 saas-card rounded-xl p-4 flex flex-col h-[380px]">
                             <div class="flex items-center justify-between border-b pb-2 mb-2 text-xs font-mono font-bold">
                                 <span>系统进化战报</span>
                                 <div class="flex items-center gap-1.5">
-                                    <span id="historyCount" class="px-2 py-0.5 rounded bg-slate-800 text-white dark:bg-slate-700 dark:text-white font-bold border border-slate-600 shadow">0条</span>
+                                    <!-- 👑 修复截图 1：实色亮灰色文字标签与清空按钮，绝不和白底混淆 -->
+                                    <span id="historyCount" class="px-2 py-0.5 rounded bg-slate-800 text-white font-bold border border-slate-600 shadow">0条</span>
                                     <button onclick="clearHistoryLog()" class="px-2 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold text-[10px] shadow">清空</button>
                                 </div>
                             </div>
                             <div id="historyFeed" class="flex-1 overflow-y-auto space-y-2 custom-scroll pr-1"></div>
                         </aside>
 
-                        <!-- 👑 修复截图 2：加入 #mentionDropdown 插槽，输入 @ 时能够立刻响应选部门 -->
                         <div class="lg:col-span-7 saas-card rounded-xl p-4 flex flex-col h-[380px] justify-between relative">
+                            <!-- 👑 修复截图 2：悬浮提示词条下拉选择菜单容器 -->
                             <div id="mentionDropdown" class="hidden absolute top-12 left-4 z-50 w-64 max-h-48 overflow-y-auto saas-card rounded-xl shadow-2xl border border-blue-500/40 p-1.5 space-y-1"></div>
                             <div>
                                 <div class="flex items-center justify-between border-b pb-2 mb-2 text-xs font-mono">
@@ -474,7 +473,7 @@
             <!-- TAB 5: 用户与管理口令权限中心 -->
             <section id="tab-users" class="hidden space-y-6">
                 <div class="saas-card rounded-2xl p-6 border-l-4 border-l-blue-600">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b pb-4">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-4 border-b pb-4">
                         <div>
                             <h3 class="font-bold text-base">管理员口令与真实 SMTP/EmailJS 邮箱服务配置</h3>
                             <p class="text-xs text-slate-400 mt-0.5">修改前端主页进入驾驶舱的口令，配置 EmailJS 发信服务参数，可给客户发送真实邮件</p>
@@ -500,20 +499,28 @@
                             <input id="emailjs-public-key" type="text" placeholder="user_xxx" class="w-full saas-input rounded-xl px-3 py-2.5 font-mono" />
                         </div>
                     </div>
-                    <div class="mt-4 flex justify-end">
-                        <button onclick="ApexUserManager.saveAdminSecurity()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md transition text-xs">
-                            💾 保存安全与发信接口参数
+
+                    <!-- 👑 修复截图 5：专门给这3个参数提供清晰直观来源引导说明 -->
+                    <div class="mt-3 p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 text-xs font-mono text-slate-400 flex items-center justify-between">
+                        <span>💡 参数来源引导：登录 <a href="https://www.emailjs.com/" target="_blank" class="text-blue-500 underline">EmailJS 官网</a> ➔ 在 Account 中获取 Public Key，在 Email Services 中获取 Service ID，在 Email Templates 中获取 Template ID。</span>
+                        <button onclick="ApexUserManager.saveAdminSecurity()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md transition text-xs">
+                            💾 保存安全与发信参数
                         </button>
                     </div>
                 </div>
 
                 <div class="saas-card rounded-2xl p-6">
-                    <div class="flex items-center justify-between mb-4 border-b pb-3">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-4 border-b pb-3">
                         <div>
                             <h3 class="font-bold text-base">注册用户管理清单</h3>
                             <p class="text-xs text-slate-400 mt-0.5">查看平台注册客户、绑定邮箱状态，具备本地持久化存储，操作销毁或验证状态立即留存</p>
                         </div>
                         <div class="flex items-center gap-2">
+                            <!-- 👑 修复截图 4：支持关键字检索和带 × 一键取消搜索框 -->
+                            <div class="relative w-56">
+                                <input id="user-search-input" type="text" oninput="ApexUserManager.filterUsers(this.value)" placeholder="搜索用户账号/邮箱..." class="w-full saas-input rounded-xl pl-3 pr-8 py-2 text-xs font-mono" />
+                                <button id="user-search-clear" onclick="ApexUserManager.clearSearch()" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+                            </div>
                             <button onclick="ApexUserManager.restoreDefaultUsers()" class="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300 font-bold rounded-xl text-xs transition">
                                 🔄 恢复默认账号
                             </button>
@@ -531,7 +538,8 @@
                                     <th class="py-3 px-4 font-bold">会员权益 & 账号角色</th>
                                     <th class="py-3 px-4 font-bold">邮箱校验状态</th>
                                     <th class="py-3 px-4 font-bold">注册时间</th>
-                                    <th class="py-3 px-4 font-bold text-right">账号权限管理</th>
+                                    <!-- 👑 修复截图 4：表头预留足够的最小宽度，绝不同列重叠 -->
+                                    <th class="py-3 px-4 font-bold text-right min-w-[240px]">账号权限管理</th>
                                 </tr>
                             </thead>
                             <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
