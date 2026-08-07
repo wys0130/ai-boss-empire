@@ -242,15 +242,15 @@ window.ApexUserManager = {
                     <td class="py-3 px-4 font-mono text-blue-600 font-bold">${user.role}</td>
                     <td class="py-3 px-4 font-mono">${verifyText}</td>
                     <td class="py-3 px-4 font-mono text-slate-400">${user.date}</td>
-                    <td class="py-3 px-4 text-right whitespace-nowrap min-w-[260px]">
+                    <td class="py-3 px-4 text-right whitespace-nowrap min-w-[280px]">
                         <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap">
-                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0 ${statusBtnCls}">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0 whitespace-nowrap ${statusBtnCls}">
                                 ${user.status ? '封禁账号' : '立即解封'}
                             </button>
-                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm shrink-0">
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm shrink-0 whitespace-nowrap">
                                 发送验证码
                             </button>
-                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm shrink-0">
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm shrink-0 whitespace-nowrap">
                                 销毁账号
                             </button>
                         </div>
@@ -443,7 +443,6 @@ window.renderAuditTable = function() {
         const badgeCls = item.status 
             ? "bg-emerald-500 text-white font-bold shadow-sm" 
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
-        const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
         const linkBtnCls = item.isLinked
             ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
             : "bg-amber-500/10 text-amber-600 border-amber-500/30";
@@ -465,13 +464,18 @@ window.renderAuditTable = function() {
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
+                        <!-- 👑 点击按钮自由切换该行的「联动计算 / 独立定额」模式 -->
                         <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="点击切换行内联动或独立脱钩定价">
                             ${linkBtnText}
                         </button>
                     </div>
                 </td>
+                <!-- 👑 小圆点移到了文字左边，水平居中对齐，杜绝错位和换行！ -->
                 <td class="py-3 px-4">
-                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
+                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap inline-flex items-center gap-1.5 transition ${badgeCls}">
+                        <span>●</span>
+                        <span>${item.status ? '已上架' : '已隐藏'}</span>
+                    </button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
                     <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
@@ -507,7 +511,7 @@ window.toggleThemeMode = function() {
 };
 
 // ==========================================
-// 6. 👑 首页轮播图配置管理 (Hero Banner Configuration)
+// 6. 👑 首页轮播图配置管理
 // ==========================================
 window.ApexBannerManager = {
     loadBannerConfig: function() {
@@ -555,7 +559,7 @@ window.ApexBannerManager = {
 };
 
 // ==========================================
-// 7. 👑 汇率与商品定价中心 (RMB & USD Linkage)
+// 7. 👑 汇率与商品定价中心
 // ==========================================
 window.ApexFX = {
     currentRate: 7.18,
@@ -694,7 +698,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 8. 👑 进度书与工单管理 (Tasks Manifest)
+// 8. 👑 进度书与工单管理
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -972,7 +976,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 10. 👑 启动函数与 GitHub Repo API 工具
+// 10. 👑 启动函数与 GitHub Repo 操作工具
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
