@@ -723,6 +723,114 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
+// ==========================================
+// 1. 👑 彻底解决“重复了”：风控审查表格改为纯展示，调价统一在 Tab 2
+// ==========================================
+window.renderAuditTable = function() {
+    const tbody = document.getElementById("auditTableBody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    AUDIT_PRODUCTS.forEach((item, index) => {
+        const badgeCls = item.status 
+            ? "bg-emerald-500 text-white font-bold shadow-sm" 
+            : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
+        const badgeText = item.status ? "已上架 ●" : "已隐藏 ○";
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                <td class="py-3 px-4">
+                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 shadow-sm" />
+                </td>
+                <td class="py-3 px-4">
+                    <div class="font-bold text-sm">${item.title}</div>
+                    <div class="text-xs text-slate-400 font-mono mt-0.5">${item.category}</div>
+                </td>
+                <!-- 👑 去掉重复的输入框，改为干净的定价读取展示，去重完美 -->
+                <td class="py-3 px-4 font-mono">
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-xs">
+                        <span class="${item.colorCls}">￥${item.priceRmb}</span>
+                        <span class="text-slate-400 mx-1">/</span>
+                        <span class="text-blue-600">$${item.priceUsd} USD</span>
+                    </span>
+                </td>
+                <td class="py-3 px-4">
+                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">
+                        ${badgeText}
+                    </button>
+                </td>
+                <td class="py-3 px-4 text-right space-x-1.5">
+                    <button onclick="alert('✏️ 提示：修改售价请在【主页与轮播图配置 -> 定价中心】统一设定！')" 
+                            class="px-3 py-1.5 rounded-lg border border-blue-500 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-50 transition shadow-sm">
+                        参数配置
+                    </button>
+                    <button onclick="forceRemoveProduct(${index})" 
+                            class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs transition font-bold shadow-sm">
+                        强制销毁
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+};
+
+// ==========================================
+// 2. 👑 原生 WebP 轮播图高清压缩引擎 (零后端、零 API 依赖)
+// ==========================================
+window.ApexWebPConverter = {
+    triggerUpload: function(targetInputId) {
+        // 创建隐藏的本地文件选择控件
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            this.convertToWebP(file, targetInputId);
+        };
+        fileInput.click();
+    },
+
+    convertToWebP: function(file, targetInputId) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // 针对主页 Banner 轮播图做标准尺寸自适应上限 (例如最大 1600 宽度，保持比例)
+                const maxWidth = 1600;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // 在 Canvas 渲染图片并导出为质量 0.8 的高清 WebP
+                ctx.drawImage(img, 0, 0, width, height);
+                const webpDataUrl = canvas.toDataURL('image/webp', 0.80);
+
+                // 填入目标 URL 输入框
+                const inputEl = document.getElementById(targetInputId);
+                if (inputEl) {
+                    inputEl.value = webpDataUrl;
+                    inputEl.focus();
+                }
+
+                alert(`✅ 压缩与格式转换成功！\n\n图片已自动压缩分辨率至 ${width}x${height}，并转换成高效的 .WEBP 轮播图格式！\n点击页面顶部的【保存同步到商城前台】即可生效。`);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
 async function fetchCommitHistory() {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
