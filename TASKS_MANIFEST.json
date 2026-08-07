@@ -1,98 +1,82 @@
 {
-  "project_name": "APEXWORK ENTERPRISE SUITE STORE - 3-STAGE MASTER PLAN",
-  "updated_at": "2026-08-06",
-  "rlff_engine": {
-    "reward_signal": "daily_success_orders",
-    "pruning_threshold": 7,
-    "min_ctr": 0.005
-  },
   "summary": {
-    "total_tasks": 9,
-    "completed": 9,
-    "in_progress": 1,
-    "todo": 0
+    "completed": 4,
+    "todo": 5,
+    "total_tasks": 9
   },
   "tasks": [
     {
       "id": "TASK-101",
-      "stage": "STAGE_1_MVP_GLOBAL",
       "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
-      "status": "DONE",
-      "department": "施工工程部 & 转化销售部",
-      "revenue_impact": "CRITICAL",
-      "notes": "绝不办国内营业执照。用最极简代码嵌入 Lemon Squeezy Checkout 直链，支持美元信用卡/Apple Pay。"
+      "notes": "用极简代码嵌入 Checkout，不办国内营业执照",
+      "stage": "STAGE_1_MVP_GLOBAL",
+      "department": "施工工程部",
+      "status": "DONE"
     },
     {
       "id": "TASK-102",
+      "title": "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约",
+      "notes": "检测中国 IP 时购买按钮自动变爱发电跳转",
       "stage": "STAGE_1_MVP_GLOBAL",
-      "title": "国内临时过渡方案：将内地 IP 访客引流至『爱发电』免签约通道",
-      "status": "DONE",
       "department": "施工工程部",
-      "revenue_impact": "HIGH",
-      "notes": "不搞境内 ICP 备案。检测到中国大陆访客时，购买按钮自动变为 ¥69 爱发电赞助获取下载码模板。"
+      "status": "DONE"
     },
     {
       "id": "TASK-103",
+      "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广",
+      "notes": "内嵌商城高单价干货图文导流链接",
       "stage": "STAGE_1_MVP_GLOBAL",
-      "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广引流贴",
-      "status": "DONE",
-      "department": "推广营销部 & 国际本地化部",
-      "revenue_impact": "CRITICAL",
-      "notes": "生产关于 Excel 财务模型和 PPT 战略演示的高价值欧美干货文，内嵌商城链接，发入 marketing/campaigns/ 目录。"
+      "department": "推广营销部",
+      "status": "DONE"
     },
     {
       "id": "TASK-104",
+      "title": "实现万里汇 (WorldFirst) 跨境结汇与对公打款",
+      "notes": "配合老板手动验证第一张外卡到账",
       "stage": "STAGE_1_MVP_GLOBAL",
-      "title": "实现万里汇 (WorldFirst) 跨境数字服务贸易结汇与本地储蓄卡验证",
-      "status": "DONE",
-      "department": "董事长 & 国际法务部",
-      "revenue_impact": "HIGH",
-      "notes": "配合老板手动验证第一张外卡到账，以服务贸易规避外汇结汇卡脖子问题。"
+      "department": "董事长",
+      "status": "DONE"
     },
     {
       "id": "TASK-201",
+      "title": "国内正规军升级：接入广州网络经营个体户执照与对公参数",
+      "notes": "办个体户无需实际租用办公楼",
       "stage": "STAGE_2_CN_UPGRADE",
-      "title": "国内正规军升级：接入广州网络经营个体户执照与对对公参数",
-      "status": "DONE",
-      "department": "董事长 & 国际法务部",
-      "revenue_impact": "HIGH",
-      "notes": "赚到第一笔美金且流水稳定后启动。办执照不租实体办公室，完成电子税务局核定。"
+      "department": "董事长",
+      "status": "IN_PROGRESS"
     },
     {
       "id": "TASK-202",
-      "stage": "STAGE_2_CN_UPGRADE",
       "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
-      "status": "DONE",
-      "department": "施工工程部 & 大脑中枢",
-      "revenue_impact": "CRITICAL",
-      "notes": "购买 .cn 备案小域。把前端主站中配置的 PAYMENT_GATEWAY_CN 无缝换成原生微信/支付宝官方扫码直连。"
+      "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
+      "stage": "STAGE_2_CN_UPGRADE",
+      "department": "施工工程部",
+      "status": "TODO"
     },
     {
       "id": "TASK-203",
+      "title": "智能判断多模态设计组，建立每日自动生成模版推文流水线",
+      "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
       "stage": "STAGE_2_CN_UPGRADE",
-      "title": "智能判断多模态设计组，建立每日自动生成模版与 85 分质检流",
-      "status": "DONE",
-      "department": "主动产品部 & 审核质量部",
-      "revenue_impact": "CRITICAL",
-      "notes": "AI 每天印钞：自动研发多样式 PPT/Excel/Word 模板，得分低于 85 分直接重做，达到标准自动挂上架。"
+      "department": "主动产品部",
+      "status": "TODO"
     },
     {
       "id": "TASK-301",
+      "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare",
+      "notes": "保持全球 TTFB < 50ms",
       "stage": "STAGE_3_FULL_SCALE",
-      "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare 边缘",
-      "status": "DONE",
       "department": "施工工程部",
-      "revenue_impact": "HIGH",
-      "notes": "全站不崩溃不白屏。海内外用户分流均保持 TTFB 50ms 极速加载。"
+      "status": "TODO"
     },
     {
       "id": "TASK-302",
+      "title": "部署 3 分钟有效期的私有预签名下载链接防止盗链",
+      "notes": "无论海外还是国内收银台，付款成功签发临时链接",
       "stage": "STAGE_3_FULL_SCALE",
-      "title": "部署 3 分钟有效期的 R2 私有预签名 (Presigned URL) 终极防盗链",
-      "status": "DONE",
       "department": "施工工程部",
-      "revenue_impact": "CRITICAL",
-      "notes": "无论海外 Lemon Squeezy 还是国内收银台，付款成功通过 Edge 验证生成防伪直链，实现无人值守永动机。"
+      "status": "TODO"
     }
-  ]
+  ],
+  "updated_at": "2026-08-07"
 }
