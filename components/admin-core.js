@@ -427,12 +427,14 @@ const DEFAULT_MANIFEST_TASKS = [
 
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
+// 👑 完整替换：系统启动引擎 (内置了 Logo、排班、轮播、汇率及全场状态初始化)
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
     renderAuditTable();
     ApexScheduleManager.loadScheduleFromCloud();
     ApexBannerManager.loadBannerConfig();
+    if (window.ApexLogoManager) ApexLogoManager.initLogo();
     
     const savedTheme = localStorage.getItem("APEX_ADMIN_THEME") || "light";
     document.documentElement.setAttribute("data-theme", savedTheme);
