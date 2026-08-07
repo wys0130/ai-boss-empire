@@ -1,7 +1,7 @@
 {
   "summary": {
-    "completed": 5,
-    "todo": 4,
+    "completed": 6,
+    "todo": 3,
     "total_tasks": 9
   },
   "tasks": [
@@ -51,7 +51,7 @@
       "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "施工工程部",
-      "status": "TODO"
+      "status": "DONE"
     },
     {
       "id": "TASK-203",
