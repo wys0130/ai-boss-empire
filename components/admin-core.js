@@ -12,7 +12,7 @@ let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
 // ==========================================
-// 1. 👑 侧边栏高亮与导航切换逻辑
+// 1. 👑 侧边栏高亮逻辑
 // ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
@@ -242,15 +242,15 @@ window.ApexUserManager = {
                     <td class="py-3 px-4 font-mono text-blue-600 font-bold">${user.role}</td>
                     <td class="py-3 px-4 font-mono">${verifyText}</td>
                     <td class="py-3 px-4 font-mono text-slate-400">${user.date}</td>
-                    <td class="py-3 px-4 text-right whitespace-nowrap min-w-[240px]">
-                        <div class="inline-flex items-center justify-end gap-1.5 flex-wrap">
-                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${statusBtnCls}">
+                    <td class="py-3 px-4 text-right whitespace-nowrap min-w-[260px]">
+                        <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0 ${statusBtnCls}">
                                 ${user.status ? '封禁账号' : '立即解封'}
                             </button>
-                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm">
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm shrink-0">
                                 发送验证码
                             </button>
-                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm">
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm shrink-0">
                                 销毁账号
                             </button>
                         </div>
@@ -465,7 +465,7 @@ window.renderAuditTable = function() {
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="切换行内汇率联动/独立定额">
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="点击切换行内联动或独立脱钩定价">
                             ${linkBtnText}
                         </button>
                     </div>
@@ -474,7 +474,7 @@ window.renderAuditTable = function() {
                     <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs transition ${badgeCls}">${badgeText}</button>
                 </td>
                 <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在调校参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
+                    <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
                     <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
             </tr>
@@ -972,7 +972,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 10. 👑 启动函数与 GitHub Repo 操作工具 API
+// 10. 👑 启动函数与 GitHub Repo API 工具
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1062,7 +1062,6 @@ function renderDeptButtons() {
         const btn = document.createElement("button");
         btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
         btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
-        // 👑 阻止鼠标点击按钮抢走文本框光标，保证按需聚焦插入可用
         btn.onmousedown = (e) => e.preventDefault();
         btn.onclick = () => window.inspectDept(dept.name, btn);
         container.appendChild(btn);
