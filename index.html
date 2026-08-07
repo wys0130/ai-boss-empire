@@ -37,13 +37,12 @@
       <a href="word-editor.html" class="hover:text-indigo-600 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
       
-      <!-- 👑 修复截图 5：一键切换中英全站翻译 -->
       <button id="langToggleBtn" onclick="window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-3 py-1 rounded-lg border border-slate-300 font-bold transition">
         🌐 EN / 简
       </button>
 
       <span id="userRoleBadge" class="bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 rounded-lg font-bold text-[11px] md:text-xs" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
-      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs">
+      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-amber-500 to-rose-600 text-white border border-amber-400 px-2.5 py-1 rounded-lg font-bold shadow-md hover:opacity-90 transition animate-pulse text-[11px] md:text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">
         👑 驾驶舱 →
       </a>
     </div>
@@ -54,19 +53,7 @@
     
     <!-- 动态轮播区 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
-      <div id="dynamicHeroContainer" class="w-full z-10">
-        <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
-          <div>
-            <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">ADMIN BANNER 01</span>
-            <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="破除低效传统冗长，全视觉商业交付新纪元" data-en="Break traditional inefficiencies, start a visual business delivery era">破除低效传统冗长，全视觉商业交付新纪元</h2>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。" data-en="Covering PPT strategies, EXCEL financial models, and WORD compliance reports, passing ATS tests.">覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。</p>
-          </div>
-          <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-              <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
-              <span class="text-white font-black">¥139 RMB</span>
-          </button>
-        </div>
-      </div>
+      <div id="dynamicHeroContainer" class="w-full z-10"></div>
       <div class="absolute bottom-3 right-5 flex gap-1.5 z-20">
         <span class="dot w-2 h-2 rounded-full bg-white cursor-pointer transition" onclick="ApexHeroSlider.jump(0)"></span>
         <span class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer transition" onclick="ApexHeroSlider.jump(1)"></span>
@@ -163,7 +150,7 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 👑 修复截图 5：原生中英双语切换内核，确保主页每一次文案都精准随动 -->
+  <!-- 多语言中英翻译同步引擎 -->
   <script>
     window.ApexLang = {
       currentLang: localStorage.getItem('APEX_LANG') || 'zh',
@@ -184,7 +171,6 @@
         if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
       }
     };
-    document.addEventListener('DOMContentLoaded', () => window.ApexLang.init());
   </script>
 
   <script>
@@ -196,8 +182,24 @@
       init: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         const defaultSlides = [
-          { tag: "ADMIN BANNER 01", title: "破除低效传统冗长，全视觉商业交付新纪元", desc: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。", bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", bgImg: "" },
-          { tag: "GLOBAL COMPLIANCE 02", title: "零注册无缝收单，满足欧美 GDPR 与金融审计", desc: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。", bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", bgImg: "" }
+          { 
+            tag: "ADMIN BANNER 01", 
+            titleZh: "破除低效传统冗长，全视觉商业交付新纪元", 
+            titleEn: "Break traditional inefficiencies, start a visual business delivery era",
+            descZh: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。", 
+            descEn: "Covering PPT strategies, EXCEL financial models, and WORD compliance reports, passing institutional ATS tests.",
+            bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", 
+            bgImg: "" 
+          },
+          { 
+            tag: "GLOBAL COMPLIANCE 02", 
+            titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", 
+            titleEn: "Zero-Registration Seamless Checkout, Compliant with EU/US GDPR & Audits",
+            descZh: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。", 
+            descEn: "One-click export of standard .pptx / .xlsx / .docx assets, supporting global automated settlement.",
+            bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", 
+            bgImg: "" 
+          }
         ];
         this.slidesData = saved ? JSON.parse(saved) : defaultSlides;
         
@@ -208,8 +210,8 @@
           <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
             <div>
               <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
-              <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug">${s.title}</h2>
-              <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl">${s.desc}</p>
+              <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${s.titleZh || s.title || ''}" data-en="${s.titleEn || s.title || ''}">${s.titleZh || s.title || ''}</h2>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${s.descZh || s.desc || ''}" data-en="${s.descEn || s.desc || ''}">${s.descZh || s.desc || ''}</p>
             </div>
             <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
                 <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
@@ -257,7 +259,10 @@
         }, 5000);
       }
     };
-    document.addEventListener('DOMContentLoaded', () => ApexHeroSlider.init());
+    document.addEventListener('DOMContentLoaded', () => {
+      ApexHeroSlider.init();
+      window.ApexLang.init();
+    });
   </script>
 
   <script>
