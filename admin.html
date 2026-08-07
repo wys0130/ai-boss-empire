@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light">
 <head>
@@ -19,11 +18,6 @@
             
         /* 悬浮框修复：深色背景，白字，拒绝全白 */
         #apexTooltip { background-color: #1e293b; color: white; border: 1px solid #334155; }
-
-        /* 其他基础样式 */
-        body { background-color: var(--bg-app); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .saas-card { background-color: var(--bg-card); border: 1px solid var(--border-color); }
-        .saas-input { background-color: var(--bg-app); border: 1px solid var(--border-color); color: var(--text-main); }
 
         /* 侧边栏导航：未选中时也拥有清晰的高对比银灰色 (#cbd5e1)，绝不发暗 */
         .nav-item { 
@@ -52,10 +46,12 @@
     <aside class="w-60 bg-[#0f172a] text-slate-300 flex flex-col justify-between shrink-0 z-30 select-none">
         <div>
             <div class="h-16 flex items-center justify-between px-4 border-b border-slate-800 bg-[#0b0f19]">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP)">
-                    <img src="assets/logo.webp" alt="LOGO" class="brand-logo-img h-7 w-auto object-contain" 
-                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
-                    <div class="hidden w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shrink-0">A</div>
+                <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击上传自定义 LOGO (自动转WebP)">
+                    <!-- 1. 优先载入图片 LOGO -->
+                    <img id="adminBrandLogo" src="assets/logo.webp" alt="LOGO" class="brand-logo-img h-7 w-auto object-contain" 
+                         onerror="this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');" />
+                    <!-- 2. 备用 "A" 字，默认 hidden，加了 shrink-0 aspect-square 永不变形 -->
+                    <div id="adminFallbackBadge" class="hidden w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shrink-0 aspect-square">A</div>
                     <span class="font-bold text-white font-mono text-xs tracking-wide truncate">顶尖商务平台</span>
                 </div>
                 <button onclick="ApexLogoManager.uploadLogo()" class="text-[10px] text-slate-400 hover:text-white px-1.5 py-0.5 border border-slate-700 rounded" title="更改企业LOGO">📤</button>
@@ -198,7 +194,7 @@
                                 </div>
                             </div>
                             
-                                <!-- SLIDE 01 背景图行 -->
+                            <!-- SLIDE 01 背景图行 -->
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">背景大图 (可直接贴 URL，也可点击右侧上传本地图片自动压缩转 WebP)</label>
                                 <div class="flex items-center gap-2">
@@ -359,10 +355,8 @@
                             <p class="text-xs text-slate-400 mt-0.5">研发与多语言市场投放清单</p>
                         </div>
                         <div class="flex items-center gap-2 font-mono text-xs">
-                            <!-- 👑 这里正是新增的「重置待办」按钮：点一下就能把工单状态洗回理性的 TODO -->
                             <button onclick="resetManifestToDefault()" class="px-3 py-1 rounded-lg bg-rose-500/10 text-rose-600 font-bold border border-rose-500/20 hover:bg-rose-500/20 transition">🔄 重置待办</button>
                             <span id="manifestSummaryBadge" class="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-600 font-bold border border-blue-500/20">载入中...</span>
-                            <!-- 下面这 4 个就是所谓的“筛选过滤按钮” -->
                             <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold">全部</button>
                             <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">1.出海</button>
                             <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600">2.国内</button>
