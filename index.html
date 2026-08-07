@@ -22,8 +22,11 @@
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
       <div class="flex items-center gap-2 cursor-pointer select-none" onclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0">A</div>
-        <img src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-10 w-auto object-contain drop-shadow onerror-hide" onerror="this.style.display='none'" />
+        <!-- 1. 默认优先展示图片 LOGO；若失败则隐藏图片并把 fallback 的 "A" 亮出来 -->
+        <img src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
+             onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
+        <!-- 2. 默认 hidden，作为加载图片失败时的保底标徽 -->
+        <div class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 items-center justify-center text-white font-black text-sm shadow-md shrink-0">A</div>
       </div>
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
