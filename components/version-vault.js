@@ -5,14 +5,14 @@
  * 3. 完整快照：一次性锁存主站全部 localStorage 业务参数与备注
  */
 
+// 修改 components/version-vault.js 中的配置项
 window.ApexVersionVault = {
-    // 默认独立备份仓库配置 (与主项目 ai-boss-empire 物理隔离)
     config: {
         ghOwner: "wys0130",
-        ghBackupRepo: "ai-boss-archive",       // GitHub 独立备份专用仓库
-        giteeOwner: "wys0130",
-        giteeBackupRepo: "ai-boss-archive",    // Gitee 独立备份专用仓库
-        maxLimit: 20                           // 最大保留 20 个存档
+        ghBackupRepo: "ai-boss-archive",       
+        giteeOwner: "superwangwang",          // 👑 必须改成你当前的 Gitee 真实用户名！
+        giteeBackupRepo: "ai-boss-archive",    
+        maxLimit: 20                           
     },
 
     // 1. 获取当前存储的第三方跨云 Token
