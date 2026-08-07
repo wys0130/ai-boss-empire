@@ -21,8 +21,8 @@
   <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <!-- 👑 双击 LOGO 触发验证，且保证 "A" 徽章永不变形 -->
-      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员口令验证">
+      <!-- 双击左上角 LOGO 开启安全验证，不漏任何提示口令 -->
+      <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="APEXWORK STUDIO">
         <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
              onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
         <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
@@ -30,7 +30,6 @@
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
 
-    <!-- PPT演示 / EXCEL表格 / WORD文档 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
       <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
       <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
@@ -51,7 +50,6 @@
   <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
     
-    <!-- 👑 动态轮播区 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
       <div id="dynamicHeroContainer" class="w-full z-10">
         <div class="hero-slide flex flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
@@ -72,7 +70,7 @@
       </div>
     </div>
 
-    <!-- 第一板块：PPT演示 -->
+    <!-- PPT演示 -->
     <section id="ppt-section">
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -123,7 +121,7 @@
       </div>
     </section>
 
-    <!-- 第二板块：EXCEL表格 与 WORD文档 -->
+    <!-- EXCEL表格 与 WORD文档 -->
     <section>
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -245,7 +243,6 @@
       if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
     }).catch(() => {});
 
-    // 👑 彻底纠正变量重复声明冲突，单次声明保证全屏按钮正常点击
     (function initFrontLogo() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
         const frontLogoEl = document.getElementById('frontBrandLogo');
@@ -257,16 +254,16 @@
         }
     })();
 
-    // 👑 严谨的口令校验函数：支持读取管理后台自定义设定的新口令，未设默认匹配 8888
+    // 👑 绝不暴露默认口令提示，安全核验网关
     function checkChairmanStealthAccess() {
         const validPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
-        const pwd = prompt("👑 [安全网关] 请输入董事长驾驶舱通行口令 (默认: 8888)：", "");
+        const pwd = prompt("👑 [安全防护网关] 请输入管理员身份口令：", "");
         if (pwd === validPwd) {
             const p = document.getElementById('adminSecretPortal');
             if (p) p.classList.remove('hidden');
-            alert("✅ 身份验证通过！管理通道已亮起，点击右上角【👑 驾驶舱 →】进入。");
+            alert("✅ 身份校验成功！驾驶舱通道已激活，点击右上角【👑 驾驶舱 →】进入。");
         } else if (pwd !== null) {
-            alert("❌ 验证错误，口令不匹配，无法开放权限！");
+            alert("❌ 口令错误，系统拦截进入！");
         }
     }
 
