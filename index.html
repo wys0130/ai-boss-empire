@@ -21,7 +21,6 @@
   <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
-      <!-- 双击 LOGO 触发口令校验 -->
       <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员身份校验">
         <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
              onerror="this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
@@ -30,7 +29,6 @@
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
 
-    <!-- PPT演示 / EXCEL表格 / WORD文档 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
       <a href="#ppt-section" class="hover:text-orange-600 transition font-bold text-orange-600" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
       <a href="excel-editor.html" class="hover:text-emerald-600 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
@@ -150,7 +148,7 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 多语言中英翻译同步引擎 -->
+  <!-- 多语言双语切换引擎 -->
   <script>
     window.ApexLang = {
       currentLang: localStorage.getItem('APEX_LANG') || 'zh',
@@ -206,19 +204,25 @@
         const container = document.getElementById('dynamicHeroContainer');
         if (!container) return;
         
-        container.innerHTML = this.slidesData.map((s, idx) => `
-          <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
-            <div>
-              <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
-              <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${s.titleZh || s.title || ''}" data-en="${s.titleEn || s.title || ''}">${s.titleZh || s.title || ''}</h2>
-              <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${s.descZh || s.desc || ''}" data-en="${s.descEn || s.desc || ''}">${s.descZh || s.desc || ''}</p>
+        container.innerHTML = this.slidesData.map((s, idx) => {
+          const titleZh = s.titleZh || s.title || "";
+          const titleEn = s.titleEn || s.title || "";
+          const descZh = s.descZh || s.desc || "";
+          const descEn = s.descEn || s.desc || "";
+          return `
+            <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
+              <div>
+                <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
+                <h2 class="text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${titleZh}" data-en="${titleEn}">${titleZh}</h2>
+                <p class="text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${descZh}" data-en="${descEn}">${descZh}</p>
+              </div>
+              <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
+                  <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
+                  <span class="text-white font-black">¥139 RMB</span>
+              </button>
             </div>
-            <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-                <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
-                <span class="text-white font-black">¥139 RMB</span>
-            </button>
-          </div>
-        `).join('');
+          `;
+        }).join('');
 
         this.jump(0);
         this.startAutoPlay(this.slidesData.length);
