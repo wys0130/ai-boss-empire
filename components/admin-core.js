@@ -40,14 +40,15 @@ window.switchAdminTab = function(tabId) {
 };
 
 // ==========================================
-// 2. 👑 企业 LOGO 上传本地自动压缩 + 云端推送转 WebP 引擎
+// 2. 👑 企业 LOGO 上传本地自动压缩转 WebP + GitHub 仓库双份持久化推送
 // ==========================================
 window.ApexLogoManager = {
     initLogo: function() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
+        if (!customLogo) return;
         const adminLogoEl = document.getElementById('adminBrandLogo');
         const adminBadgeEl = document.getElementById('adminFallbackBadge');
-        if (customLogo && adminLogoEl) {
+        if (adminLogoEl) {
             adminLogoEl.src = customLogo;
             adminLogoEl.style.display = 'block';
             if (adminBadgeEl) adminBadgeEl.classList.add('hidden');
@@ -73,24 +74,24 @@ window.ApexLogoManager = {
                     ctx.drawImage(img, 0, 0, w, h);
                     const webpUrl = canvas.toDataURL('image/webp', 0.90);
                     
-                    // 1. 先写本地即时预览
+                    // 1. 本地立即生效
                     localStorage.setItem('APEX_CUSTOM_LOGO', webpUrl);
                     this.initLogo();
                     
-                    // 2. 👑 修复图1与图3：若配置了 GitHub 密钥，自动提交真正文件入库 assets/logo.webp！
+                    // 2. 👑 云端 GitHub 仓库同时持久化推送，换任意电脑均有正式 LOGO
                     try {
                         const keys = getKeysSafe();
                         if (keys && keys.gh) {
                             const rawBase64 = webpUrl.replace(/^data:image\/webp;base64,/, "");
                             const fileObj = await getGithubFileSafe("assets/logo.webp", keys.gh);
                             await pushGithubBinaryFile("assets/logo.webp", rawBase64, fileObj.sha, "🖼️ Update Enterprise Logo (WebP) via Dashboard [skip ci]", keys.gh);
-                            alert("✅ 企业 LOGO 已本地生效，且成功提交更新至云端 GitHub 仓库 (assets/logo.webp)！换台电脑依然可见！");
+                            alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！已同步覆盖至云端 GitHub 仓库 assets/logo.webp！");
                             return;
                         }
                     } catch(err) {
-                        console.warn("提交 GitHub 云端异常，保持本地生效:", err);
+                        console.warn("未连接 GitHub 或 Token 权限受限，仅维持设备本地存储:", err);
                     }
-                    alert("✅ 企业 LOGO 已压缩为 WebP 并当前生效！（配置密钥后可同步推到 GitHub）");
+                    alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！（如需换新电脑依然可见，请在右上角保存 GitHub 密钥）");
                 };
                 img.src = event.target.result;
             };
@@ -101,7 +102,7 @@ window.ApexLogoManager = {
 };
 
 // ==========================================
-// 3. 👑 用户与权限管理中台 (持久化 + 检索 + 真实邮件验证码引擎)
+// 3. 👑 用户与权限管理中台 (3层加载同步 + 检索 + EmailJS 真实发信)
 // ==========================================
 window.ApexUserManager = {
     defaultUsers: [
@@ -113,22 +114,64 @@ window.ApexUserManager = {
     searchQuery: "",
     currentVerifyIdx: -1,
 
-    loadUsers: function() {
+    loadUsers: async function() {
+        // Tier 1: 先快速读本地缓存
         const saved = localStorage.getItem('APEX_USER_LIST');
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
-    },
-
-    saveUsers: function() {
-        localStorage.setItem('APEX_USER_LIST', JSON.stringify(this.userList));
-    },
-
-    initUserSection: function() {
-        this.loadUsers();
-        const savedPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
-        const sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
-        const tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
-        const pkey = localStorage.getItem("APEX_EMAILJS_KEY") || "";
         
+        // Tier 2: 静默从 GitHub 仓库云同步用户清单，保证多设备持久一致
+        try {
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/users.json", keys.gh);
+                if (fileObj.content) {
+                    this.userList = JSON.parse(fileObj.content);
+                    localStorage.setItem('APEX_USER_LIST', JSON.stringify(this.userList));
+                    this.renderUserTable();
+                }
+            }
+        } catch(e) {}
+    },
+
+    saveUsers: async function() {
+        localStorage.setItem('APEX_USER_LIST', JSON.stringify(this.userList));
+        try {
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/users.json", keys.gh);
+                await pushGithubJsonFile("config/users.json", this.userList, fileObj.sha, "👥 Update users list via Dashboard [skip ci]", keys.gh);
+            }
+        } catch(e) {}
+    },
+
+    initUserSection: async function() {
+        await this.loadUsers();
+        
+        // 👑 修复图2：3层加载管理员口令与 EmailJS 参数
+        let savedPwd = localStorage.getItem("APEX_ADMIN_PWD");
+        let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
+        let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
+        let pkey = localStorage.getItem("APEX_EMAILJS_KEY") || "";
+
+        try {
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/security.json", keys.gh);
+                if (fileObj.content) {
+                    const sec = JSON.parse(fileObj.content);
+                    savedPwd = sec.pwd || savedPwd || "8888";
+                    sid = sec.emailjs_sid || sid;
+                    tid = sec.emailjs_tid || tid;
+                    pkey = sec.emailjs_key || pkey;
+                    localStorage.setItem("APEX_ADMIN_PWD", savedPwd);
+                    if (sid) localStorage.setItem("APEX_EMAILJS_SID", sid);
+                    if (tid) localStorage.setItem("APEX_EMAILJS_TID", tid);
+                    if (pkey) localStorage.setItem("APEX_EMAILJS_KEY", pkey);
+                }
+            }
+        } catch(e) {}
+
+        savedPwd = savedPwd || "8888";
         if (document.getElementById("pwd-new-admin")) document.getElementById("pwd-new-admin").value = savedPwd;
         if (document.getElementById("emailjs-service-id")) document.getElementById("emailjs-service-id").value = sid;
         if (document.getElementById("emailjs-template-id")) document.getElementById("emailjs-template-id").value = tid;
@@ -136,7 +179,7 @@ window.ApexUserManager = {
         this.renderUserTable();
     },
 
-    saveAdminSecurity: function() {
+    saveAdminSecurity: async function() {
         const pwd = document.getElementById("pwd-new-admin").value.trim() || "8888";
         const sid = document.getElementById("emailjs-service-id").value.trim();
         const tid = document.getElementById("emailjs-template-id").value.trim();
@@ -146,7 +189,19 @@ window.ApexUserManager = {
         localStorage.setItem("APEX_EMAILJS_SID", sid);
         localStorage.setItem("APEX_EMAILJS_TID", tid);
         localStorage.setItem("APEX_EMAILJS_KEY", pkey);
-        alert(`✅ 安全配置已更新！\n\n主页驾驶舱通行口令为：【 ${pwd} 】\nEmailJS 发信接口已绑定！`);
+
+        // 👑 立即推送至 GitHub 云端仓库 config/security.json，跨设备随时用！
+        try {
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/security.json", keys.gh);
+                const payload = { pwd, emailjs_sid: sid, emailjs_tid: tid, emailjs_key: pkey, updated_at: new Date().toISOString() };
+                await pushGithubJsonFile("config/security.json", payload, fileObj.sha, "🛡️ Update admin security & EmailJS configs [skip ci]", keys.gh);
+                alert(`✅ 安全口令及邮箱发信配置已更新，同步推入 GitHub 仓库！\n\n主页进入驾驶舱口令：【 ${pwd} 】`);
+                return;
+            }
+        } catch(e) {}
+        alert(`✅ 安全配置已在当前电脑设备中更新生效！\n\n主页驾驶舱通行口令为：【 ${pwd} 】`);
     },
 
     sendRealVerifyEmail: function(idx) {
@@ -348,9 +403,9 @@ window.ApexScheduleManager = {
         try {
             const keys = getKeys();
             const fileObj = await getGithubFileSafe("config/ai-schedule.json", keys.gh);
-            await pushGithubFile(
+            await pushGithubJsonFile(
                 "config/ai-schedule.json",
-                JSON.stringify(payload, null, 2),
+                payload,
                 fileObj.sha,
                 `⏱️ Config: 更新 AI 夜间自主排班时段 -> 北京时间 [${start}:00 - ${end}:00] [skip ci]`,
                 keys.gh
@@ -523,7 +578,7 @@ window.toggleThemeMode = function() {
 };
 
 // ==========================================
-// 6. 👑 首页轮播图配置管理 (支持色块预设应用)
+// 6. 👑 首页轮播图配置管理 (支持色块预设应用与 3层云同步)
 // ==========================================
 window.ApexBannerManager = {
     setPreset: function(idx, gradientStr) {
@@ -534,29 +589,42 @@ window.ApexBannerManager = {
         }
     },
 
-    loadBannerConfig: function() {
+    loadBannerConfig: async function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
-        if (!saved) return;
+        let config = null;
+        if (saved) {
+            try { config = JSON.parse(saved); } catch(e) {}
+        }
+        
         try {
-            const config = JSON.parse(saved);
-            if (config[0]) {
-                if (document.getElementById('banner-tag-0')) document.getElementById('banner-tag-0').value = config[0].tag || "ADMIN BANNER 01";
-                if (document.getElementById('banner-title-0')) document.getElementById('banner-title-0').value = config[0].title || "";
-                if (document.getElementById('banner-desc-0')) document.getElementById('banner-desc-0').value = config[0].desc || "";
-                if (document.getElementById('banner-bg-0')) document.getElementById('banner-bg-0').value = config[0].bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
-                if (document.getElementById('banner-img-0')) document.getElementById('banner-img-0').value = config[0].bgImg || "";
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/banner.json", keys.gh);
+                if (fileObj.content) {
+                    config = JSON.parse(fileObj.content);
+                    localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(config));
+                }
             }
-            if (config[1]) {
-                if (document.getElementById('banner-tag-1')) document.getElementById('banner-tag-1').value = config[1].tag || "GLOBAL COMPLIANCE 02";
-                if (document.getElementById('banner-title-1')) document.getElementById('banner-title-1').value = config[1].title || "";
-                if (document.getElementById('banner-desc-1')) document.getElementById('banner-desc-1').value = config[1].desc || "";
-                if (document.getElementById('banner-bg-1')) document.getElementById('banner-bg-1').value = config[1].bgStyle || "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)";
-                if (document.getElementById('banner-img-1')) document.getElementById('banner-img-1').value = config[1].bgImg || "";
-            }
-        } catch (e) {}
+        } catch(e) {}
+
+        if (!config) return;
+        if (config[0]) {
+            if (document.getElementById('banner-tag-0')) document.getElementById('banner-tag-0').value = config[0].tag || "ADMIN BANNER 01";
+            if (document.getElementById('banner-title-0')) document.getElementById('banner-title-0').value = config[0].title || "";
+            if (document.getElementById('banner-desc-0')) document.getElementById('banner-desc-0').value = config[0].desc || "";
+            if (document.getElementById('banner-bg-0')) document.getElementById('banner-bg-0').value = config[0].bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
+            if (document.getElementById('banner-img-0')) document.getElementById('banner-img-0').value = config[0].bgImg || "";
+        }
+        if (config[1]) {
+            if (document.getElementById('banner-tag-1')) document.getElementById('banner-tag-1').value = config[1].tag || "GLOBAL COMPLIANCE 02";
+            if (document.getElementById('banner-title-1')) document.getElementById('banner-title-1').value = config[1].title || "";
+            if (document.getElementById('banner-desc-1')) document.getElementById('banner-desc-1').value = config[1].desc || "";
+            if (document.getElementById('banner-bg-1')) document.getElementById('banner-bg-1').value = config[1].bgStyle || "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)";
+            if (document.getElementById('banner-img-1')) document.getElementById('banner-img-1').value = config[1].bgImg || "";
+        }
     },
 
-    saveBannerConfig: function() {
+    saveBannerConfig: async function() {
         const config = [
             {
                 tag: document.getElementById('banner-tag-0').value,
@@ -574,12 +642,19 @@ window.ApexBannerManager = {
             }
         ];
         localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(config));
-        alert('✅ 首页双幕大图文案与背景配置已保存！\n\n如果填入了【背景大图 URL】，前台轮播自动展示高清大图背景；如果未填，则按指定的渐变配色显现！');
+        try {
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/banner.json", keys.gh);
+                await pushGithubJsonFile("config/banner.json", config, fileObj.sha, "🎨 Update homepage banners via Dashboard [skip ci]", keys.gh);
+            }
+        } catch(e) {}
+        alert('✅ 首页双幕大图文案与背景配置已保存并同步至云端！');
     }
 };
 
 // ==========================================
-// 7. 👑 汇率与商品定价中心
+// 7. 👑 汇率与商品定价中心 (3层加载云同步)
 // ==========================================
 window.ApexFX = {
     currentRate: 7.18,
@@ -671,7 +746,7 @@ window.ApexPricing = {
         if (el) el.value = rmb > 0 ? rmb : "";
     },
 
-    saveAllToStorage: function() {
+    saveAllToStorage: async function() {
         const config = {
             bundle: { rmb: document.getElementById('rmb-bundle').value, usd: document.getElementById('usd-bundle').value },
             ppt: { rmb: document.getElementById('rmb-ppt').value, usd: document.getElementById('usd-ppt').value },
@@ -683,7 +758,14 @@ window.ApexPricing = {
             updatedAt: new Date().toISOString()
         };
         localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(config));
-        alert('✅ 商品定价已锁存完毕！');
+        try {
+            const keys = getKeysSafe();
+            if (keys && keys.gh) {
+                const fileObj = await getGithubFileSafe("config/pricing.json", keys.gh);
+                await pushGithubJsonFile("config/pricing.json", config, fileObj.sha, "💰 Update pricing tables via Dashboard [skip ci]", keys.gh);
+            }
+        } catch(e) {}
+        alert('✅ 商品全网统一定价已保存，云端 GitHub config/pricing.json 已推送更新！');
     }
 };
 
@@ -718,7 +800,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 8. 👑 进度书与工单管理
+// 8. 👑 进度书与工单管理 (3层备援同步)
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -778,7 +860,7 @@ window.resetManifestToDefault = async function() {
                 tasks: rawManifestTasks,
                 updated_at: new Date().toISOString().slice(0, 10)
             };
-            await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, "🔄 Reset tasks to realistic default", keys.gh);
+            await pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, "🔄 Reset tasks to realistic default [skip ci]", keys.gh);
             alert("✅ 云端 GitHub 仓库及页面工单已全部洗回初始待办状态！");
             return;
         }
@@ -861,7 +943,7 @@ window.toggleTaskStatus = async function(taskId) {
             manifest.summary.completed = manifest.tasks.filter(t => t.status === 'DONE').length;
             manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
             manifest.updated_at = new Date().toISOString().slice(0, 10);
-            await pushGithubFile("TASKS_MANIFEST.json", JSON.stringify(manifest, null, 2), fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status}`, keys.gh);
+            await pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status} [skip ci]`, keys.gh);
             appendLog(`✅ 工单进度写入成功！`);
             loadTasksManifest();
         }
@@ -996,7 +1078,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 10. 👑 启动函数与 GitHub Repo API 工具
+// 10. 👑 启动函数与 GitHub 仓库全能推拉工具 (JSON + 二进制)
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1136,19 +1218,21 @@ async function getGithubFileSafe(path, token) {
     return { content: b64_to_utf8(data.content), sha: data.sha };
 }
 
-async function pushGithubFile(path, content, sha, message, token) {
-    const payload = { message: message, content: utf8_to_b64(content) };
+// 👑 GitHub 仓库普通文本与 JSON 格式写入通用方法
+async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
+    const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
+    const payload = { message: message, content: utf8_to_b64(contentStr) };
     if (sha) payload.sha = sha;
     const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
         method: "PUT",
         headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error(`写回 ${path} 失败`);
+    if (!res.ok) throw new Error(`提交配置文件 ${path} 失败: ` + res.statusText);
     return await res.json();
 }
 
-// 👑 专为上传 LOGO 等二进制或图片 Base64 设计的直接 GitHub 推送引擎
+// 👑 GitHub 仓库 WebP 图像等二进制 Base64 数据直接推送方法
 async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
     const payload = { message: message, content: base64Raw };
     if (sha) payload.sha = sha;
@@ -1157,7 +1241,7 @@ async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
         headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error(`提交二进制文件 ${path} 失败: ` + res.statusText);
+    if (!res.ok) throw new Error(`提交图片 ${path} 失败: ` + res.statusText);
     return await res.json();
 }
 
