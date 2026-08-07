@@ -1,10 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 0元秒开：集成 jsDelivr 全球加速 CDN 引擎，自动转化 assets/ 相对路径为 CDN 极速节点！
- * 2. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格，并接入 WebP CDN 转换！
- * 3. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
- * 4. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
- * 5. 管理员口令安全与注册用户邮箱中心！
+ * 1. 👑 修复图裂：内置 5 张真实高清商用测试图，无本地图片时百分百秒出大图不过载！
+ * 2. 👑 修复按钮变形：为“汇率联动/独立定价”按钮全面加装 whitespace-nowrap 与 shrink-0！
+ * 3. 进度书内置完整工单，口令安全中心、部门@提及调令全线畅通。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -41,7 +39,7 @@ window.switchAdminTab = function(tabId) {
 };
 
 // ==========================================
-// 2. 👑 全站图片 CDN 与 WebP 转换引擎 (jsDelivr 0元秒开)
+// 2. 👑 全站图片 CDN 与 WebP 转换引擎 (自带测试图防裂)
 // ==========================================
 window.ApexImageEngine = {
     cdn: {
@@ -50,7 +48,6 @@ window.ApexImageEngine = {
         branch: "main"
     },
 
-    // 自动转化为 jsDelivr 全球加速 CDN 网址
     toCDN: function(path) {
         if (!path || path.trim() === "") return null;
         if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) {
@@ -60,18 +57,23 @@ window.ApexImageEngine = {
         return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
     },
 
-    // 3层图片解析器：本地缓冲 -> jsDelivr全球CDN -> 默认兜底图
+    // 3层图片解析器：本地缓冲 -> GitHub/外链 -> 默认极速高精测试图
     resolve: function(assetKey, cloudPath, defaultFallback) {
         const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
         if (local && local.startsWith("data:image")) return local;
 
-        const cdnUrl = this.toCDN(cloudPath);
-        if (cdnUrl) return cdnUrl;
+        // 如果云端是绝对网址(如我们内置的测试图)，直接给；如果是相对路径，转CDN
+        if (cloudPath && (cloudPath.startsWith("http://") || cloudPath.startsWith("https://"))) {
+            return cloudPath;
+        }
+        if (cloudPath && cloudPath.trim() !== "" && !cloudPath.startsWith("assets/")) {
+            const cdnUrl = this.toCDN(cloudPath);
+            if (cdnUrl) return cdnUrl;
+        }
 
         return defaultFallback || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
     },
 
-    // 上传图片 -> 压缩转 WebP -> 双写本地与 GitHub 仓库
     uploadAndBackup: function(assetKey, repoPath, callback) {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
@@ -112,7 +114,7 @@ window.ApexImageEngine = {
                     } catch (err) {
                         console.warn("提交 GitHub 云端异常，保持设备缓存生效:", err);
                     }
-                    alert("✅ 图片已压缩为 WebP 并写入本地缓存！（配置密钥后可同步推往云端）");
+                    alert("✅ 图片已压缩为 WebP 并写入当前电脑缓存！");
                 };
                 img.src = event.target.result;
             };
@@ -123,7 +125,7 @@ window.ApexImageEngine = {
 };
 
 // ==========================================
-// 3. 👑 企业 LOGO 上传本地自动压缩转 WebP + GitHub 仓库持久化
+// 3. 👑 企业 LOGO 上传本地自动压缩转 WebP
 // ==========================================
 window.ApexLogoManager = {
     initLogo: function() {
@@ -146,7 +148,7 @@ window.ApexLogoManager = {
 };
 
 // ==========================================
-// 4. 👑 用户与权限管理中台 (3层同步 + 邮箱核对 + EmailJS 真实发信)
+// 4. 👑 用户与权限管理中台
 // ==========================================
 window.ApexUserManager = {
     defaultUsers: [
@@ -295,7 +297,7 @@ window.ApexUserManager = {
             this.userList[this.currentVerifyIdx].verified = true;
             this.saveUsers();
             this.renderUserTable();
-            alert("✅ 恭喜！邮箱真实身份核验成功！认证标识已标记为已认证！");
+            alert("✅ 恭喜！邮箱真实身份核验成功！");
             this.closeVerifyModal();
         }
     },
@@ -458,7 +460,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 👑 作品审核与定价表 (支持 WebP CDN 与价格联动)
+// 6. 👑 作品审核与定价表 (修复图裂 + 修复按钮拉伸变形)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -466,8 +468,9 @@ const AUDIT_PRODUCTS = [
         title: "AeroTech 创投规划书",
         category: "15 SLIDES · Office PPT演示",
         thumbKey: "prod_aerotech",
-        thumbCloudPath: "assets/products/aerotech.webp",
-        thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+        // 👑 填入真实极速高清缩略图，一开网页100%有清晰大图，绝无404
+        thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -479,8 +482,8 @@ const AUDIT_PRODUCTS = [
         title: "SaaS 增长指标盘点",
         category: "20 SLIDES · Office PPT演示",
         thumbKey: "prod_saas",
-        thumbCloudPath: "assets/products/saas.webp",
-        thumbDefault: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80",
+        thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -492,8 +495,8 @@ const AUDIT_PRODUCTS = [
         title: "FinTech A 轮融资方案",
         category: "12 SLIDES · Office PPT演示",
         thumbKey: "prod_fintech",
-        thumbCloudPath: "assets/products/fintech.webp",
-        thumbDefault: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
+        thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -505,8 +508,8 @@ const AUDIT_PRODUCTS = [
         title: "全渠道 ROI 动态自适应测算模型",
         category: "XLSX MODEL · Office EXCEL表格",
         thumbKey: "prod_excel",
-        thumbCloudPath: "assets/products/excel.webp",
-        thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+        thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-emerald-600 font-bold",
@@ -518,7 +521,7 @@ const AUDIT_PRODUCTS = [
         title: "欧美企业级 ATS 智能排版合规报告",
         category: "DOCX STANDARD · Office WORD文档",
         thumbKey: "prod_word",
-        thumbCloudPath: "assets/products/word.webp",
+        thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
         thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
@@ -532,7 +535,7 @@ window.uploadProductThumb = function(index) {
     const item = AUDIT_PRODUCTS[index];
     ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
         renderAuditTable();
-        if (typeof appendLog === "function") appendLog(`>> [产品缩略图] [${item.title}] WebP转换完成，已绑定CDN！`);
+        if (typeof appendLog === "function") appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
     });
 };
 
@@ -571,10 +574,12 @@ window.renderAuditTable = function() {
         const badgeCls = item.status 
             ? "bg-emerald-500 text-white font-bold shadow-sm" 
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
+        
+        // 👑 修复：专门加装 whitespace-nowrap 与 shrink-0，永远是精美小巧的胶囊，绝不竖向变形！
         const linkBtnCls = item.isLinked
-            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-            : "bg-amber-500/10 text-amber-600 border-amber-500/30";
-        const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 已脱钩";
+            ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 hover:bg-emerald-500/20"
+            : "bg-amber-500/10 text-amber-600 border border-amber-500/30 hover:bg-amber-500/20";
+        const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
@@ -589,13 +594,14 @@ window.renderAuditTable = function() {
                     <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
                 <td class="py-3 px-4 font-mono">
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 flex-nowrap whitespace-nowrap">
                         <span class="${item.colorCls}">￥</span>
                         <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-[#0f172a] dark:text-[#f8fafc] ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="点击切换该行内独立脱钩定价">
+                        <!-- 👑 修复按钮变形：添加 whitespace-nowrap, shrink-0 与 inline-flex -->
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition-all shrink-0 whitespace-nowrap inline-flex items-center justify-center select-none ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
                             ${linkBtnText}
                         </button>
                     </div>
@@ -606,7 +612,7 @@ window.renderAuditTable = function() {
                         <span>${item.status ? '已上架' : '已隐藏'}</span>
                     </button>
                 </td>
-                <td class="py-3 px-4 text-right space-x-1.5">
+                <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                     <button onclick="uploadProductThumb(${index})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition">上传WebP图</button>
                     <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
@@ -640,7 +646,7 @@ window.toggleThemeMode = function() {
 };
 
 // ==========================================
-// 7. 👑 首页轮播图配置管理 (支持 WebP 上传与 CDN 地址)
+// 7. 👑 首页轮播图配置管理
 // ==========================================
 window.ApexBannerManager = {
     setPreset: function(idx, gradientStr) {
@@ -726,7 +732,7 @@ window.ApexBannerManager = {
 };
 
 // ==========================================
-// 8. 👑 汇率与商品定价中心 (3层云同步)
+// 8. 👑 汇率与商品定价中心
 // ==========================================
 window.ApexFX = {
     currentRate: 7.18,
@@ -872,7 +878,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 9. 👑 进度书与工单管理 (3层同步)
+// 9. 👑 进度书与工单管理
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -1150,7 +1156,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 11. 👑 启动函数与 GitHub 仓库操作工具
+// 11. 👑 启动函数与 GitHub 仓库全功能推拉
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
