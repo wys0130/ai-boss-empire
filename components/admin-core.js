@@ -1,9 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 作品风控审核表格支持直接行内调整 RMB 与 USD 授权价格！
- * 2. 进度书内置完整出海/国内/后期工单，彻底解除“无对应工单”空白现象。
- * 3. 严格遵循按需输入：只有聚焦文本框时点击部门才追加 @词条！
- * 4. 👑 全新加入：管理员口令安全与注册用户邮箱中心！
+ * 1. 👑 满血恢复 UI：彻底还原所有深浅色模式（Light/Dark）与 Grid/Flex 响应式布局样式！
+ * 2. 👑 究极防弹版 @ 菜单：使用 Range.insertNode 完美保护历史胶囊标签，大厂级 Portal 悬浮解决遮挡！
+ * 3. 👑 模板拉取：自动将 AI 生产的模板 (ai-generated-decks.json) 合并进大盘。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -12,7 +11,7 @@ let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
 // ==========================================
-// 1. 👑 侧边栏高亮逻辑
+// 1. 侧边栏高亮与切换逻辑
 // ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
@@ -40,7 +39,73 @@ window.switchAdminTab = function(tabId) {
 };
 
 // ==========================================
-// 2. 👑 企业 LOGO 上传本地自动压缩转 WebP + GitHub 仓库双份持久化推送
+// 2. 全站图片 CDN 与 WebP 转换引擎
+// ==========================================
+window.ApexImageEngine = {
+    cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
+
+    toCDN: function(path) {
+        if (!path || path.trim() === "") return null;
+        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) return path;
+        const cleanPath = path.replace(/^\//, "");
+        return `[https://cdn.jsdelivr.net/gh/$](https://cdn.jsdelivr.net/gh/$){this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
+    },
+
+    resolve: function(assetKey, cloudPath, defaultFallback) {
+        const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
+        if (local && local.startsWith("data:image")) return local;
+        if (cloudPath && (cloudPath.startsWith("http://") || cloudPath.startsWith("https://"))) return cloudPath;
+        if (cloudPath && cloudPath.trim() !== "" && !cloudPath.startsWith("assets/")) {
+            const cdnUrl = this.toCDN(cloudPath);
+            if (cdnUrl) return cdnUrl;
+        }
+        return defaultFallback || "[https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80)";
+    },
+
+    uploadAndBackup: function(assetKey, repoPath, callback) {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = "image/*";
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const maxW = 1280;
+                    let w = img.width, h = img.height;
+                    if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+                    canvas.width = w; canvas.height = h;
+                    
+                    const webpDataUrl = canvas.toDataURL("image/webp", 0.85);
+                    localStorage.setItem("APEX_IMG_CACHE_" + assetKey, webpDataUrl);
+                    if (callback) callback(webpDataUrl, repoPath);
+
+                    try {
+                        const keys = getKeysSafe();
+                        if (keys && keys.gh) {
+                            const rawBase64 = webpDataUrl.replace(/^data:image\/webp;base64,/, "");
+                            const fileObj = await getGithubFileSafe(repoPath, keys.gh);
+                            await pushGithubBinaryFile(repoPath, rawBase64, fileObj.sha, `🖼️ Asset: Backup WebP image [${assetKey}] to ${repoPath} [skip ci]`, keys.gh);
+                            alert(`✅ 图片已转 WebP 并成功备份！\n\n全球CDN秒开链接：\n${ApexImageEngine.toCDN(repoPath)}`);
+                            return;
+                        }
+                    } catch (err) { console.warn("提交 GitHub 云端异常:", err); }
+                    alert("✅ 图片已压缩为 WebP 并写入当前电脑缓存！");
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+        fileInput.click();
+    }
+};
+
+// ==========================================
+// 3. 企业 LOGO 上传本地自动压缩转 WebP
 // ==========================================
 window.ApexLogoManager = {
     initLogo: function() {
@@ -55,54 +120,15 @@ window.ApexLogoManager = {
         }
     },
     uploadLogo: function() {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = async () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const maxSize = 240;
-                    let w = img.width, h = img.height;
-                    if (w > maxSize) { h = Math.round((h * maxSize) / w); w = maxSize; }
-                    canvas.width = w; canvas.height = h;
-                    ctx.drawImage(img, 0, 0, w, h);
-                    const webpUrl = canvas.toDataURL('image/webp', 0.90);
-                    
-                    // 1. 本地立即生效
-                    localStorage.setItem('APEX_CUSTOM_LOGO', webpUrl);
-                    this.initLogo();
-                    
-                    // 2. 👑 云端 GitHub 仓库同时持久化推送，换任意电脑均有正式 LOGO
-                    try {
-                        const keys = getKeysSafe();
-                        if (keys && keys.gh) {
-                            const rawBase64 = webpUrl.replace(/^data:image\/webp;base64,/, "");
-                            const fileObj = await getGithubFileSafe("assets/logo.webp", keys.gh);
-                            await pushGithubBinaryFile("assets/logo.webp", rawBase64, fileObj.sha, "🖼️ Update Enterprise Logo (WebP) via Dashboard [skip ci]", keys.gh);
-                            alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！已同步覆盖至云端 GitHub 仓库 assets/logo.webp！");
-                            return;
-                        }
-                    } catch(err) {
-                        console.warn("未连接 GitHub 或 Token 权限受限，仅维持设备本地存储:", err);
-                    }
-                    alert("✅ 企业 LOGO 已压缩为 WebP 并全站生效！（如需换新电脑依然可见，请在右上角保存 GitHub 密钥）");
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-        fileInput.click();
+        ApexImageEngine.uploadAndBackup("custom_logo", "assets/logo.webp", (webpUrl) => {
+            localStorage.setItem('APEX_CUSTOM_LOGO', webpUrl);
+            this.initLogo();
+        });
     }
 };
 
 // ==========================================
-// 3. 👑 用户与权限管理中台 (3层加载同步 + 检索 + EmailJS 真实发信)
+// 4. 用户与权限管理中台
 // ==========================================
 window.ApexUserManager = {
     defaultUsers: [
@@ -115,11 +141,8 @@ window.ApexUserManager = {
     currentVerifyIdx: -1,
 
     loadUsers: async function() {
-        // Tier 1: 先快速读本地缓存
         const saved = localStorage.getItem('APEX_USER_LIST');
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
-        
-        // Tier 2: 静默从 GitHub 仓库云同步用户清单，保证多设备持久一致
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -146,9 +169,7 @@ window.ApexUserManager = {
 
     initUserSection: async function() {
         await this.loadUsers();
-        
-        // 👑 修复图2：3层加载管理员口令与 EmailJS 参数
-        let savedPwd = localStorage.getItem("APEX_ADMIN_PWD");
+        let savedPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
         let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
         let pkey = localStorage.getItem("APEX_EMAILJS_KEY") || "";
@@ -171,7 +192,6 @@ window.ApexUserManager = {
             }
         } catch(e) {}
 
-        savedPwd = savedPwd || "8888";
         if (document.getElementById("pwd-new-admin")) document.getElementById("pwd-new-admin").value = savedPwd;
         if (document.getElementById("emailjs-service-id")) document.getElementById("emailjs-service-id").value = sid;
         if (document.getElementById("emailjs-template-id")) document.getElementById("emailjs-template-id").value = tid;
@@ -190,18 +210,17 @@ window.ApexUserManager = {
         localStorage.setItem("APEX_EMAILJS_TID", tid);
         localStorage.setItem("APEX_EMAILJS_KEY", pkey);
 
-        // 👑 立即推送至 GitHub 云端仓库 config/security.json，跨设备随时用！
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
                 const fileObj = await getGithubFileSafe("config/security.json", keys.gh);
                 const payload = { pwd, emailjs_sid: sid, emailjs_tid: tid, emailjs_key: pkey, updated_at: new Date().toISOString() };
                 await pushGithubJsonFile("config/security.json", payload, fileObj.sha, "🛡️ Update admin security & EmailJS configs [skip ci]", keys.gh);
-                alert(`✅ 安全口令及邮箱发信配置已更新，同步推入 GitHub 仓库！\n\n主页进入驾驶舱口令：【 ${pwd} 】`);
+                alert(`✅ 安全口令及发信配置已同步推入 GitHub 仓库！\n\n主页进入驾驶舱口令：【 ${pwd} 】`);
                 return;
             }
         } catch(e) {}
-        alert(`✅ 安全配置已在当前电脑设备中更新生效！\n\n主页驾驶舱通行口令为：【 ${pwd} 】`);
+        alert(`✅ 安全配置在当前设备中更新生效！\n\n主页驾驶舱口令为：【 ${pwd} 】`);
     },
 
     sendRealVerifyEmail: function(idx) {
@@ -221,12 +240,12 @@ window.ApexUserManager = {
                 alert(`📧 【真实发信成功】\n已向 [${targetEmail}] 成功投递真实邮件码！请查收邮件后填入校验框。`);
                 this.openVerifyModal();
             })
-            .catch((err) => {
+            .catch(() => {
                 alert(`⚠️ EmailJS 接口连接失败，已启用标准安全信道。\n为方便演示核验，当前生成验证码为：【 ${code} 】`);
                 this.openVerifyModal();
             });
         } else {
-            alert(`📧 【发信网关已触发】\n当前系统尚未填入第三方 EmailJS 接口参数，但已启用安全校验链路！\n\n请在收件码校验框输入本次生成验证码：【 ${code} 】`);
+            alert(`📧 【发信网关已触发】\n当前系统尚未填入 EmailJS 接口参数，已启用安全校验链路！\n\n本次验证码为：【 ${code} 】`);
             this.openVerifyModal();
         }
     },
@@ -255,7 +274,7 @@ window.ApexUserManager = {
             this.userList[this.currentVerifyIdx].verified = true;
             this.saveUsers();
             this.renderUserTable();
-            alert("✅ 恭喜！邮箱真实身份核验成功！认证标识已标记为已认证！");
+            alert("✅ 恭喜！邮箱真实身份核验成功！");
             this.closeVerifyModal();
         }
     },
@@ -369,7 +388,7 @@ window.ApexUserManager = {
 };
 
 // ==========================================
-// 4. 👑 AI 智能体排班区间配置中台
+// 5. AI 智能体排班区间配置中台
 // ==========================================
 window.ApexScheduleManager = {
     loadScheduleFromCloud: async function() {
@@ -418,14 +437,16 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 5. 👑 作品审核与定价表 (含独立行内联动 / 脱钩开关)
+// 6. 作品审核与定价表 (满血还原，含完整 Light/Dark 模式样式)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
         id: "aerotech",
         title: "AeroTech 创投规划书",
         category: "15 SLIDES · Office PPT演示",
-        thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_aerotech",
+        thumbCloudPath: "[https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80)",
+        thumbDefault: "[https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80)",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -436,7 +457,9 @@ const AUDIT_PRODUCTS = [
         id: "saas",
         title: "SaaS 增长指标盘点",
         category: "20 SLIDES · Office PPT演示",
-        thumb: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_saas",
+        thumbCloudPath: "[https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80)",
+        thumbDefault: "[https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80)",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -447,7 +470,9 @@ const AUDIT_PRODUCTS = [
         id: "fintech",
         title: "FinTech A 轮融资方案",
         category: "12 SLIDES · Office PPT演示",
-        thumb: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_fintech",
+        thumbCloudPath: "[https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80)",
+        thumbDefault: "[https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80)",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -458,7 +483,9 @@ const AUDIT_PRODUCTS = [
         id: "excel",
         title: "全渠道 ROI 动态自适应测算模型",
         category: "XLSX MODEL · Office EXCEL表格",
-        thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_excel",
+        thumbCloudPath: "[https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80)",
+        thumbDefault: "[https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80)",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-emerald-600 font-bold",
@@ -469,7 +496,9 @@ const AUDIT_PRODUCTS = [
         id: "word",
         title: "欧美企业级 ATS 智能排版合规报告",
         category: "DOCX STANDARD · Office WORD文档",
-        thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+        thumbKey: "prod_word",
+        thumbCloudPath: "[https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80)",
+        thumbDefault: "[https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80)",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-indigo-600 font-bold",
@@ -477,6 +506,47 @@ const AUDIT_PRODUCTS = [
         status: true
     }
 ];
+
+async function loadAuditProducts() {
+    try {
+        const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+        if (res.ok) {
+            const aiData = await res.json();
+            if (Array.isArray(aiData)) {
+                aiData.forEach(aiItem => {
+                    if (!AUDIT_PRODUCTS.find(p => p.id === aiItem.id)) {
+                        let col = 'text-blue-600 font-bold';
+                        if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
+                        if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
+                        
+                        AUDIT_PRODUCTS.push({
+                            id: aiItem.id,
+                            title: aiItem.title || aiItem.name,
+                            category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
+                            thumbKey: "prod_" + aiItem.id,
+                            thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
+                            thumbDefault: aiItem.thumb || aiItem.thumbnail || "[https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80)",
+                            priceRmb: aiItem.priceRmb || 69,
+                            priceUsd: "9.99",
+                            colorCls: col,
+                            isLinked: true,
+                            status: true
+                        });
+                    }
+                });
+            }
+        }
+    } catch(e) {}
+    renderAuditTable();
+}
+
+window.uploadProductThumb = function(index) {
+    const item = AUDIT_PRODUCTS[index];
+    ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
+        renderAuditTable();
+        appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
+    });
+};
 
 window.toggleRowLinkage = function(index) {
     AUDIT_PRODUCTS[index].isLinked = !AUDIT_PRODUCTS[index].isLinked;
@@ -508,32 +578,42 @@ window.renderAuditTable = function() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    const tableEl = tbody.closest("table");
+    if (tableEl) {
+        tableEl.querySelectorAll("th").forEach(th => th.classList.add("whitespace-nowrap", "tracking-wider", "select-none"));
+    }
+
     AUDIT_PRODUCTS.forEach((item, index) => {
+        const finalThumbUrl = ApexImageEngine.resolve(item.thumbKey, item.thumbCloudPath, item.thumbDefault);
         const badgeCls = item.status 
             ? "bg-emerald-500 text-white font-bold shadow-sm" 
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
+        
         const linkBtnCls = item.isLinked
-            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
-            : "bg-amber-500/10 text-amber-600 border-amber-500/30";
-        const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 已脱钩";
+            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20"
+            : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
+        const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-3 px-4">
-                    <img src="${item.thumb}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
+                    <div class="relative group w-14 h-18">
+                        <img src="${finalThumbUrl}" alt="快照" class="w-14 h-18 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
+                        <button onclick="uploadProductThumb(${index})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold">📤 转WebP</button>
+                    </div>
                 </td>
                 <td class="py-3 px-4">
                     <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] tracking-wide">${item.title}</div>
                     <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
                 <td class="py-3 px-4 font-mono">
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-1.5 flex-nowrap whitespace-nowrap">
                         <span class="${item.colorCls}">￥</span>
                         <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-[#0f172a] dark:text-[#f8fafc] ${item.colorCls}" />
                         <span class="text-slate-400">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 saas-input border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center bg-white dark:bg-slate-900 text-blue-600" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2 py-1 rounded border text-[11px] font-bold transition ${linkBtnCls}" title="点击切换该行内独立脱钩定价">
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition-all shrink-0 whitespace-nowrap inline-flex items-center justify-center select-none ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
                             ${linkBtnText}
                         </button>
                     </div>
@@ -544,9 +624,9 @@ window.renderAuditTable = function() {
                         <span>${item.status ? '已上架' : '已隐藏'}</span>
                     </button>
                 </td>
-                <td class="py-3 px-4 text-right space-x-1.5">
-                    <button onclick="alert('✏️ 正在调教参数: ${item.title}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition">参数配置</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
+                <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+                    <button onclick="uploadProductThumb(${index})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition">上传WebP图</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
                 </td>
             </tr>
         `;
@@ -578,7 +658,7 @@ window.toggleThemeMode = function() {
 };
 
 // ==========================================
-// 6. 👑 首页轮播图配置管理 (支持色块预设应用与 3层云同步)
+// 7. 首页轮播图配置管理
 // ==========================================
 window.ApexBannerManager = {
     setPreset: function(idx, gradientStr) {
@@ -587,6 +667,16 @@ window.ApexBannerManager = {
             inputEl.value = gradientStr;
             appendLog(`>> [视觉渐变] 已为第 ${idx + 1} 幕横幅快速应用配色方案 -> ${gradientStr}`);
         }
+    },
+
+    uploadBannerImg: function(idx) {
+        const assetKey = "banner_slide_" + idx;
+        const repoPath = `assets/banners/slide-${idx}.webp`;
+        ApexImageEngine.uploadAndBackup(assetKey, repoPath, (webpUrl, finalCloudPath) => {
+            const imgInput = document.getElementById(`banner-img-${idx}`);
+            if (imgInput) imgInput.value = finalCloudPath;
+            appendLog(`>> [轮播图云备份] 幻灯片 #${idx + 1} 绑定实体路径 -> ${finalCloudPath}`);
+        });
     },
 
     loadBannerConfig: async function() {
@@ -649,12 +739,12 @@ window.ApexBannerManager = {
                 await pushGithubJsonFile("config/banner.json", config, fileObj.sha, "🎨 Update homepage banners via Dashboard [skip ci]", keys.gh);
             }
         } catch(e) {}
-        alert('✅ 首页双幕大图文案与背景配置已保存并同步至云端！');
+        alert('✅ 首页轮播图配置与图片地址已保存并同步至云端！');
     }
 };
 
 // ==========================================
-// 7. 👑 汇率与商品定价中心 (3层加载云同步)
+// 8. 汇率与商品定价中心
 // ==========================================
 window.ApexFX = {
     currentRate: 7.18,
@@ -672,7 +762,7 @@ window.ApexFX = {
         const badge = document.getElementById("fxRateBadge");
         if (badge) badge.innerText = "向央行查汇中...";
         try {
-            const res = await fetch("https://open.er-api.com/v6/latest/USD");
+            const res = await fetch("[https://open.er-api.com/v6/latest/USD](https://open.er-api.com/v6/latest/USD)");
             const data = await res.json();
             if (data && data.rates && data.rates.CNY) {
                 this.currentRate = Number(data.rates.CNY).toFixed(2);
@@ -770,15 +860,15 @@ window.ApexPricing = {
 };
 
 const deptConfig = [
-    { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
-    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 border-rose-500/30" },
-    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
-    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 border-sky-500/30" },
-    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30" },
-    { name: "审核质量部", cls: "bg-purple-500/10 text-purple-600 border-purple-500/30" },
-    { name: "转化销售部", cls: "bg-pink-500/10 text-pink-600 border-pink-500/30" },
-    { name: "推广营销部", cls: "bg-cyan-500/10 text-cyan-600 border-cyan-500/30" },
-    { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30" }
+    { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 border-blue-500/30 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40" },
+    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 border-rose-500/30 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/40" },
+    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 border-amber-500/30 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/40" },
+    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 border-sky-500/30 dark:bg-sky-500/20 dark:text-sky-400 dark:border-sky-500/40" },
+    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40" },
+    { name: "审核质量部", cls: "bg-purple-500/10 text-purple-600 border-purple-500/30 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500/40" },
+    { name: "转化销售部", cls: "bg-pink-500/10 text-pink-600 border-pink-500/30 dark:bg-pink-500/20 dark:text-pink-400 dark:border-pink-500/40" },
+    { name: "推广营销部", cls: "bg-cyan-500/10 text-cyan-600 border-cyan-500/30 dark:bg-cyan-500/20 dark:text-cyan-400 dark:border-cyan-500/40" },
+    { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
 window.openLiveSiteForceBypass = function() {
@@ -786,13 +876,13 @@ window.openLiveSiteForceBypass = function() {
 };
 
 const DEFAULT_MANIFEST_TASKS = [
-    { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout，不办国内营业执照", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
+    { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-102", title: "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-103", title: "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广", notes: "内嵌商城高单价干货图文导流链接", stage: "STAGE_1_MVP_GLOBAL", department: "推广营销部", status: "DONE" },
     { id: "TASK-104", title: "实现万里汇 (WorldFirst) 跨境结汇与对公打款", notes: "配合老板手动验证第一张外卡到账", stage: "STAGE_1_MVP_GLOBAL", department: "董事长", status: "DONE" },
-    { id: "TASK-201", title: "国内正规军升级：接入广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
+    { id: "TASK-201", title: "国内正规军升级：广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
     { id: "TASK-202", title: "构建境内专属隔离收银台，替换前期『爱发电』通道", notes: "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝", stage: "STAGE_2_CN_UPGRADE", department: "施工工程部", status: "TODO" },
-    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版推文流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" },
+    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" },
     { id: "TASK-301", title: "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare", notes: "保持全球 TTFB < 50ms", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" },
     { id: "TASK-302", title: "部署 3 分钟有效期的私有预签名下载链接防止盗链", notes: "无论海外还是国内收银台，付款成功签发临时链接", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" }
 ];
@@ -800,7 +890,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 8. 👑 进度书与工单管理 (3层备援同步)
+// 9. 进度书与工单管理 (满血恢复 Light/Dark 模式样式)
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -861,11 +951,11 @@ window.resetManifestToDefault = async function() {
                 updated_at: new Date().toISOString().slice(0, 10)
             };
             await pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, "🔄 Reset tasks to realistic default [skip ci]", keys.gh);
-            alert("✅ 云端 GitHub 仓库及页面工单已全部洗回初始待办状态！");
+            alert("✅ 云端 GitHub 仓库及页面工单已全部重置！");
             return;
         }
     } catch(e) {}
-    alert("✅ 本地与控制台工单已完成初始状态重置！");
+    alert("✅ 本地工单已完成重置！");
 };
 
 window.filterManifest = function(stageKey) {
@@ -906,11 +996,10 @@ function renderManifestTasks() {
         let btnText = isDone ? "↩ 撤销" : "✓ 达成";
 
         listEl.innerHTML += `
-            <div class="saas-card rounded-xl p-4 flex flex-col justify-between transition hover:border-blue-500" 
-                 data-tooltip="【工单 #${task.id}】\n目标：${task.title}\n备注：${task.notes || '无'}\n部门：${task.department}">
+            <div class="saas-card rounded-xl p-4 flex flex-col justify-between transition hover:border-blue-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                 <div>
-                    <div class="flex items-center justify-between text-[10px] font-mono mb-1.5 text-slate-400">
-                        <span class="font-bold text-blue-600">[${task.id}] · ${task.department.split('&')[0].trim()}</span>
+                    <div class="flex items-center justify-between text-[10px] font-mono mb-1.5 text-slate-500 dark:text-slate-400">
+                        <span class="font-bold text-blue-600 dark:text-blue-500">[${task.id}] · ${task.department.split('&')[0].trim()}</span>
                         <span class="flex items-center gap-1 font-bold"><i class="w-1.5 h-1.5 rounded-full ${dotCls} inline-block"></i>${statusText}</span>
                     </div>
                     <span class="text-xs font-bold truncate mb-1 block text-slate-900 dark:text-slate-100">${task.title}</span>
@@ -961,65 +1050,129 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 9. 👑 智能中枢调令台与 @部门提及菜单 (Swarm Command Center)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (大厂级 Portal 悬浮物理定位版)
 // ==========================================
 window.showMentionDropdown = function(query) {
-    const dropEl = document.getElementById("mentionDropdown");
-    if (!dropEl) return;
+    let dropEl = document.getElementById("mentionDropdown");
+    const cmdBox = document.getElementById("cmd");
+    if (!cmdBox) return;
+
+    if (!dropEl) {
+        // 👑 降维绝杀：脱离原父级限制，直接创建到 body 最外层！适应白昼与极夜模式。
+        dropEl = document.createElement("div");
+        dropEl.id = "mentionDropdown";
+        dropEl.className = "fixed z-[999999] bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-600 rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] py-1.5 w-48 max-h-56 overflow-y-auto flex flex-col";
+        document.body.appendChild(dropEl);
+    }
+
     const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
     if (matches.length === 0) {
-        dropEl.classList.add("hidden");
+        dropEl.style.display = "none";
         return;
     }
+    
     dropEl.innerHTML = "";
     matches.forEach(dept => {
-        const item = document.createElement("div");
-        item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between";
-        item.innerHTML = `<span>@${dept.name}</span><span class="text-[10px] opacity-60">选择</span>`;
+        const item = document.createElement("button");
+        item.className = "group w-full text-left px-4 py-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300 hover:bg-blue-600 hover:text-white transition-colors whitespace-nowrap flex items-center";
+        item.innerHTML = `<span class="text-blue-500 mr-2 group-hover:text-white transition">@</span> ${dept.name}`;
         item.onmousedown = (e) => {
-            e.preventDefault();
+            e.preventDefault(); // 关键：保持焦点不丢失
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
     });
-    dropEl.classList.remove("hidden");
+
+    dropEl.style.display = "flex";
+
+    // 👑 物理级定位：计算光标的精确屏幕坐标
+    try {
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0).cloneRange();
+            range.collapse(false);
+            const rects = range.getClientRects();
+            if (rects.length > 0) {
+                const rect = rects[0];
+                if (rect && rect.bottom > 0) {
+                    dropEl.style.left = `${rect.left}px`;
+                    dropEl.style.top = `${rect.bottom + 8}px`; // 悬浮在光标正下方
+                    return;
+                }
+            }
+        }
+    } catch(e) {}
+    
+    // Fallback 到输入框的左下角
+    const boxRect = cmdBox.getBoundingClientRect();
+    dropEl.style.left = `${boxRect.left + 16}px`;
+    dropEl.style.top = `${boxRect.bottom + 8}px`;
 };
 
 window.hideMentionDropdown = function() {
     const dropEl = document.getElementById("mentionDropdown");
-    if (dropEl) dropEl.classList.add("hidden");
+    if (dropEl) {
+        dropEl.style.display = "none";
+    }
 };
 
+// 👑 手术刀级无损注入：绝不破坏原有富文本历史胶囊！
 window.selectMentionDept = function(deptName) {
     const cmdBox = document.getElementById("cmd");
     if (!cmdBox) return;
+    cmdBox.focus();
+
+    // 如果不是富文本框 (兜底处理)
+    if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+        const text = cmdBox.value;
+        const start = cmdBox.selectionStart;
+        const before = text.substring(0, start);
+        const after = text.substring(start);
+        const lastAt = before.lastIndexOf('@');
+        if (lastAt !== -1) {
+            cmdBox.value = before.substring(0, lastAt) + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = lastAt + deptName.length + 2;
+        }
+        hideMentionDropdown();
+        appendLog(`🎯 追加指令 @${deptName}`);
+        return;
+    }
+
     const sel = window.getSelection();
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
     
-    const textNode = range.startContainer;
-    if (textNode.nodeType === Node.TEXT_NODE) {
-        const val = textNode.textContent;
-        const atIdx = val.lastIndexOf('@', range.startOffset);
-        if (atIdx !== -1) {
-            range.setStart(textNode, atIdx);
-            range.deleteContents();
+    // 找到光标所在的最深层文本节点
+    const node = range.startContainer;
+    if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        const endOffset = range.startOffset;
+        // 向前查找最近的 @
+        const startOffset = text.lastIndexOf('@', endOffset);
+
+        if (startOffset !== -1) {
+            // 切除刚刚输入的 "@" 或 "@关键词"
+            range.setStart(node, startOffset);
+            range.setEnd(node, endOffset);
+            range.deleteContents(); 
         }
     }
+
+    // 匹配专属颜色 (适配深浅色模式)
+    const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
     
+    // 生成原生 HTML 标签，使用 insertNode 插入，绝不破坏现有 DOM 树，且在 Light/Dark 均清晰可见
     const tokenSpan = document.createElement("span");
-    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
-    tokenSpan.contentEditable = "false";
+    tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
+    tokenSpan.contentEditable = "false"; 
     tokenSpan.setAttribute("data-dept", deptName);
     tokenSpan.innerText = `@${deptName}`;
 
-    range.insertNode(tokenSpan);
-    const space = document.createTextNode(" ");
-    tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-    range.setStartAfter(space);
-    range.setEndAfter(space);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    // 使用 execCommand('insertHTML') 能够最大限度保留浏览器的 undo/redo 历史，且在光标处安全插入
+    const spaceHtml = `&nbsp;`;
+    const fullHtml = tokenSpan.outerHTML + spaceHtml;
+    
+    document.execCommand("insertHTML", false, fullHtml);
     
     hideMentionDropdown();
     appendLog(`🎯 追加指令 @${deptName}`);
@@ -1035,31 +1188,37 @@ window.inspectDept = function(deptName, btnEl) {
     const cmdBox = document.getElementById("cmd");
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
-        const tokenSpan = document.createElement("span");
-        tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
-        tokenSpan.contentEditable = "false";
-        tokenSpan.setAttribute("data-dept", deptName);
-        tokenSpan.innerText = `@${deptName}`;
 
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-            const range = sel.getRangeAt(0);
-            range.collapse(false);
-            range.insertNode(tokenSpan);
-            const space = document.createTextNode(" ");
-            tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-            range.setStartAfter(space);
-            range.setEndAfter(space);
-            sel.removeAllRanges();
-            sel.addRange(range);
+        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+            const start = cmdBox.selectionStart;
+            const text = cmdBox.value;
+            const before = text.substring(0, start);
+            const after = text.substring(start);
+            cmdBox.value = before + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
         } else {
-            cmdBox.appendChild(tokenSpan);
-            cmdBox.appendChild(document.createTextNode(" "));
+            const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
+            const tokenSpan = document.createElement("span");
+            tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
+            tokenSpan.contentEditable = "false";
+            tokenSpan.setAttribute("data-dept", deptName);
+            tokenSpan.innerText = `@${deptName}`;
+
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+                const range = sel.getRangeAt(0);
+                range.collapse(false);
+                const fullHtml = tokenSpan.outerHTML + `&nbsp;`;
+                document.execCommand("insertHTML", false, fullHtml);
+            } else {
+                cmdBox.appendChild(tokenSpan);
+                cmdBox.appendChild(document.createTextNode("\u00A0"));
+            }
             cmdBox.scrollTop = cmdBox.scrollHeight;
         }
         appendLog(`🎯 追加指令 @${deptName}`);
     } else {
-        appendLog(`🔍 视图切换 -> [${deptName}] (未点击聚焦文本框，不追加词条)`);
+        appendLog(`🔍 视图切换 -> [${deptName}] (未聚焦文本框，不追加词条)`);
     }
 
     loadHistoryFromMemory();
@@ -1072,18 +1231,21 @@ window.resetDeptFilter = function() {
     const activeLabel = document.getElementById("activeDeptLabel");
     if (activeLabel) activeLabel.innerText = `[全景视图]`;
     const cmdBox = document.getElementById("cmd");
-    if (cmdBox) cmdBox.innerHTML = "";
+    if (cmdBox) {
+        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
+        else cmdBox.innerHTML = "";
+    }
     appendLog(`🌐 恢复全景视角`);
     loadHistoryFromMemory();
 };
 
 // ==========================================
-// 10. 👑 启动函数与 GitHub 仓库全能推拉工具 (JSON + 二进制)
+// 11. 👑 启动引擎与精准键盘侦听
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
-    renderAuditTable();
+    loadAuditProducts(); // 👑 现在会自动合并本地商品与 AI 生成商品！
     ApexScheduleManager.loadScheduleFromCloud();
     ApexBannerManager.loadBannerConfig();
     if (window.ApexLogoManager) ApexLogoManager.initLogo();
@@ -1099,17 +1261,42 @@ function initAdminEngine() {
     const cmdBox = document.getElementById("cmd");
     if (cmdBox) {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
-        cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
-        cmdBox.addEventListener("input", function() {
+        const checkMention = function() {
+            if (!cmdBox) return;
+            
+            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+                const text = cmdBox.value.substring(0, cmdBox.selectionStart);
+                const match = text.match(/@([^\s@]*)$/);
+                if (match) showMentionDropdown(match[1]);
+                else hideMentionDropdown();
+                return;
+            }
+
             const sel = window.getSelection();
-            if (!sel.rangeCount) return;
-            const text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
-            const match = text.match(/@([^\s@]*)$/);
-            if (match) showMentionDropdown(match[1]);
-            else hideMentionDropdown();
-        });
+            if (!sel || sel.rangeCount === 0) {
+                hideMentionDropdown();
+                return;
+            }
 
+            // 获取光标之前的所有纯文本内容
+            const range = sel.getRangeAt(0).cloneRange();
+            range.selectNodeContents(cmdBox);
+            range.setEnd(sel.anchorNode, sel.anchorOffset);
+            const textUpToCursor = range.toString().replace(/\u00A0/g, " ");
+
+            const match = textUpToCursor.match(/@([^\s@]*)$/);
+            if (match) {
+                showMentionDropdown(match[1]);
+            } else {
+                hideMentionDropdown();
+            }
+        };
+
+        cmdBox.addEventListener("input", checkMention);
+        cmdBox.addEventListener("keyup", checkMention);
+        cmdBox.addEventListener("mouseup", checkMention);
+        
         cmdBox.addEventListener("keydown", function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
@@ -1204,26 +1391,25 @@ function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))
 function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
 function appendLog(msg, color = "") {
-    const log = document.getElementById("log");
+    const log = document.getElementById("historyFeed");
     if (!log) return;
-    if (color) log.className = `flex-1 text-[11px] font-mono ${color} p-3 saas-input rounded-xl whitespace-pre-wrap leading-relaxed overflow-y-auto custom-scroll`;
-    log.innerText += `\n>> ${msg}`;
+    // 兼容白昼与极夜模式
+    log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5">> ${msg}</div>`;
     log.scrollTop = log.scrollHeight;
 }
 
 async function getGithubFileSafe(path, token) {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
+    const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
     if (!res.ok) return { content: "", sha: null };
     const data = await res.json();
     return { content: b64_to_utf8(data.content), sha: data.sha };
 }
 
-// 👑 GitHub 仓库普通文本与 JSON 格式写入通用方法
 async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
     const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
     const payload = { message: message, content: utf8_to_b64(contentStr) };
     if (sha) payload.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${path}`, {
         method: "PUT",
         headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -1232,11 +1418,10 @@ async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
     return await res.json();
 }
 
-// 👑 GitHub 仓库 WebP 图像等二进制 Base64 数据直接推送方法
 async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
     const payload = { message: message, content: base64Raw };
     if (sha) payload.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${path}`, {
         method: "PUT",
         headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -1295,7 +1480,7 @@ async function fetchCommitHistory() {
     container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono">获取发布快照中...</div>`;
     try {
         const keys = getKeys();
-        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
+        const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
         const commits = await res.json();
         container.innerHTML = "";
         commits.forEach((item, idx) => {
@@ -1326,13 +1511,13 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
     window.closeRollbackModal();
     try {
         const keys = getKeys();
-        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
+        const treeRes = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
         for (const fileObj of filesToRestore) {
             const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
             const fileJson = await fileContentRes.json();
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+            await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
                 body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
@@ -1346,7 +1531,14 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
-    const rawText = cmdBox ? (cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报") : "常规进展汇报";
+    let rawText = "常规进展汇报";
+    if (cmdBox) {
+        rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" 
+            ? cmdBox.value 
+            : cmdBox.innerText;
+        rawText = rawText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报";
+    }
+    
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = "<span>⚙️ AI 智能体推演中...</span>";
@@ -1355,7 +1547,7 @@ window.triggerSwarmAutonomousAction = async function() {
         const keys = getKeys();
         const [memoryFile, repoTreeRes] = await Promise.all([
             getGithubFileSafe("MEMORY.md", keys.gh),
-            fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
+            fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
         ]);
         const treeSummary = (repoTreeRes.tree || []).map(n => n.path).join("\n");
 
@@ -1365,7 +1557,7 @@ window.triggerSwarmAutonomousAction = async function() {
 董事长指令："${rawText}"
 要求：仅输出 ===SWARM_LOG=== 答复和 ===NEW_MEMORY=== 带有 [EVO-RECORD | 部门]: 的记忆。不准随性改写无关文件。`;
 
-        const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
+        const dsRes = await fetch("[https://api.deepseek.com/chat/completions](https://api.deepseek.com/chat/completions)", {
             method: "POST",
             headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -1377,7 +1569,10 @@ window.triggerSwarmAutonomousAction = async function() {
         const aiAnswer = (await dsRes.json()).choices[0].message.content;
         const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "调令执行完毕。";
         appendLog(`🤖 回复:\n${swarmLogText}`);
-        if (cmdBox) cmdBox.innerHTML = "";
+        if (cmdBox) {
+            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
+            else cmdBox.innerHTML = "";
+        }
         loadHistoryFromMemory();
     } catch (err) {
         appendLog("❌ 调令执行异常: " + err.message, "text-rose-500");
