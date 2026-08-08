@@ -111,15 +111,15 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 👑 全新画廊渲染引擎：按类型渲染到三大分区 -->
+  <!-- 👑 全新画廊渲染引擎：按类型渲染到三大分区，并满血修复双语/多币种切换！ -->
   <script>
     window.ApexMallGallery = {
         baseProducts: [
-            { id: "aerotech", type: "ppt", title: "AeroTech 创投规划书", category: "15 页 · 商业计划书", thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "saas", type: "ppt", title: "SaaS 增长指标盘点", category: "20 页 · 数据可视化", thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "fintech", type: "ppt", title: "FinTech A 轮融资方案", category: "12 页 · 科技金融", thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "excel-roi", type: "excel", title: "全渠道 ROI 动态自适应测算模型", category: "数据模型 · 自动计算", thumb: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "word-ats", type: "word", title: "欧美企业级 ATS 智能排版合规报告", category: "标准报告 · ATS 盲测", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
+            { id: "aerotech", type: "ppt", title: "AeroTech 创投规划书", titleEn: "AeroTech Pitch Deck", category: "15 页 · 商业计划书", categoryEn: "15 Pages · Business Plan", thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", priceRmb: 69, priceUsd: 9.99 },
+            { id: "saas", type: "ppt", title: "SaaS 增长指标盘点", titleEn: "SaaS Growth Metrics", category: "20 页 · 数据可视化", categoryEn: "20 Pages · Data Viz", thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80", priceRmb: 69, priceUsd: 9.99 },
+            { id: "fintech", type: "ppt", title: "FinTech A 轮融资方案", titleEn: "FinTech Series A", category: "12 页 · 科技金融", categoryEn: "12 Pages · FinTech", thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80", priceRmb: 69, priceUsd: 9.99 },
+            { id: "excel-roi", type: "excel", title: "全渠道 ROI 动态测算模型", titleEn: "Omnichannel ROI Model", category: "数据模型 · 自动计算", categoryEn: "Data Model · Auto Calc", thumb: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=600&q=80", priceRmb: 69, priceUsd: 9.99 },
+            { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69, priceUsd: 9.99 }
         ],
 
         init: async function() {
@@ -128,14 +128,15 @@
                 const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
                 if (res.ok) {
                     const aiData = await res.json();
-                    if (Array.isArray(aiData) && aiData.length > 0) allProducts = [...allProducts, ...aiData];
+                    if (Array.isArray(aiData) && aiData.length > 0) {
+                        allProducts = [...allProducts, ...aiData];
+                    }
                 }
             } catch(e) { console.log("云端 AI 库暂无数据，载入默认图库..."); }
             this.render(allProducts);
         },
 
         render: function(products) {
-            // 精准分流三类商品
             const ppts = products.filter(p => !p.type || p.type === 'ppt' || (p.category && p.category.toLowerCase().includes('ppt')) || p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech');
             const excels = products.filter(p => p.type === 'excel' || (p.category && p.category.toLowerCase().includes('excel')) || p.id === 'excel-roi');
             const words = products.filter(p => p.type === 'word' || (p.category && p.category.toLowerCase().includes('word')) || p.id === 'word-ats');
@@ -144,6 +145,7 @@
             this.renderGrid('mall-excel-grid', excels, 'emerald', 'excel-editor.html');
             this.renderGrid('mall-word-grid', words, 'indigo', 'word-editor.html');
             
+            // 渲染完毕后，强制触翻译引擎，更新全站文字与货币！
             if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
         },
 
@@ -151,33 +153,40 @@
             const grid = document.getElementById(containerId);
             if (!grid) return;
             grid.innerHTML = "";
-            const pricing = window.ApexPricing ? window.ApexPricing.getConfig() : { ppt: { rmb: 69 } };
+            const pricing = window.ApexPricing ? window.ApexPricing.getConfig() : { ppt: { rmb: 69, usd: 9.99 } };
 
             if (items.length === 0) {
-                grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-mono text-sm border border-dashed border-slate-300 rounded-2xl">暂无 AI 生成数据</div>`;
+                grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-mono text-sm border border-dashed border-slate-300 rounded-2xl">该分区暂无模板数据</div>`;
                 return;
             }
 
             items.forEach(p => {
                 const finalImg = p.thumb || p.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
+                
+                // 👑 修复：获取完整的双语与多币种数据
                 const rmb = p.priceRmb || pricing.ppt.rmb;
+                const usd = p.priceUsd || pricing.ppt.usd || 9.99;
+                const titleZh = p.title;
+                const titleEn = p.titleEn || p.title;
+                const catZh = p.category ? p.category.split('·')[1]?.trim() : '精选模板';
+                const catEn = p.categoryEn || 'Premium Model';
 
-                // 动态主题色彩
                 const textCol = themeColor === 'blue' ? 'text-blue-600' : (themeColor === 'emerald' ? 'text-emerald-600' : 'text-indigo-600');
                 const badgeGrad = themeColor === 'blue' ? 'from-blue-500 to-indigo-500' : (themeColor === 'emerald' ? 'from-emerald-500 to-teal-500' : 'from-indigo-500 to-purple-500');
 
+                // 👑 修复：为标题、副标题、价格全面注入 data-zh 和 data-en
                 grid.innerHTML += `
-                    <div onclick="ApexMallGallery.openDetailModal('${p.id}', '${p.title}', '${finalImg}', ${rmb}, '${editorUrl}')" class="bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 group cursor-pointer flex flex-col relative">
+                    <div onclick="ApexMallGallery.openDetailModal('${p.id}', '${titleZh}', '${finalImg}', ${rmb}, '${editorUrl}')" class="bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 group cursor-pointer flex flex-col relative">
                         <div class="relative w-full pt-[75%] bg-slate-100 overflow-hidden">
                             <img src="${finalImg}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="封面" loading="lazy">
-                            <div class="absolute top-2 left-2 bg-gradient-to-r ${badgeGrad} text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">👑 严选商用</div>
+                            <div class="absolute top-2 left-2 bg-gradient-to-r ${badgeGrad} text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm" data-zh="👑 严选商用" data-en="👑 Premium">👑 严选商用</div>
                             <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-mono px-1.5 py-0.5 rounded">${p.category ? p.category.split('·')[0].trim() : '模板'}</div>
                         </div>
                         <div class="p-3.5 flex-1 flex flex-col justify-between bg-white">
-                            <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:${textCol} transition tracking-tight">${p.title}</h4>
+                            <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:${textCol} transition tracking-tight" data-zh="${titleZh}" data-en="${titleEn}">${titleZh}</h4>
                             <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
-                                <span class="text-[11px] text-slate-400 font-medium truncate pr-2">${p.category ? p.category.split('·')[1]?.trim() : '精选模板'}</span>
-                                <span class="text-[15px] font-black ${textCol} font-mono">￥${rmb}</span>
+                                <span class="text-[11px] text-slate-400 font-medium truncate pr-2" data-zh="${catZh}" data-en="${catEn}">${catZh}</span>
+                                <span class="text-[15px] font-black ${textCol} font-mono" data-zh="￥${rmb} RMB" data-en="$${usd} USD">￥${rmb} RMB</span>
                             </div>
                         </div>
                     </div>
@@ -194,7 +203,7 @@
                 document.body.appendChild(modal);
             }
             modal.innerHTML = `
-                <div class="bg-white max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+                <div class="bg-white max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative animate-[fadeIn_0.2s_ease-out]">
                     <button onclick="document.getElementById('productDetailModal').classList.add('hidden')" class="absolute top-4 right-4 z-10 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition font-bold">✕</button>
                     <div class="md:w-3/5 bg-slate-100 relative min-h-[250px] md:min-h-[400px]">
                         <img src="${img}" class="absolute inset-0 w-full h-full object-cover" alt="预览">
