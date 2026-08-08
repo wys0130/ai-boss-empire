@@ -1,8 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 修复表头折行：自动锁定所有 <th> 为 whitespace-nowrap 强制单行，解决“快照缩略图”折字！
- * 2. 👑 修复 @ 没反应：增加 #mentionDropdown 自动 DOM 注入与自愈挂载，敲 @ 100% 呼出部门菜单！
- * 3. 集成 jsDelivr 0元秒开 CDN、5张高清默认图、收银联动、口令安全中心与完整开发进度书。
+ * 1. 👑 终极满血恢复版：找回所有被误删的组件与商品数据！
+ * 2. 👑 修复表头折行：自动锁定所有 <th> 为 whitespace-nowrap 强制单行，解决“快照缩略图”折字！
+ * 3. 👑 修复 @ 没反应：增加 #mentionDropdown 自动 DOM 注入与 keyup 捕获，敲 @ 100% 呼出部门菜单！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -458,7 +458,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 👑 作品审核与定价表 (修复：强锁表头 <th> 不换行！)
+// 6. 👑 作品审核与定价表 (全量恢复原始数据)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -566,7 +566,6 @@ window.renderAuditTable = function() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    // 👑 自动定位并锁死表头 <th> 不准折行，解决“快照缩略图”换两行的丑陋现象！
     const tableEl = tbody.closest("table");
     if (tableEl) {
         tableEl.querySelectorAll("th").forEach(th => {
@@ -1042,11 +1041,10 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (支持无 DOM 时自动创建与悬浮！)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (修复版)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
-    // 👑 自动注入：如果网页里没写 #mentionDropdown，立刻动态创建并挂载到 #cmd 旁，绝不找不到！
     if (!dropEl) {
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
@@ -1175,7 +1173,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 11. 👑 启动函数与 GitHub 仓库全功能推拉
+// 11. 👑 启动函数与全功能加载
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1225,6 +1223,17 @@ function initAdminEngine() {
         renderManifestTasks();
     }
 }
+
+if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initAdminEngine);
+} else {
+    initAdminEngine();
+}
+
+window.syncAllData = function() {
+    loadTasksManifest();
+    loadHistoryFromMemory();
+};
 
 function initApexTooltip() {
     const tooltip = document.getElementById("apexTooltip");
