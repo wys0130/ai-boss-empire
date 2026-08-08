@@ -1,9 +1,10 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
  * 1. 👑 彻底解决 @ 功能：采用最底层 Range.insertNode 节点无损操作，100% 保护历史标签！
- * 2. 👑 修复代码备份死机：去除强制的 DeepSeek 密钥绑定，仅靠 GitHub Token 即可拉取快照。
- * 3. 👑 修复排版：修复表格变形、允许超长邮箱换行，按钮极简防挤压！
- * 4. 👑 恢复 AI 部门与战报：强制执行初始化调用与注入默认出厂数据。
+ * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
+ * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
+ * 4. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
+ * 5. 👑 终极修复快照回溯：修复 GitHub 409 写入冲突，解除深层密钥绑定，加入成功重载机制！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -310,8 +311,6 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：放宽表格列宽度限制，使用 break-all whitespace-normal 允许超长邮箱自然换行
-            // 将按钮做极度微缩 (px-2 py-1 text-[10px])，防止把操作列挤出视线
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <td class="py-2 px-2 w-1/3 min-w-[160px] break-all whitespace-normal">
@@ -533,7 +532,6 @@ window.renderAuditTable = function() {
             : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
-        // 👑 修复：防挤压表格样式
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-2 px-2 w-16 whitespace-nowrap">
@@ -793,15 +791,11 @@ window.ApexPricing = {
 };
 
 const deptConfig = [
-    { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 border-blue-500/30 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40" },
-    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 border-rose-500/30 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/40" },
-    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 border-amber-500/30 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/40" },
-    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 border-sky-500/30 dark:bg-sky-500/20 dark:text-sky-400 dark:border-sky-500/40" },
-    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40" },
-    { name: "审核质量部", cls: "bg-purple-500/10 text-purple-600 border-purple-500/30 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500/40" },
-    { name: "转化销售部", cls: "bg-pink-500/10 text-pink-600 border-pink-500/30 dark:bg-pink-500/20 dark:text-pink-400 dark:border-pink-500/40" },
-    { name: "推广营销部", cls: "bg-cyan-500/10 text-cyan-600 border-cyan-500/30 dark:bg-cyan-500/20 dark:text-cyan-400 dark:border-cyan-500/40" },
-    { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
+    { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30" },
+    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30" },
+    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30" },
+    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30" },
+    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" }
 ];
 
 window.openLiveSiteForceBypass = function() {
@@ -857,6 +851,7 @@ async function loadTasksManifest() {
     }
 }
 
+// 兜底辅助函数：只需提取，不强行要求抛出异常打断进程
 function getKeysSafe() {
     return {
         gh: localStorage.getItem("APEX_GH_TOKEN") || "",
@@ -1223,7 +1218,10 @@ function initAdminEngine() {
     
     if(typeof initApexTooltip === "function") initApexTooltip();
     
+    // 👑 修复：渲染 AI 部门按钮
     renderDeptButtons();
+    
+    // 👑 修复：默认渲染历史战报
     loadHistoryFromMemory();
     
     if(typeof ApexScheduleManager !== "undefined") ApexScheduleManager.loadScheduleFromCloud();
@@ -1457,38 +1455,62 @@ async function fetchCommitHistory() {
     }
 }
 
+// 👑 终极修复快照回溯：加入 currentSha 防止 GitHub 写入 409 冲突，增加反馈弹窗并重载
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
     if (!confirm(`⏳ 危险！此操作将覆盖云端源码，确定回退到快照 [#${shortSha}] 吗？`)) return;
     window.closeRollbackModal();
+    
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
-    if (!ghToken) return;
+    if (!ghToken) {
+        alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
+        return; 
+    }
 
     try {
+        alert(`⏳ 开始回溯全站代码至快照 [#${shortSha}] ...\n由于涉及多个底层文件覆盖，预计需要 10-20 秒，请勿关闭或刷新页面！`);
+        
         const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!treeRes.ok) throw new Error("无法读取目标快照的文件树结构");
+        
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
         
-        appendLog(`⏳ 开始回溯仓库源码至 #${shortSha}...`);
+        let successCount = 0;
+        appendLog(`⏳ 开始逐一回溯源码至快照 #${shortSha}...`);
         
         for (const fileObj of filesToRestore) {
             const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
             const fileJson = await fileContentRes.json();
             
+            // 👑 获取线上文件的现存 SHA，防止 409 写入冲突
             let currentSha = null;
             try {
                 const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, { headers: { "Authorization": `token ${ghToken}` } });
-                if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
+                if(curFileRes.ok) {
+                    currentSha = (await curFileRes.json()).sha;
+                }
             } catch(e){}
 
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content, ...(currentSha && {sha: currentSha}) })
+                body: JSON.stringify({ 
+                    message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path}) [skip ci]`, 
+                    content: fileJson.content, 
+                    ...(currentSha && {sha: currentSha}) 
+                })
             });
+            
+            if (updateRes.ok) successCount++;
         }
-        appendLog(`✅ 成功还原主仓库到快照 [#${shortSha}]！建议刷新页面。`);
-        loadHistoryFromMemory();
-    } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
+        
+        alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！共覆盖了 ${successCount} 个系统核心文件。\n系统即将强制重载以应用旧版代码...`);
+        location.reload();
+        
+    } catch(err) { 
+        alert("❌ 还原异常: " + err.message);
+        appendLog("❌ 还原异常: " + err.message, "text-rose-500"); 
+    }
 };
 
 window.triggerSwarmAutonomousAction = async function() {
