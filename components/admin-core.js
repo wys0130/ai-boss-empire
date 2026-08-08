@@ -3,6 +3,7 @@
  * 1. 👑 彻底解决 @ 功能：采用最底层 Range.insertNode 节点无损操作，100% 保护历史标签！
  * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
  * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
+ * 4. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -141,6 +142,7 @@ window.ApexUserManager = {
                 }
             }
         } catch(e) {}
+        this.renderUserTable();
     },
 
     saveUsers: async function() {
@@ -309,7 +311,7 @@ window.ApexUserManager = {
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
             // 👑 修复：放宽表格列宽度限制，使用 break-all whitespace-normal 允许超长邮箱换行
-            // 按钮极致微缩紧凑
+            // 按钮极致微缩紧凑 px-2 py-1
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <td class="py-2 px-2 w-1/3 break-all whitespace-normal">
@@ -424,17 +426,18 @@ window.ApexScheduleManager = {
 
 let AUDIT_PRODUCTS = [];
 const DEFAULT_AUDIT_PRODUCTS = [
-    { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
-    { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
-    { id: "fintech", title: "FinTech A 轮融资方案", category: "12 SLIDES · PPT演示", thumbKey: "prod_fintech", thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
-    { id: "excel-roi", title: "全渠道 ROI 动态测算模型", category: "XLSX MODEL · EXCEL表格", thumbKey: "prod_excel", thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-emerald-600 font-bold", isLinked: true, status: true },
-    { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
+    { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "fintech", title: "FinTech A 轮融资方案", category: "12 SLIDES · Office PPT演示", thumbKey: "prod_fintech", thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "excel-roi", title: "全渠道 ROI 动态测算模型", category: "XLSX MODEL · Office EXCEL表格", thumbKey: "prod_excel", thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-emerald-600 font-bold", isLinked: true, status: true },
+    { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
 async function loadAuditProducts() {
+    // 👑 修复：优先从本地金库提取数据，而不是强行覆盖！
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     if (localProducts) {
-        AUDIT_PRODUCTS.length = 0; 
+        AUDIT_PRODUCTS.length = 0; // 清空默认项
         JSON.parse(localProducts).forEach(p => AUDIT_PRODUCTS.push(p));
     } else {
         AUDIT_PRODUCTS = JSON.parse(JSON.stringify(DEFAULT_AUDIT_PRODUCTS));
@@ -470,6 +473,7 @@ async function loadAuditProducts() {
         }
     } catch(e) {}
     
+    // 更新大盘并渲染
     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
     renderAuditTable();
 }
@@ -618,7 +622,9 @@ window.ApexBannerManager = {
     loadBannerConfig: async function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         let config = null;
-        if (saved) { try { config = JSON.parse(saved); } catch(e) {} }
+        if (saved) {
+            try { config = JSON.parse(saved); } catch(e) {}
+        }
         
         try {
             const keys = getKeysSafe();
@@ -724,12 +730,18 @@ window.ApexPricing = {
         if (this.isLinked) {
             btn.className = "px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/30 transition whitespace-nowrap";
             btn.innerText = "🔗 汇率关联: 已绑定";
-            icons.forEach(k => { const el = document.getElementById(`linkIcon-${k}`); if (el) { el.innerText = "⇄"; el.className = "text-xs text-emerald-500 font-bold"; } });
+            icons.forEach(k => {
+                const el = document.getElementById(`linkIcon-${k}`);
+                if (el) { el.innerText = "⇄"; el.className = "text-xs text-emerald-500 font-bold"; }
+            });
             appendLog(`>> [定价控制] 开启关联：任意修改将按汇率 1 : ${ApexFX.currentRate} 互转。`);
         } else {
             btn.className = "px-3 py-1.5 rounded-lg bg-slate-500/10 text-slate-400 border border-slate-500/30 transition whitespace-nowrap";
             btn.innerText = "🔓 汇率关联: 已解绑";
-            icons.forEach(k => { const el = document.getElementById(`linkIcon-${k}`); if (el) { el.innerText = "‖"; el.className = "text-xs text-slate-400"; } });
+            icons.forEach(k => {
+                const el = document.getElementById(`linkIcon-${k}`);
+                if (el) { el.innerText = "‖"; el.className = "text-xs text-slate-400"; }
+            });
             appendLog(`>> [定价控制] 关闭关联：双方完全独立填写。`);
         }
     },
@@ -793,7 +805,9 @@ const deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
-window.openLiveSiteForceBypass = function() { window.open('index.html', '_blank'); };
+window.openLiveSiteForceBypass = function() {
+    window.open('index.html', '_blank');
+};
 
 const DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
@@ -844,6 +858,13 @@ async function loadTasksManifest() {
     }
 }
 
+function getKeysSafe() {
+    return {
+        gh: localStorage.getItem("APEX_GH_TOKEN") || "",
+        ds: localStorage.getItem("APEX_DS_KEY") || ""
+    };
+}
+
 window.resetManifestToDefault = async function() {
     if (!confirm("确定将所有阶段工单重置为初始待办进度 (TODO) 吗？")) return;
     rawManifestTasks = JSON.parse(JSON.stringify(DEFAULT_MANIFEST_TASKS));
@@ -870,9 +891,13 @@ window.resetManifestToDefault = async function() {
 
 window.filterManifest = function(stageKey) {
     currentManifestFilter = stageKey;
-    document.querySelectorAll('.manifest-tab').forEach(btn => { btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600"; });
+    document.querySelectorAll('.manifest-tab').forEach(btn => {
+        btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600";
+    });
     const targetBtn = window.event?.target;
-    if (targetBtn) { targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold"; }
+    if (targetBtn) {
+        targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold";
+    }
     renderManifestTasks();
 };
 
@@ -895,7 +920,10 @@ function renderManifestTasks() {
         const isInProg = task.status === 'IN_PROGRESS';
         let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-400");
         let statusText = isDone ? "已达成" : (isInProg ? "执行中" : "待落实");
-        let btnCls = isDone ? "bg-slate-700 hover:bg-slate-600 text-slate-200" : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
+        
+        let btnCls = isDone 
+            ? "bg-slate-700 hover:bg-slate-600 text-slate-200" 
+            : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
         let btnText = isDone ? "↩ 撤销" : "✓ 达成";
 
         listEl.innerHTML += `
@@ -909,7 +937,9 @@ function renderManifestTasks() {
                     <span class="text-[11px] text-slate-500 font-mono truncate block">${task.notes || '暂无说明'}</span>
                 </div>
                 <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end text-xs font-mono">
-                    <button onclick="toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">${btnText}</button>
+                    <button onclick="toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">
+                        ${btnText}
+                    </button>
                 </div>
             </div>
         `;
@@ -1142,6 +1172,21 @@ async function loadHistoryFromMemory() {
 // ==========================================
 // 11. 启动引擎与精准键盘侦听
 // ==========================================
+// 👑 修复：恢复 AI 部门按钮的渲染
+function renderDeptButtons() {
+    const container = document.getElementById("deptButtonsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    deptConfig.forEach(dept => {
+        const btn = document.createElement("button");
+        btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
+        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
+        btn.onmousedown = (e) => e.preventDefault();
+        btn.onclick = () => window.inspectDept(dept.name, btn);
+        container.appendChild(btn);
+    });
+}
+
 function initAdminEngine() {
     if(typeof loadAuditProducts === "function") loadAuditProducts(); 
     else if(typeof renderAuditTable === "function") renderAuditTable();
@@ -1149,7 +1194,7 @@ function initAdminEngine() {
     if(typeof initApexTooltip === "function") initApexTooltip();
     
     // 👑 修复：渲染 AI 部门按钮
-    if(typeof renderDeptButtons === "function") renderDeptButtons();
+    renderDeptButtons();
     
     // 👑 修复：默认渲染历史战报
     loadHistoryFromMemory();
@@ -1259,20 +1304,6 @@ function initApexTooltip() {
     });
 }
 
-function renderDeptButtons() {
-    const container = document.getElementById("deptButtonsContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    deptConfig.forEach(dept => {
-        const btn = document.createElement("button");
-        btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
-        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
-        btn.onmousedown = (e) => e.preventDefault();
-        btn.onclick = () => window.inspectDept(dept.name, btn);
-        container.appendChild(btn);
-    });
-}
-
 function getKeys() {
     const gh = localStorage.getItem("APEX_GH_TOKEN");
     const ds = localStorage.getItem("APEX_DS_KEY");
@@ -1373,15 +1404,15 @@ async function fetchCommitHistory() {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             container.innerHTML += `
-                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input">
+                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input bg-slate-50 dark:bg-slate-900/50">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
                         </div>
-                        <div class="text-xs font-mono truncate">${item.commit.message}</div>
+                        <div class="text-xs font-mono truncate text-slate-800 dark:text-slate-300">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 saas-card rounded-lg text-xs font-mono font-bold hover:opacity-80">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
