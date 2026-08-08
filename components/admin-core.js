@@ -3,6 +3,8 @@
  * 1. 👑 彻底解决 @ 功能：采用最底层 Range.insertNode 节点无损操作，100% 保护历史标签！
  * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
  * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
+ * 4. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
+ * 5. 👑 终极修复快照回溯：注入 SHA 指纹比对算法，跳过无改动文件，彻底消灭 GitHub 422 报错！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -141,6 +143,7 @@ window.ApexUserManager = {
                 }
             }
         } catch(e) {}
+        this.renderUserTable();
     },
 
     saveUsers: async function() {
@@ -308,11 +311,9 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：放宽表格列宽度限制，使用 break-all whitespace-normal 允许超长邮箱换行
-            // 按钮极致微缩紧凑
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                    <td class="py-2 px-2 w-1/3 break-all whitespace-normal">
+                    <td class="py-2 px-2 w-1/3 min-w-[160px] break-all whitespace-normal">
                         <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${user.email}</div>
                         <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: ${user.id}</div>
                     </td>
@@ -320,7 +321,7 @@ window.ApexUserManager = {
                     <td class="py-2 px-2 font-mono text-xs whitespace-nowrap">${verifyText}</td>
                     <td class="py-2 px-2 font-mono text-slate-400 text-xs whitespace-nowrap">${user.date}</td>
                     <td class="py-2 px-2 text-right whitespace-nowrap">
-                        <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap">
+                        <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap w-[150px]">
                             <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2 py-1 rounded text-[10px] font-bold transition ${statusBtnCls}">
                                 ${user.status ? '封禁' : '解封'}
                             </button>
@@ -424,11 +425,11 @@ window.ApexScheduleManager = {
 
 let AUDIT_PRODUCTS = [];
 const DEFAULT_AUDIT_PRODUCTS = [
-    { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
-    { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
-    { id: "fintech", title: "FinTech A 轮融资方案", category: "12 SLIDES · PPT演示", thumbKey: "prod_fintech", thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
-    { id: "excel-roi", title: "全渠道 ROI 动态测算模型", category: "XLSX MODEL · EXCEL表格", thumbKey: "prod_excel", thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-emerald-600 font-bold", isLinked: true, status: true },
-    { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
+    { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "fintech", title: "FinTech A 轮融资方案", category: "12 SLIDES · Office PPT演示", thumbKey: "prod_fintech", thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "excel-roi", title: "全渠道 ROI 动态测算模型", category: "XLSX MODEL · Office EXCEL表格", thumbKey: "prod_excel", thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-emerald-600 font-bold", isLinked: true, status: true },
+    { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
 async function loadAuditProducts() {
@@ -533,37 +534,37 @@ window.renderAuditTable = function() {
 
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                <td class="py-3 px-4 whitespace-nowrap">
-                    <div class="relative group w-14 h-18">
-                        <img src="${finalThumbUrl}" alt="快照" class="w-14 h-18 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
-                        <button onclick="uploadProductThumb(${index})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold">📤 转WebP</button>
+                <td class="py-2 px-2 w-16 whitespace-nowrap">
+                    <div class="relative group w-12 h-16">
+                        <img src="${finalThumbUrl}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
+                        <button onclick="uploadProductThumb(${index})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold">📤 WebP</button>
                     </div>
                 </td>
-                <td class="py-3 px-4 whitespace-nowrap">
-                    <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] tracking-wide">${item.title}</div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
+                <td class="py-2 px-2 min-w-[150px] whitespace-normal">
+                    <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${item.title}</div>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
-                <td class="py-3 px-4 font-mono whitespace-nowrap">
-                    <div class="flex items-center gap-1.5 flex-nowrap whitespace-nowrap">
+                <td class="py-2 px-2 font-mono whitespace-nowrap">
+                    <div class="flex items-center gap-1 flex-nowrap whitespace-nowrap">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-16 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center text-[#0f172a] dark:text-[#f8fafc] outline-none ${item.colorCls}" />
-                        <span class="text-slate-400">/</span>
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-[#0f172a] dark:text-[#f8fafc] outline-none ${item.colorCls}" />
+                        <span class="text-slate-400 mx-1">/</span>
                         <span class="text-blue-600 font-bold">$</span>
-                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-20 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 text-xs font-bold text-center text-blue-600 outline-none" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition-all shrink-0 whitespace-nowrap inline-flex items-center justify-center select-none border ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
+                        <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-16 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-blue-600 outline-none" />
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap inline-flex items-center justify-center select-none ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
                             ${linkBtnText}
                         </button>
                     </div>
                 </td>
-                <td class="py-3 px-4 whitespace-nowrap">
-                    <button onclick="toggleAuditStatus(${index})" class="px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap inline-flex items-center gap-1.5 transition ${badgeCls}">
+                <td class="py-2 px-2 whitespace-nowrap text-center">
+                    <button onclick="toggleAuditStatus(${index})" class="px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 transition ${badgeCls}">
                         <span>●</span>
                         <span>${item.status ? '已上架' : '已隐藏'}</span>
                     </button>
                 </td>
-                <td class="py-3 px-4 text-right whitespace-nowrap min-w-[220px]">
-                    <button onclick="uploadProductThumb(${index})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition">上传WebP图</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition">强制销毁</button>
+                <td class="py-2 px-2 text-right whitespace-nowrap">
+                    <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
+                    <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition ml-1">销毁</button>
                 </td>
             </tr>
         `;
@@ -618,7 +619,9 @@ window.ApexBannerManager = {
     loadBannerConfig: async function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         let config = null;
-        if (saved) { try { config = JSON.parse(saved); } catch(e) {} }
+        if (saved) {
+            try { config = JSON.parse(saved); } catch(e) {}
+        }
         
         try {
             const keys = getKeysSafe();
@@ -724,12 +727,18 @@ window.ApexPricing = {
         if (this.isLinked) {
             btn.className = "px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 font-bold border border-emerald-500/30 transition whitespace-nowrap";
             btn.innerText = "🔗 汇率关联: 已绑定";
-            icons.forEach(k => { const el = document.getElementById(`linkIcon-${k}`); if (el) { el.innerText = "⇄"; el.className = "text-xs text-emerald-500 font-bold"; } });
+            icons.forEach(k => {
+                const el = document.getElementById(`linkIcon-${k}`);
+                if (el) { el.innerText = "⇄"; el.className = "text-xs text-emerald-500 font-bold"; }
+            });
             appendLog(`>> [定价控制] 开启关联：任意修改将按汇率 1 : ${ApexFX.currentRate} 互转。`);
         } else {
             btn.className = "px-3 py-1.5 rounded-lg bg-slate-500/10 text-slate-400 border border-slate-500/30 transition whitespace-nowrap";
             btn.innerText = "🔓 汇率关联: 已解绑";
-            icons.forEach(k => { const el = document.getElementById(`linkIcon-${k}`); if (el) { el.innerText = "‖"; el.className = "text-xs text-slate-400"; } });
+            icons.forEach(k => {
+                const el = document.getElementById(`linkIcon-${k}`);
+                if (el) { el.innerText = "‖"; el.className = "text-xs text-slate-400"; }
+            });
             appendLog(`>> [定价控制] 关闭关联：双方完全独立填写。`);
         }
     },
@@ -782,18 +791,16 @@ window.ApexPricing = {
 };
 
 const deptConfig = [
-    { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 border-blue-500/30 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/40" },
-    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 border-rose-500/30 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/40" },
-    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 border-amber-500/30 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/40" },
-    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 border-sky-500/30 dark:bg-sky-500/20 dark:text-sky-400 dark:border-sky-500/40" },
-    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40" },
-    { name: "审核质量部", cls: "bg-purple-500/10 text-purple-600 border-purple-500/30 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500/40" },
-    { name: "转化销售部", cls: "bg-pink-500/10 text-pink-600 border-pink-500/30 dark:bg-pink-500/20 dark:text-pink-400 dark:border-pink-500/40" },
-    { name: "推广营销部", cls: "bg-cyan-500/10 text-cyan-600 border-cyan-500/30 dark:bg-cyan-500/20 dark:text-cyan-400 dark:border-cyan-500/40" },
-    { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
+    { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30" },
+    { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30" },
+    { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30" },
+    { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30" },
+    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" }
 ];
 
-window.openLiveSiteForceBypass = function() { window.open('index.html', '_blank'); };
+window.openLiveSiteForceBypass = function() {
+    window.open('index.html', '_blank');
+};
 
 const DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
@@ -844,6 +851,14 @@ async function loadTasksManifest() {
     }
 }
 
+// 兜底辅助函数：只需提取，不强行要求抛出异常打断进程
+function getKeysSafe() {
+    return {
+        gh: localStorage.getItem("APEX_GH_TOKEN") || "",
+        ds: localStorage.getItem("APEX_DS_KEY") || ""
+    };
+}
+
 window.resetManifestToDefault = async function() {
     if (!confirm("确定将所有阶段工单重置为初始待办进度 (TODO) 吗？")) return;
     rawManifestTasks = JSON.parse(JSON.stringify(DEFAULT_MANIFEST_TASKS));
@@ -870,9 +885,13 @@ window.resetManifestToDefault = async function() {
 
 window.filterManifest = function(stageKey) {
     currentManifestFilter = stageKey;
-    document.querySelectorAll('.manifest-tab').forEach(btn => { btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600"; });
+    document.querySelectorAll('.manifest-tab').forEach(btn => {
+        btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600";
+    });
     const targetBtn = window.event?.target;
-    if (targetBtn) { targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold"; }
+    if (targetBtn) {
+        targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold";
+    }
     renderManifestTasks();
 };
 
@@ -895,7 +914,10 @@ function renderManifestTasks() {
         const isInProg = task.status === 'IN_PROGRESS';
         let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-400");
         let statusText = isDone ? "已达成" : (isInProg ? "执行中" : "待落实");
-        let btnCls = isDone ? "bg-slate-700 hover:bg-slate-600 text-slate-200" : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
+        
+        let btnCls = isDone 
+            ? "bg-slate-700 hover:bg-slate-600 text-slate-200" 
+            : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
         let btnText = isDone ? "↩ 撤销" : "✓ 达成";
 
         listEl.innerHTML += `
@@ -909,7 +931,9 @@ function renderManifestTasks() {
                     <span class="text-[11px] text-slate-500 font-mono truncate block">${task.notes || '暂无说明'}</span>
                 </div>
                 <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end text-xs font-mono">
-                    <button onclick="toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">${btnText}</button>
+                    <button onclick="toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">
+                        ${btnText}
+                    </button>
                 </div>
             </div>
         `;
@@ -924,18 +948,20 @@ window.toggleTaskStatus = async function(taskId) {
     appendLog(`✏️ 变更工单状态 -> [${taskId}] ${task.status}`);
     renderManifestTasks();
     try {
-        const keys = getKeys();
-        const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
-        const manifest = JSON.parse(fileObj.content);
-        const targetInManifest = manifest.tasks.find(t => t.id === taskId);
-        if (targetInManifest) {
-            targetInManifest.status = task.status;
-            manifest.summary.completed = manifest.tasks.filter(t => t.status === 'DONE').length;
-            manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
-            manifest.updated_at = new Date().toISOString().slice(0, 10);
-            await pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status} [skip ci]`, keys.gh);
-            appendLog(`✅ 工单进度写入成功！`);
-            loadTasksManifest();
+        const keys = getKeysSafe();
+        if(keys.gh) {
+            const fileObj = await getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            const manifest = JSON.parse(fileObj.content);
+            const targetInManifest = manifest.tasks.find(t => t.id === taskId);
+            if (targetInManifest) {
+                targetInManifest.status = task.status;
+                manifest.summary.completed = manifest.tasks.filter(t => t.status === 'DONE').length;
+                manifest.summary.todo = manifest.tasks.filter(t => t.status === 'TODO').length;
+                manifest.updated_at = new Date().toISOString().slice(0, 10);
+                await pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status} [skip ci]`, keys.gh);
+                appendLog(`✅ 工单进度写入成功！`);
+                loadTasksManifest();
+            }
         }
     } catch (e) {
         appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500");
@@ -1117,24 +1143,53 @@ window.resetDeptFilter = function() {
     loadHistoryFromMemory();
 };
 
-// 👑 修复：恢复完整的战报 mock 数据，不再空空如也！
+// 👑 修复：强制初始化模拟战报数据，绝对不让页面空置
 async function loadHistoryFromMemory() {
-    const f = document.getElementById("historyFeed");
-    const c = document.getElementById("historyCount");
-    if(!f) return;
+    const feed = document.getElementById("historyFeed");
+    const countBadge = document.getElementById("historyCount");
+    if(!feed) return;
+    
+    try {
+        const keys = getKeysSafe();
+        if (!keys.gh) throw new Error("No token"); 
+        const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
+        let lines = (memFile.content || "").split("\n").filter(l => l.includes("[EVO-RECORD") || l.includes("[VETO-RECORD"));
+        if (activeFilterDept) lines = lines.filter(l => l.includes(activeFilterDept));
+        
+        if (lines.length > 0) {
+            if (countBadge) countBadge.innerText = `${lines.length}条`;
+            feed.innerHTML = "";
+            lines.reverse().forEach((line, idx) => {
+                const timeMatch = line.match(/(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
+                const timeStr = timeMatch ? timeMatch[1] : "归档";
+                const cleanText = line.replace(/^- /, "").replace(/\[EVO-RECORD[^\]]*\]:/, "").replace(/\[VETO-RECORD[^\]]*\]:/, "").trim();
+                feed.innerHTML += `
+                    <div class="border rounded-xl p-2.5 saas-input bg-slate-50 dark:bg-slate-900/50 mb-2">
+                        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">
+                            <span>⏱️ ${timeStr}</span><span>#${lines.length - idx}</span>
+                        </div>
+                        <div class="text-xs font-mono text-slate-800 dark:text-slate-300">${cleanText}</div>
+                    </div>
+                `;
+            });
+            return;
+        }
+    } catch (err) {}
+    
+    // 如果没有配置密钥或者云端没有日志，展示出厂 Mock 战报
     const mockLogs = [
         "🤖 [大脑中枢]: 系统启动并注入全局异常捕获钩子。",
         "👁️ [视觉策划部]: 轮播图资源尺寸及 WebP 转化效验完成。状态：🟢 健康",
         "🛠️ [施工工程部]: 商业金库架构双端读写 (GitHub/Gitee) 已连通。",
         "✅ [系统]: AI 智能体准备就绪，待命执行调令。"
     ];
-    if (c) c.innerText = "4条";
-    f.innerHTML = mockLogs.map((log, i) => `
-        <div class="border rounded-xl p-2.5 saas-input bg-slate-50 dark:bg-slate-900/50">
+    if (countBadge) countBadge.innerText = "4条";
+    feed.innerHTML = mockLogs.map((log, i) => `
+        <div class="border rounded-xl p-2.5 saas-input bg-slate-50 dark:bg-slate-900/50 mb-2">
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">
                 <span>⏱️ 今天 ${i+1}:00</span><span>#${4 - i}</span>
             </div>
-            <div class="text-xs font-mono text-slate-800 dark:text-slate-300">${log}</div>
+            <div class="text-xs font-mono text-slate-800 dark:text-slate-300 leading-relaxed">${log}</div>
         </div>
     `).join('');
 }
@@ -1142,6 +1197,21 @@ async function loadHistoryFromMemory() {
 // ==========================================
 // 11. 启动引擎与精准键盘侦听
 // ==========================================
+// 👑 修复：强制初始化部门按键
+function renderDeptButtons() {
+    const container = document.getElementById("deptButtonsContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    deptConfig.forEach(dept => {
+        const btn = document.createElement("button");
+        btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
+        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
+        btn.onmousedown = (e) => e.preventDefault();
+        btn.onclick = () => window.inspectDept(dept.name, btn);
+        container.appendChild(btn);
+    });
+}
+
 function initAdminEngine() {
     if(typeof loadAuditProducts === "function") loadAuditProducts(); 
     else if(typeof renderAuditTable === "function") renderAuditTable();
@@ -1149,7 +1219,7 @@ function initAdminEngine() {
     if(typeof initApexTooltip === "function") initApexTooltip();
     
     // 👑 修复：渲染 AI 部门按钮
-    if(typeof renderDeptButtons === "function") renderDeptButtons();
+    renderDeptButtons();
     
     // 👑 修复：默认渲染历史战报
     loadHistoryFromMemory();
@@ -1259,20 +1329,6 @@ function initApexTooltip() {
     });
 }
 
-function renderDeptButtons() {
-    const container = document.getElementById("deptButtonsContainer");
-    if (!container) return;
-    container.innerHTML = "";
-    deptConfig.forEach(dept => {
-        const btn = document.createElement("button");
-        btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
-        btn.innerHTML = `<div class="text-xs font-bold truncate">${dept.name}</div>`;
-        btn.onmousedown = (e) => e.preventDefault();
-        btn.onclick = () => window.inspectDept(dept.name, btn);
-        container.appendChild(btn);
-    });
-}
-
 function getKeys() {
     const gh = localStorage.getItem("APEX_GH_TOKEN");
     const ds = localStorage.getItem("APEX_DS_KEY");
@@ -1356,15 +1412,22 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
+// 👑 修复：防报错机制。即便没有填 DeepSeek 密钥，只要有 GitHub Token，也能拉取备份代码记录！
 async function fetchCommitHistory() {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
     container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono">获取发布快照中...</div>`;
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+    if (!ghToken) {
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取提交记录。<br>请在右上角【🔑 密钥设置】填入 GitHub Token。</div>`;
+        return;
+    }
+
     try {
-        const keys = getKeys();
-        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
+        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${ghToken}` } });
         if (!res.ok) {
-            container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取提交记录。<br>请确认右上角 Token 权限正确，且仓库为 GitHub（不兼容 Gitee）。</div>`;
+            container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无权访问或仓库错误。<br>请确认仓库地址为 GitHub（不支持Gitee），且 Token 有效。</div>`;
             return;
         }
         const commits = await res.json();
@@ -1373,45 +1436,89 @@ async function fetchCommitHistory() {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             container.innerHTML += `
-                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input">
+                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input bg-slate-50 dark:bg-slate-900/50 mb-2">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
                         </div>
-                        <div class="text-xs font-mono truncate">${item.commit.message}</div>
+                        <div class="text-xs font-mono truncate text-slate-800 dark:text-slate-300">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 saas-card rounded-lg text-xs font-mono font-bold hover:opacity-80">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常，请检查网络或密钥。</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常，请检查网络。</div>`;
     }
 }
 
+// 👑 终极修复快照回溯：加入 currentSha 防止 GitHub 写入 409 冲突，增加反馈弹窗并重载
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定还原至快照 [#${shortSha}] 吗？`)) return;
+    if (!confirm(`⏳ 危险！此操作将覆盖云端源码，确定回退到快照 [#${shortSha}] 吗？`)) return;
     window.closeRollbackModal();
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
+    if (!ghToken) {
+        alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
+        return; 
+    }
+
     try {
-        const keys = getKeys();
-        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
+        alert(`⏳ 开始回溯全站代码至快照 [#${shortSha}] ...\n由于涉及多个底层文件覆盖，预计需要 10-20 秒，请勿关闭或刷新页面！`);
+        
+        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!treeRes.ok) throw new Error("无法读取目标快照的文件树结构");
+        
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
+        
+        let successCount = 0;
+        let skipCount = 0;
+        appendLog(`⏳ 开始逐一回溯源码至快照 #${shortSha}...`);
+        
         for (const fileObj of filesToRestore) {
-            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
+            
+            // 👑 获取线上文件的现存 SHA，防止 409 写入冲突
+            let currentSha = null;
+            try {
+                const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, { headers: { "Authorization": `token ${ghToken}` } });
+                if(curFileRes.ok) {
+                    currentSha = (await curFileRes.json()).sha;
+                }
+            } catch(e){}
+
+            // 如果线上文件的 sha 和目标旧版本的 sha 完全一致，代表文件没发生过更改，直接跳过！
+            if (currentSha === fileObj.sha) {
+                skipCount++;
+                continue;
+            }
+
+            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
             const fileJson = await fileContentRes.json();
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+
+            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
-                headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
+                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path}) [skip ci]`, 
+                    content: fileJson.content, 
+                    ...(currentSha && {sha: currentSha}) 
+                })
             });
+            
+            if (updateRes.ok) successCount++;
         }
-        appendLog(`✅ 成功还原主仓库到快照 [#${shortSha}]`);
-        loadHistoryFromMemory();
-    } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
+        
+        alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！\n📊 报告：修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将强制重载以应用旧版代码...`);
+        location.reload();
+        
+    } catch(err) { 
+        alert("❌ 还原异常: " + err.message);
+        appendLog("❌ 还原异常: " + err.message, "text-rose-500"); 
+    }
 };
 
 window.triggerSwarmAutonomousAction = async function() {
@@ -1430,7 +1537,13 @@ window.triggerSwarmAutonomousAction = async function() {
         btn.innerHTML = "<span>⚙️ AI 智能体推演中...</span>";
     }
     try {
-        const keys = getKeys();
+        const keys = getKeysSafe();
+        if (!keys.ds) {
+            appendLog("❌ 缺少 DeepSeek API Key，调令推演中止。", "text-rose-500");
+            if (btn) { btn.disabled = false; btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>"; }
+            return;
+        }
+
         const [memoryFile, repoTreeRes] = await Promise.all([
             getGithubFileSafe("MEMORY.md", keys.gh),
             fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
