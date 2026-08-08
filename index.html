@@ -12,6 +12,7 @@
   <!-- 先加载独立风控中台，再加载收银验证模块 -->
   <script src="components/vip-download-guard.js"></script>
   <script src="components/zero-auth.js"></script>
+  <script src="components/mall-gallery.js"></script>
   
   <style>
     body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -68,19 +69,12 @@
         <div>
           <h3 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
-            <span data-zh="精品商业 PPT 模板" data-en="Premium PPT Templates">精品商业 PPT 模板 (云端实时同步)</span>
+            <span data-zh="精品商业 PPT 模板" data-en="Premium PPT Templates">精品商业 PPT 模板</span>
           </h3>
-          <p class="text-xs text-slate-500 mt-1" data-zh="海量高定视觉，对标顶级大厂画廊" data-en="Massive premium visuals, gallery style">海量高定视觉，对标顶级大厂画廊</p>
         </div>
-        <a href="#" class="text-xs text-blue-600 font-bold hover:underline px-3 py-1 bg-blue-50 rounded-lg">查看全部模板 →</a>
       </div>
-
-      <!-- 👑 觅知网风格：大图画廊网格 (PC 4列，手机 2列) -->
-      <div id="mall-ppt-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          <div class="col-span-full py-10 text-center text-slate-400 font-mono text-sm animate-pulse border border-dashed border-slate-300 rounded-2xl">
-              ☁️ 正在从云端抓取 AI 自动上架的最新自研模板...
-          </div>
-      </div>
+      <!-- 容器： mall-gallery.js 会自动往这里面塞商品 -->
+      <div id="mall-ppt-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
     </section>
 
     <!-- 第二板块：EXCEL表格 与 WORD文档 -->
