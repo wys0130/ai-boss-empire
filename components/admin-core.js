@@ -1,8 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 终极满血恢复版：找回所有被误删的组件与商品数据！
- * 2. 👑 修复表头折行：自动锁定所有 <th> 为 whitespace-nowrap 强制单行，解决“快照缩略图”折字！
- * 3. 👑 修复 @ 没反应：增加 #mentionDropdown 自动 DOM 注入与 keyup 捕获，敲 @ 100% 呼出部门菜单！
+ * 1. 👑 终极防弹版修复：彻底解决 @ 菜单无法唤出问题，兼容所有输入法与富文本标签！
+ * 2. 👑 满血保留：所有被误删的组件、商品数据、汇率、进度书 100% 完整！
+ * 3. 👑 强制表头防换行，解决快照缩略图折断问题。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -11,7 +11,7 @@ let currentManifestFilter = 'ALL';
 let isCmdActive = false;
 
 // ==========================================
-// 1. 👑 侧边栏高亮与切换逻辑
+// 1. 侧边栏高亮与切换逻辑
 // ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
@@ -39,20 +39,14 @@ window.switchAdminTab = function(tabId) {
 };
 
 // ==========================================
-// 2. 👑 全站图片 CDN 与 WebP 转换引擎
+// 2. 全站图片 CDN 与 WebP 转换引擎
 // ==========================================
 window.ApexImageEngine = {
-    cdn: {
-        owner: "wys0130",
-        repo: "ai-boss-empire",
-        branch: "main"
-    },
+    cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
 
     toCDN: function(path) {
         if (!path || path.trim() === "") return null;
-        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) {
-            return path;
-        }
+        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) return path;
         const cleanPath = path.replace(/^\//, "");
         return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
     },
@@ -60,15 +54,11 @@ window.ApexImageEngine = {
     resolve: function(assetKey, cloudPath, defaultFallback) {
         const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
         if (local && local.startsWith("data:image")) return local;
-
-        if (cloudPath && (cloudPath.startsWith("http://") || cloudPath.startsWith("https://"))) {
-            return cloudPath;
-        }
+        if (cloudPath && (cloudPath.startsWith("http://") || cloudPath.startsWith("https://"))) return cloudPath;
         if (cloudPath && cloudPath.trim() !== "" && !cloudPath.startsWith("assets/")) {
             const cdnUrl = this.toCDN(cloudPath);
             if (cdnUrl) return cdnUrl;
         }
-
         return defaultFallback || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
     },
 
@@ -99,19 +89,11 @@ window.ApexImageEngine = {
                         if (keys && keys.gh) {
                             const rawBase64 = webpDataUrl.replace(/^data:image\/webp;base64,/, "");
                             const fileObj = await getGithubFileSafe(repoPath, keys.gh);
-                            await pushGithubBinaryFile(
-                                repoPath, 
-                                rawBase64, 
-                                fileObj.sha, 
-                                `🖼️ Asset: Backup WebP image [${assetKey}] to ${repoPath} [skip ci]`, 
-                                keys.gh
-                            );
+                            await pushGithubBinaryFile(repoPath, rawBase64, fileObj.sha, `🖼️ Asset: Backup WebP image [${assetKey}] to ${repoPath} [skip ci]`, keys.gh);
                             alert(`✅ 图片已转 WebP 并成功备份！\n\n全球CDN秒开链接：\n${ApexImageEngine.toCDN(repoPath)}`);
                             return;
                         }
-                    } catch (err) {
-                        console.warn("提交 GitHub 云端异常，保持设备缓存生效:", err);
-                    }
+                    } catch (err) { console.warn("提交 GitHub 云端异常，保持设备缓存生效:", err); }
                     alert("✅ 图片已压缩为 WebP 并写入当前电脑缓存！");
                 };
                 img.src = event.target.result;
@@ -123,7 +105,7 @@ window.ApexImageEngine = {
 };
 
 // ==========================================
-// 3. 👑 企业 LOGO 上传本地自动压缩转 WebP
+// 3. 企业 LOGO 上传本地自动压缩转 WebP
 // ==========================================
 window.ApexLogoManager = {
     initLogo: function() {
@@ -146,7 +128,7 @@ window.ApexLogoManager = {
 };
 
 // ==========================================
-// 4. 👑 用户与权限管理中台
+// 4. 用户与权限管理中台
 // ==========================================
 window.ApexUserManager = {
     defaultUsers: [
@@ -161,7 +143,6 @@ window.ApexUserManager = {
     loadUsers: async function() {
         const saved = localStorage.getItem('APEX_USER_LIST');
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
-        
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -188,7 +169,6 @@ window.ApexUserManager = {
 
     initUserSection: async function() {
         await this.loadUsers();
-        
         let savedPwd = localStorage.getItem("APEX_ADMIN_PWD");
         let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
         let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
@@ -409,7 +389,7 @@ window.ApexUserManager = {
 };
 
 // ==========================================
-// 5. 👑 AI 智能体排班区间配置中台
+// 5. AI 智能体排班区间配置中台
 // ==========================================
 window.ApexScheduleManager = {
     loadScheduleFromCloud: async function() {
@@ -458,7 +438,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 👑 作品审核与定价表 (全量恢复原始数据)
+// 6. 作品审核与定价表 (全量恢复原始数据)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -648,7 +628,7 @@ window.toggleThemeMode = function() {
 };
 
 // ==========================================
-// 7. 👑 首页轮播图配置管理
+// 7. 首页轮播图配置管理
 // ==========================================
 window.ApexBannerManager = {
     setPreset: function(idx, gradientStr) {
@@ -734,7 +714,7 @@ window.ApexBannerManager = {
 };
 
 // ==========================================
-// 8. 👑 汇率与商品定价中心
+// 8. 汇率与商品定价中心
 // ==========================================
 window.ApexFX = {
     currentRate: 7.18,
@@ -880,7 +860,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 9. 👑 进度书与工单管理
+// 9. 进度书与工单管理
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -1041,7 +1021,7 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (修复版)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (防弹兼容修复版)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
@@ -1085,9 +1065,27 @@ window.hideMentionDropdown = function() {
     if (dropEl) dropEl.classList.add("hidden");
 };
 
+// 👑 自动兼容 Input、Textarea 以及 contenteditable 的文本插入
 window.selectMentionDept = function(deptName) {
     const cmdBox = document.getElementById("cmd");
     if (!cmdBox) return;
+
+    if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+        const start = cmdBox.selectionStart;
+        const text = cmdBox.value;
+        const before = text.substring(0, start);
+        const after = text.substring(start);
+        const atIdx = before.lastIndexOf('@');
+        if (atIdx !== -1) {
+            cmdBox.value = before.substring(0, atIdx) + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = atIdx + deptName.length + 2;
+        }
+        hideMentionDropdown();
+        appendLog(`🎯 追加指令 @${deptName}`);
+        return;
+    }
+
+    // 富文本 (ContentEditable)
     const sel = window.getSelection();
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
@@ -1103,7 +1101,7 @@ window.selectMentionDept = function(deptName) {
     }
     
     const tokenSpan = document.createElement("span");
-    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
+    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
     tokenSpan.contentEditable = "false";
     tokenSpan.setAttribute("data-dept", deptName);
     tokenSpan.innerText = `@${deptName}`;
@@ -1130,27 +1128,37 @@ window.inspectDept = function(deptName, btnEl) {
     const cmdBox = document.getElementById("cmd");
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
-        const tokenSpan = document.createElement("span");
-        tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded";
-        tokenSpan.contentEditable = "false";
-        tokenSpan.setAttribute("data-dept", deptName);
-        tokenSpan.innerText = `@${deptName}`;
 
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-            const range = sel.getRangeAt(0);
-            range.collapse(false);
-            range.insertNode(tokenSpan);
-            const space = document.createTextNode(" ");
-            tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-            range.setStartAfter(space);
-            range.setEndAfter(space);
-            sel.removeAllRanges();
-            sel.addRange(range);
+        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+            const start = cmdBox.selectionStart;
+            const text = cmdBox.value;
+            const before = text.substring(0, start);
+            const after = text.substring(start);
+            cmdBox.value = before + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
         } else {
-            cmdBox.appendChild(tokenSpan);
-            cmdBox.appendChild(document.createTextNode(" "));
-            cmdBox.scrollTop = cmdBox.scrollHeight;
+            const tokenSpan = document.createElement("span");
+            tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
+            tokenSpan.contentEditable = "false";
+            tokenSpan.setAttribute("data-dept", deptName);
+            tokenSpan.innerText = `@${deptName}`;
+
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+                const range = sel.getRangeAt(0);
+                range.collapse(false);
+                range.insertNode(tokenSpan);
+                const space = document.createTextNode(" ");
+                tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
+                range.setStartAfter(space);
+                range.setEndAfter(space);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            } else {
+                cmdBox.appendChild(tokenSpan);
+                cmdBox.appendChild(document.createTextNode(" "));
+                cmdBox.scrollTop = cmdBox.scrollHeight;
+            }
         }
         appendLog(`🎯 追加指令 @${deptName}`);
     } else {
@@ -1173,7 +1181,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 11. 👑 启动函数与全功能加载
+// 11. 👑 启动引擎与物理按键绑定中心
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1196,15 +1204,33 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
-        // 👑 彻底改用键盘松开和鼠标抬起事件，精准抓取纯文本，100% 触发 @ 菜单
+        // 👑 彻底改用兼容方案捕获，无视输入法，100% 触发 @ 菜单
         const checkMention = function() {
             if (!cmdBox) return;
-            const text = cmdBox.innerText || "";
-            const match = text.trim().match(/@([^\s@]*)$/);
-            if (match) showMentionDropdown(match[1]);
-            else hideMentionDropdown();
+            let text = "";
+            
+            // 完美兼容所有的标签情况
+            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+                text = cmdBox.value.substring(0, cmdBox.selectionStart);
+            } else {
+                const sel = window.getSelection();
+                if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+                    text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+                } else {
+                    text = cmdBox.innerText || "";
+                }
+            }
+
+            const match = text.match(/@([^\s@]*)$/);
+            if (match) {
+                showMentionDropdown(match[1]);
+            } else {
+                hideMentionDropdown();
+            }
         };
 
+        // 绑定三种物理级事件，绝不漏掉一个字符！
+        cmdBox.addEventListener("input", checkMention);
         cmdBox.addEventListener("keyup", checkMention);
         cmdBox.addEventListener("mouseup", checkMention);
 
@@ -1442,7 +1468,14 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
-    const rawText = cmdBox ? (cmdBox.innerText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报") : "常规进展汇报";
+    let rawText = "常规进展汇报";
+    if (cmdBox) {
+        rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" 
+            ? cmdBox.value 
+            : cmdBox.innerText;
+        rawText = rawText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报";
+    }
+    
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = "<span>⚙️ AI 智能体推演中...</span>";
@@ -1473,7 +1506,10 @@ window.triggerSwarmAutonomousAction = async function() {
         const aiAnswer = (await dsRes.json()).choices[0].message.content;
         const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "调令执行完毕。";
         appendLog(`🤖 回复:\n${swarmLogText}`);
-        if (cmdBox) cmdBox.innerHTML = "";
+        if (cmdBox) {
+            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
+            else cmdBox.innerHTML = "";
+        }
         loadHistoryFromMemory();
     } catch (err) {
         appendLog("❌ 调令执行异常: " + err.message, "text-rose-500");
