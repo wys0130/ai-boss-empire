@@ -1017,7 +1017,7 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (绝杀：直接置于文档流！)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (大厂级 Portal 物理悬浮版)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
@@ -1025,11 +1025,12 @@ window.showMentionDropdown = function(query) {
     if (!cmdBox) return;
 
     if (!dropEl) {
+        // 👑 降维绝杀：脱离原父级限制，直接创建到 body 最外层！
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
-        // 👑 绝杀：不再使用绝对定位导致被隐藏，直接置入正常文档流！
-        dropEl.className = "flex flex-wrap gap-2 mb-3 p-2 bg-slate-900 border border-slate-700 rounded-xl w-full shadow-lg";
-        cmdBox.parentNode.insertBefore(dropEl, cmdBox);
+        // 采用 fixed 固定定位，打造精致的垂直列表菜单
+        dropEl.className = "fixed z-[99999] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 w-48 max-h-64 overflow-y-auto flex flex-col";
+        document.body.appendChild(dropEl);
     }
 
     const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
@@ -1041,15 +1042,23 @@ window.showMentionDropdown = function(query) {
     dropEl.innerHTML = "";
     matches.forEach(dept => {
         const item = document.createElement("button");
-        item.className = "px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold transition shadow-md shadow-blue-900/50";
-        item.innerHTML = `@${dept.name}`;
+        // 👑 修复排版：竖向铺开，文字居左，强制不换行 (whitespace-nowrap)
+        item.className = "group w-full text-left px-4 py-2.5 text-xs font-mono font-bold text-slate-300 hover:bg-blue-600 hover:text-white transition-colors whitespace-nowrap flex items-center";
+        item.innerHTML = `<span class="text-blue-500 mr-1.5 group-hover:text-blue-200">@</span> ${dept.name}`;
         item.onmousedown = (e) => {
-            e.preventDefault(); 
+            e.preventDefault(); // 防止输入框失去焦点
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
     });
+
+    // 必须先让他显示出来，浏览器才能计算出它的真实高度
     dropEl.style.display = "flex";
+
+    // 👑 物理级定位：计算输入框的精确屏幕坐标，将菜单悬浮钉在它头顶！
+    const rect = cmdBox.getBoundingClientRect();
+    dropEl.style.left = `${rect.left}px`;
+    dropEl.style.top = `${rect.top - dropEl.offsetHeight - 8}px`; // 减去自身高度和 8px 间距
 };
 
 window.hideMentionDropdown = function() {
