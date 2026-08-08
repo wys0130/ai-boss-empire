@@ -40,12 +40,13 @@
         .saas-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 min-h-screen flex overflow-hidden selection:bg-blue-500/30">
+<!-- 👑 修复：恢复网页全局滚动，去除 overflow-hidden 束缚，解决底部按钮点不到的问题 -->
+<body class="bg-slate-50 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 min-h-screen flex items-start selection:bg-blue-500/30">
 
-    <!-- 1. 侧边栏 (Sidebar) -->
-    <aside class="w-64 bg-white dark:bg-[#0f172a] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 z-40 relative shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-colors duration-300">
+    <!-- 1. 侧边栏 (Sidebar) 👑 固定在屏幕左侧 -->
+    <aside class="w-64 bg-white dark:bg-[#0f172a] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 z-40 sticky top-0 h-screen shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-colors duration-300">
         <!-- Logo区 -->
-        <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50 group cursor-pointer" onclick="ApexLogoManager.uploadLogo()" title="点击更换企业 LOGO">
+        <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50 group cursor-pointer shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击更换企业 LOGO">
             <div class="flex items-center gap-2.5">
                 <img id="adminBrandLogo" src="assets/logo.webp" class="h-7 w-auto object-contain drop-shadow-sm" onerror="this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');" />
                 <div id="adminFallbackBadge" class="hidden w-7 h-7 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shadow-md shrink-0 aspect-square">A</div>
@@ -53,7 +54,7 @@
             </div>
         </div>
 
-        <div class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">后台业务管理</div>
+        <div class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">后台业务管理</div>
 
         <!-- 导航菜单 -->
         <nav class="flex-1 px-3 space-y-1.5 overflow-y-auto custom-scroll">
@@ -75,7 +76,7 @@
         </nav>
 
         <!-- 底部状态 -->
-        <div class="p-4 border-t border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-900/20">
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-900/20 shrink-0">
             <button onclick="window.openLiveSiteForceBypass()" class="w-full bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-200 text-xs font-bold py-2.5 rounded-lg transition shadow flex items-center justify-center gap-2">
                 🏠 返回前台商城 <span>→</span>
             </button>
@@ -86,23 +87,23 @@
         </div>
     </aside>
 
-    <!-- 2. 主控制区 (Main Workspace) -->
-    <main class="flex-1 flex flex-col min-w-0 relative bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+    <!-- 2. 主控制区 (Main Workspace) 👑 跟随窗口滚动 -->
+    <main class="flex-1 flex flex-col min-w-0 relative transition-colors duration-300 min-h-screen">
         
-        <!-- 顶栏 -->
-        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-6 flex items-center justify-between shrink-0 shadow-sm z-30 transition-colors duration-300">
+        <!-- 顶栏 👑 贴顶悬浮 -->
+        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-6 flex items-center justify-between shrink-0 shadow-sm sticky top-0 z-30 transition-colors duration-300">
             <div class="flex items-center gap-3">
                 <h2 id="pageHeaderTitle" class="text-base font-black text-slate-800 dark:text-slate-100 tracking-tight">业务控制台 / 作品风控审查与上架</h2>
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm">实时同步中</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm hidden sm:inline-block">实时同步中</span>
             </div>
             
             <div class="flex items-center gap-3">
-                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold shadow-sm" title="实时外汇挂牌价">
+                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold shadow-sm" title="实时外汇挂牌价">
                     <span>💱 汇率:</span>
                     <span id="fxRateBadge" class="tracking-wider">查询中...</span>
                 </div>
                 
-                <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
+                <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
                 
                 <button id="themeToggleBtn" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm">
                     <span>🌙 极夜模式</span>
@@ -112,7 +113,7 @@
                     ⏳ 历史快照
                 </button>
                 
-                <button onclick="alert('独立金库架构加载中...')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition shadow-sm flex items-center gap-1.5">
+                <button onclick="ApexVault.open()" class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-500 text-xs font-bold hover:bg-amber-500/20 transition shadow-sm flex items-center gap-1.5">
                     🗄️ 独立金库
                 </button>
 
@@ -122,8 +123,8 @@
             </div>
         </header>
 
-        <!-- 内容渲染区 -->
-        <div class="flex-1 overflow-y-auto custom-scroll p-6 md:p-8">
+        <!-- 内容渲染区 👑 不再限制 overflow，交由 window 滚动 -->
+        <div class="p-6 md:p-8 flex-1 w-full relative">
             
             <!-- 模块 1：作品审核与上架 -->
             <section id="tab-audit" class="max-w-6xl mx-auto space-y-6">
@@ -136,15 +137,15 @@
                         <span class="text-xs font-mono font-bold px-3 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-lg border border-orange-500/20">可调价清单在线</span>
                     </div>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
+                    <div class="overflow-x-auto w-full pb-4">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                    <th class="py-3 px-4 w-24">快照缩略图</th>
-                                    <th class="py-3 px-4">作品名 / Office 分类</th>
-                                    <th class="py-3 px-4">商用授权价 (RMB / USD) · 可行内独立脱钩</th>
-                                    <th class="py-3 px-4 w-28">当前状态</th>
-                                    <th class="py-3 px-4 text-right w-48">管理操作</th>
+                                    <th class="py-3 px-4 w-24 whitespace-nowrap">快照缩略图</th>
+                                    <th class="py-3 px-4 whitespace-nowrap">作品名 / Office 分类</th>
+                                    <th class="py-3 px-4 whitespace-nowrap">商用授权价 (RMB / USD) · 可行内独立脱钩</th>
+                                    <th class="py-3 px-4 w-28 whitespace-nowrap">当前状态</th>
+                                    <th class="py-3 px-4 text-right min-w-[220px] whitespace-nowrap">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody id="auditTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -157,25 +158,25 @@
 
             <!-- 模块 2：主页轮播图与定价中心 -->
             <section id="tab-config" class="hidden max-w-6xl mx-auto space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     <!-- 左侧：全局价格中台 -->
                     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col">
-                        <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-center">
+                        <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-center flex-wrap gap-3">
                             <div>
                                 <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2"><span class="text-blue-500">01.</span> 全局商业价格中台</h3>
                                 <p class="text-[11px] text-slate-500 mt-1">控制大盘全局统一定价，启用联动将根据最新汇率自动换算。</p>
                             </div>
-                            <div class="flex gap-2">
-                                <button id="btnToggle99" onclick="ApexPricing.toggle99Rule()" class="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px] border border-blue-500/30 transition">✨ .99尾数: 开启</button>
-                                <button id="btnToggleLink" onclick="ApexPricing.toggleLinkage()" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/30 transition">🔗 汇率关联: 已绑定</button>
+                            <div class="flex gap-2 shrink-0">
+                                <button id="btnToggle99" onclick="ApexPricing.toggle99Rule()" class="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px] border border-blue-500/30 transition whitespace-nowrap">✨ .99尾数: 开启</button>
+                                <button id="btnToggleLink" onclick="ApexPricing.toggleLinkage()" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/30 transition whitespace-nowrap">🔗 汇率关联: 已绑定</button>
                             </div>
                         </div>
 
                         <div class="space-y-4 flex-1">
                             <!-- 三件套 -->
-                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <div class="w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">商业三件套全能包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">BUNDLE</div></div>
-                                <div class="flex-1 flex items-center gap-2">
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">商业三件套包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">BUNDLE</div></div>
+                                <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span>
                                         <input id="rmb-bundle" type="number" onchange="ApexPricing.onRMBChange('bundle', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500 transition" value="139">
@@ -189,32 +190,32 @@
                             </div>
                             
                             <!-- PPT -->
-                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <div class="w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一图解授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">PPT DECK</div></div>
-                                <div class="flex-1 flex items-center gap-2">
-                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-ppt" type="number" onchange="ApexPricing.onRMBChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none" value="69"></div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一图解授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">PPT DECK</div></div>
+                                <div class="flex-1 flex items-center gap-2 w-full">
+                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-ppt" type="number" onchange="ApexPricing.onRMBChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-ppt" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
-                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-ppt" type="number" step="0.01" onchange="ApexPricing.onUSDChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none" value="9.99"></div>
+                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-ppt" type="number" step="0.01" onchange="ApexPricing.onUSDChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="9.99"></div>
                                 </div>
                             </div>
 
                             <!-- EXCEL -->
-                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <div class="w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一模型授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">EXCEL MODEL</div></div>
-                                <div class="flex-1 flex items-center gap-2">
-                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-excel" type="number" onchange="ApexPricing.onRMBChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none" value="69"></div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一模型授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">EXCEL MODEL</div></div>
+                                <div class="flex-1 flex items-center gap-2 w-full">
+                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-excel" type="number" onchange="ApexPricing.onRMBChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-excel" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
-                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-excel" type="number" step="0.01" onchange="ApexPricing.onUSDChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none" value="9.99"></div>
+                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-excel" type="number" step="0.01" onchange="ApexPricing.onUSDChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="9.99"></div>
                                 </div>
                             </div>
 
                             <!-- WORD -->
-                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <div class="w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一报告授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">WORD REPORT</div></div>
-                                <div class="flex-1 flex items-center gap-2">
-                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-word" type="number" onchange="ApexPricing.onRMBChange('word', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none" value="69"></div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一报告授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">WORD REPORT</div></div>
+                                <div class="flex-1 flex items-center gap-2 w-full">
+                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-word" type="number" onchange="ApexPricing.onRMBChange('word', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-word" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
-                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-word" type="number" step="0.01" onchange="ApexPricing.onUSDChange('word', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none" value="9.99"></div>
+                                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-word" type="number" step="0.01" onchange="ApexPricing.onUSDChange('word', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="9.99"></div>
                                 </div>
                             </div>
                         </div>
@@ -243,11 +244,11 @@
                                 <input id="banner-desc-0" type="text" placeholder="巨幕副标题介绍" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 
                                 <div class="flex gap-2">
-                                    <input id="banner-img-0" type="text" placeholder="背景图 CDN 链接 (为空则用渐变色)" class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none">
+                                    <input id="banner-img-0" type="text" placeholder="背景图 CDN 链接 (为空则用渐变色)" class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
                                 </div>
                                 
                                 <div class="space-y-1.5">
-                                    <input id="banner-bg-0" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none">
+                                    <input id="banner-bg-0" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
                                     <div class="flex gap-1">
                                         <div onclick="ApexBannerManager.setPreset(0, 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)')" class="h-4 flex-1 rounded cursor-pointer border border-white/20" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)"></div>
                                         <div onclick="ApexBannerManager.setPreset(0, 'linear-gradient(135deg, #064e3b 0%, #0f172a 100%)')" class="h-4 flex-1 rounded cursor-pointer border border-white/20" style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%)"></div>
@@ -267,11 +268,11 @@
                                 <input id="banner-desc-1" type="text" placeholder="巨幕副标题介绍" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 
                                 <div class="flex gap-2">
-                                    <input id="banner-img-1" type="text" placeholder="背景图 CDN 链接" class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none">
+                                    <input id="banner-img-1" type="text" placeholder="背景图 CDN 链接" class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
                                 </div>
 
                                 <div class="space-y-1.5">
-                                    <input id="banner-bg-1" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none">
+                                    <input id="banner-bg-1" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
                                     <div class="flex gap-1">
                                         <div onclick="ApexBannerManager.setPreset(1, 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)')" class="h-4 flex-1 rounded cursor-pointer border border-white/20" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)"></div>
                                         <div onclick="ApexBannerManager.setPreset(1, 'linear-gradient(135deg, #064e3b 0%, #0f172a 100%)')" class="h-4 flex-1 rounded cursor-pointer border border-white/20" style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%)"></div>
@@ -469,15 +470,15 @@
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto flex-1">
-                            <table class="w-full text-left border-collapse">
+                        <div class="overflow-x-auto flex-1 w-full pb-4">
+                            <table class="w-full text-left border-collapse min-w-[700px]">
                                 <thead>
                                     <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                        <th class="py-2.5 px-4 w-1/3">邮箱主体 / 终端 ID</th>
-                                        <th class="py-2.5 px-4 w-40">商用角色</th>
-                                        <th class="py-2.5 px-4 w-28">核验状态</th>
-                                        <th class="py-2.5 px-4 w-28">注册日期</th>
-                                        <th class="py-2.5 px-4 text-right">安全操作</th>
+                                        <th class="py-2.5 px-4 w-1/3 whitespace-nowrap">邮箱主体 / 终端 ID</th>
+                                        <th class="py-2.5 px-4 w-40 whitespace-nowrap">商用角色</th>
+                                        <th class="py-2.5 px-4 w-28 whitespace-nowrap">核验状态</th>
+                                        <th class="py-2.5 px-4 w-28 whitespace-nowrap">注册日期</th>
+                                        <th class="py-2.5 px-4 text-right min-w-[280px] whitespace-nowrap">安全操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-800 dark:text-slate-200">
@@ -498,34 +499,72 @@
 
     <!-- 弹窗层 -->
     
-    <!-- GitHub Token 密钥配置弹窗 -->
+    <!-- 👑 GitHub + Gitee 双节点独立金库配置弹窗 -->
     <div id="configArea" class="hidden absolute top-16 right-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-2xl z-50 w-80">
         <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2">🔑 系统级云端密钥配置</h3>
         <div class="space-y-3">
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">GitHub Personal Access Token</label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">GitHub Token (必备)</label>
                 <input type="password" id="ghTokenInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="ghp_xxxxxxxxxxxx">
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">DeepSeek API Key</label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">DeepSeek API Key (AI 引擎)</label>
                 <input type="password" id="dsKeyInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="sk-xxxxxxxxxxxx">
             </div>
+            
+            <div class="border-t border-slate-200 dark:border-slate-700 my-2 pt-2"></div>
+            
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Gitee Token (独立金库双写节点)</label>
+                <input type="password" id="giteeTokenInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Gitee 私人令牌">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Gitee 仓库路径</label>
+                <input type="text" id="giteeRepoInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="例如: wys0130/ai-boss-empire">
+            </div>
+            
             <div class="flex gap-2 pt-2">
-                <button onclick="saveKeys()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-1.5 rounded-lg text-xs transition">保存并连接</button>
+                <button onclick="saveKeys()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-1.5 rounded-lg text-xs transition shadow">保存并连接</button>
                 <button onclick="toggleConfig()" class="px-4 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-1.5 rounded-lg text-xs transition">取消</button>
             </div>
         </div>
     </div>
 
-    <!-- 历史快照还原弹窗 -->
+    <!-- 👑 独立数据金库核心面板 (Vault Modal) -->
+    <div id="vaultModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-md w-full rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col relative animate-[fadeIn_0.2s_ease-out]">
+            <button onclick="ApexVault.close()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold">✕</button>
+            <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">🗄️ 独立数据金库 (Vault)</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                金库可将您的全局价格、用户名单、阶段工单等全站核心配置打包为单一档案，并<strong class="text-indigo-500 dark:text-indigo-400">双写同步至 GitHub 与 Gitee 双节点</strong>，确保核心数据永不丢失。
+            </p>
+            <div class="space-y-4">
+                <button id="vaultBackupBtn" onclick="ApexVault.backup()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(79,70,229,0.3)] flex justify-center items-center gap-2">
+                    📦 打包备份全站至云端 (GitHub + Gitee)
+                </button>
+                <button id="vaultRestoreBtn" onclick="ApexVault.restore()" class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3.5 rounded-xl text-sm transition border border-slate-200 dark:border-slate-700 flex justify-center items-center gap-2">
+                    📥 从云端金库全量拉取恢复
+                </button>
+            </div>
+            <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 p-2.5 rounded-lg leading-relaxed font-mono">
+                ⚠️ 注意：金库双写机制强依赖【密钥设置】中的 Gitee Token 和 Repo 路径，未配置 Gitee 将仅作单节点备份。
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史快照还原弹窗 (依赖 GitHub Commits) -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 shrink-0">
                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">⏳ 云端 Git 快照还原点</h3>
-                <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg">✕</button>
+                <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold">✕</button>
             </div>
-            <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 p-2 rounded leading-relaxed shrink-0">
-                <strong>⚠️ 快照依赖 GitHub 仓库提交记录。</strong><br>如果您没有在右上角配置 GitHub 密钥并将修改同步至云端，这里拉取到的只有演示版本，不会包含您本地的修改。请确保配置了密钥。
+            <!-- 👑 新增醒目警告，解释快照拉取原理 -->
+            <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 p-2.5 rounded-lg leading-relaxed shrink-0">
+                <strong>⚠️ 快照强依赖 GitHub 仓库提交记录。</strong><br>
+                1. 必须在右上角配置【GitHub Token】才能拉取您本人的云端记录。<br>
+                2. 本功能仅读取 GitHub 的 Commit 树，不兼容 Gitee。<br>
+                如果您只在本地修改而未同步云端，这里拉取到的仍是出厂的演示版本。
             </div>
             <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2">
                 <!-- 动态插入 -->
@@ -551,5 +590,187 @@
     <div id="apexTooltip" class="hidden fixed z-[9999] bg-slate-900 text-white text-[10px] font-mono px-3 py-2 rounded-lg shadow-xl pointer-events-none max-w-xs whitespace-pre-wrap leading-relaxed border border-slate-700"></div>
 
     <script src="components/admin-core.js"></script>
+    
+    <!-- 👑 独立金库引擎脚本 (Gitee + GitHub 双写) -->
+    <script>
+        async function pushToGitee(path, contentStr, message) {
+            const token = localStorage.getItem("APEX_GITEE_TOKEN");
+            const repoFull = localStorage.getItem("APEX_GITEE_REPO");
+            if (!token || !repoFull) return false;
+
+            const url = `https://gitee.com/api/v5/repos/${repoFull}/contents/${path}`;
+            let sha = null;
+            try {
+                const res = await fetch(`${url}?access_token=${token}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    sha = data.sha;
+                }
+            } catch(e){}
+
+            const method = sha ? "PUT" : "POST";
+            const body = {
+                access_token: token,
+                content: btoa(unescape(encodeURIComponent(contentStr))),
+                message: message
+            };
+            if (sha) body.sha = sha;
+
+            const pushRes = await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            if (!pushRes.ok) throw new Error("Gitee 节点写入遭遇拦截或无权限。");
+            return true;
+        }
+
+        window.ApexVault = {
+            open: function() {
+                document.getElementById('vaultModal').classList.remove('hidden');
+            },
+            close: function() {
+                document.getElementById('vaultModal').classList.add('hidden');
+            },
+            backup: async function() {
+                const btn = document.getElementById('vaultBackupBtn');
+                const origText = btn.innerHTML;
+                btn.innerHTML = "⏳ 全站打包压缩与多节点同步中...";
+                btn.disabled = true;
+                
+                try {
+                    // 打包所有核心大盘配置
+                    const vaultData = {
+                        products: AUDIT_PRODUCTS || [],
+                        pricing: JSON.parse(localStorage.getItem('APEX_PRICING_CONFIG') || "{}"),
+                        banner: JSON.parse(localStorage.getItem('APEX_BANNER_CONFIG') || "{}"),
+                        users: window.ApexUserManager ? window.ApexUserManager.userList : [],
+                        tasks: rawManifestTasks || [],
+                        schedule: {
+                            start: document.getElementById("sched-start") ? document.getElementById("sched-start").value : 0,
+                            end: document.getElementById("sched-end") ? document.getElementById("sched-end").value : 8,
+                            enabled: document.getElementById("sched-enabled") ? document.getElementById("sched-enabled").value : "true"
+                        },
+                        timestamp: new Date().toISOString()
+                    };
+
+                    const content = JSON.stringify(vaultData, null, 2);
+                    let syncLog = [];
+                    
+                    // 1. 同步 GitHub
+                    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+                    if (ghToken) {
+                        try {
+                            let sha = null;
+                            try {
+                                const fileObj = await getGithubFileSafe("data/vault-archive.json", ghToken);
+                                sha = fileObj.sha;
+                            } catch(e){}
+                            await pushGithubJsonFile("data/vault-archive.json", vaultData, sha, "🗄️ Vault: System Full Backup [skip ci]", ghToken);
+                            syncLog.push("GitHub 节点 [就绪]");
+                        } catch(e) { syncLog.push("GitHub 节点 [失败: "+e.message+"]"); }
+                    } else {
+                        syncLog.push("GitHub 节点 [跳过: 未配置 Token]");
+                    }
+
+                    // 2. 同步 Gitee
+                    try {
+                        const giteeResult = await pushToGitee("data/vault-archive.json", content, "🗄️ Vault: System Full Backup [skip ci]");
+                        if (giteeResult) syncLog.push("Gitee 节点 [就绪]");
+                        else syncLog.push("Gitee 节点 [跳过: 未配置完整参数]");
+                    } catch (e) {
+                        syncLog.push("Gitee 节点 [失败: "+e.message+"]");
+                    }
+
+                    alert(`✅ 独立金库同步执行完毕。\n\n同步报告:\n- ` + syncLog.join('\n- '));
+                } catch(err) {
+                    alert("❌ 金库备份遭遇致命异常: " + err.message);
+                } finally {
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                }
+            },
+            restore: async function() {
+                const btn = document.getElementById('vaultRestoreBtn');
+                const origText = btn.innerHTML;
+                btn.innerHTML = "⏳ 正在突破网络拉取多节点金库档案...";
+                btn.disabled = true;
+
+                try {
+                    let vaultData = null;
+                    
+                    // 策略 1: 优先尝试从 GitHub 拉取
+                    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+                    if (ghToken) {
+                        try {
+                            const fileObj = await getGithubFileSafe("data/vault-archive.json", ghToken);
+                            if (fileObj.content) {
+                                vaultData = JSON.parse(fileObj.content);
+                                console.log(">> 成功从 GitHub 节点拉取档案");
+                            }
+                        } catch(e) {}
+                    }
+                    
+                    // 策略 2: 如果 GitHub 拉取失败或无数据，尝试从 Gitee 降级拉取
+                    if (!vaultData) {
+                        const gToken = localStorage.getItem("APEX_GITEE_TOKEN");
+                        const gRepo = localStorage.getItem("APEX_GITEE_REPO");
+                        if (gToken && gRepo) {
+                            try {
+                                const res = await fetch(`https://gitee.com/api/v5/repos/${gRepo}/contents/data/vault-archive.json?access_token=${gToken}`);
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    vaultData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+                                    console.log(">> 成功从 Gitee 备用节点拉取档案");
+                                }
+                            } catch (e) {}
+                        }
+                    }
+
+                    if (!vaultData) {
+                        throw new Error("云端双节点均未找到任何金库存档 (vault-archive.json)！请检查配置或确认之前是否备份过。");
+                    }
+
+                    // 覆写全站核心本地数据
+                    if (vaultData.pricing) localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(vaultData.pricing));
+                    if (vaultData.banner) localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(vaultData.banner));
+                    if (vaultData.users) localStorage.setItem('APEX_USER_LIST', JSON.stringify(vaultData.users));
+                    if (vaultData.tasks) localStorage.setItem('APEX_TASKS_CACHE', JSON.stringify(vaultData.tasks));
+                    
+                    alert("✅ 提取档案并应用成功！页面即将重载以刷新底层数据。");
+                    location.reload();
+                } catch(err) {
+                    alert("❌ 金库档案提取失败: " + err.message);
+                } finally {
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                }
+            }
+        };
+
+        // 拦截原版的 saveKeys 和 toggleConfig，注入 Gitee
+        window.saveKeys = function() {
+            localStorage.setItem("APEX_GH_TOKEN", document.getElementById("ghTokenInput").value.trim());
+            localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
+            localStorage.setItem("APEX_GITEE_TOKEN", document.getElementById("giteeTokenInput").value.trim());
+            localStorage.setItem("APEX_GITEE_REPO", document.getElementById("giteeRepoInput").value.trim());
+            window.toggleConfig();
+            if(typeof window.syncAllData === 'function') window.syncAllData();
+            alert("✅ 系统密钥与 Gitee 金库节点参数已全量保存生效！");
+        };
+
+        window.toggleConfig = function() {
+            const el = document.getElementById("configArea");
+            if (el) {
+                el.classList.toggle("hidden");
+                if (!el.classList.contains("hidden")) {
+                    if (document.getElementById("ghTokenInput")) document.getElementById("ghTokenInput").value = localStorage.getItem("APEX_GH_TOKEN") || "";
+                    if (document.getElementById("dsKeyInput")) document.getElementById("dsKeyInput").value = localStorage.getItem("APEX_DS_KEY") || "";
+                    if (document.getElementById("giteeTokenInput")) document.getElementById("giteeTokenInput").value = localStorage.getItem("APEX_GITEE_TOKEN") || "";
+                    if (document.getElementById("giteeRepoInput")) document.getElementById("giteeRepoInput").value = localStorage.getItem("APEX_GITEE_REPO") || "";
+                }
+            }
+        };
+    </script>
 </body>
 </html>
