@@ -122,7 +122,6 @@
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">编辑价格与上架状态，支持每一行的【🔗 联动 / 🔓 独立】状态快速切换</p>
                         </div>
                     </div>
-                    <!-- 👑 修复：作品审核表专属策略。必须保持 min-w-[800px]，防止输入框被挤压不见 -->
                     <div class="w-full overflow-x-auto custom-scroll pb-4">
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
@@ -345,7 +344,7 @@
                 </div>
             </section>
 
-            <!-- 👑 修复 3：解除最外层的定宽锁定，加入 min-w-0，彻底释放用户名单表格弹性 -->
+            <!-- 👑 修复：为用户清单配置 flex 并且允许按钮组在不够宽时换行，解除越界与遮挡问题 -->
             <section id="tab-users" class="hidden max-w-6xl mx-auto space-y-6">
                 <div class="bg-gradient-to-r from-blue-900 to-slate-900 border border-blue-500/30 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -398,7 +397,7 @@
                         </button>
                     </div>
 
-                    <!-- 👑 修复：加入了 min-w-0 并在里面让表格纯净自适应 -->
+                    <!-- 👑 修复：防挤压表格，让操作按钮可以自然换行不会消失 -->
                     <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col overflow-hidden min-w-0">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">终端客户清单</h3>
@@ -408,15 +407,15 @@
                             </div>
                         </div>
 
-                        <div class="w-full pb-4">
-                            <table class="w-full text-left border-collapse">
+                        <div class="w-full pb-4 overflow-visible">
+                            <table class="w-full text-left border-collapse table-auto">
                                 <thead>
                                     <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                        <th class="py-2.5 px-2">邮箱主体 / ID</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap">商用角色</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap">核验状态</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap hidden sm:table-cell">注册日期</th>
-                                        <th class="py-2.5 px-2 text-right whitespace-nowrap">安全操作</th>
+                                        <th class="py-2.5 px-2 w-[40%]">邮箱 / ID</th>
+                                        <th class="py-2.5 px-2 w-[25%]">商用角色</th>
+                                        <th class="py-2.5 px-2 w-16">状态</th>
+                                        <th class="py-2.5 px-2 hidden lg:table-cell w-20">注册日期</th>
+                                        <th class="py-2.5 px-2 text-right min-w-[130px]">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-800 dark:text-slate-200">
@@ -489,12 +488,12 @@
             </div>
 
             <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 p-2.5 rounded-lg leading-relaxed font-mono shrink-0">
-                ⚠️ 注意：此操作依赖【密钥设置】中的 Gitee Token 和 Repo 路径进行双节点备份。
+                ⚠️ 注意：金库双写机制强依赖【密钥设置】中的 Gitee Token 和 Repo 路径，未配置 Gitee 将仅作单节点备份。
             </div>
         </div>
     </div>
 
-    <!-- 👑 代码备份 (原历史快照) -->
+    <!-- 👑 修复：代码备份 (原历史快照)，加入自定义快照按钮与全屏进度条支持 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 shrink-0">
@@ -503,13 +502,14 @@
             </div>
             
             <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 p-2.5 rounded-lg leading-relaxed shrink-0">
-                <strong>⚠️ 核心原理说明：</strong><br>
-                此列表是你在 GitHub 的底层提交记录（就像系统的黑匣子）。每次“还原”其实是把旧代码作为一份新记录盖在上面，你的历史**永远不会丢失**。
+                <strong>💡 核心原理说明：</strong><br>
+                此列表是 GitHub 的底层提交记录（黑匣子）。每次“还原”都是把旧代码作为新记录追加在顶部，你的历史**永远不会丢失**。
             </div>
             
+            <!-- 👑 修复：加入手工打标签创建代码快照功能 -->
             <div class="flex gap-2 mb-4 shrink-0">
                 <input id="customSnapshotName" type="text" placeholder="为当前代码打个标记 (例如: 上线前稳定版)" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition shadow-inner">
-                <button onclick="createCodeSnapshot()" class="shrink-0 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm border border-slate-700 whitespace-nowrap">
+                <button onclick="createCodeSnapshot(event)" class="shrink-0 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm border border-slate-700 whitespace-nowrap">
                     💾 打标记
                 </button>
             </div>
@@ -522,11 +522,11 @@
     <!-- 👑 全新：动态防宕机进度条 -->
     <div id="restoreProgressOverlay" class="hidden fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6">
         <div class="w-full max-w-md">
-            <h3 id="restoreProgressText" class="text-white text-sm font-bold mb-4 text-center font-mono animate-pulse">正在比对底层文件 SHA 码...</h3>
+            <h3 id="restoreProgressText" class="text-white text-sm font-bold mb-4 text-center font-mono animate-pulse">正在提取系统快照矩阵...</h3>
             <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                 <div id="restoreProgressBar" class="h-full bg-blue-500 w-0 transition-all duration-300 ease-out"></div>
             </div>
-            <p class="text-slate-400 text-[10px] text-center mt-3 font-mono">请勿关闭或刷新浏览器窗口</p>
+            <p class="text-slate-400 text-[10px] text-center mt-3 font-mono">底层代码时空跃迁中，请勿关闭或刷新窗口</p>
         </div>
     </div>
 
@@ -622,6 +622,7 @@
                         } catch(e) {}
                     }
                     
+                    // Fallback to Gitee
                     if (!vaultData) {
                         const gToken = localStorage.getItem("APEX_GITEE_TOKEN");
                         const gRepo = localStorage.getItem("APEX_GITEE_REPO");
@@ -662,6 +663,7 @@
                 listEl.innerHTML = "";
                 const sortedSaves = [...this.saves].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
+                // 👑 修复：将暗淡色按钮全部替换为鲜艳的实体色
                 sortedSaves.forEach(save => {
                     const timeStr = new Date(save.timestamp).toLocaleString('zh-CN', { hour12: false });
                     listEl.innerHTML += `
@@ -871,7 +873,7 @@
             }
         };
         
-        // 👑 新增：手动创建代码快照
+        // 👑 新增：手动创建代码快照，注入时间戳防缓存
         window.createCodeSnapshot = async function() {
             const token = localStorage.getItem("APEX_GH_TOKEN");
             if (!token) {
@@ -880,11 +882,11 @@
             }
             const tagInput = document.getElementById("customSnapshotName");
             const tagName = tagInput ? tagInput.value.trim() : "";
-            const commitMsg = tagName ? `📸 代码备份标记: ${tagName} [skip ci]` : `📸 代码备份标记: 手动存档 ${new Date().toLocaleString('zh-CN')} [skip ci]`;
+            const commitMsg = tagName ? `📸 代码标记: ${tagName} [skip ci]` : `📸 代码标记: 手动存档 ${new Date().toLocaleString('zh-CN')} [skip ci]`;
             
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
-            btn.innerHTML = "⏳ 提交中...";
+            btn.innerHTML = "⏳ 打标中...";
             btn.disabled = true;
 
             try {
@@ -892,17 +894,18 @@
                 let sha = null;
                 let oldContent = "{}";
                 try {
-                    const f = await getGithubFileSafe("data/.snapshot", token);
+                    const f = await getGithubFileSafe("config/.snapshot", token);
                     sha = f.sha;
                     oldContent = f.content || "{}";
                 } catch(e){}
                 
-                const pushRes = await pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
+                // 强行塞入时间戳改变文件指纹，确保每次提交都能成功写入
+                const pushRes = await pushGithubJsonFile("config/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
                 
                 if (pushRes) {
                     alert("✅ 成功创建自定义代码快照！");
                     if (tagInput) tagInput.value = "";
-                    fetchCommitHistory(); // 刷新列表
+                    fetchCommitHistory(true); // 强制刷新列表
                 }
             } catch (err) {
                 alert("❌ 创建代码快照失败: " + err.message);
