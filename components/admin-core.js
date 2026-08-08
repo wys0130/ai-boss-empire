@@ -1,7 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 究极防弹版：彻底重写 @ 的 DOM 注入机制，使用 Range.insertNode 完美保护历史胶囊标签！
- * 2. 👑 满血保留：商品图库、WebP 转换、汇率中台、进度书等所有资产一行未删。
+ * 1. 👑 终极防弹版：重构 @ 菜单为 Range.insertNode 手术刀级无损注入，100% 保护历史胶囊标签！
+ * 2. 👑 视觉升级：采用大厂标准垂直单列悬浮菜单，精致美观，绝不变形。
+ * 3. 👑 满血保留：所有商品图库、WebP 转换、汇率中台、进度书等资产一行未删。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -436,7 +437,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 作品审核与定价表 
+// 6. 作品审核与定价表 (全量恢复原始数据)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -1025,7 +1026,7 @@ window.showMentionDropdown = function(query) {
     if (!cmdBox) return;
 
     if (!dropEl) {
-        // 👑 不再使用暴力内嵌，直接挂在 body 层，物理定位，绝不会被任何 CSS 截断隐藏
+        // 👑 绝对悬浮：直接挂在 body 层，使用绝对精确定位，绝不会被截断
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
         dropEl.className = "fixed z-[99999] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 w-48 max-h-60 overflow-y-auto hidden flex-col";
@@ -1041,24 +1042,20 @@ window.showMentionDropdown = function(query) {
     dropEl.innerHTML = "";
     matches.forEach(dept => {
         const item = document.createElement("button");
-        // 确保垂直单列渲染，不会挤压变形
         item.className = "group w-full text-left px-4 py-2 text-xs font-mono font-bold text-slate-300 hover:bg-blue-600 hover:text-white transition-colors whitespace-nowrap block";
         item.innerHTML = `<span class="text-blue-500 mr-1.5 group-hover:text-white transition">@</span>${dept.name}`;
         item.onmousedown = (e) => {
-            e.preventDefault(); // 关键：阻止丢失光标焦点
+            e.preventDefault(); 
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
     });
 
-    // 必须取消 hidden 并设置为 flex 才能计算高度
     dropEl.classList.remove("hidden");
     dropEl.style.display = "flex";
 
-    // 👑 物理坐标测绘：计算输入框的精确屏幕位置
+    // 物理坐标测绘
     const boxRect = cmdBox.getBoundingClientRect();
-    
-    // 如果是用富文本选择器，尝试更精确地跟在光标下面
     const sel = window.getSelection();
     if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
         const range = sel.getRangeAt(0);
@@ -1069,8 +1066,6 @@ window.showMentionDropdown = function(query) {
             return;
         }
     }
-    
-    // 默认回落定位：放在输入框左下角
     dropEl.style.left = `${boxRect.left + 16}px`;
     dropEl.style.top = `${boxRect.bottom + 8}px`;
 };
@@ -1114,24 +1109,22 @@ window.selectMentionDept = function(deptName) {
             if (startOffset !== -1) {
                 range.setStart(node, startOffset);
                 range.setEnd(node, endOffset);
-                range.deleteContents(); // 精准切除输入的 "@"
+                range.deleteContents(); 
             }
         }
 
-        // 创建神圣不可侵犯的胶囊
+        const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
         const tokenSpan = document.createElement("span");
-        tokenSpan.className = "inline-flex items-center bg-blue-500/20 text-blue-400 border border-blue-500/40 px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default";
-        tokenSpan.contentEditable = "false"; // 锁死，确保它是一个整体块
+        tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
+        tokenSpan.contentEditable = "false"; 
         tokenSpan.setAttribute("data-dept", deptName);
         tokenSpan.innerText = `@${deptName}`;
 
         range.insertNode(tokenSpan);
 
-        // 插入尾部空格，让光标平滑跨越
         const spaceNode = document.createTextNode("\u00A0"); 
         tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
 
-        // 把光标移动到空格后面，继续待命
         range.setStartAfter(spaceNode);
         range.setEndAfter(spaceNode);
         sel.removeAllRanges();
@@ -1161,9 +1154,9 @@ window.inspectDept = function(deptName, btnEl) {
             cmdBox.value = before + "@" + deptName + " " + after;
             cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
         } else {
-            // 同样使用精准插入，而不是粗暴改变 innerHTML
+            const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
             const tokenSpan = document.createElement("span");
-            tokenSpan.className = "inline-flex items-center bg-blue-500/20 text-blue-400 border border-blue-500/40 px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default";
+            tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
             tokenSpan.contentEditable = "false";
             tokenSpan.setAttribute("data-dept", deptName);
             tokenSpan.innerText = `@${deptName}`;
@@ -1214,7 +1207,7 @@ window.resetDeptFilter = function() {
 function initAdminEngine() {
     initApexTooltip();
     renderDeptButtons();
-    renderAuditTable();
+    loadAuditProducts(); // 👑 拉取 AI 生成的模板
     ApexScheduleManager.loadScheduleFromCloud();
     ApexBannerManager.loadBannerConfig();
     if (window.ApexLogoManager) ApexLogoManager.initLogo();
@@ -1232,7 +1225,6 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
-        // 侦听输入事件并激活菜单
         const checkMention = function() {
             if (!cmdBox) return;
             let text = "";
@@ -1242,14 +1234,13 @@ function initAdminEngine() {
             } else {
                 const sel = window.getSelection();
                 if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                    // 只截取当前所在文本节点内，光标之前的文字
                     if (sel.anchorNode.nodeType === Node.TEXT_NODE) {
                         text = sel.anchorNode.textContent.substring(0, sel.anchorOffset);
                     }
                 }
             }
 
-            text = text.replace(/\u00A0/g, " "); // 把不可断空格转换
+            text = text.replace(/\u00A0/g, " ");
             const match = text.match(/@([^\s@]*)$/);
             if (match) {
                 showMentionDropdown(match[1]);
