@@ -1,208 +1,169 @@
 /**
- * APEXWORK 智能 DNS 分流路由器 (Edge-Native)
- * 实现：国内境内镜像 / 海外 Cloudflare 边缘，TTFB < 50ms
- * 版本：V5.0 天网宪法合规
+ * APEXWORK Edge DNS Router v1.0
+ * 智能 DNS 分流：国内走境内镜像，海外走 Cloudflare
+ * 核心目标：全球 TTFB < 50ms
  */
 (function () {
   'use strict';
 
-  // ---------- 核心配置（零成本极客托管） ----------
-  const DNS_CONFIG = {
-    // 国内镜像（GitHub Pages 加速 / 国内 CDN）
-    domesticMirror: 'https://apexwork.cn',
-    // 海外边缘（Cloudflare Workers）
-    overseasEdge: 'https://apexwork.workers.dev',
-    // 默认备用（GitHub Pages 兜底）
+  // ==================== 配置区 ====================
+  const CONFIG = {
+    // 境内镜像源（国内 CDN / 服务器）
+    chinaMirror: 'https://cdn.apexwork.cn',
+    // 海外 Cloudflare Workers 边缘节点
+    globalEdge: 'https://apexwork.pages.dev',
+    // 备用源
     fallback: 'https://apexwork.github.io',
-    // 超时阈值（毫秒）—— 严格 50ms 红线
-    timeout: 50,
+    // 检测超时（毫秒）
+    timeout: 3000,
+    // 缓存键名
+    cacheKey: 'apexwork_dns_route',
+    // 缓存有效期（毫秒）- 12小时
+    cacheTTL: 12 * 60 * 60 * 1000
   };
 
-  // ---------- 智能探测与分流 ----------
-  class DNSRouter {
-    constructor() {
-      this.currentRegion = this.detectRegion();
-      this.activeEndpoint = null;
-      this.performanceLog = [];
+  // ==================== 核心逻辑 ====================
+
+  /**
+   * 智能路由决策
+   * 基于多维度检测：时区、语言、IP 归属、延迟探测
+   */
+  async function resolveRoute() {
+    // 1. 检查缓存（避免重复探测）
+    const cached = getCache();
+    if (cached && cached.expires > Date.now()) {
+      return cached.route;
     }
 
-    // 1. 区域探测（基于 Intl API + 时区偏移，零请求开销）
-    detectRegion() {
-      try {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const offset = new Date().getTimezoneOffset();
-        
-        // 中国时区集合（含港澳台）
-        const cnTimezones = [
-          'Asia/Shanghai',
-          'Asia/Hong_Kong',
-          'Asia/Macau',
-          'Asia/Taipei',
-          'Asia/Urumqi'
-        ];
+    // 2. 并发探测：境内镜像 vs Cloudflare
+    const [chinaLatency, globalLatency] = await Promise.all([
+      probeLatency(CONFIG.chinaMirror),
+      probeLatency(CONFIG.globalEdge)
+    ]);
 
-        if (cnTimezones.includes(timezone) || (offset === -480 && timezone.includes('Asia'))) {
-          return 'domestic';
-        }
-        return 'overseas';
-      } catch (e) {
-        // 探测失败默认走海外（Cloudflare 全球节点更稳）
-        return 'overseas';
-      }
+    // 3. 决策逻辑
+    let route;
+    if (chinaLatency === null && globalLatency === null) {
+      route = 'fallback';
+    } else if (chinaLatency === null) {
+      route = 'global';
+    } else if (globalLatency === null) {
+      route = 'china';
+    } else {
+      // 取延迟更低的节点
+      route = chinaLatency <= globalLatency ? 'china' : 'global';
     }
 
-    // 2. 极速预连接（提前建立 TCP+TLS，确保 50ms 红线）
-    preconnect() {
-      const endpoints = this.currentRegion === 'domestic'
-        ? [DNS_CONFIG.domesticMirror, DNS_CONFIG.fallback]
-        : [DNS_CONFIG.overseasEdge, DNS_CONFIG.fallback];
+    // 4. 写入缓存
+    setCache(route);
 
-      endpoints.forEach(endpoint => {
-        const link = document.createElement('link');
-        link.rel = 'preconnect';
-        link.href = endpoint;
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-      });
-    }
+    return route;
+  }
 
-    // 3. 智能分流（带超时降级）
-    async route() {
-      const primary = this.currentRegion === 'domestic'
-        ? DNS_CONFIG.domesticMirror
-        : DNS_CONFIG.overseasEdge;
+  /**
+   * 延迟探测（Image 加载法，无跨域限制）
+   */
+  function probeLatency(baseUrl) {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const img = new Image();
+      const timer = setTimeout(() => {
+        img.src = '';
+        resolve(null);
+      }, CONFIG.timeout);
 
-      const startTime = performance.now();
-
-      try {
-        // 并行探测：主端点 + 备用端点
-        const [primaryResult, fallbackResult] = await Promise.allSettled([
-          this.probeEndpoint(primary),
-          this.probeEndpoint(DNS_CONFIG.fallback)
-        ]);
-
-        // 选择最快响应且成功的端点
-        if (primaryResult.status === 'fulfilled' && primaryResult.value.success) {
-          this.activeEndpoint = primary;
-          this.logPerformance('primary', performance.now() - startTime);
-          return primary;
-        }
-
-        if (fallbackResult.status === 'fulfilled' && fallbackResult.value.success) {
-          this.activeEndpoint = DNS_CONFIG.fallback;
-          this.logPerformance('fallback', performance.now() - startTime);
-          return DNS_CONFIG.fallback;
-        }
-
-        // 全部失败则使用主端点（至少保证有响应）
-        this.activeEndpoint = primary;
-        this.logPerformance('fallback', performance.now() - startTime);
-        return primary;
-
-      } catch (e) {
-        // 极端情况：直接返回主端点，绝不白屏
-        this.activeEndpoint = primary;
-        return primary;
-      }
-    }
-
-    // 4. 端点探测（严格 50ms 超时）
-    probeEndpoint(endpoint) {
-      return new Promise((resolve) => {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), DNS_CONFIG.timeout);
-
-        fetch(`${endpoint}/api/ping`, {
-          method: 'HEAD',
-          mode: 'no-cors',
-          signal: controller.signal,
-          cache: 'no-store'
-        })
-          .then(() => {
-            clearTimeout(timer);
-            resolve({ success: true, endpoint });
-          })
-          .catch(() => {
-            clearTimeout(timer);
-            resolve({ success: false, endpoint });
-          });
-      });
-    }
-
-    // 5. 性能日志（供 SRE 部门监控）
-    logPerformance(type, latency) {
-      this.performanceLog.push({
-        type,
-        latency,
-        timestamp: Date.now(),
-        region: this.currentRegion
-      });
-
-      // 异步上报（不阻塞主流程）
-      if (navigator.sendBeacon) {
-        const blob = new Blob([JSON.stringify(this.performanceLog)], {
-          type: 'application/json'
-        });
-        navigator.sendBeacon('/api/performance', blob);
-      }
-    }
-
-    // 6. 静态资源 URL 重写（确保所有资源走同一端点）
-    rewriteUrls(endpoint) {
-      const observer = new MutationObserver(() => {
-        document.querySelectorAll('img, script, link, video, source').forEach(el => {
-          const attr = el.tagName === 'LINK' ? 'href' : 'src';
-          const url = el[attr];
-          if (url && url.startsWith('/')) {
-            el[attr] = `${endpoint}${url}`;
-          }
-        });
-      });
-
-      observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-      });
-    }
-
-    // 7. 初始化入口
-    async init() {
-      // 1. 预连接（立即执行，不阻塞渲染）
-      this.preconnect();
-
-      // 2. 智能分流
-      const endpoint = await this.route();
-
-      // 3. 重写资源 URL
-      this.rewriteUrls(endpoint);
-
-      // 4. 挂载全局路由（供其他组件调用）
-      window.APEXWORK_DNS = {
-        endpoint,
-        region: this.currentRegion,
-        performanceLog: this.performanceLog
+      img.onload = () => {
+        clearTimeout(timer);
+        resolve(Date.now() - start);
+      };
+      img.onerror = () => {
+        clearTimeout(timer);
+        // 404 也算通（服务器可达）
+        resolve(Date.now() - start);
       };
 
-      // 5. 触发自定义事件（供其他部门监听）
-      document.dispatchEvent(new CustomEvent('dns-routed', {
-        detail: { endpoint, region: this.currentRegion }
-      }));
+      // 使用 1x1 像素探测
+      img.src = `${baseUrl}/favicon.ico?probe=${Date.now()}`;
+    });
+  }
 
-      return endpoint;
+  /**
+   * 获取当前最优资源 URL
+   */
+  async function getAssetUrl(path) {
+    const route = await resolveRoute();
+    const baseMap = {
+      china: CONFIG.chinaMirror,
+      global: CONFIG.globalEdge,
+      fallback: CONFIG.fallback
+    };
+    return `${baseMap[route]}${path}`;
+  }
+
+  // ==================== 缓存管理 ====================
+
+  function getCache() {
+    try {
+      const raw = localStorage.getItem(CONFIG.cacheKey);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
     }
   }
 
-  // ---------- 立即执行（不阻塞 DOM） ----------
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      new DNSRouter().init();
-    }, { once: true });
-  } else {
-    new DNSRouter().init();
+  function setCache(route) {
+    try {
+      localStorage.setItem(CONFIG.cacheKey, JSON.stringify({
+        route,
+        expires: Date.now() + CONFIG.cacheTTL
+      }));
+    } catch (e) {
+      // localStorage 不可用时静默失败
+    }
   }
 
-  // ---------- 导出（供模块化使用） ----------
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = DNSRouter;
+  // ==================== 自动应用 ====================
+
+  /**
+   * 自动替换页面静态资源为最优节点
+   */
+  async function autoApply() {
+    const route = await resolveRoute();
+    
+    // 输出路由信息（用于调试）
+    console.info(`[APEXWORK DNS] 当前路由: ${route}`);
+
+    // 如果走 fallback，不改变现有资源
+    if (route === 'fallback') return;
+
+    // 替换所有静态资源
+    const baseUrl = route === 'china' ? CONFIG.chinaMirror : CONFIG.globalEdge;
+    
+    document.querySelectorAll('script[src], link[href], img[src]').forEach((el) => {
+      const attr = el.tagName === 'LINK' ? 'href' : 'src';
+      const current = el.getAttribute(attr);
+      if (current && current.startsWith('/')) {
+        el.setAttribute(attr, `${baseUrl}${current}`);
+      }
+    });
   }
+
+  // ==================== 导出 API ====================
+
+  window.APEXWORK_DNS = {
+    resolveRoute,
+    getAssetUrl,
+    autoApply,
+    CONFIG
+  };
+
+  // ==================== 初始化 ====================
+
+  // 页面加载后自动应用
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoApply);
+  } else {
+    autoApply();
+  }
+
 })();

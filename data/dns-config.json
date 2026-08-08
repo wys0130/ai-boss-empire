@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "description": "APEXWORK 智能 DNS 分流配置",
+  "routes": {
+    "china": {
+      "label": "境内镜像",
+      "baseUrl": "https://cdn.apexwork.cn",
+      "regions": ["cn", "hk", "mo", "tw"],
+      "priority": 1
+    },
+    "global": {
+      "label": "Cloudflare 全球边缘",
+      "baseUrl": "https://apexwork.pages.dev",
+      "regions": ["us", "eu", "jp", "sg", "au"],
+      "priority": 2
+    },
+    "fallback": {
+      "label": "GitHub Pages 备用",
+      "baseUrl": "https://apexwork.github.io",
+      "regions": ["*"],
+      "priority": 3
+    }
+  },
+  "detection": {
+    "method": "latency-probe",
+    "timeout": 3000,
+    "cacheTTL": 43200000,
+    "probeEndpoint": "/favicon.ico"
+  },
+  "performance": {
+    "targetTTFB": 50,
+    "maxTTFB": 100,
+    "edgeCompression": true,
+    "webpEnabled": true
+  }
+}
