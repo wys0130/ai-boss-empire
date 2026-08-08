@@ -78,35 +78,36 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col min-w-0 relative transition-colors duration-300 min-h-screen">
+    <main class="flex-1 flex flex-col min-w-0 relative transition-colors duration-300 min-h-screen overflow-x-hidden">
         
-        <header class="h-auto min-h-[64px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-6 py-3 flex flex-wrap items-center justify-between gap-4 shrink-0 shadow-sm sticky top-0 z-30 transition-colors duration-300">
-            <div class="flex items-center gap-3">
+        <!-- 👑 修复：顶部 Header 去除 flex-wrap，改为 overflow-x-auto，彻底告别丑陋换行 -->
+        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-6 flex items-center justify-between shrink-0 shadow-sm sticky top-0 z-30 transition-colors duration-300">
+            <div class="flex items-center gap-3 whitespace-nowrap shrink-0">
                 <h2 id="pageHeaderTitle" class="text-base font-black text-slate-800 dark:text-slate-100 tracking-tight">业务控制台 / 作品风控审查与上架</h2>
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm hidden sm:inline-block">实时同步中</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm hidden md:inline-block">实时同步中</span>
             </div>
             
-            <div class="flex items-center flex-wrap gap-3">
-                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold shadow-sm" title="实时外汇挂牌价">
+            <div class="flex items-center gap-3 overflow-x-auto custom-scroll pr-2 pb-1 lg:pb-0 h-full">
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold shadow-sm whitespace-nowrap shrink-0" title="实时外汇挂牌价">
                     <span>💱 汇率:</span>
                     <span id="fxRateBadge" class="tracking-wider">查询中...</span>
                 </div>
                 
-                <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+                <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 hidden sm:block shrink-0"></div>
                 
-                <button id="themeToggleBtn" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm">
+                <button id="themeToggleBtn" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm whitespace-nowrap shrink-0">
                     <span>🌙 极夜</span>
                 </button>
 
-                <button onclick="openRollbackModal()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-1.5">
+                <button onclick="openRollbackModal()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     ⏳ 代码备份
                 </button>
                 
-                <button onclick="ApexVault.open()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition shadow-md shadow-indigo-500/30 flex items-center gap-1.5">
+                <button onclick="ApexVault.open()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition shadow-md shadow-indigo-500/30 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     🗄️ 数据备份
                 </button>
 
-                <button onclick="toggleConfig()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 border border-slate-700">
+                <button onclick="toggleConfig()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 border border-slate-700 whitespace-nowrap shrink-0">
                     🔑 密钥设置
                 </button>
             </div>
@@ -123,14 +124,14 @@
                         </div>
                     </div>
                     <div class="w-full overflow-x-auto custom-scroll pb-4">
-                        <table class="w-full text-left border-collapse min-w-[800px]">
+                        <table class="w-full text-left border-collapse min-w-[750px]">
                             <thead>
                                 <tr class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                    <th class="py-3 px-2 w-16 whitespace-nowrap text-center">缩略图</th>
+                                    <th class="py-3 px-2 w-16 text-center whitespace-nowrap">缩略图</th>
                                     <th class="py-3 px-3 whitespace-nowrap">作品名 / 分类</th>
                                     <th class="py-3 px-2 whitespace-nowrap">商用授权价</th>
-                                    <th class="py-3 px-2 w-20 whitespace-nowrap text-center">状态</th>
-                                    <th class="py-3 px-2 text-right whitespace-nowrap">管理操作</th>
+                                    <th class="py-3 px-2 w-20 text-center whitespace-nowrap">状态</th>
+                                    <th class="py-3 px-2 w-32 text-right whitespace-nowrap">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody id="auditTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
@@ -207,7 +208,7 @@
                             <div class="bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 pb-2">
                                     <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">#01 PRIMARY SLIDE</span>
-                                    <button onclick="ApexBannerManager.uploadBannerImg(0)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传展示底图</button>
+                                    <button onclick="ApexBannerManager.uploadBannerImg(0)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传图片</button>
                                 </div>
                                 <input id="banner-tag-0" type="text" placeholder="左上角小标签" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-title-0" type="text" placeholder="巨幕主标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500">
@@ -219,7 +220,7 @@
                             <div class="bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 pb-2">
                                     <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">#02 SECONDARY SLIDE</span>
-                                    <button onclick="ApexBannerManager.uploadBannerImg(1)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传展示底图</button>
+                                    <button onclick="ApexBannerManager.uploadBannerImg(1)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传图片</button>
                                 </div>
                                 <input id="banner-tag-1" type="text" placeholder="左上角小标签" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-title-1" type="text" placeholder="巨幕主标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500">
@@ -230,7 +231,7 @@
                         </div>
 
                         <button onclick="ApexBannerManager.saveBannerConfig()" class="mt-5 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.4)] transition">
-                            🖼️ 编译轮播图元数据并同步
+                            🖼️ 编译轮播图同步
                         </button>
                     </div>
                 </div>
@@ -240,8 +241,7 @@
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 border-b border-slate-200 dark:border-slate-800 pb-5 gap-4">
                         <div>
-                            <h3 class="text-lg font-black text-slate-900 dark:text-white">阶段开发进度书 / TASKS MANIFEST</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">研发与多语言市场投放清单</p>
+                            <h3 class="text-lg font-black text-slate-900 dark:text-white">阶段开发进度书</h3>
                         </div>
                         <div class="flex items-center gap-3 flex-wrap">
                             <button onclick="resetManifestToDefault()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition border border-rose-500/20 shadow-sm flex items-center gap-1.5">
@@ -344,7 +344,7 @@
                 </div>
             </section>
 
-            <!-- 👑 修复：为用户清单配置 flex 并且允许按钮组在不够宽时换行，解除越界与遮挡问题 -->
+            <!-- 👑 修复：防挤压重构，加入 table-fixed 让长邮箱文本自动省略 -->
             <section id="tab-users" class="hidden max-w-6xl mx-auto space-y-6">
                 <div class="bg-gradient-to-r from-blue-900 to-slate-900 border border-blue-500/30 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -376,7 +376,7 @@
                             </div>
 
                             <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3 relative overflow-hidden">
-                                <h4 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-slate-200 dark:border-blue-500/20 pb-1.5 uppercase">EmailJS 发信参数 (选填)</h4>
+                                <h4 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-slate-200 dark:border-blue-500/20 pb-1.5 uppercase">EmailJS 发信参数</h4>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Service ID</label>
                                     <input id="emailjs-service-id" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500" placeholder="例如: service_xxx">
@@ -397,7 +397,6 @@
                         </button>
                     </div>
 
-                    <!-- 👑 修复：防挤压表格，让操作按钮可以自然换行不会消失 -->
                     <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col overflow-hidden min-w-0">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">终端客户清单</h3>
@@ -407,15 +406,16 @@
                             </div>
                         </div>
 
-                        <div class="w-full pb-4 overflow-visible">
-                            <table class="w-full text-left border-collapse table-auto">
+                        <!-- 👑 修复：配置 table-fixed 并合理分配宽度比例，确保按钮绝不溢出 -->
+                        <div class="w-full pb-4 overflow-x-auto custom-scroll">
+                            <table class="w-full text-left border-collapse table-fixed min-w-[600px]">
                                 <thead>
                                     <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                        <th class="py-2.5 px-2 w-[40%]">邮箱 / ID</th>
-                                        <th class="py-2.5 px-2 w-[25%]">商用角色</th>
-                                        <th class="py-2.5 px-2 w-16">状态</th>
-                                        <th class="py-2.5 px-2 hidden lg:table-cell w-20">注册日期</th>
-                                        <th class="py-2.5 px-2 text-right min-w-[130px]">操作</th>
+                                        <th class="py-2.5 px-2 w-[30%]">邮箱主体 / ID</th>
+                                        <th class="py-2.5 px-2 w-[25%] whitespace-nowrap">商用角色</th>
+                                        <th class="py-2.5 px-2 w-[15%] whitespace-nowrap">核验状态</th>
+                                        <th class="py-2.5 px-2 w-[15%] whitespace-nowrap">注册日期</th>
+                                        <th class="py-2.5 px-2 w-[15%] text-right whitespace-nowrap">安全操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-800 dark:text-slate-200">
@@ -467,7 +467,7 @@
         </div>
     </div>
 
-    <!-- 🗄️ 数据备份 (原独立金库) -->
+    <!-- 🗄️ 数据备份 -->
     <div id="vaultModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-3xl w-full rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col relative animate-[fadeIn_0.2s_ease-out] max-h-[85vh]">
             <button onclick="ApexVault.close()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold transition">✕</button>
@@ -493,7 +493,7 @@
         </div>
     </div>
 
-    <!-- 👑 修复：代码备份 (原历史快照)，加入自定义快照按钮与全屏进度条支持 -->
+    <!-- 👑 代码备份 (加入防报错说明) -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 shrink-0">
@@ -506,7 +506,6 @@
                 此列表是 GitHub 的底层提交记录（黑匣子）。每次“还原”都是把旧代码作为新记录追加在顶部，你的历史**永远不会丢失**。
             </div>
             
-            <!-- 👑 修复：加入手工打标签创建代码快照功能 -->
             <div class="flex gap-2 mb-4 shrink-0">
                 <input id="customSnapshotName" type="text" placeholder="为当前代码打个标记 (例如: 上线前稳定版)" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition shadow-inner">
                 <button onclick="createCodeSnapshot(event)" class="shrink-0 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm border border-slate-700 whitespace-nowrap">
@@ -519,14 +518,14 @@
         </div>
     </div>
 
-    <!-- 👑 全新：动态防宕机进度条 -->
+    <!-- 👑 修复：全屏的动态防宕机进度条！ -->
     <div id="restoreProgressOverlay" class="hidden fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6">
         <div class="w-full max-w-md">
             <h3 id="restoreProgressText" class="text-white text-sm font-bold mb-4 text-center font-mono animate-pulse">正在提取系统快照矩阵...</h3>
             <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                 <div id="restoreProgressBar" class="h-full bg-blue-500 w-0 transition-all duration-300 ease-out"></div>
             </div>
-            <p class="text-slate-400 text-[10px] text-center mt-3 font-mono">底层代码时空跃迁中，请勿关闭或刷新窗口</p>
+            <p class="text-slate-400 text-[10px] text-center mt-3 font-mono">底层代码通讯中，请勿关闭或刷新窗口</p>
         </div>
     </div>
 
@@ -622,7 +621,6 @@
                         } catch(e) {}
                     }
                     
-                    // Fallback to Gitee
                     if (!vaultData) {
                         const gToken = localStorage.getItem("APEX_GITEE_TOKEN");
                         const gRepo = localStorage.getItem("APEX_GITEE_REPO");
@@ -663,7 +661,6 @@
                 listEl.innerHTML = "";
                 const sortedSaves = [...this.saves].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
-                // 👑 修复：将暗淡色按钮全部替换为鲜艳的实体色
                 sortedSaves.forEach(save => {
                     const timeStr = new Date(save.timestamp).toLocaleString('zh-CN', { hour12: false });
                     listEl.innerHTML += `
@@ -870,48 +867,6 @@
                     if (document.getElementById("giteeTokenInput")) document.getElementById("giteeTokenInput").value = localStorage.getItem("APEX_GITEE_TOKEN") || "";
                     if (document.getElementById("giteeRepoInput")) document.getElementById("giteeRepoInput").value = localStorage.getItem("APEX_GITEE_REPO") || "";
                 }
-            }
-        };
-        
-        // 👑 新增：手动创建代码快照，注入时间戳防缓存
-        window.createCodeSnapshot = async function() {
-            const token = localStorage.getItem("APEX_GH_TOKEN");
-            if (!token) {
-                alert("❌ 请先在【🔑 密钥设置】配置 GitHub Token");
-                return;
-            }
-            const tagInput = document.getElementById("customSnapshotName");
-            const tagName = tagInput ? tagInput.value.trim() : "";
-            const commitMsg = tagName ? `📸 代码标记: ${tagName} [skip ci]` : `📸 代码标记: 手动存档 ${new Date().toLocaleString('zh-CN')} [skip ci]`;
-            
-            const btn = event.currentTarget;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "⏳ 打标中...";
-            btn.disabled = true;
-
-            try {
-                // 随便更新一个隐藏文件来触发一次带备注的 commit
-                let sha = null;
-                let oldContent = "{}";
-                try {
-                    const f = await getGithubFileSafe("config/.snapshot", token);
-                    sha = f.sha;
-                    oldContent = f.content || "{}";
-                } catch(e){}
-                
-                // 强行塞入时间戳改变文件指纹，确保每次提交都能成功写入
-                const pushRes = await pushGithubJsonFile("config/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
-                
-                if (pushRes) {
-                    alert("✅ 成功创建自定义代码快照！");
-                    if (tagInput) tagInput.value = "";
-                    fetchCommitHistory(true); // 强制刷新列表
-                }
-            } catch (err) {
-                alert("❌ 创建代码快照失败: " + err.message);
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
             }
         };
     </script>
