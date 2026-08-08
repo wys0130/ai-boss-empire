@@ -1,8 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
  * 1. 👑 彻底解决 @ 功能：采用最底层 Range.insertNode 节点无损操作，100% 保护历史标签！
- * 2. 👑 修复金库：彻底打通 Gitee 原生分支，解决 "分支 2" 带来的无法读取 Bug！
- * 3. 👑 修复排版：修复用户大名单超长邮箱挤压屏幕的 Bug，支持自动换行！
+ * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
+ * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -133,15 +133,15 @@ window.ApexUserManager = {
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
         try {
             const keys = getKeysSafe();
-            if (keys && keys.gh) {
+            if (keys && keys.gh && !saved) {
                 const fileObj = await getGithubFileSafe("config/users.json", keys.gh);
                 if (fileObj.content) {
                     this.userList = JSON.parse(fileObj.content);
                     localStorage.setItem('APEX_USER_LIST', JSON.stringify(this.userList));
-                    this.renderUserTable();
                 }
             }
         } catch(e) {}
+        this.renderUserTable();
     },
 
     saveUsers: async function() {
@@ -309,7 +309,7 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证码补签</span>';
 
-            // 👑 修复：防挤压布局，允许邮箱自动换行 (break-all whitespace-normal)
+            // 👑 修复：放宽表格列宽度限制，使用 break-all whitespace-normal 允许超长邮箱换行
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <td class="py-3 px-4 min-w-[160px] max-w-[220px] break-all whitespace-normal">
@@ -376,9 +376,6 @@ window.ApexUserManager = {
     }
 };
 
-// ==========================================
-// 5. AI 智能体排班区间配置中台
-// ==========================================
 window.ApexScheduleManager = {
     loadScheduleFromCloud: async function() {
         try {
@@ -391,9 +388,7 @@ window.ApexScheduleManager = {
                 if (document.getElementById("sched-end")) document.getElementById("sched-end").value = sched.end_hour || 8;
                 if (document.getElementById("sched-enabled")) document.getElementById("sched-enabled").value = String(sched.enabled !== false);
             }
-        } catch (e) {
-            console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。");
-        }
+        } catch (e) {}
     },
 
     saveScheduleToCloud: async function() {
@@ -401,44 +396,30 @@ window.ApexScheduleManager = {
         const end = Number(document.getElementById("sched-end").value) || 8;
         const enabled = document.getElementById("sched-enabled").value === "true";
         
-        const payload = {
-            start_hour: start,
-            end_hour: end,
-            enabled: enabled,
-            updated_at: new Date().toISOString()
-        };
+        const payload = { start_hour: start, end_hour: end, enabled: enabled, updated_at: new Date().toISOString() };
 
         try {
             const keys = getKeys();
             const fileObj = await getGithubFileSafe("config/ai-schedule.json", keys.gh);
-            await pushGithubJsonFile(
-                "config/ai-schedule.json",
-                payload,
-                fileObj.sha,
-                `⏱️ Config: 更新 AI 夜间自主排班时段 -> 北京时间 [${start}:00 - ${end}:00] [skip ci]`,
-                keys.gh
-            );
-            alert(`✅ 排班表写入成功！\n\nAI 自主运行区间已被限定为北京时间 [${start}:00 至 ${end}:00]。`);
+            await pushGithubJsonFile("config/ai-schedule.json", payload, fileObj.sha, `⏱️ Config: 更新 AI 夜间自主排班时段 -> 北京时间 [${start}:00 - ${end}:00] [skip ci]`, keys.gh);
+            alert(`✅ 排班表写入成功！`);
         } catch (e) {
             alert("❌ 同步时间表失败: " + e.message);
         }
     }
 };
 
-// ==========================================
-// 6. 作品审核与定价表 
-// ==========================================
 let AUDIT_PRODUCTS = [];
 const DEFAULT_AUDIT_PRODUCTS = [
-    { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-blue-600 font-bold", isLinked: true, status: true },
-    { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-blue-600 font-bold", isLinked: true, status: true },
-    { id: "fintech", title: "FinTech A 轮融资方案", category: "12 SLIDES · Office PPT演示", thumbKey: "prod_fintech", thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-blue-600 font-bold", isLinked: true, status: true },
+    { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
+    { id: "fintech", title: "FinTech A 轮融资方案", category: "12 SLIDES · Office PPT演示", thumbKey: "prod_fintech", thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
     { id: "excel-roi", title: "全渠道 ROI 动态测算模型", category: "XLSX MODEL · Office EXCEL表格", thumbKey: "prod_excel", thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-emerald-600 font-bold", isLinked: true, status: true },
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
 async function loadAuditProducts() {
-    // 👑 核心修复：打通金库双向恢复绑定
+    // 👑 修复：优先从本地金库提取数据
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     if (localProducts) {
         AUDIT_PRODUCTS.length = 0; 
@@ -454,7 +435,7 @@ async function loadAuditProducts() {
             if (Array.isArray(aiData)) {
                 aiData.forEach(aiItem => {
                     if (!AUDIT_PRODUCTS.find(p => p.id === aiItem.id)) {
-                        let col = 'text-blue-600 font-bold';
+                        let col = 'text-orange-500 font-bold';
                         if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
                         if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
                         
@@ -689,6 +670,45 @@ window.ApexBannerManager = {
     }
 };
 
+window.ApexFX = {
+    currentRate: 7.18,
+    initWeeklyRate: async function() {
+        const cache = JSON.parse(localStorage.getItem("APEX_FX_RATE_CACHE") || "{}");
+        const now = Date.now();
+        if (cache.rate && cache.timestamp && (now - cache.timestamp < 604800000)) {
+            this.currentRate = cache.rate;
+            this.updateBadge(cache.rate, false);
+            return;
+        }
+        await this.forceRefreshRate();
+    },
+    forceRefreshRate: async function() {
+        const badge = document.getElementById("fxRateBadge");
+        if (badge) badge.innerText = "向央行查汇中...";
+        try {
+            const res = await fetch("https://open.er-api.com/v6/latest/USD");
+            const data = await res.json();
+            if (data && data.rates && data.rates.CNY) {
+                this.currentRate = Number(data.rates.CNY).toFixed(2);
+                localStorage.setItem("APEX_FX_RATE_CACHE", JSON.stringify({
+                    rate: this.currentRate,
+                    timestamp: Date.now()
+                }));
+                this.updateBadge(this.currentRate, true);
+                appendLog(`>> [汇率中台] 抓取最新外汇：1 USD = ${this.currentRate} CNY`);
+                return;
+            }
+        } catch (err) {
+            appendLog(`>> [汇率中台] 查询超时，沿用缓存：1 USD = ${this.currentRate} CNY`);
+        }
+        this.updateBadge(this.currentRate, false);
+    },
+    updateBadge: function(rate, isFresh) {
+        const badge = document.getElementById("fxRateBadge");
+        if (badge) badge.innerText = `1 : ${rate} ${isFresh ? '(最新)' : ''}`;
+    }
+};
+
 window.ApexPricing = {
     isLinked: true,
     use99Rule: true,
@@ -793,9 +813,6 @@ const DEFAULT_MANIFEST_TASKS = [
 
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
-// ==========================================
-// 9. 进度书与工单管理
-// ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
@@ -954,7 +971,7 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (无损精准注入)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
@@ -1045,6 +1062,7 @@ window.selectMentionDept = function(deptName) {
 
     const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
     
+    // 👑 核心修复：采用 Range.insertNode 精准插入 DOM 节点，不再破坏之前的历史胶囊
     const tokenSpan = document.createElement("span");
     tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
     tokenSpan.contentEditable = "false"; 
