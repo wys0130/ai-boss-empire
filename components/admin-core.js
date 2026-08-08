@@ -4,7 +4,7 @@
  * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
  * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
  * 4. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
- * 5. 👑 终极修复快照回溯：修复 GitHub 409 写入冲突，解除深层密钥绑定，加入成功重载机制！
+ * 5. 👑 终极修复快照回溯：注入 SHA 指纹比对算法，跳过无改动文件，彻底消灭 GitHub 422 报错！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -1476,11 +1476,10 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
         
         let successCount = 0;
+        let skipCount = 0;
         appendLog(`⏳ 开始逐一回溯源码至快照 #${shortSha}...`);
         
         for (const fileObj of filesToRestore) {
-            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
-            const fileJson = await fileContentRes.json();
             
             // 👑 获取线上文件的现存 SHA，防止 409 写入冲突
             let currentSha = null;
@@ -1490,6 +1489,15 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
                     currentSha = (await curFileRes.json()).sha;
                 }
             } catch(e){}
+
+            // 如果线上文件的 sha 和目标旧版本的 sha 完全一致，代表文件没发生过更改，直接跳过！
+            if (currentSha === fileObj.sha) {
+                skipCount++;
+                continue;
+            }
+
+            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
+            const fileJson = await fileContentRes.json();
 
             const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
@@ -1504,7 +1512,7 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             if (updateRes.ok) successCount++;
         }
         
-        alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！共覆盖了 ${successCount} 个系统核心文件。\n系统即将强制重载以应用旧版代码...`);
+        alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！\n📊 报告：修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将强制重载以应用旧版代码...`);
         location.reload();
         
     } catch(err) { 
