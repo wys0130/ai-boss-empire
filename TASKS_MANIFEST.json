@@ -1,14 +1,14 @@
 {
   "summary": {
-    "completed": 9,
-    "todo": 0,
+    "completed": 4,
+    "todo": 4,
     "total_tasks": 9
   },
   "tasks": [
     {
       "id": "TASK-101",
       "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
-      "notes": "用极简代码嵌入 Checkout，不办国内营业执照",
+      "notes": "用极简代码嵌入 Checkout",
       "stage": "STAGE_1_MVP_GLOBAL",
       "department": "施工工程部",
       "status": "DONE"
@@ -39,11 +39,11 @@
     },
     {
       "id": "TASK-201",
-      "title": "国内正规军升级：接入广州网络经营个体户执照与对公参数",
+      "title": "国内正规军升级：广州网络经营个体户执照与对公参数",
       "notes": "办个体户无需实际租用办公楼",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "董事长",
-      "status": "DONE"
+      "status": "IN_PROGRESS"
     },
     {
       "id": "TASK-202",
@@ -51,15 +51,15 @@
       "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-203",
-      "title": "智能判断多模态设计组，建立每日自动生成模版推文流水线",
+      "title": "智能判断多模态设计组，建立每日自动生成模版流水线",
       "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "主动产品部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-301",
@@ -67,7 +67,7 @@
       "notes": "保持全球 TTFB < 50ms",
       "stage": "STAGE_3_FULL_SCALE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-302",
@@ -75,8 +75,8 @@
       "notes": "无论海外还是国内收银台，付款成功签发临时链接",
       "stage": "STAGE_3_FULL_SCALE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     }
   ],
-  "updated_at": "2026-08-07"
+  "updated_at": "2026-08-08"
 }
