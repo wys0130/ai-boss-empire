@@ -50,8 +50,8 @@
     </div>
   </header>
 
-  <!-- 2. 主体工作区 -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-10 md:space-y-12">
+  <!-- 2. 主体工作区 (👑 全新画廊架构) -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-12">
     
     <!-- 动态轮播区 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
@@ -62,92 +62,172 @@
       </div>
     </div>
 
-    <!-- 第一板块：PPT演示 -->
+    <!-- 第一板块：大图画廊区 (PPT & AI 自动上架模版) -->
     <section id="ppt-section">
       <div class="flex justify-between items-center mb-6">
         <div>
           <h3 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-orange-600 inline-block"></span>
-            <span data-zh="PPT 可视化路演战略套件" data-en="PPT Visual Strategic Decks">PPT 可视化路演战略套件</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+            <span data-zh="精品商业 PPT 模板" data-en="Premium PPT Templates">精品商业 PPT 模板 (云端实时同步)</span>
           </h3>
-          <p class="text-xs text-slate-500" data-zh="视觉至上 · 大图表表现 · 告别枯燥段落" data-en="Visual-First · Data-Driven · Say Goodbye to Wordy Slides">视觉至上 · 大图表表现 · 告别枯燥段落</p>
+          <p class="text-xs text-slate-500 mt-1" data-zh="海量高定视觉，对标顶级大厂画廊" data-en="Massive premium visuals, gallery style">海量高定视觉，对标顶级大厂画廊</p>
         </div>
+        <a href="#" class="text-xs text-blue-600 font-bold hover:underline px-3 py-1 bg-blue-50 rounded-lg">查看全部模板 →</a>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
-          <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">15 SLIDES · PPT</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="AeroTech 创投规划书" data-en="AeroTech Pitch Deck">AeroTech 创投规划书</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。" data-en="Global venture & ROI plan. Large charts, SVG progress metrics, high-res backgrounds.">全球创投与 ROI 数据计划。大图标，SVG 进度指标，高精实景背景图。</p>
+      <!-- 👑 觅知网风格：大图画廊网格 (PC 4列，手机 2列) -->
+      <div id="mall-ppt-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div class="col-span-full py-10 text-center text-slate-400 font-mono text-sm animate-pulse border border-dashed border-slate-300 rounded-2xl">
+              ☁️ 正在从云端抓取 AI 自动上架的最新自研模板...
           </div>
-          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="editor.html?deck=aerotech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit Deck →">进入修改 →</a>
-          </div>
-        </div>
-
-        <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
-          <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">20 SLIDES · PPT</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="SaaS 增长指标盘点" data-en="SaaS Growth Metrics">SaaS 增长指标盘点</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。" data-en="Enterprise OKR reconciliation. Focused on data charts, dynamic palette adjustment.">企业级 OKR 可视化对账。聚焦经营数据图表展示，支持动态底文一键调色。</p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="editor.html?deck=saas" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit Deck →">进入修改 →</a>
-          </div>
-        </div>
-
-        <div class="bg-white border border-orange-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between hover:border-orange-500 transition">
-          <div>
-            <span class="bg-orange-500/10 text-orange-600 border border-orange-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">12 SLIDES · PPT</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="FinTech A 轮融资方案" data-en="FinTech Series A Deck">FinTech A 轮融资方案</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。" data-en="FinTech visual business plan. Gold foil textures, custom financial statements & charts.">金融全渠道图解计划书。高端金色光斑纹理，专属金融报表与可视化对比条。</p>
-          </div>
-          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <div data-price-rmb="69" class="font-mono font-bold text-sm text-orange-600">￥69 RMB</div>
-            <a href="editor.html?deck=fintech" class="text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 font-bold px-4 py-2 rounded-xl transition" data-zh="进入修改 →" data-en="Edit Deck →">进入修改 →</a>
-          </div>
-        </div>
       </div>
     </section>
 
     <!-- 第二板块：EXCEL表格 与 WORD文档 -->
     <section>
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center mb-6 border-t border-slate-200 pt-8">
         <div>
-          <h3 class="text-base md:text-lg font-bold text-slate-900" data-zh="商务核心：EXCEL表格 与 WORD文档" data-en="Core Business: EXCEL Models & WORD Reports">商务核心：EXCEL表格 与 WORD文档</h3>
+          <h3 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+            <span data-zh="商务核心：办公文档模型" data-en="Core Business: Document Models">商务核心：办公文档模型</span>
+          </h3>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white border border-emerald-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-emerald-50/30 hover:border-emerald-500 transition">
-          <div>
-            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL · EXCEL</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="全渠道 ROI 动态自适应测算模型" data-en="Omnichannel ROI Adaptive Model">全渠道 ROI 动态自适应测算模型</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。" data-en="Compare CAC vs LTV intelligently, includes 12-month rolling cash flow matrix.">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。</p>
+        <!-- EXCEL 卡片 -->
+        <div class="bg-white border border-emerald-500/20 rounded-2xl overflow-hidden card-shadow flex flex-col justify-between hover:border-emerald-500 hover:shadow-2xl transition-all duration-300 group cursor-pointer" onclick="window.location.href='excel-editor.html'">
+          <div class="p-6 bg-gradient-to-br from-white to-emerald-50/50">
+            <span class="bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">XLSX MODEL</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3 group-hover:text-emerald-600 transition">全渠道 ROI 动态自适应测算模型</h4>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">智能对比获取成本 (CAC) 与终身客单价 (LTV)，内置 12 个月现金流滚动矩阵。公式透明全开。</p>
           </div>
-          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <div data-price-rmb="69" class="font-mono font-bold text-sm text-emerald-600">￥69 RMB</div>
-            <a href="excel-editor.html" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Excel 表格 →" data-en="Open Excel Model →">进入 Excel 表格 →</a>
+          <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-black text-base text-emerald-600">￥69 RMB</div>
+            <span class="text-xs text-emerald-600 font-bold group-hover:translate-x-1 transition-transform">立即编辑体验 →</span>
           </div>
         </div>
 
-        <div class="bg-white border border-indigo-500/30 rounded-2xl p-6 card-shadow flex flex-col justify-between bg-gradient-to-br from-white to-indigo-50/30 hover:border-indigo-500 transition">
-          <div>
-            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD · WORD</span>
-            <h4 class="text-base font-bold text-slate-900 mt-3" data-zh="欧美企业级 ATS 智能排版合规报告" data-en="US/EU ATS Intelligent Compliance Report">欧美企业级 ATS 智能排版合规报告</h4>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed" data-zh="杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。" data-en="Zero OS encoding issues, bilingual standard presentation, passes institutional ATS bots.">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人盲测。</p>
+        <!-- WORD 卡片 -->
+        <div class="bg-white border border-indigo-500/20 rounded-2xl overflow-hidden card-shadow flex flex-col justify-between hover:border-indigo-500 hover:shadow-2xl transition-all duration-300 group cursor-pointer" onclick="window.location.href='word-editor.html'">
+          <div class="p-6 bg-gradient-to-br from-white to-indigo-50/50">
+            <span class="bg-indigo-500/10 text-indigo-600 border border-indigo-500/30 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold">DOCX STANDARD</span>
+            <h4 class="text-base font-bold text-slate-900 mt-3 group-hover:text-indigo-600 transition">欧美企业级 ATS 智能排版合规报告</h4>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">杜绝操作系统乱码，双语规范呈现，完美通过各大顶尖财团与银行机器人 (ATS) 盲测标准。</p>
           </div>
-          <div class="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
-            <div data-price-rmb="69" class="font-mono font-bold text-sm text-indigo-600">￥69 RMB</div>
-            <a href="word-editor.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl transition shadow-md" data-zh="进入 Word 文档 →" data-en="Open Word Report →">进入 Word 文档 →</a>
+          <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+            <div data-price-rmb="69" class="font-mono font-black text-base text-indigo-600">￥69 RMB</div>
+            <span class="text-xs text-indigo-600 font-bold group-hover:translate-x-1 transition-transform">立即编辑体验 →</span>
           </div>
         </div>
       </div>
     </section>
   </main>
+
+  <!-- 👑 全新画廊渲染引擎：负责陈列本地货品并抓取 GitHub AI 新模版 -->
+  <script>
+    window.ApexMallGallery = {
+        // 兜底基础货品
+        baseProducts: [
+            {
+                id: "aerotech",
+                title: "AeroTech 创投规划书",
+                category: "15 页 · 商业计划书",
+                thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80",
+                priceRmb: 69
+            },
+            {
+                id: "saas",
+                title: "SaaS 增长指标盘点",
+                category: "20 页 · 数据可视化",
+                thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
+                priceRmb: 69
+            },
+            {
+                id: "fintech",
+                title: "FinTech A 轮融资方案",
+                category: "12 页 · 科技金融",
+                thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
+                priceRmb: 69
+            }
+        ],
+
+        init: async function() {
+            let allProducts = [...this.baseProducts];
+
+            // 👑 智能侦测：去拉取 AI 大脑在后台偷偷干活生成的 `ai-generated-decks.json`
+            try {
+                // 兼容抓取可能被 AI 创建的数据文件
+                const urlsToTry = ['data/ai-generated-decks.json', 'data/templates.json'];
+                for (const url of urlsToTry) {
+                    const res = await fetch(url + '?nocache=' + Date.now());
+                    if (res.ok) {
+                        const aiData = await res.json();
+                        if (Array.isArray(aiData) && aiData.length > 0) {
+                            // 拼接到商品列表里！
+                            allProducts = [...allProducts, ...aiData];
+                            break;
+                        }
+                    }
+                }
+            } catch(e) {
+                console.log("正在静默重试抓取 AI 自研模板...");
+            }
+
+            this.render(allProducts);
+        },
+
+        render: function(products) {
+            const grid = document.getElementById('mall-ppt-grid');
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            const pricing = window.ApexPricing ? window.ApexPricing.getConfig() : { ppt: { rmb: 69 } };
+            const rmbPrice = pricing.ppt.rmb;
+
+            products.forEach(p => {
+                // 图片采用 4:3 高级比例铺满
+                const finalImg = p.thumb || p.fallback || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
+
+                grid.innerHTML += `
+                    <div onclick="window.location.href='editor.html?deck=${p.id}'" class="bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 group cursor-pointer flex flex-col">
+                        <!-- 图片容器：宽高比严格锁定 -->
+                        <div class="relative w-full pt-[75%] bg-slate-100 overflow-hidden">
+                            <img src="${finalImg}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80'">
+                            
+                            <!-- 浮动徽章：VIP标识 -->
+                            <div class="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                👑 特惠 VIP
+                            </div>
+                            
+                            <!-- 浮动徽章：页数标识 -->
+                            <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-mono px-1.5 py-0.5 rounded">
+                                ${p.category ? p.category.split('·')[0].trim() : '模板'}
+                            </div>
+                        </div>
+                        
+                        <!-- 底部文字与价格框 -->
+                        <div class="p-3.5 flex-1 flex flex-col justify-between bg-white">
+                            <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition tracking-tight">${p.title}</h4>
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
+                                <span class="text-[11px] text-slate-400 font-medium truncate pr-2">${p.category ? p.category.split('·')[1]?.trim() : '精选演示'}</span>
+                                <span class="text-[15px] font-black text-orange-600 font-mono">￥${p.priceRmb || rmbPrice}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // 通知系统价格中台更新一下最新汇率标签
+            if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
+        }
+    };
+
+    // 网页加载完后立刻渲染商城画廊
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => window.ApexMallGallery.init(), 100);
+    });
+  </script>
 
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
