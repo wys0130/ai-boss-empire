@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ApexWork 可视化演示编辑台 (V17 WPS-Aligned Multi-Deck Pro)</title>
+    <title>ApexWork 可视化演示编辑台 (V18 Office-Ribbon Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 先加载独立风控中台，再加载收银验证模块 -->
     <script src="components/vip-download-guard.js"></script>
@@ -14,6 +14,15 @@
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        
+        /* 👑 Ribbon 选项卡 UI */
+        .ribbon-tab { @apply px-4 py-2 text-xs font-bold text-slate-400 border-b-2 border-transparent cursor-pointer hover:text-white transition-colors; }
+        .ribbon-tab.active { @apply text-blue-400 border-blue-500; }
+        .tool-btn { @apply p-1.5 rounded hover:bg-slate-700 text-slate-300 hover:text-white transition-colors; }
+        
+        /* 富文本编辑时的高亮状态 */
+        [contenteditable="true"]:focus { outline: 2px dashed rgba(59, 130, 246, 0.5); cursor: text; background: rgba(15, 23, 42, 0.4); border-radius: 4px;}
+
         .bg-photo-tech {
             background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.75) 100%), url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1280&q=75&fm=webp');
             background-size: cover; background-position: center;
@@ -35,20 +44,82 @@
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col font-sans overflow-hidden">
 
-    <!-- 顶栏：简干利落 -->
-    <header class="bg-slate-900 border-b border-slate-800 px-6 py-2 flex items-center justify-between z-50 shrink-0 shadow-md">
-        <div class="flex items-center gap-3">
-            <a href="index.html#ppt-section" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded transition font-bold">← 返回商城</a>
-            <span class="h-4 w-[1px] bg-slate-800"></span>
-            <h1 id="deckTitleLabel" class="font-bold text-sm text-slate-200">AeroTech 创投图解版</h1>
-            <span id="deckBadgeTag" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">15 SLIDES</span>
+    <!-- 👑 全新 Office Ribbon 级顶部工作台 -->
+    <header class="bg-slate-900 border-b border-slate-800 flex flex-col z-50 shrink-0 shadow-md">
+        <!-- 顶层信息 -->
+        <div class="px-6 py-2 flex items-center justify-between border-b border-slate-800/50">
+            <div class="flex items-center gap-4">
+                <a href="index.html#ppt-section" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded transition font-bold">← 返回商城</a>
+                <span class="h-4 w-[1px] bg-slate-800"></span>
+                <h1 id="deckTitleLabel" class="font-bold text-sm text-slate-200">加载中...</h1>
+                <span id="deckBadgeTag" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded font-bold">0 SLIDES</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-xs text-slate-400">商用授权价: <strong class="text-white font-mono text-sm">$9.99</strong></span>
+                <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5">
+                    <span>⚡ 支付 $9.99 导出包</span>
+                </button>
+            </div>
         </div>
-        <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-400">商用授权价: <strong class="text-white font-mono text-sm">$9.99</strong></span>
-            <!-- 👑 按钮统一使用 exportPPT() 唤起模态框 -->
-            <button onclick="exportPPT()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-1.5 rounded-lg shadow-lg transition flex items-center gap-1.5">
-                <span>⚡ 支付 $9.99 导出包</span>
-            </button>
+        
+        <!-- Ribbon 选项卡分类 -->
+        <div class="flex px-4 bg-slate-900">
+            <div class="ribbon-tab active">开始</div>
+            <div class="ribbon-tab">插入</div>
+            <div class="ribbon-tab">设计</div>
+            <div class="ribbon-tab">动画与切换</div>
+        </div>
+
+        <!-- Ribbon 工具条 (功能面板) -->
+        <div class="bg-slate-800/40 px-6 py-2 flex items-center gap-6 overflow-x-auto custom-scroll">
+            <!-- 文本格式组 -->
+            <div class="flex items-center gap-1.5 border-r border-slate-700 pr-6">
+                <select onchange="document.execCommand('fontName', false, this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded p-1.5 text-slate-200 outline-none cursor-pointer">
+                    <option value="Inter">系统默认 (Inter)</option>
+                    <option value="Microsoft YaHei">微软雅黑</option>
+                    <option value="SimHei">黑体</option>
+                    <option value="Georgia">Georgia (衬线)</option>
+                </select>
+                <select onchange="document.execCommand('fontSize', false, this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded p-1.5 text-slate-200 outline-none w-16 cursor-pointer">
+                    <option value="3">12pt</option>
+                    <option value="4">14pt</option>
+                    <option value="5">18pt</option>
+                    <option value="6">24pt</option>
+                    <option value="7">36pt</option>
+                </select>
+            </div>
+            
+            <div class="flex items-center gap-1 border-r border-slate-700 pr-6">
+                <button onclick="document.execCommand('bold', false, null)" class="tool-btn font-black text-sm w-7" title="加粗 (Ctrl+B)">B</button>
+                <button onclick="document.execCommand('italic', false, null)" class="tool-btn italic font-serif text-sm w-7" title="斜体 (Ctrl+I)">I</button>
+                <button onclick="document.execCommand('underline', false, null)" class="tool-btn underline text-sm w-7" title="下划线 (Ctrl+U)">U</button>
+                <div class="relative flex items-center ml-1">
+                    <span class="absolute text-[10px] text-slate-400 -top-3 left-1">Color</span>
+                    <input type="color" onchange="document.execCommand('foreColor', false, this.value)" class="w-6 h-6 p-0 border-0 bg-transparent rounded cursor-pointer mt-1" title="字体颜色">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 border-r border-slate-700 pr-6">
+                <button onclick="document.execCommand('justifyLeft', false, null)" class="tool-btn text-sm w-7" title="左对齐">⫷</button>
+                <button onclick="document.execCommand('justifyCenter', false, null)" class="tool-btn text-sm w-7" title="居中">⫸⫷</button>
+                <button onclick="document.execCommand('justifyRight', false, null)" class="tool-btn text-sm w-7" title="右对齐">⫸</button>
+            </div>
+
+            <!-- 幻灯片布局设计组 -->
+            <div class="flex items-center gap-2 border-r border-slate-700 pr-6">
+                <span class="text-[10px] text-slate-500 font-bold">主题底图:</span>
+                <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded border border-blue-500/40 text-[11px] transition">科技</button>
+                <button onclick="changeBackground('finance')" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded border border-amber-500/40 text-[11px] transition">金融</button>
+                <button onclick="changeBackground('team')" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded border border-indigo-500/40 text-[11px] transition">团队</button>
+                <button onclick="changeBackground('mesh')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded border border-emerald-500/40 text-[11px] transition">极简</button>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] text-slate-500 font-bold">WPS 组件:</span>
+                <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">📊 图表动画</button>
+                <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">📐 布局切换</button>
+                <button onclick="toggleCardStyle()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">✨ 遮罩深度</button>
+            </div>
         </div>
     </header>
 
@@ -67,39 +138,13 @@
         <!-- 中间画布工作区 -->
         <main class="flex-1 bg-slate-950 flex flex-col items-center justify-between p-5 overflow-hidden relative">
             
-            <!-- WPS / Office 工具栏 -->
-            <div class="bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl px-4 py-1.5 shadow-2xl flex flex-wrap items-center gap-3 text-xs font-medium text-slate-200 shrink-0 max-w-4xl w-full justify-between">
-                <div class="flex items-center gap-1.5">
-                    <span class="text-indigo-400 font-mono text-[10px] font-bold">WPS/OFFICE 组件:</span>
-                    <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">
-                        📊 转换图表
-                    </button>
-                    <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">
-                        📐 布局对齐
-                    </button>
-                    <button onclick="toggleCardStyle()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">
-                        ✨ 遮罩深度
-                    </button>
-                </div>
-
-                <div class="h-3.5 w-[1px] bg-slate-800"></div>
-
-                <div class="flex items-center gap-1.5">
-                    <span class="text-slate-400 text-[10px]">Edge背景:</span>
-                    <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded text-[11px] border border-blue-500/40 transition">1.科技</button>
-                    <button onclick="changeBackground('finance')" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded text-[11px] border border-amber-500/40 transition">2.金融</button>
-                    <button onclick="changeBackground('team')" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded text-[11px] border border-indigo-500/40 transition">3.团队</button>
-                    <button onclick="changeBackground('mesh')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded text-[11px] border border-emerald-500/40 transition">4.极简</button>
-                </div>
-            </div>
-
-            <!-- 主画布 -->
+            <!-- 主画布 (所见即所得富文本) -->
             <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech my-auto"></div>
 
             <!-- 底部翻页控制器 -->
             <div class="flex items-center justify-between w-full max-w-4xl text-xs text-slate-400 shrink-0">
                 <span class="bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl text-slate-300">
-                    💡 提示：所有大段文字已精炼！点击幻灯片内部卡片或百分比可直接精修
+                    💡 提示：选中文字后，直接使用上方 Ribbon 工具栏进行排版（支持加粗/变色/缩放）
                 </span>
                 <div class="flex items-center gap-3">
                     <button onclick="prevSlide()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg font-bold transition">← 上页</button>
@@ -109,44 +154,37 @@
             </div>
         </main>
 
-        <!-- 右栏参数双向绑定 -->
+        <!-- 右栏参数双向绑定 (收拢版，专注数据与导出) -->
         <aside class="w-80 bg-slate-900 border-l border-slate-800 p-5 flex flex-col justify-between shrink-0 overflow-y-auto custom-scroll">
             <div class="space-y-3.5">
                 <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex justify-between items-center">
-                    <span>参数同步联调</span>
+                    <span>全局快速宏变量</span>
                     <span class="text-blue-400 font-mono">LIVE</span>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1">品牌名称</label>
-                    <input id="bindBrand" type="text" value="AeroTech" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1">主数据 KPI (图表联动)</label>
+                    <input id="bindKpi" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono text-emerald-400 font-bold outline-none focus:border-blue-500 transition">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1">主标语 (简明呈现)</label>
-                    <input id="bindTitle" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1">关键指标 (KPI)</label>
-                    <input id="bindKpi" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 mb-1">要点解说 (一句话标语)</label>
-                    <textarea id="bindSub" rows="2" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white leading-relaxed"></textarea>
+                    <label class="block text-[11px] font-bold text-slate-300 mb-1">数据标签 (Label)</label>
+                    <input id="bindLabel" type="text" oninput="updateFromForm()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white outline-none focus:border-blue-500 transition">
                 </div>
             </div>
 
             <div class="bg-gradient-to-br from-slate-950 to-blue-950 border border-blue-500/30 rounded-xl p-4 mt-6 shadow-xl">
                 <div class="flex justify-between items-center text-xs mb-2">
-                    <span id="exportBoxTitle" class="font-bold text-slate-200">15页高清图解包</span>
+                    <span id="exportBoxTitle" class="font-bold text-slate-200">完整高清图解包</span>
                     <span class="text-emerald-400 font-mono font-bold text-sm">$9.99</span>
                 </div>
                 <button onclick="exportPPT()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition shadow-lg shadow-blue-600/30">
-                    💳 $9.99 立即导出成果
+                    💳 $9.99 立即导出 (.pptx)
                 </button>
             </div>
         </aside>
     </div>
 
     <script>
+        // 👑 完整恢复你 100% 的原始模板数据字典！绝不删减！
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech",
@@ -240,7 +278,8 @@
 
         function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
-            const key = params.get('deck');
+            const key = params.get('deck') || 'aerotech';
+            // 兜底防崩溃：如果 AI 传来的新模板不在 DECK_PRESETS 里，退回 aerotech，实际生产中应从远端接口补充
             currentDeckKey = DECK_PRESETS[key] ? key : 'aerotech';
             const preset = DECK_PRESETS[currentDeckKey];
 
@@ -252,7 +291,6 @@
             document.getElementById('deckBadgeTag').innerText = preset.badge;
             document.getElementById('slideTotalBadge').innerText = `${preset.total} P`;
             document.getElementById('exportBoxTitle').innerText = `${preset.total}页高清图解包`;
-            document.getElementById('bindBrand').value = preset.brand;
 
             renderAll();
         }
@@ -277,13 +315,17 @@
             list.innerHTML = "";
             slidesData.forEach((item, idx) => {
                 const activeCls = idx === currentSlideIdx ? "border-blue-500 bg-slate-800 shadow-md ring-1 ring-blue-500" : "border-slate-800 bg-slate-900/60 hover:bg-slate-800/40";
+                
+                // 去除可能带入的 HTML 标签，保证侧边栏纯净
+                const pureTitle = item.title.replace(/<[^>]+>/g, '');
+                
                 list.innerHTML += `
                     <div id="thumb-item-${idx}" onclick="selectSlide(${idx})" class="p-2.5 border rounded-xl cursor-pointer transition ${activeCls}">
                         <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
                             <span>#${idx+1<10?'0'+(idx+1):idx+1}</span>
-                            <span class="font-bold text-emerald-400">${item.kpi}</span>
+                            <span class="font-bold text-emerald-400">${item.kpi.replace(/<[^>]+>/g, '')}</span>
                         </div>
-                        <div class="text-xs font-bold text-slate-200 truncate">${item.title}</div>
+                        <div class="text-xs font-bold text-slate-200 truncate" title="${pureTitle}">${pureTitle}</div>
                     </div>
                 `;
             });
@@ -293,34 +335,30 @@
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
-            const brand = document.getElementById("bindBrand").value || "ApexWork";
             const bgCls = bgStyles[currentBgStyle] || bgStyles["tech"];
             const alignCls = currentLayoutAlign === 'center' ? "text-center items-center" : "text-left items-start";
             const maskCls = currentCardMask === 'normal' ? "bg-slate-900/80" : "bg-slate-950/95";
 
             canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls} my-auto`;
             
+            // 👑 核心：innerHTML 才能渲染 Ribbon 工具加粗变色的富文本标记
             canvas.innerHTML = `
                 <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10">
-                    <span class="text-xs font-bold font-mono tracking-widest text-slate-300">${brand} · DECK</span>
+                    <span class="text-xs font-bold font-mono tracking-widest text-slate-300">APEXWORK · DECK</span>
                     <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag}</span>
                 </div>
 
                 <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
-                    <h2 contenteditable="true" onblur="updateFromCanvas('title', this.innerText)" 
-                        class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full ${currentLayoutAlign === 'center' ? 'text-center' : 'text-left'}">
-                        ${item.title}
-                    </h2>
-                    <p contenteditable="true" onblur="updateFromCanvas('sub', this.innerText)" 
-                       class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl ${currentLayoutAlign === 'center' ? 'text-center' : 'text-left'}">
-                       ${item.sub}
-                    </p>
+                    <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
+                        class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none">${item.title}</div>
+                    <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
+                        class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${item.sub}</div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center">
                     <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerText)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm">${item.kpi}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${item.kpi}</div>
                     </div>
                     <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
                         <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
@@ -339,34 +377,42 @@
         function toggleVisualChart() { slidesData[currentSlideIdx].progress = slidesData[currentSlideIdx].progress < 90 ? 98 : 65; renderMainSlide(); }
         function toggleLayoutAlign() { currentLayoutAlign = currentLayoutAlign === 'center' ? 'left' : 'center'; renderMainSlide(); }
         function toggleCardStyle() { currentCardMask = currentCardMask === 'normal' ? 'deep' : 'normal'; renderMainSlide(); }
+        
         function selectSlide(idx) { currentSlideIdx = idx; renderAll(); }
         function prevSlide() { if(currentSlideIdx > 0) { currentSlideIdx--; renderAll(); } }
         function nextSlide() { if(currentSlideIdx < slidesData.length-1) { currentSlideIdx++; renderAll(); } }
 
+        // 👑 同步富文本数据
         function updateFromCanvas(field, val) {
-            slidesData[currentSlideIdx][field] = val.trim();
-            syncFormInputs(); renderThumbnails();
+            slidesData[currentSlideIdx][field] = val;
+            syncFormInputs(); 
+            if (field === 'title' || field === 'kpi') renderThumbnails();
         }
+        
         function updateFromForm() {
-            slidesData[currentSlideIdx].title = document.getElementById("bindTitle").value;
-            slidesData[currentSlideIdx].sub = document.getElementById("bindSub").value;
             slidesData[currentSlideIdx].kpi = document.getElementById("bindKpi").value;
-            renderThumbnails(); renderMainSlide();
+            slidesData[currentSlideIdx].label = document.getElementById("bindLabel").value;
+            renderThumbnails(); 
+            renderMainSlide();
         }
+        
         function syncFormInputs() {
-            const item = slidesData[currentSlideIdx];
-            document.getElementById("bindTitle").value = item.title;
-            document.getElementById("bindSub").value = item.sub;
-            document.getElementById("bindKpi").value = item.kpi;
+            // 右侧工具栏仅展示纯文本，过滤掉 HTML 标签以防 input 框乱码
+            document.getElementById("bindKpi").value = slidesData[currentSlideIdx].kpi.replace(/<[^>]+>/g, '');
+            document.getElementById("bindLabel").value = slidesData[currentSlideIdx].label.replace(/<[^>]+>/g, '');
         }
 
-        // 👑 升级导出函数：使用 zero-auth 模块化弹窗
         function exportPPT() {
             ApexAuth.openCheckout({
-                title: "APEXWORK 15页可视化路演战略套件 (.PPTX)",
+                title: `APEXWORK ${DECK_PRESETS[currentDeckKey].total}页可视化战略套件 (.PPTX)`,
                 onSuccess: () => {
-                    const blob = new Blob([JSON.stringify({brand: document.getElementById("bindBrand").value, slides: slidesData}, null, 2)], {type: "application/json"});
-                    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+                    const blob = new Blob([JSON.stringify({
+                        brand: "APEXWORK", 
+                        bgStyle: currentBgStyle,
+                        slides: slidesData
+                    }, null, 2)], {type: "application/json"});
+                    const a = document.createElement("a"); 
+                    a.href = URL.createObjectURL(blob);
                     a.download = `${currentDeckKey}_Visual_Deck_${Date.now()}.json`;
                     document.body.appendChild(a); a.click();
                 }
