@@ -1017,19 +1017,15 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (大厂级 Portal 物理悬浮版)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (大厂级光标追踪 + DOM无损注入版)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
-    const cmdBox = document.getElementById("cmd");
-    if (!cmdBox) return;
-
     if (!dropEl) {
-        // 👑 降维绝杀：脱离原父级限制，直接创建到 body 最外层！
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
-        // 采用 fixed 固定定位，打造精致的垂直列表菜单
-        dropEl.className = "fixed z-[99999] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 w-48 max-h-64 overflow-y-auto flex flex-col";
+        // 👑 纯粹的 block 列表容器，抛弃容易变形的 flex，设定绝对置顶层级
+        dropEl.className = "fixed z-[99999] bg-slate-800 border border-slate-700 rounded-xl shadow-2xl py-1 w-48 max-h-60 overflow-y-auto";
         document.body.appendChild(dropEl);
     }
 
@@ -1041,24 +1037,30 @@ window.showMentionDropdown = function(query) {
     
     dropEl.innerHTML = "";
     matches.forEach(dept => {
-        const item = document.createElement("button");
-        // 👑 修复排版：竖向铺开，文字居左，强制不换行 (whitespace-nowrap)
-        item.className = "group w-full text-left px-4 py-2.5 text-xs font-mono font-bold text-slate-300 hover:bg-blue-600 hover:text-white transition-colors whitespace-nowrap flex items-center";
-        item.innerHTML = `<span class="text-blue-500 mr-1.5 group-hover:text-blue-200">@</span> ${dept.name}`;
+        const item = document.createElement("div");
+        // 清爽紧凑的列表项，绝不折行
+        item.className = "px-4 py-2.5 text-xs font-mono font-bold text-slate-300 hover:bg-blue-600 hover:text-white cursor-pointer transition-colors block w-full text-left truncate";
+        item.innerHTML = `<span class="text-blue-400 mr-1 opacity-70">@</span>${dept.name}`;
         item.onmousedown = (e) => {
-            e.preventDefault(); // 防止输入框失去焦点
+            e.preventDefault(); // 关键：防止点击菜单时输入框失去焦点
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
     });
 
-    // 必须先让他显示出来，浏览器才能计算出它的真实高度
-    dropEl.style.display = "flex";
+    dropEl.style.display = "block";
 
-    // 👑 物理级定位：计算输入框的精确屏幕坐标，将菜单悬浮钉在它头顶！
-    const rect = cmdBox.getBoundingClientRect();
-    dropEl.style.left = `${rect.left}px`;
-    dropEl.style.top = `${rect.top - dropEl.offsetHeight - 8}px`; // 减去自身高度和 8px 间距
+    // 👑 降维打击：通过原生 Selection 获取光标此刻打字的真实物理坐标
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0).cloneRange();
+        const rect = range.getBoundingClientRect();
+        // 悬浮在光标正下方
+        if (rect.left > 0 && rect.bottom > 0) {
+            dropEl.style.left = `${rect.left}px`;
+            dropEl.style.top = `${rect.bottom + 8}px`;
+        }
+    }
 };
 
 window.hideMentionDropdown = function() {
@@ -1070,35 +1072,45 @@ window.selectMentionDept = function(deptName) {
     const cmdBox = document.getElementById("cmd");
     if (!cmdBox) return;
 
-    if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-        const text = cmdBox.value;
-        const start = cmdBox.selectionStart;
-        const before = text.substring(0, start);
-        const after = text.substring(start);
-        const lastAt = before.lastIndexOf('@');
-        if (lastAt !== -1) {
-            cmdBox.value = before.substring(0, lastAt) + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = lastAt + deptName.length + 2;
-        }
-        cmdBox.focus();
-    } else {
-        const text = cmdBox.innerText || "";
-        const lastAt = text.lastIndexOf('@');
-        if (lastAt !== -1) {
-            const before = text.slice(0, lastAt);
-            cmdBox.innerHTML = before + `<span class="dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1" contenteditable="false" data-dept="${deptName}">@${deptName}</span>&nbsp;`;
-            
-            cmdBox.focus();
-            if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
-                const range = document.createRange();
-                range.selectNodeContents(cmdBox);
-                range.collapse(false);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
+    cmdBox.focus();
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+
+    // 👑 核心修复：绝对不碰 innerHTML，直接操作底层的 TextNode！前面的 @模块 绝不会被覆盖失效！
+    const node = range.startContainer;
+    if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        const endOffset = range.startOffset;
+        const startOffset = text.lastIndexOf('@', endOffset);
+
+        if (startOffset !== -1) {
+            // 框选刚刚输入的 @xxx 字符并删除
+            range.setStart(node, startOffset);
+            range.setEnd(node, endOffset);
+            range.deleteContents();
         }
     }
+
+    // 创建不可编辑的部门精美胶囊
+    const tokenSpan = document.createElement("span");
+    tokenSpan.className = "inline-block bg-blue-500/20 text-blue-400 border border-blue-500/40 px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 align-baseline select-none shadow-sm";
+    tokenSpan.contentEditable = "false";
+    tokenSpan.setAttribute("data-dept", deptName);
+    tokenSpan.innerText = `@${deptName}`;
+
+    // 像手术刀一样直接插入 DOM 树
+    range.insertNode(tokenSpan);
+
+    // 尾部插入一个打字空格，方便你继续流畅打字
+    const spaceNode = document.createTextNode("\u00A0"); 
+    tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
+
+    // 把光标移动到空格后面，继续待命
+    range.setStartAfter(spaceNode);
+    range.setEndAfter(spaceNode);
+    sel.removeAllRanges();
+    sel.addRange(range);
     
     hideMentionDropdown();
     appendLog(`🎯 追加指令 @${deptName}`);
@@ -1114,32 +1126,27 @@ window.inspectDept = function(deptName, btnEl) {
     const cmdBox = document.getElementById("cmd");
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
-        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-            const start = cmdBox.selectionStart;
-            const text = cmdBox.value;
-            const before = text.substring(0, start);
-            const after = text.substring(start);
-            cmdBox.value = before + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
-        } else {
-            const tokenSpan = document.createElement("span");
-            tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
-            tokenSpan.contentEditable = "false";
-            tokenSpan.setAttribute("data-dept", deptName);
-            tokenSpan.innerText = `@${deptName}`;
+        
+        const tokenSpan = document.createElement("span");
+        tokenSpan.className = "inline-block bg-blue-500/20 text-blue-400 border border-blue-500/40 px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 align-baseline select-none shadow-sm";
+        tokenSpan.contentEditable = "false";
+        tokenSpan.setAttribute("data-dept", deptName);
+        tokenSpan.innerText = `@${deptName}`;
 
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+            const range = sel.getRangeAt(0);
+            range.collapse(false);
+            range.insertNode(tokenSpan);
+            const space = document.createTextNode("\u00A0");
+            tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
+            range.setStartAfter(space);
+            range.setEndAfter(space);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else {
             cmdBox.appendChild(tokenSpan);
-            cmdBox.appendChild(document.createTextNode(" "));
-            cmdBox.scrollTop = cmdBox.scrollHeight;
-            
-            if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
-                const range = document.createRange();
-                range.selectNodeContents(cmdBox);
-                range.collapse(false);
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
+            cmdBox.appendChild(document.createTextNode("\u00A0"));
         }
         appendLog(`🎯 追加指令 @${deptName}`);
     } else {
@@ -1185,23 +1192,27 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
+        // 👑 实时侦听当前光标所在的文本节点
         const checkMention = function() {
             if (!cmdBox) return;
-            let text = "";
-            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-                text = cmdBox.value.substring(0, cmdBox.selectionStart);
-            } else {
-                const sel = window.getSelection();
-                if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                    text = (sel.anchorNode.textContent || "").substring(0, sel.anchorOffset);
-                } else {
-                    text = cmdBox.innerText || "";
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) {
+                hideMentionDropdown();
+                return;
+            }
+
+            const node = sel.focusNode;
+            // 确保光标真的在当前富文本框里的某个文字上
+            if (node && node.nodeType === Node.TEXT_NODE && cmdBox.contains(node)) {
+                // 截取光标之前的文字
+                const text = node.textContent.substring(0, sel.focusOffset).replace(/\u00A0/g, " ");
+                const match = text.match(/@([^\s@]*)$/);
+                if (match) {
+                    showMentionDropdown(match[1]);
+                    return;
                 }
             }
-            text = text.replace(/\u00A0/g, " ");
-            const match = text.match(/@([^\s@]*)$/);
-            if (match) showMentionDropdown(match[1]);
-            else hideMentionDropdown();
+            hideMentionDropdown();
         };
 
         cmdBox.addEventListener("input", checkMention);
