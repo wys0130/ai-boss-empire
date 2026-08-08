@@ -1,6 +1,6 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 降维打击版：物理坐标强制定位 @ 菜单，绝对无视任何 CSS 遮挡，100% 必出！
+ * 1. 👑 降维打击版：正常文档流插入 @ 菜单，强制排开文字，杜绝滚动条和截断死坑，100% 必出！
  * 2. 👑 满血保留：商品图库、WebP 转换、汇率中台、进度书等所有资产一行未删。
  */
 
@@ -436,7 +436,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 作品审核与定价表 
+// 6. 作品审核与定价表
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -510,7 +510,7 @@ window.uploadProductThumb = function(index) {
     const item = AUDIT_PRODUCTS[index];
     ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
         renderAuditTable();
-        if (typeof appendLog === "function") appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
+        appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
     });
 };
 
@@ -1017,17 +1017,19 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 降维打击版：智能中枢 @ 调令菜单
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (绝杀：直接置于文档流！)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
+    const cmdBox = document.getElementById("cmd");
+    if (!cmdBox) return;
+
     if (!dropEl) {
-        // 👑 降维打击 1：绝对脱离原 DOM 树，挂载到 body 顶层，无视任何父级 overflow:hidden 遮挡！
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
-        // 强制使用 fixed，脱离所有相对定位的父级魔咒
-        dropEl.className = "fixed z-[99999] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1.5 space-y-1 w-48 max-h-48 overflow-y-auto";
-        document.body.appendChild(dropEl);
+        // 👑 绝杀：不再使用绝对定位导致被隐藏，直接置入正常文档流！
+        dropEl.className = "flex flex-wrap gap-2 mb-3 p-2 bg-slate-900 border border-slate-700 rounded-xl w-full shadow-lg";
+        cmdBox.parentNode.insertBefore(dropEl, cmdBox);
     }
 
     const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
@@ -1038,25 +1040,16 @@ window.showMentionDropdown = function(query) {
     
     dropEl.innerHTML = "";
     matches.forEach(dept => {
-        const item = document.createElement("div");
-        item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between text-slate-200";
-        item.innerHTML = `<span>@${dept.name}</span><span class="text-[10px] opacity-60">选择</span>`;
+        const item = document.createElement("button");
+        item.className = "px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold transition shadow-md shadow-blue-900/50";
+        item.innerHTML = `@${dept.name}`;
         item.onmousedown = (e) => {
             e.preventDefault(); 
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
     });
-
-    // 👑 降维打击 2：物理坐标级强制精确定位
-    dropEl.style.display = "block";
-    const cmdBox = document.getElementById("cmd");
-    if (cmdBox) {
-        const rect = cmdBox.getBoundingClientRect();
-        dropEl.style.left = rect.left + "px";
-        // 悬浮在输入框正上方 5px 的位置，不受任何内外边距影响
-        dropEl.style.top = (rect.top - dropEl.offsetHeight - 5) + "px"; 
-    }
+    dropEl.style.display = "flex";
 };
 
 window.hideMentionDropdown = function() {
@@ -1064,28 +1057,28 @@ window.hideMentionDropdown = function() {
     if (dropEl) dropEl.style.display = "none";
 };
 
-// 👑 兼容所有标签类型的富文本截取
 window.selectMentionDept = function(deptName) {
     const cmdBox = document.getElementById("cmd");
     if (!cmdBox) return;
 
-    if (cmdBox.value !== undefined) {
-        // 对于 input / textarea
+    if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
         const text = cmdBox.value;
-        const lastAt = text.lastIndexOf('@');
+        const start = cmdBox.selectionStart;
+        const before = text.substring(0, start);
+        const after = text.substring(start);
+        const lastAt = before.lastIndexOf('@');
         if (lastAt !== -1) {
-            cmdBox.value = text.slice(0, lastAt) + "@" + deptName + " ";
+            cmdBox.value = before.substring(0, lastAt) + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = lastAt + deptName.length + 2;
         }
         cmdBox.focus();
     } else {
-        // 对于 contenteditable div
         const text = cmdBox.innerText || "";
         const lastAt = text.lastIndexOf('@');
         if (lastAt !== -1) {
             const before = text.slice(0, lastAt);
             cmdBox.innerHTML = before + `<span class="dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1" contenteditable="false" data-dept="${deptName}">@${deptName}</span>&nbsp;`;
             
-            // 强制把光标移到最后
             cmdBox.focus();
             if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
                 const range = document.createRange();
@@ -1112,9 +1105,13 @@ window.inspectDept = function(deptName, btnEl) {
     const cmdBox = document.getElementById("cmd");
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
-        if (cmdBox.value !== undefined) {
+        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+            const start = cmdBox.selectionStart;
             const text = cmdBox.value;
-            cmdBox.value = text + "@" + deptName + " ";
+            const before = text.substring(0, start);
+            const after = text.substring(start);
+            cmdBox.value = before + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
         } else {
             const tokenSpan = document.createElement("span");
             tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
@@ -1139,6 +1136,7 @@ window.inspectDept = function(deptName, btnEl) {
     } else {
         appendLog(`🔍 视图切换 -> [${deptName}] (未聚焦文本框，不追加词条)`);
     }
+
     loadHistoryFromMemory();
 };
 
@@ -1155,7 +1153,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 11. 👑 启动函数与全功能加载
+// 11. 👑 启动引擎与物理按键绑定中心
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1178,21 +1176,23 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
-        // 👑 彻底改用键盘松开和鼠标抬起事件，无视任何输入法，物理暴力抽字
         const checkMention = function() {
             if (!cmdBox) return;
-            const text = cmdBox.value !== undefined ? cmdBox.value : cmdBox.innerText;
-            const cleanText = (text || "").replace(/\u00A0/g, " ").replace(/\n/g, " ");
-            
-            const lastAt = cleanText.lastIndexOf('@');
-            if (lastAt !== -1) {
-                const afterAt = cleanText.substring(lastAt + 1);
-                if (!/\s/.test(afterAt)) { 
-                    showMentionDropdown(afterAt);
-                    return;
+            let text = "";
+            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+                text = cmdBox.value.substring(0, cmdBox.selectionStart);
+            } else {
+                const sel = window.getSelection();
+                if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+                    text = (sel.anchorNode.textContent || "").substring(0, sel.anchorOffset);
+                } else {
+                    text = cmdBox.innerText || "";
                 }
             }
-            hideMentionDropdown();
+            text = text.replace(/\u00A0/g, " ");
+            const match = text.match(/@([^\s@]*)$/);
+            if (match) showMentionDropdown(match[1]);
+            else hideMentionDropdown();
         };
 
         cmdBox.addEventListener("input", checkMention);
