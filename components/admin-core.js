@@ -1198,27 +1198,18 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
-        // 👑 完美修复 @ 呼出 Bug：兼容 textarea / input 与 contenteditable
-        cmdBox.addEventListener("input", function() {
-            let text = "";
-            if (typeof this.selectionStart === "number") {
-                // 如果是输入框或文本域
-                text = this.value.substring(0, this.selectionStart);
-            } else {
-                // 如果是富文本 div
-                const sel = window.getSelection();
-                if (sel.rangeCount > 0) {
-                    text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
-                } else {
-                    text = this.innerText;
-                }
-            }
-            // 匹配末尾的 @ 呼出菜单
-            const match = text.match(/@([^\s@]*)$/);
+        // 👑 彻底改用键盘松开和鼠标抬起事件，精准抓取纯文本，100% 触发 @ 菜单
+        const checkMention = function() {
+            if (!cmdBox) return;
+            const text = cmdBox.innerText || "";
+            const match = text.trim().match(/@([^\s@]*)$/);
             if (match) showMentionDropdown(match[1]);
             else hideMentionDropdown();
-        });
-        
+        };
+
+        cmdBox.addEventListener("keyup", checkMention);
+        cmdBox.addEventListener("mouseup", checkMention);
+
         cmdBox.addEventListener("keydown", function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
@@ -1234,17 +1225,6 @@ function initAdminEngine() {
         renderManifestTasks();
     }
 }
-
-if (document.readyState === "loading") {
-    window.addEventListener("DOMContentLoaded", initAdminEngine);
-} else {
-    initAdminEngine();
-}
-
-window.syncAllData = function() {
-    loadTasksManifest();
-    loadHistoryFromMemory();
-};
 
 function initApexTooltip() {
     const tooltip = document.getElementById("apexTooltip");
