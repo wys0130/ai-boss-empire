@@ -1,0 +1,26 @@
+[
+  {
+    "id": "U-1001",
+    "email": "wys0130@apexwork.cn",
+    "role": "企业高级合伙人 [ADMIN]",
+    "verified": true,
+    "date": "2026-06-12",
+    "status": true
+  },
+  {
+    "id": "U-1002",
+    "email": "founder@invest-tech.com",
+    "role": "商业三件套终身版 [CLIENT]",
+    "verified": true,
+    "date": "2026-07-03",
+    "status": true
+  },
+  {
+    "id": "U-1003",
+    "email": "product_pm@saas-growth.org",
+    "role": "PPT 战略套件订阅 [CLIENT]",
+    "verified": false,
+    "date": "2026-08-01",
+    "status": true
+  }
+]
