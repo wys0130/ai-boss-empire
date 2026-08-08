@@ -1,10 +1,9 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 彻底解决 @ 功能：采用最底层 Range.insertNode 节点无损操作，100% 保护历史标签！
- * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
- * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
- * 4. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
- * 5. 👑 终极修复快照回溯：注入 SHA 指纹比对算法，跳过无改动文件，彻底消灭 GitHub 422 报错！
+ * 1. 👑 修复防挤压排版：恢复 @ 功能的底层无损插入，表格允许换行。
+ * 2. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
+ * 3. 👑 终极 Git 引擎重构：引入 Tree API 原子级时空跃迁还原！秒级覆盖，不产垃圾记录，完美保留上一版本！
+ * 4. 👑 修复代码快照打标：强制刺穿 API 缓存，打标后秒刷新。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -311,6 +310,7 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
+            // 👑 修复：防挤压设计。允许超长邮箱换行 (break-all whitespace-normal)，按钮精简 (px-2 py-1) 且加入 flex-wrap 自动折行
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <td class="py-2 px-2 w-1/3 min-w-[160px] break-all whitespace-normal">
@@ -319,9 +319,9 @@ window.ApexUserManager = {
                     </td>
                     <td class="py-2 px-2 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
                     <td class="py-2 px-2 font-mono text-xs whitespace-nowrap">${verifyText}</td>
-                    <td class="py-2 px-2 font-mono text-slate-400 text-xs whitespace-nowrap">${user.date}</td>
-                    <td class="py-2 px-2 text-right whitespace-nowrap">
-                        <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap w-[150px]">
+                    <td class="py-2 px-2 font-mono text-slate-400 text-xs whitespace-nowrap hidden lg:table-cell">${user.date}</td>
+                    <td class="py-2 px-2 text-right whitespace-normal">
+                        <div class="inline-flex items-center justify-end gap-1 flex-wrap w-[130px]">
                             <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2 py-1 rounded text-[10px] font-bold transition ${statusBtnCls}">
                                 ${user.status ? '封禁' : '解封'}
                             </button>
@@ -532,15 +532,16 @@ window.renderAuditTable = function() {
             : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
+        // 👑 修复：防挤压表格样式，允许文字自然换行，按钮加入 flex-wrap
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                <td class="py-2 px-2 w-16 whitespace-nowrap">
-                    <div class="relative group w-12 h-16">
+                <td class="py-2 px-2 w-16 whitespace-nowrap text-center">
+                    <div class="relative group w-12 h-16 mx-auto">
                         <img src="${finalThumbUrl}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
                         <button onclick="uploadProductThumb(${index})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold">📤 WebP</button>
                     </div>
                 </td>
-                <td class="py-2 px-2 min-w-[150px] whitespace-normal">
+                <td class="py-2 px-3 min-w-[150px] whitespace-normal break-words">
                     <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${item.title}</div>
                     <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
@@ -562,9 +563,11 @@ window.renderAuditTable = function() {
                         <span>${item.status ? '已上架' : '已隐藏'}</span>
                     </button>
                 </td>
-                <td class="py-2 px-2 text-right whitespace-nowrap">
-                    <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition ml-1">销毁</button>
+                <td class="py-2 px-2 text-right whitespace-normal">
+                    <div class="inline-flex justify-end gap-1 w-[120px] flex-wrap">
+                        <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
+                        <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition">销毁</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -1404,7 +1407,7 @@ async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
 window.openRollbackModal = function() {
     const el = document.getElementById("rollbackModal");
     if (el) el.classList.remove("hidden");
-    fetchCommitHistory();
+    fetchCommitHistory(true);
 };
 
 window.closeRollbackModal = function() {
@@ -1412,11 +1415,11 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
-// 👑 修复：防报错机制。即便没有填 DeepSeek 密钥，只要有 GitHub Token，也能拉取备份代码记录！
-async function fetchCommitHistory() {
+// 👑 修复：防报错机制，扩大拉取条数到 30 条，并识别我们自定义的标签。强制破除 API 缓存。
+window.fetchCommitHistory = async function(forceRefresh = false) {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
-    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono">获取发布快照中...</div>`;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono animate-pulse">获取发布快照中...</div>`;
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
     if (!ghToken) {
@@ -1425,26 +1428,35 @@ async function fetchCommitHistory() {
     }
 
     try {
-        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${ghToken}` } });
+        const ts = forceRefresh ? `&_t=${Date.now()}` : '';
+        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
         if (!res.ok) {
             container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无权访问或仓库错误。<br>请确认仓库地址为 GitHub（不支持Gitee），且 Token 有效。</div>`;
             return;
         }
         const commits = await res.json();
         container.innerHTML = "";
+        
         commits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
+            
+            const isTag = item.commit.message.includes("代码标记:");
+            const isRollback = item.commit.message.includes("代码时空回溯");
+            let bgCls = "bg-slate-50 dark:bg-slate-900/50";
+            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800";
+            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800";
+
             container.innerHTML += `
-                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input bg-slate-50 dark:bg-slate-900/50 mb-2">
+                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input ${bgCls} mb-2 transition hover:shadow-md">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
                         </div>
-                        <div class="text-xs font-mono truncate text-slate-800 dark:text-slate-300">${item.commit.message}</div>
+                        <div class="text-xs font-mono truncate ${isTag || isRollback ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-800 dark:text-slate-300'}">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
@@ -1455,9 +1467,9 @@ async function fetchCommitHistory() {
     }
 }
 
-// 👑 终极修复快照回溯：加入 currentSha 防止 GitHub 写入 409 冲突，增加反馈弹窗并重载
+// 👑 终极架构级更新：单极原子回退算法（Git Tree Pointer Reversal）
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 危险！此操作将覆盖云端源码，确定回退到快照 [#${shortSha}] 吗？`)) return;
+    if (!confirm(`⏳ 确定将全站代码一键回退到快照 [#${shortSha}] 吗？\n\n注意：当前状态将被自动保存为上一级记录，绝对不会丢失！`)) return;
     window.closeRollbackModal();
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
@@ -1466,56 +1478,58 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         return; 
     }
 
+    const overlay = document.getElementById("restoreProgressOverlay");
+    const bar = document.getElementById("restoreProgressBar");
+    const text = document.getElementById("restoreProgressText");
+
     try {
-        alert(`⏳ 开始回溯全站代码至快照 [#${shortSha}] ...\n由于涉及多个底层文件覆盖，预计需要 10-20 秒，请勿关闭或刷新页面！`);
-        
-        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!treeRes.ok) throw new Error("无法读取目标快照的文件树结构");
-        
-        const treeData = await treeRes.json();
-        const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
-        
-        let successCount = 0;
-        let skipCount = 0;
-        appendLog(`⏳ 开始逐一回溯源码至快照 #${shortSha}...`);
-        
-        for (const fileObj of filesToRestore) {
-            
-            // 👑 获取线上文件的现存 SHA，防止 409 写入冲突
-            let currentSha = null;
-            try {
-                const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, { headers: { "Authorization": `token ${ghToken}` } });
-                if(curFileRes.ok) {
-                    currentSha = (await curFileRes.json()).sha;
-                }
-            } catch(e){}
+        if (overlay) overlay.classList.remove("hidden");
+        if (text) text.innerText = `[1/4] 正在抓取系统当前状态...`;
+        if (bar) bar.style.width = "25%";
 
-            // 如果线上文件的 sha 和目标旧版本的 sha 完全一致，代表文件没发生过更改，直接跳过！
-            if (currentSha === fileObj.sha) {
-                skipCount++;
-                continue;
-            }
+        const refRes = await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!refRes.ok) throw new Error("无法读取主分支信息");
+        const currentCommitSha = (await refRes.json()).object.sha;
 
-            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
-            const fileJson = await fileContentRes.json();
+        if (text) text.innerText = `[2/4] 正在提取目标快照 [#${shortSha}] 的底层蓝图...`;
+        if (bar) bar.style.width = "50%";
 
-            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
-                method: "PUT",
-                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path}) [skip ci]`, 
-                    content: fileJson.content, 
-                    ...(currentSha && {sha: currentSha}) 
-                })
-            });
-            
-            if (updateRes.ok) successCount++;
-        }
-        
-        alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！\n📊 报告：修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将强制重载以应用旧版代码...`);
-        location.reload();
+        const targetCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits/${targetSha}`, { headers: { "Authorization": `token ${ghToken}` } });
+        const targetTreeSha = (await targetCommitRes.json()).tree.sha;
+
+        if (text) text.innerText = `[3/4] 正在生成全新的时空回溯节点...`;
+        if (bar) bar.style.width = "75%";
+
+        const newCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits`, {
+            method: "POST",
+            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: `⏪ 代码时空回溯：还原至快照 [#${shortSha}] [skip ci]`,
+                tree: targetTreeSha,
+                parents: [currentCommitSha]
+            })
+        });
+        const newCommitSha = (await newCommitRes.json()).sha;
+
+        if (text) text.innerText = `[4/4] 正在强制刷新云端大盘代码...`;
+        if (bar) bar.style.width = "90%";
+
+        await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, {
+            method: "PATCH",
+            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ sha: newCommitSha, force: true })
+        });
+
+        if (bar) bar.style.width = "100%";
+        if (text) text.innerText = `🎉 还原大功告成！正在重载系统...`;
+
+        setTimeout(() => {
+            alert(`✅ 已成功通过时空跃迁将代码还原至 [#${shortSha}]！\n\n💡 你的上一个版本安全地躺在这个还原记录的正下方，随时可以再次找回。`);
+            location.reload();
+        }, 800);
         
     } catch(err) { 
+        if (overlay) overlay.classList.add("hidden");
         alert("❌ 还原异常: " + err.message);
         appendLog("❌ 还原异常: " + err.message, "text-rose-500"); 
     }
