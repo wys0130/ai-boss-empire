@@ -41,7 +41,6 @@
 </head>
 <body class="bg-slate-50 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 min-h-screen flex items-start selection:bg-blue-500/30">
 
-    <!-- 侧边栏 -->
     <aside class="w-64 bg-white dark:bg-[#0f172a] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 z-40 sticky top-0 h-screen shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-colors duration-300">
         <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50 group cursor-pointer shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击更换企业 LOGO">
             <div class="flex items-center gap-2.5">
@@ -75,12 +74,15 @@
             <button onclick="window.openLiveSiteForceBypass()" class="w-full bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-200 text-xs font-bold py-2.5 rounded-lg transition shadow flex items-center justify-center gap-2">
                 🏠 返回前台商城 <span>→</span>
             </button>
+            <div class="flex justify-between items-center mt-3 text-[10px] font-mono text-slate-500">
+                <span>状态: <span class="text-emerald-500 font-bold">NORMAL</span></span>
+                <span>V2026.08</span>
+            </div>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col min-w-0 relative transition-colors duration-300 min-h-screen">
         
-        <!-- 👑 修复：顶部 Header 引入 flex-wrap，宽度不够时按钮自动折行，绝不把下方表格挤死 -->
         <header class="h-auto min-h-[64px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-6 py-3 flex flex-wrap items-center justify-between gap-4 shrink-0 shadow-sm sticky top-0 z-30 transition-colors duration-300">
             <div class="flex items-center gap-3">
                 <h2 id="pageHeaderTitle" class="text-base font-black text-slate-800 dark:text-slate-100 tracking-tight">业务控制台 / 作品风控审查与上架</h2>
@@ -99,12 +101,10 @@
                     <span>🌙 极夜</span>
                 </button>
 
-                <!-- 👑 已解除隐藏，并正确重命名 -->
                 <button onclick="openRollbackModal()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-1.5">
                     ⏳ 代码备份
                 </button>
                 
-                <!-- 👑 正确重命名 -->
                 <button onclick="ApexVault.open()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition shadow-md shadow-indigo-500/30 flex items-center gap-1.5">
                     🗄️ 数据备份
                 </button>
@@ -125,16 +125,17 @@
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">编辑价格与上架状态，支持每一行的【🔗 联动 / 🔓 独立】状态快速切换</p>
                         </div>
                     </div>
-                    <!-- 👑 修复：彻底移除了 min-w 霸王条款，取消了横向滚动，让表格纯净自适应 -->
+                    
+                    <!-- 👑 修复：彻底移除了 min-w 霸王条款，取消了横向滚动，表格纯净自适应 -->
                     <div class="w-full pb-4">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full text-left border-collapse table-auto w-full">
                             <thead>
                                 <tr class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                    <th class="py-3 px-2 w-16 whitespace-nowrap text-center">缩略图</th>
+                                    <th class="py-3 px-2 w-16 text-center">缩略图</th>
                                     <th class="py-3 px-3">作品名 / 分类</th>
-                                    <th class="py-3 px-2 whitespace-nowrap">商用授权价</th>
-                                    <th class="py-3 px-2 w-20 whitespace-nowrap text-center">状态</th>
-                                    <th class="py-3 px-2 text-right whitespace-nowrap">管理操作</th>
+                                    <th class="py-3 px-2">商用授权价</th>
+                                    <th class="py-3 px-2 w-20 text-center">状态</th>
+                                    <th class="py-3 px-2 text-right">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody id="auditTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
@@ -348,6 +349,7 @@
                 </div>
             </section>
 
+            <!-- 模块 5：用户与权限管理中心 -->
             <section id="tab-users" class="hidden max-w-6xl mx-auto space-y-6">
                 <div class="bg-gradient-to-r from-blue-900 to-slate-900 border border-blue-500/30 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -400,7 +402,7 @@
                         </button>
                     </div>
 
-                    <!-- 👑 修复：防挤压表格，让内容舒展自如 -->
+                    <!-- 👑 修复：解除霸王条款定宽，允许内部换行，右侧按钮 flex-wrap 防挤压 -->
                     <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col overflow-hidden">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">终端客户清单</h3>
@@ -414,11 +416,11 @@
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                        <th class="py-2.5 px-2 w-1/3 whitespace-nowrap">邮箱主体 / 终端 ID</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap">商用角色</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap">核验状态</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap">注册日期</th>
-                                        <th class="py-2.5 px-2 text-right whitespace-nowrap">安全操作</th>
+                                        <th class="py-2.5 px-2 w-1/3">邮箱主体 / ID</th>
+                                        <th class="py-2.5 px-2 w-1/4">商用角色</th>
+                                        <th class="py-2.5 px-2 w-16">核验状态</th>
+                                        <th class="py-2.5 px-2 w-20 hidden sm:table-cell">注册日期</th>
+                                        <th class="py-2.5 px-2 text-right">安全操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-800 dark:text-slate-200">
@@ -470,17 +472,17 @@
         </div>
     </div>
 
-    <!-- 👑 数据备份 (原独立金库) -->
+    <!-- 🗄️ 数据备份 (原独立金库) -->
     <div id="vaultModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-3xl w-full rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col relative animate-[fadeIn_0.2s_ease-out] max-h-[85vh]">
             <button onclick="ApexVault.close()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold transition">✕</button>
             <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">🗄️ 数据备份 (Data Vault)</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">
-                双端同步（GitHub + Gitee）的企业级数据档案管家。支持多槽位存档、覆盖与回档。
+                备份或恢复全站所有：商品列表、价格、用户清单、轮播图等【数据配置】。
             </p>
 
             <div class="flex gap-3 mb-5">
-                <input id="newSaveName" type="text" placeholder="输入自定义存档备注（如：双11大促定价备份）" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500 transition shadow-inner">
+                <input id="newSaveName" type="text" placeholder="输入自定义存档备注（如：大促降价备份）" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500 transition shadow-inner">
                 <button onclick="ApexVault.createSave()" class="shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-[0_4px_15px_rgba(79,70,229,0.3)] flex items-center gap-1.5 whitespace-nowrap">
                     ➕ 新建存档
                 </button>
@@ -491,25 +493,45 @@
             </div>
 
             <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 p-2.5 rounded-lg leading-relaxed font-mono shrink-0">
-                ⚠️ 注意：金库双写机制强依赖【密钥设置】中的 Gitee Token 和 Repo 路径，未配置 Gitee 将仅作单节点备份。
+                ⚠️ 注意：此操作依赖【密钥设置】中的 Gitee Token 和 Repo 路径进行双节点备份。
             </div>
         </div>
     </div>
 
-    <!-- 👑 代码备份 (原历史快照) -->
+    <!-- 👑 修复：代码备份，加入创建快照按钮与直白说明 -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 shrink-0">
                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">⏳ 代码备份 (Code Snapshot)</h3>
                 <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold">✕</button>
             </div>
-            <!-- 👑 新增直白的原理说明 -->
+            
             <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 p-2.5 rounded-lg leading-relaxed shrink-0">
-                <strong>⚠️ 仅用于恢复 HTML/JS 源码崩盘。</strong><br>
-                此列表为 GitHub 系统自动生成的底层操作快照（不可手动修改）。如需手动写备注存档，请使用顶部的【🗄️ 数据备份】。
+                <strong>⚠️ 核心原理说明：</strong><br>
+                此列表是你在 GitHub 的底层提交记录（就像系统的黑匣子）。每次“还原”其实是把旧代码作为一份新记录盖在上面，你的历史**永远不会丢失**。
             </div>
+            
+            <!-- 👑 修复：加入手工打标签创建代码快照功能 -->
+            <div class="flex gap-2 mb-4 shrink-0">
+                <input id="customSnapshotName" type="text" placeholder="为当前代码打个标记 (例如: 上线前稳定版)" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition shadow-inner">
+                <button onclick="createCodeSnapshot()" class="shrink-0 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm border border-slate-700 whitespace-nowrap">
+                    💾 打标记
+                </button>
+            </div>
+
             <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2">
             </div>
+        </div>
+    </div>
+
+    <!-- 👑 修复：加入可视化的全局还原进度条覆盖层 -->
+    <div id="restoreProgressOverlay" class="hidden fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6">
+        <div class="w-full max-w-md">
+            <h3 id="restoreProgressText" class="text-white text-sm font-bold mb-4 text-center font-mono animate-pulse">正在比对底层文件 SHA 码...</h3>
+            <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div id="restoreProgressBar" class="h-full bg-blue-500 w-0 transition-all duration-300 ease-out"></div>
+            </div>
+            <p class="text-slate-400 text-[10px] text-center mt-3 font-mono">请勿关闭或刷新浏览器窗口</p>
         </div>
     </div>
 
@@ -605,7 +627,6 @@
                         } catch(e) {}
                     }
                     
-                    // Fallback to Gitee
                     if (!vaultData) {
                         const gToken = localStorage.getItem("APEX_GITEE_TOKEN");
                         const gRepo = localStorage.getItem("APEX_GITEE_REPO");
@@ -646,7 +667,6 @@
                 listEl.innerHTML = "";
                 const sortedSaves = [...this.saves].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
-                // 👑 修复：将暗淡色按钮全部替换为鲜艳的实体色
                 sortedSaves.forEach(save => {
                     const timeStr = new Date(save.timestamp).toLocaleString('zh-CN', { hour12: false });
                     listEl.innerHTML += `
