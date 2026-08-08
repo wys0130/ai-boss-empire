@@ -101,12 +101,10 @@
                     <span>🌙 极夜模式</span>
                 </button>
 
-                <!-- 👑 修复 1：去除 hidden，重命名为 代码备份，随时可用 -->
                 <button onclick="openRollbackModal()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-1.5">
                     ⏳ 代码备份
                 </button>
                 
-                <!-- 👑 修复 1：重命名为 数据备份 -->
                 <button onclick="ApexVault.open()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition shadow-md shadow-indigo-500/30 flex items-center gap-1.5">
                     🗄️ 数据备份
                 </button>
@@ -127,16 +125,16 @@
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">编辑价格与上架状态，支持每一行的【🔗 联动 / 🔓 独立】状态快速切换</p>
                         </div>
                     </div>
-                    <!-- 👑 修复 3：移除霸王条款 min-w-[900px]，让表格自适应，保证右侧按钮永远能被看到 -->
-                    <div class="overflow-x-auto w-full pb-4 custom-scroll">
+                    <!-- 👑 修复：解除了定宽霸王条款，取消了横向滚动，让内容在一眼内看全 -->
+                    <div class="w-full pb-4">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                    <th class="py-3 px-4 w-20 whitespace-nowrap">缩略图</th>
-                                    <th class="py-3 px-4">作品名 / 分类</th>
-                                    <th class="py-3 px-4 whitespace-nowrap">商用授权价 (RMB / USD)</th>
-                                    <th class="py-3 px-4 w-24 whitespace-nowrap">状态</th>
-                                    <th class="py-3 px-4 text-right whitespace-nowrap">管理操作</th>
+                                    <th class="py-3 px-2 w-16 whitespace-nowrap text-center">缩略图</th>
+                                    <th class="py-3 px-3">作品名 / 分类</th>
+                                    <th class="py-3 px-2 whitespace-nowrap">商用授权价</th>
+                                    <th class="py-3 px-2 w-20 whitespace-nowrap text-center">状态</th>
+                                    <th class="py-3 px-2 text-right whitespace-nowrap">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody id="auditTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
@@ -174,7 +172,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一图解包</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一图解授权包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-ppt" type="number" onchange="ApexPricing.onRMBChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-ppt" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
@@ -182,7 +180,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一模型包</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一模型授权包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-excel" type="number" onchange="ApexPricing.onRMBChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-excel" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
@@ -190,7 +188,7 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一报告包</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一报告授权包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-word" type="number" onchange="ApexPricing.onRMBChange('word', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-word" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
@@ -208,35 +206,32 @@
                         <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
                             <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2"><span class="text-blue-500">02.</span> 首页巨幕轮播管理</h3>
                         </div>
-                        
                         <div class="space-y-6 flex-1 overflow-y-auto custom-scroll pr-2">
                             <div class="bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 pb-2">
                                     <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">#01 PRIMARY SLIDE</span>
-                                    <button onclick="ApexBannerManager.uploadBannerImg(0)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传展示底图</button>
+                                    <button onclick="ApexBannerManager.uploadBannerImg(0)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传图片</button>
                                 </div>
                                 <input id="banner-tag-0" type="text" placeholder="左上角小标签" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-title-0" type="text" placeholder="巨幕主标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500">
-                                <input id="banner-desc-0" type="text" placeholder="巨幕副标题介绍" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
+                                <input id="banner-desc-0" type="text" placeholder="巨幕副标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-img-0" type="text" placeholder="背景图 CDN 链接" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
                                 <input id="banner-bg-0" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
                             </div>
-
                             <div class="bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 pb-2">
                                     <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">#02 SECONDARY SLIDE</span>
-                                    <button onclick="ApexBannerManager.uploadBannerImg(1)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传展示底图</button>
+                                    <button onclick="ApexBannerManager.uploadBannerImg(1)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传图片</button>
                                 </div>
                                 <input id="banner-tag-1" type="text" placeholder="左上角小标签" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-title-1" type="text" placeholder="巨幕主标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500">
-                                <input id="banner-desc-1" type="text" placeholder="巨幕副标题介绍" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
+                                <input id="banner-desc-1" type="text" placeholder="巨幕副标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-img-1" type="text" placeholder="背景图 CDN 链接" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
                                 <input id="banner-bg-1" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
                             </div>
                         </div>
-
                         <button onclick="ApexBannerManager.saveBannerConfig()" class="mt-5 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.4)] transition">
-                            🖼️ 编译轮播图元数据并同步
+                            🖼️ 编译轮播图同步
                         </button>
                     </div>
                 </div>
@@ -246,8 +241,7 @@
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 border-b border-slate-200 dark:border-slate-800 pb-5 gap-4">
                         <div>
-                            <h3 class="text-lg font-black text-slate-900 dark:text-white">阶段开发进度书 / TASKS MANIFEST</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">研发与多语言市场投放清单</p>
+                            <h3 class="text-lg font-black text-slate-900 dark:text-white">阶段开发进度书</h3>
                         </div>
                         <div class="flex items-center gap-3 flex-wrap">
                             <button onclick="resetManifestToDefault()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition border border-rose-500/20 shadow-sm flex items-center gap-1.5">
@@ -256,9 +250,9 @@
                             <span id="manifestSummaryBadge" class="text-xs font-mono font-bold px-3 py-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-500/20">完成度: 0/0</span>
                             <div class="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
                                 <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm whitespace-nowrap">全部</button>
-                                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition whitespace-nowrap">1.出海</button>
-                                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition whitespace-nowrap">2.国内</button>
-                                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition whitespace-nowrap">3.后期</button>
+                                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition">1.出海</button>
+                                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition">2.国内</button>
+                                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition">3.后期</button>
                             </div>
                         </div>
                     </div>
@@ -274,7 +268,6 @@
                             <h3 class="text-base font-black text-white flex items-center gap-2">
                                 ⏳ AI 蜂群夜间自主运行北京时间段控制
                             </h3>
-                            <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">预设时段内触发定时巡检才编写代码提交；其余白天时间自动静默，不抢发版队列</p>
                         </div>
                         <button onclick="ApexScheduleManager.saveScheduleToCloud()" class="shrink-0 px-4 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white text-xs font-bold transition flex items-center gap-2 border border-fuchsia-400/30">
                             💾 同步排班区间到 GitHub
@@ -321,7 +314,6 @@
                             <span class="text-[10px] text-slate-400">先聚焦框内点击或按 @ 追加部门</span>
                         </div>
                         
-                        <!-- AI 部门按钮容器 -->
                         <div id="deptButtonsContainer" class="flex flex-wrap gap-2 mb-4 shrink-0"></div>
 
                         <div class="flex-1 flex flex-col gap-3 relative">
@@ -371,28 +363,28 @@
                         </button>
                     </div>
 
-                    <!-- 👑 修复 3：去除霸王条款宽度，允许邮件长文本换行，按钮极简防挤压 -->
                     <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col overflow-hidden">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">终端客户清单</h3>
                             <div class="relative w-full sm:w-64">
-                                <input id="user-search-input" type="text" placeholder="按邮箱搜索..." oninput="ApexUserManager.filterUsers(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs outline-none focus:border-blue-500">
+                                <input id="user-search-input" type="text" placeholder="按邮箱或 ID 搜索..." oninput="ApexUserManager.filterUsers(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs outline-none focus:border-blue-500">
                             </div>
                         </div>
 
+                        <!-- 👑 修复：防挤压表格，让内容舒展自如 -->
                         <div class="overflow-x-auto w-full pb-4 custom-scroll">
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                                         <th class="py-2.5 px-2 w-1/3">邮箱主体 / ID</th>
-                                        <th class="py-2.5 px-2">商用角色</th>
-                                        <th class="py-2.5 px-2">核验状态</th>
-                                        <th class="py-2.5 px-2 whitespace-nowrap">注册日期</th>
-                                        <th class="py-2.5 px-2 text-right whitespace-nowrap">安全操作</th>
+                                        <th class="py-2.5 px-2 w-1/4">商用角色</th>
+                                        <th class="py-2.5 px-2 w-16">核验状态</th>
+                                        <th class="py-2.5 px-2 w-20">注册日期</th>
+                                        <th class="py-2.5 px-2 text-right">安全操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50">
-                                    <!-- JS 渲染 -->
+                                    <!-- 动态渲染 -->
                                 </tbody>
                             </table>
                         </div>
@@ -403,6 +395,8 @@
         </div>
     </main>
 
+    <!-- 弹窗层 -->
+    
     <!-- 🔑 密钥配置 -->
     <div id="configArea" class="hidden fixed top-20 right-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-2xl z-50 w-80">
         <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-3">🔑 密钥配置</h3>
@@ -419,7 +413,7 @@
         </div>
     </div>
 
-    <!-- 🗄️ 数据备份 (原独立金库) -->
+    <!-- 🗄️ 数据备份 (原独立金库) 👑 修复：按钮变纯亮色 -->
     <div id="vaultModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-3xl w-full rounded-2xl p-6 shadow-2xl flex flex-col relative max-h-[85vh]">
             <button onclick="ApexVault.close()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold">✕</button>
@@ -442,8 +436,9 @@
                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">⏳ 代码备份 (Code Snapshot)</h3>
                 <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
             </div>
+            <!-- 👑 修复：加入直白的原理说明，告知用户为何不能增删 -->
             <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 p-2.5 rounded-lg leading-relaxed">
-                <strong>⚠️ 仅用于恢复 HTML/JS 源码崩盘。</strong><br>需配置正确的 GitHub Token 以拉取云端提交记录。
+                <strong>⚠️ 仅用于恢复 HTML/JS 源码崩盘。</strong><br>此列表为 GitHub 系统自动生成的底层操作快照（不可手动修改）。如需手动写备注存档，请使用顶部的【🗄️ 数据备份】。
             </div>
             <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2"></div>
         </div>
@@ -510,13 +505,14 @@
                 if (this.saves.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">📭 暂无备份数据</div>`; return; }
                 listEl.innerHTML = "";
                 [...this.saves].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).forEach(save => {
+                    // 👑 修复：把原来的半透明暗淡色（bg-emerald-500/10）全部去除了，换成了实体亮色（bg-emerald-600）
                     listEl.innerHTML += `
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-indigo-400 transition gap-3">
                             <div><div class="text-sm font-black text-slate-800 dark:text-slate-100">${save.name}</div><div class="text-[11px] text-slate-500 mt-1">⏱️ ${new Date(save.timestamp).toLocaleString()}</div></div>
                             <div class="flex gap-2">
-                                <button onclick="ApexVault.restoreSave('${save.id}')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 rounded text-xs font-bold transition hover:bg-emerald-500 hover:text-white border border-emerald-200">📥 读取</button>
-                                <button onclick="ApexVault.overwriteSave('${save.id}')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded text-xs font-bold transition hover:bg-blue-500 hover:text-white border border-blue-200">💾 覆盖</button>
-                                <button onclick="ApexVault.deleteSave('${save.id}')" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 rounded text-xs font-bold transition hover:bg-rose-500 hover:text-white border border-rose-200">🗑️ 删</button>
+                                <button onclick="ApexVault.restoreSave('${save.id}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold transition hover:bg-emerald-500 shadow-md whitespace-nowrap">📥 读取</button>
+                                <button onclick="ApexVault.overwriteSave('${save.id}')" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold transition hover:bg-blue-500 shadow-md whitespace-nowrap">💾 覆盖</button>
+                                <button onclick="ApexVault.deleteSave('${save.id}')" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold transition hover:bg-rose-500 shadow-md whitespace-nowrap">🗑️ 删除</button>
                             </div>
                         </div>`;
                 });
