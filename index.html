@@ -12,7 +12,6 @@
   <!-- 先加载独立风控中台，再加载收银验证模块 -->
   <script src="components/vip-download-guard.js"></script>
   <script src="components/zero-auth.js"></script>
-  <script src="components/mall-gallery.js"></script>
   
   <style>
     body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -43,7 +42,6 @@
         🌐 EN / 简
       </button>
 
-      <!-- 👑 修复：全新石墨青冷灰与高定皇家蓝靛蓝徽章，绝不屎黄，也绝不闪退 -->
       <span id="userRoleBadge" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-1 rounded-lg font-bold text-xs shadow-sm transition select-none" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
       <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black shadow-md hover:opacity-95 transition text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">
         👑 驾驶舱 →
@@ -51,7 +49,7 @@
     </div>
   </header>
 
-  <!-- 2. 主体工作区 (👑 全新画廊架构) -->
+  <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-12">
     
     <!-- 动态轮播区 -->
@@ -69,12 +67,18 @@
         <div>
           <h3 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
-            <span data-zh="精品商业 PPT 模板" data-en="Premium PPT Templates">精品商业 PPT 模板</span>
+            <span data-zh="精品商业 PPT 模板" data-en="Premium PPT Templates">精品商业 PPT 模板 (云端实时同步)</span>
           </h3>
+          <p class="text-xs text-slate-500 mt-1" data-zh="海量高定视觉，对标顶级大厂画廊" data-en="Massive premium visuals, gallery style">海量高定视觉，对标顶级大厂画廊</p>
         </div>
       </div>
-      <!-- 容器： mall-gallery.js 会自动往这里面塞商品 -->
-      <div id="mall-ppt-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
+
+      <!-- 👑 画廊网格容器 -->
+      <div id="mall-ppt-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div class="col-span-full py-10 text-center text-slate-400 font-mono text-sm animate-pulse border border-dashed border-slate-300 rounded-2xl">
+              ☁️ 正在初始化商品图库...
+          </div>
+      </div>
     </section>
 
     <!-- 第二板块：EXCEL表格 与 WORD文档 -->
@@ -118,56 +122,27 @@
     </section>
   </main>
 
-  <!-- 👑 全新画廊渲染引擎：负责陈列本地货品并抓取 GitHub AI 新模版 -->
+  <div id="compliance-footer-container"></div>
+  <div id="cn-paywall-container"></div>
+
+  <!-- 👑 全新画廊渲染引擎 (直接内嵌防白屏) -->
   <script>
     window.ApexMallGallery = {
-        // 兜底基础货品
         baseProducts: [
-            {
-                id: "aerotech",
-                title: "AeroTech 创投规划书",
-                category: "15 页 · 商业计划书",
-                thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80",
-                priceRmb: 69
-            },
-            {
-                id: "saas",
-                title: "SaaS 增长指标盘点",
-                category: "20 页 · 数据可视化",
-                thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
-                priceRmb: 69
-            },
-            {
-                id: "fintech",
-                title: "FinTech A 轮融资方案",
-                category: "12 页 · 科技金融",
-                thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80",
-                priceRmb: 69
-            }
+            { id: "aerotech", title: "AeroTech 创投规划书", category: "15 页 · 商业计划书", thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
+            { id: "saas", title: "SaaS 增长指标盘点", category: "20 页 · 数据可视化", thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
+            { id: "fintech", title: "FinTech A 轮融资方案", category: "12 页 · 科技金融", thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
         ],
 
         init: async function() {
             let allProducts = [...this.baseProducts];
-
-            // 👑 智能侦测：去拉取 AI 大脑在后台偷偷干活生成的 `ai-generated-decks.json`
             try {
-                // 兼容抓取可能被 AI 创建的数据文件
-                const urlsToTry = ['data/ai-generated-decks.json', 'data/templates.json'];
-                for (const url of urlsToTry) {
-                    const res = await fetch(url + '?nocache=' + Date.now());
-                    if (res.ok) {
-                        const aiData = await res.json();
-                        if (Array.isArray(aiData) && aiData.length > 0) {
-                            // 拼接到商品列表里！
-                            allProducts = [...allProducts, ...aiData];
-                            break;
-                        }
-                    }
+                const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+                if (res.ok) {
+                    const aiData = await res.json();
+                    if (Array.isArray(aiData) && aiData.length > 0) allProducts = [...allProducts, ...aiData];
                 }
-            } catch(e) {
-                console.log("正在静默重试抓取 AI 自研模板...");
-            }
-
+            } catch(e) { console.log("从本地载入商品库..."); }
             this.render(allProducts);
         },
 
@@ -175,67 +150,80 @@
             const grid = document.getElementById('mall-ppt-grid');
             if (!grid) return;
             grid.innerHTML = "";
-
             const pricing = window.ApexPricing ? window.ApexPricing.getConfig() : { ppt: { rmb: 69 } };
-            const rmbPrice = pricing.ppt.rmb;
 
             products.forEach(p => {
-                // 图片采用 4:3 高级比例铺满
                 const finalImg = p.thumb || p.fallback || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
+                const rmb = p.priceRmb || pricing.ppt.rmb;
 
                 grid.innerHTML += `
-                    <div onclick="window.location.href='editor.html?deck=${p.id}'" class="bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 group cursor-pointer flex flex-col">
-                        <!-- 图片容器：宽高比严格锁定 -->
+                    <div onclick="ApexMallGallery.openDetailModal('${p.id}', '${p.title}', '${finalImg}', ${rmb})" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 group cursor-pointer flex flex-col relative">
                         <div class="relative w-full pt-[75%] bg-slate-100 overflow-hidden">
-                            <img src="${finalImg}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="${p.title}" onerror="this.src='https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80'">
-                            
-                            <!-- 浮动徽章：VIP标识 -->
-                            <div class="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
-                                👑 特惠 VIP
-                            </div>
-                            
-                            <!-- 浮动徽章：页数标识 -->
-                            <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-mono px-1.5 py-0.5 rounded">
-                                ${p.category ? p.category.split('·')[0].trim() : '模板'}
-                            </div>
+                            <img src="${finalImg}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="封面">
+                            <div class="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">👑 特惠 VIP</div>
+                            <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-mono px-1.5 py-0.5 rounded">${p.category ? p.category.split('·')[0].trim() : '模板'}</div>
                         </div>
-                        
-                        <!-- 底部文字与价格框 -->
-                        <div class="p-3.5 flex-1 flex flex-col justify-between bg-white">
+                        <div class="p-4 flex-1 flex flex-col justify-between bg-white">
                             <h4 class="text-sm font-bold text-slate-800 line-clamp-2 leading-snug group-hover:text-blue-600 transition tracking-tight">${p.title}</h4>
                             <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
                                 <span class="text-[11px] text-slate-400 font-medium truncate pr-2">${p.category ? p.category.split('·')[1]?.trim() : '精选演示'}</span>
-                                <span class="text-[15px] font-black text-orange-600 font-mono">￥${p.priceRmb || rmbPrice}</span>
+                                <span class="text-base font-black text-orange-600 font-mono">￥${rmb}</span>
                             </div>
                         </div>
                     </div>
                 `;
             });
-            
-            // 通知系统价格中台更新一下最新汇率标签
             if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
+        },
+
+        openDetailModal: function(id, title, img, priceRmb) {
+            let modal = document.getElementById("productDetailModal");
+            if (!modal) {
+                modal = document.createElement("div");
+                modal.id = "productDetailModal";
+                modal.className = "hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4";
+                document.body.appendChild(modal);
+            }
+            modal.innerHTML = `
+                <div class="bg-white max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+                    <button onclick="document.getElementById('productDetailModal').classList.add('hidden')" class="absolute top-4 right-4 z-10 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition font-bold">✕</button>
+                    <div class="md:w-3/5 bg-slate-100 relative min-h-[250px] md:min-h-[400px]">
+                        <img src="${img}" class="absolute inset-0 w-full h-full object-cover" alt="预览">
+                    </div>
+                    <div class="md:w-2/5 p-6 md:p-8 flex flex-col justify-between bg-white">
+                        <div>
+                            <div class="text-[10px] font-mono text-blue-600 font-bold bg-blue-50 inline-block px-2 py-1 rounded mb-3">APEXWORK 官方自营模板</div>
+                            <h2 class="text-xl font-black text-slate-900 leading-tight mb-2">${title}</h2>
+                            <p class="text-xs text-slate-500 leading-relaxed mb-4">包含高阶配色方案、矢量数据图表与全套动画。支持一键修改企业数据，100% 符合欧美与国内商用合规标准。</p>
+                            <div class="space-y-2 mb-6 border-t border-b border-slate-100 py-4">
+                                <div class="flex justify-between text-xs font-mono"><span class="text-slate-400">商用授权许可</span><span class="font-bold text-emerald-600">✓ 终身可商用</span></div>
+                                <div class="flex justify-between text-xs font-mono"><span class="text-slate-400">格式支持</span><span class="font-bold text-slate-700">.PPTX / 在线编辑</span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-end gap-2 mb-3">
+                                <span class="text-2xl font-black text-orange-600 font-mono">￥${priceRmb}</span>
+                                <span class="text-xs text-slate-400 line-through mb-1">￥199</span>
+                            </div>
+                            <button onclick="window.location.href='editor.html?deck=${id}'" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2">
+                                <span>⚡ 立即解锁并进入全能编辑器</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove("hidden");
         }
     };
-
-    // 网页加载完后立刻渲染商城画廊
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => window.ApexMallGallery.init(), 100);
-    });
   </script>
 
-  <div id="compliance-footer-container"></div>
-  <div id="cn-paywall-container"></div>
-
-  <!-- 1. 👑 前台云端同步自检中台 (Tier1: Local ➔ Tier2: GitHub Cloud ➔ Tier3: Default) -->
+  <!-- 其它组件初始化 -->
   <script>
     window.ApexCloudSync = {
       init: async function() {
         try {
           const resSec = await fetch('config/security.json?nocache=' + Date.now());
-          if (resSec.ok) {
-            const secData = await resSec.json();
-            if (secData.pwd) localStorage.setItem('APEX_ADMIN_PWD', secData.pwd);
-          }
+          if (resSec.ok) { const secData = await resSec.json(); if (secData.pwd) localStorage.setItem('APEX_ADMIN_PWD', secData.pwd); }
           const resPrice = await fetch('config/pricing.json?nocache=' + Date.now());
           if (resPrice.ok) {
             const priceData = await resPrice.json();
@@ -248,90 +236,30 @@
             localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(bannerData));
             if (window.ApexHeroSlider) window.ApexHeroSlider.init();
           }
-        } catch(e) {
-          console.log("云端配置文件未创建或网络脱机，沿用当前设备本地存储。");
-        }
+        } catch(e) {}
       }
     };
-  </script>
 
-  <!-- 2. 👑 前台多币种定价智能折算中台 -->
-  <script>
     window.ApexPricing = {
       getConfig: function() {
         const saved = localStorage.getItem('APEX_PRICING_CONFIG');
-        const defaultConfig = {
-          bundle: { rmb: 139, usd: 19.99 },
-          ppt: { rmb: 69, usd: 9.99 },
-          excel: { rmb: 69, usd: 9.99 },
-          word: { rmb: 69, usd: 9.99 }
-        };
+        const defaultConfig = { bundle: { rmb: 139, usd: 19.99 }, ppt: { rmb: 69, usd: 9.99 }, excel: { rmb: 69, usd: 9.99 }, word: { rmb: 69, usd: 9.99 } };
         if (!saved) return defaultConfig;
-        try {
-          const parsed = JSON.parse(saved);
-          return {
-            bundle: parsed.bundle || defaultConfig.bundle,
-            ppt: parsed.ppt || defaultConfig.ppt,
-            excel: parsed.excel || defaultConfig.excel,
-            word: parsed.word || defaultConfig.word
-          };
-        } catch (e) {
-          return defaultConfig;
-        }
+        try { return { ...defaultConfig, ...JSON.parse(saved) }; } catch (e) { return defaultConfig; }
       },
-
       applyPricing: function(lang = 'zh') {
         const config = this.getConfig();
         const isEn = lang === 'en';
-
         document.querySelectorAll('.hero-bundle-price').forEach(el => {
-          const zhText = `¥${config.bundle.rmb} RMB`;
-          const enText = `$${config.bundle.usd} USD`;
-          el.setAttribute('data-zh', zhText);
-          el.setAttribute('data-en', enText);
-          el.innerText = isEn ? enText : zhText;
-        });
-
-        document.querySelectorAll('#ppt-section [data-price-rmb]').forEach(el => {
-          const zhText = `￥${config.ppt.rmb} RMB`;
-          const enText = `$${config.ppt.usd} USD`;
-          el.setAttribute('data-zh', zhText);
-          el.setAttribute('data-en', enText);
-          el.innerText = isEn ? enText : zhText;
-        });
-
-        document.querySelectorAll('a[href*="excel-editor"]').forEach(btn => {
-          const priceContainer = btn.previousElementSibling;
-          if (priceContainer && priceContainer.hasAttribute('data-price-rmb')) {
-            const zhText = `￥${config.excel.rmb} RMB`;
-            const enText = `$${config.excel.usd} USD`;
-            priceContainer.setAttribute('data-zh', zhText);
-            priceContainer.setAttribute('data-en', enText);
-            priceContainer.innerText = isEn ? enText : zhText;
-          }
-        });
-
-        document.querySelectorAll('a[href*="word-editor"]').forEach(btn => {
-          const priceContainer = btn.previousElementSibling;
-          if (priceContainer && priceContainer.hasAttribute('data-price-rmb')) {
-            const zhText = `￥${config.word.rmb} RMB`;
-            const enText = `$${config.word.usd} USD`;
-            priceContainer.setAttribute('data-zh', zhText);
-            priceContainer.setAttribute('data-en', enText);
-            priceContainer.innerText = isEn ? enText : zhText;
-          }
+          const zhText = `¥${config.bundle.rmb} RMB`; const enText = `$${config.bundle.usd} USD`;
+          el.setAttribute('data-zh', zhText); el.setAttribute('data-en', enText); el.innerText = isEn ? enText : zhText;
         });
       }
     };
-  </script>
 
-  <!-- 3. 👑 全站中英双语即时翻译引擎 -->
-  <script>
     window.ApexLang = {
       currentLang: localStorage.getItem('APEX_LANG') || 'zh',
-      init: function() {
-        this.apply(this.currentLang);
-      },
+      init: function() { this.apply(this.currentLang); },
       toggle: function() {
         this.currentLang = this.currentLang === 'zh' ? 'en' : 'zh';
         localStorage.setItem('APEX_LANG', this.currentLang);
@@ -344,143 +272,76 @@
         });
         const btn = document.getElementById('langToggleBtn');
         if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
-        
-        document.querySelectorAll('#dynamicHeroContainer .hero-slide-title, #dynamicHeroContainer .hero-slide-desc').forEach(el => {
-          const text = el.getAttribute(`data-${lang}`);
-          if (text) el.innerText = text;
-        });
-        if (window.ApexPricing) {
-          window.ApexPricing.applyPricing(lang);
-        }
+        if (window.ApexPricing) window.ApexPricing.applyPricing(lang);
       }
     };
-  </script>
 
-  <!-- 4. 👑 首页轮播图管理引擎 -->
-  <script>
     window.ApexHeroSlider = {
-      currentIndex: 0,
-      timer: null,
-      slidesData: [],
-      
+      currentIndex: 0, timer: null, slidesData: [],
       init: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         const defaultSlides = [
-          { 
-            tag: "ADMIN BANNER 01", 
-            titleZh: "破除低效传统冗长，全视觉商业交付新纪元", 
-            titleEn: "Break traditional inefficiencies, start a visual business delivery era",
-            descZh: "覆盖 PPT 战略、EXCEL 财务测算模型与 WORD 欧美合规报告，真正通过银行与金融机构 ATS 严测。", 
-            descEn: "Covering PPT strategies, EXCEL financial models, and WORD compliance reports, passing institutional ATS tests.",
-            bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", 
-            bgImg: "" 
-          },
-          { 
-            tag: "GLOBAL COMPLIANCE 02", 
-            titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", 
-            titleEn: "Zero-Registration Seamless Checkout, Compliant with EU/US GDPR & Audits",
-            descZh: "一键导出标准 .pptx / .xlsx / .docx 资产，支持全球多币种自动智能结算。", 
-            descEn: "One-click export of standard .pptx / .xlsx / .docx assets, supporting global automated settlement.",
-            bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", 
-            bgImg: "" 
-          }
+          { tag: "ADMIN BANNER 01", titleZh: "破除低效传统冗长，全视觉商业交付新纪元", titleEn: "Break traditional inefficiencies", descZh: "覆盖 PPT 战略、EXCEL 财务模型与 WORD 报告。", descEn: "Covering PPT, EXCEL and WORD.", bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", bgImg: "" },
+          { tag: "GLOBAL COMPLIANCE 02", titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", titleEn: "Zero-Registration Seamless Checkout", descZh: "一键导出标准格式，支持全球自动结算。", descEn: "One-click export, automated settlement.", bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", bgImg: "" }
         ];
-
         let rawData = saved ? JSON.parse(saved) : defaultSlides;
-        
-        this.slidesData = rawData.map((s, i) => {
-          const fallback = defaultSlides[i] || defaultSlides[0];
-          return {
-            ...s,
-            titleZh: s.titleZh || s.title || fallback.titleZh,
-            titleEn: s.titleEn || fallback.titleEn,
-            descZh: s.descZh || s.desc || fallback.descZh,
-            descEn: s.descEn || fallback.descEn
-          };
-        });
-        
+        this.slidesData = rawData.map((s, i) => ({ ...s, titleZh: s.titleZh || s.title || defaultSlides[i].titleZh, descZh: s.descZh || s.desc || defaultSlides[i].descZh }));
         const container = document.getElementById('dynamicHeroContainer');
         if (!container) return;
-        
         const config = window.ApexPricing ? window.ApexPricing.getConfig() : { bundle: { rmb: 139, usd: 19.99 } };
 
-        container.innerHTML = this.slidesData.map((s, idx) => {
-          const titleZh = s.titleZh;
-          const titleEn = s.titleEn;
-          const descZh = s.descZh;
-          const descEn = s.descEn;
-          return `
+        container.innerHTML = this.slidesData.map((s, idx) => `
             <div id="hero-slide-${idx}" class="hero-slide ${idx === 0 ? 'flex' : 'hidden'} flex-col md:flex-row justify-between items-start md:items-center gap-6 w-full">
               <div>
                 <span class="bg-blue-500/20 text-blue-400 border border-blue-500/40 text-[10px] font-mono px-2.5 py-0.5 rounded font-bold uppercase">${s.tag || 'BANNER'}</span>
-                <h2 class="hero-slide-title text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${titleZh}" data-en="${titleEn}">${titleZh}</h2>
-                <p class="hero-slide-desc text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${descZh}" data-en="${descEn}">${descZh}</p>
+                <h2 class="hero-slide-title text-xl md:text-2xl font-black tracking-tight mt-2 leading-snug" data-zh="${s.titleZh}">${s.titleZh}</h2>
+                <p class="hero-slide-desc text-xs text-slate-300 mt-1 leading-relaxed max-w-2xl" data-zh="${s.descZh}">${s.descZh}</p>
               </div>
               <button onclick="openBundleCheckout()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-3">
-                  <span data-zh="⚡ 立即解锁商用三件套包" data-en="⚡ Unlock All Commercial Bundle">⚡ 立即解锁商用三件套包</span>
-                  <span class="hero-bundle-price text-white font-black" data-zh="¥${config.bundle.rmb} RMB" data-en="$${config.bundle.usd} USD">¥${config.bundle.rmb} RMB</span>
+                  <span data-zh="⚡ 立即解锁商用三件套包">⚡ 立即解锁商用三件套包</span>
+                  <span class="hero-bundle-price text-white font-black" data-zh="¥${config.bundle.rmb} RMB">¥${config.bundle.rmb} RMB</span>
               </button>
             </div>
-          `;
-        }).join('');
+        `).join('');
 
         this.jump(0);
         this.startAutoPlay(this.slidesData.length);
-        if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
       },
-
       jump: function(idx) {
         const total = document.querySelectorAll('.hero-slide').length;
         if (total === 0) return;
         for (let i = 0; i < total; i++) {
           const el = document.getElementById(`hero-slide-${i}`);
           const dot = document.querySelectorAll('.dot')[i];
-          if (el) {
-            if (i === idx) { el.classList.remove('hidden'); el.classList.add('flex'); }
-            else { el.classList.remove('flex'); el.classList.add('hidden'); }
-          }
+          if (el) { if (i === idx) { el.classList.remove('hidden'); el.classList.add('flex'); } else { el.classList.remove('flex'); el.classList.add('hidden'); } }
           if (dot) dot.style.backgroundColor = i === idx ? '#ffffff' : 'rgba(255,255,255,0.4)';
         }
-        const currentData = this.slidesData[idx];
         const box = document.getElementById('heroBannerBox');
-        if (box && currentData) {
-          if (currentData.bgImg && currentData.bgImg.trim() !== "") {
-            box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.75), rgba(15,23,42,0.75)), url('${currentData.bgImg}')`;
-            box.style.backgroundSize = "cover";
-          } else {
-            box.style.backgroundImage = currentData.bgStyle || "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)";
-          }
+        if (box && this.slidesData[idx]) {
+          if (this.slidesData[idx].bgImg) { box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.75), rgba(15,23,42,0.75)), url('${this.slidesData[idx].bgImg}')`; box.style.backgroundSize = "cover"; }
+          else { box.style.backgroundImage = this.slidesData[idx].bgStyle; }
         }
         this.currentIndex = idx;
-        if (window.ApexPricing) window.ApexPricing.applyPricing(window.ApexLang.currentLang);
-        if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
       },
-
       startAutoPlay: function(total) {
         if (this.timer) clearInterval(this.timer);
-        this.timer = setInterval(() => {
-          this.currentIndex = (this.currentIndex + 1) % total;
-          this.jump(this.currentIndex);
-        }, 5000);
+        this.timer = setInterval(() => { this.currentIndex = (this.currentIndex + 1) % total; this.jump(this.currentIndex); }, 5000);
       }
     };
 
-    // 5. 👑 彻底修复：无论加载、切语言还是反复刷新，只要是董事长，属性与文本全部双绑锁定，绝对不再闪回游客！
     function initUserRoleBadge() {
       const badge = document.getElementById('userRoleBadge');
       const portalBtn = document.getElementById('adminSecretPortal');
       const role = localStorage.getItem('APEX_USER_ROLE');
       if (role === 'ADMIN' && badge) {
         badge.setAttribute('data-zh', '👑 董事长 [ADMIN]');
-        badge.setAttribute('data-en', '👑 Chairman [ADMIN]');
         badge.className = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black text-xs shadow-md transition select-none";
-        badge.innerText = window.ApexLang && window.ApexLang.currentLang === 'en' ? '👑 Chairman [ADMIN]' : '👑 董事长 [ADMIN]';
+        badge.innerText = '👑 董事长 [ADMIN]';
         if (portalBtn) portalBtn.classList.remove('hidden');
       } else if (badge) {
         badge.setAttribute('data-zh', '👤 游客');
-        badge.setAttribute('data-en', '👤 Visitor');
         badge.className = "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-1 rounded-lg font-bold text-xs shadow-sm transition select-none";
-        badge.innerText = window.ApexLang && window.ApexLang.currentLang === 'en' ? '👤 Visitor' : '👤 游客';
+        badge.innerText = '👤 游客';
         if (portalBtn) portalBtn.classList.add('hidden');
       }
     }
@@ -490,51 +351,31 @@
       window.ApexLang.init();
       initUserRoleBadge();
       window.ApexCloudSync.init();
+      setTimeout(() => { if (window.ApexMallGallery) window.ApexMallGallery.init(); }, 100);
     });
-  </script>
 
-  <script>
-    fetch('components/compliance-footer.html').then(r => r.text()).then(html => {
-      const c = document.getElementById('compliance-footer-container');
-      if (c) { c.innerHTML = html; const s = document.createElement('script'); s.src = 'components/lang-and-policy.js'; document.body.appendChild(s); }
-    }).catch(() => {});
-
-    fetch('components/payment/cn-paywall.html').then(r => r.text()).then(html => {
-      const c = document.getElementById('cn-paywall-container');
-      if (c) { c.innerHTML = html; const s1 = document.createElement('script'); s1.src = 'components/payment/cn-status-poll.js'; document.body.appendChild(s1); const s2 = document.createElement('script'); s2.src = 'components/payment/cn-signature.js'; document.body.appendChild(s2); }
-    }).catch(() => {});
-
-    // 6. 👑 LOGO 三层架构渲染：本地 Cache ➔ GitHub assets/logo.webp ➔ 默认矢量 A 徽章
     (function initFrontLogo() {
         const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
         const frontLogoEl = document.getElementById('frontBrandLogo');
         const badgeEl = document.getElementById('frontFallbackBadge');
         if (customLogo && frontLogoEl) {
-            frontLogoEl.src = customLogo;
-            frontLogoEl.style.display = 'block';
+            frontLogoEl.src = customLogo; frontLogoEl.style.display = 'block';
             if (badgeEl) badgeEl.classList.add('hidden');
         }
     })();
 
-    // 7. 👑 董事长口令安全网关：输入口令成功立刻锁存状态为 ADMIN
     function checkChairmanStealthAccess() {
         const validPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         const pwd = prompt("👑 [安全防护网关] 请输入管理员身份口令：", "");
         if (pwd === validPwd) {
-            localStorage.setItem("APEX_USER_ROLE", "ADMIN");
-            initUserRoleBadge();
+            localStorage.setItem("APEX_USER_ROLE", "ADMIN"); initUserRoleBadge();
             alert("✅ 身份校验成功！驾驶舱通道已激活，点击右上角【👑 驾驶舱 →】进入。");
-        } else if (pwd !== null) {
-            alert("❌ 口令错误，系统拦截进入！");
-        }
+        } else if (pwd !== null) { alert("❌ 口令错误，系统拦截进入！"); }
     }
 
     window.openBundleCheckout = function() {
       if (window.ApexAuth && window.ApexAuth.openCheckout) {
-        ApexAuth.openCheckout({
-          title: "顶尖智能商务办公平台 · 商业企业全能包",
-          onSuccess: () => alert("🎉 您已激活全站商用权限！")
-        });
+        ApexAuth.openCheckout({ title: "顶尖智能商务办公平台 · 商业企业全能包", onSuccess: () => alert("🎉 您已激活全站商用权限！") });
       }
     };
   </script>
