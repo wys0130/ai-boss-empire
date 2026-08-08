@@ -1,8 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 终极防弹版修复：彻底解决 @ 菜单无法唤出问题，兼容所有输入法与富文本标签！
- * 2. 👑 满血保留：所有被误删的组件、商品数据、汇率、进度书 100% 完整！
- * 3. 👑 强制表头防换行，解决快照缩略图折断问题。
+ * 1. 👑 终极防弹版修复：彻底解决 @ 菜单无法唤出问题，精确操作光标与纯文本映射。
+ * 2. 👑 满血保留：所有被误删的组件、商品数据、汇率中台、进度书 100% 完整。
+ * 3. 👑 强制表头防换行：修复快照缩略图表头折断问题。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -169,7 +169,7 @@ window.ApexUserManager = {
 
     initUserSection: async function() {
         await this.loadUsers();
-        let savedPwd = localStorage.getItem("APEX_ADMIN_PWD");
+        let savedPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
         let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
         let pkey = localStorage.getItem("APEX_EMAILJS_KEY") || "";
@@ -192,7 +192,6 @@ window.ApexUserManager = {
             }
         } catch(e) {}
 
-        savedPwd = savedPwd || "8888";
         if (document.getElementById("pwd-new-admin")) document.getElementById("pwd-new-admin").value = savedPwd;
         if (document.getElementById("emailjs-service-id")) document.getElementById("emailjs-service-id").value = sid;
         if (document.getElementById("emailjs-template-id")) document.getElementById("emailjs-template-id").value = tid;
@@ -309,11 +308,11 @@ window.ApexUserManager = {
             : this.userList;
 
         if (list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有找到相关匹配的用户记录</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有记录</td></tr>`;
             return;
         }
 
-        list.forEach((user) => {
+        list.forEach((user, idx) => {
             const realIdx = this.userList.findIndex(item => item.id === user.id);
             const statusBtnCls = user.status 
                 ? "bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-sm" 
@@ -438,7 +437,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 作品审核与定价表 (全量恢复原始数据)
+// 6. 作品审核与定价表 (全量恢复原始数据与核心引擎)
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -512,7 +511,7 @@ window.uploadProductThumb = function(index) {
     const item = AUDIT_PRODUCTS[index];
     ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
         renderAuditTable();
-        if (typeof appendLog === "function") appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
+        appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
     });
 };
 
@@ -546,11 +545,10 @@ window.renderAuditTable = function() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
+    // 强力锁定表头不折行
     const tableEl = tbody.closest("table");
     if (tableEl) {
-        tableEl.querySelectorAll("th").forEach(th => {
-            th.classList.add("whitespace-nowrap", "select-none", "tracking-wider");
-        });
+        tableEl.querySelectorAll("th").forEach(th => th.classList.add("whitespace-nowrap", "tracking-wider", "select-none"));
     }
 
     AUDIT_PRODUCTS.forEach((item, index) => {
@@ -1071,48 +1069,66 @@ window.selectMentionDept = function(deptName) {
     if (!cmdBox) return;
 
     if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-        const start = cmdBox.selectionStart;
         const text = cmdBox.value;
+        const start = cmdBox.selectionStart;
         const before = text.substring(0, start);
         const after = text.substring(start);
-        const atIdx = before.lastIndexOf('@');
-        if (atIdx !== -1) {
-            cmdBox.value = before.substring(0, atIdx) + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = atIdx + deptName.length + 2;
+        const lastAt = before.lastIndexOf('@');
+        if (lastAt !== -1) {
+            cmdBox.value = before.substring(0, lastAt) + "@" + deptName + " " + after;
+            cmdBox.selectionStart = cmdBox.selectionEnd = lastAt + deptName.length + 2;
         }
-        hideMentionDropdown();
-        appendLog(`🎯 追加指令 @${deptName}`);
-        return;
-    }
-
-    // 富文本 (ContentEditable)
-    const sel = window.getSelection();
-    if (!sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    
-    const textNode = range.startContainer;
-    if (textNode.nodeType === Node.TEXT_NODE) {
-        const val = textNode.textContent;
-        const atIdx = val.lastIndexOf('@', range.startOffset);
-        if (atIdx !== -1) {
-            range.setStart(textNode, atIdx);
-            range.deleteContents();
+        cmdBox.focus();
+    } else {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+            const range = sel.getRangeAt(0);
+            const textNode = range.startContainer;
+            
+            if (textNode.nodeType === Node.TEXT_NODE) {
+                const text = textNode.textContent;
+                const offset = range.startOffset;
+                const before = text.substring(0, offset);
+                const lastAt = before.lastIndexOf('@');
+                
+                if (lastAt !== -1) {
+                    range.setStart(textNode, lastAt);
+                    range.setEnd(textNode, offset);
+                    range.deleteContents();
+                    
+                    const tokenSpan = document.createElement("span");
+                    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
+                    tokenSpan.contentEditable = "false";
+                    tokenSpan.setAttribute("data-dept", deptName);
+                    tokenSpan.innerText = `@${deptName}`;
+                    
+                    range.insertNode(tokenSpan);
+                    
+                    const spaceNode = document.createTextNode("\u00A0"); 
+                    tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
+                    
+                    range.setStartAfter(spaceNode);
+                    range.setEndAfter(spaceNode);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+        } else {
+            const text = cmdBox.innerText || "";
+            const lastAt = text.lastIndexOf('@');
+            if (lastAt !== -1) {
+                const before = text.slice(0, lastAt);
+                cmdBox.innerHTML = before + `<span class="dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1" contenteditable="false" data-dept="${deptName}">@${deptName}</span>&nbsp;`;
+                
+                const range = document.createRange();
+                range.selectNodeContents(cmdBox);
+                range.collapse(false);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
         }
     }
-    
-    const tokenSpan = document.createElement("span");
-    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
-    tokenSpan.contentEditable = "false";
-    tokenSpan.setAttribute("data-dept", deptName);
-    tokenSpan.innerText = `@${deptName}`;
-
-    range.insertNode(tokenSpan);
-    const space = document.createTextNode(" ");
-    tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-    range.setStartAfter(space);
-    range.setEndAfter(space);
-    sel.removeAllRanges();
-    sel.addRange(range);
     
     hideMentionDropdown();
     appendLog(`🎯 追加指令 @${deptName}`);
@@ -1209,18 +1225,18 @@ function initAdminEngine() {
             if (!cmdBox) return;
             let text = "";
             
-            // 完美兼容所有的标签情况
             if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
                 text = cmdBox.value.substring(0, cmdBox.selectionStart);
             } else {
                 const sel = window.getSelection();
                 if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                    text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+                    text = (sel.anchorNode.textContent || "").substring(0, sel.anchorOffset);
                 } else {
                     text = cmdBox.innerText || "";
                 }
             }
 
+            text = text.replace(/\u00A0/g, " ");
             const match = text.match(/@([^\s@]*)$/);
             if (match) {
                 showMentionDropdown(match[1]);
@@ -1229,7 +1245,6 @@ function initAdminEngine() {
             }
         };
 
-        // 绑定三种物理级事件，绝不漏掉一个字符！
         cmdBox.addEventListener("input", checkMention);
         cmdBox.addEventListener("keyup", checkMention);
         cmdBox.addEventListener("mouseup", checkMention);
