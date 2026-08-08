@@ -508,6 +508,13 @@ const AUDIT_PRODUCTS = [
 ];
 
 async function loadAuditProducts() {
+    // 👑 核心修复：优先从本地金库提取数据，而不是强行覆盖！
+    const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
+    if (localProducts) {
+        AUDIT_PRODUCTS.length = 0; // 清空默认项
+        JSON.parse(localProducts).forEach(p => AUDIT_PRODUCTS.push(p));
+    }
+
     try {
         const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
         if (res.ok) {
@@ -537,6 +544,9 @@ async function loadAuditProducts() {
             }
         }
     } catch(e) {}
+    
+    // 更新大盘并渲染
+    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
     renderAuditTable();
 }
 
