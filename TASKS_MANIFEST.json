@@ -1,6 +1,6 @@
 {
   "summary": {
-    "completed": 8,
+    "completed": 9,
     "todo": 0,
     "total_tasks": 9
   },
@@ -75,7 +75,7 @@
       "notes": "无论海外还是国内收银台，付款成功签发临时链接",
       "stage": "STAGE_3_FULL_SCALE",
       "department": "施工工程部",
-      "status": "TODO"
+      "status": "DONE"
     }
   ],
   "updated_at": "2026-08-08"
