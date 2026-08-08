@@ -4,7 +4,7 @@
  * 2. 👑 修复金库与本地缓存：优先读取本地 LocalStorage 渲染商品与用户列表。
  * 3. 👑 修复排版：修复用户大名单表格变形、超长邮箱强制换行防挤压！
  * 4. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据。
- * 5. 👑 终极修复快照回溯：注入 SHA 指纹比对算法，跳过无改动文件，彻底消灭 GitHub 422 报错！
+ * 5. 👑 终极修复快照回溯：注入 SHA 指纹比对算法，跳过无改动文件，彻底消灭 GitHub 422 报错！并加入可视进度条！
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -311,6 +311,7 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
+            // 👑 修复：防挤压设计。允许超长邮箱换行 (break-all whitespace-normal)，按钮精简 (px-2 py-1)
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <td class="py-2 px-2 w-1/3 min-w-[160px] break-all whitespace-normal">
@@ -532,6 +533,7 @@ window.renderAuditTable = function() {
             : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
+        // 👑 修复：防挤压表格样式，缩减文字边距，保证操作区不消失
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-2 px-2 w-16 whitespace-nowrap">
@@ -540,7 +542,7 @@ window.renderAuditTable = function() {
                         <button onclick="uploadProductThumb(${index})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold">📤 WebP</button>
                     </div>
                 </td>
-                <td class="py-2 px-2 min-w-[150px] whitespace-normal">
+                <td class="py-2 px-2 min-w-[150px] whitespace-normal break-words">
                     <div class="font-black text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${item.title}</div>
                     <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-1">${item.category}</div>
                 </td>
@@ -563,8 +565,10 @@ window.renderAuditTable = function() {
                     </button>
                 </td>
                 <td class="py-2 px-2 text-right whitespace-nowrap">
-                    <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition ml-1">销毁</button>
+                    <div class="flex justify-end gap-1 w-[120px]">
+                        <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
+                        <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition">销毁</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -851,7 +855,7 @@ async function loadTasksManifest() {
     }
 }
 
-// 兜底辅助函数：只需提取，不强行要求抛出异常打断进程
+// 兜底辅助函数
 function getKeysSafe() {
     return {
         gh: localStorage.getItem("APEX_GH_TOKEN") || "",
@@ -1444,7 +1448,7 @@ async function fetchCommitHistory() {
                         </div>
                         <div class="text-xs font-mono truncate text-slate-800 dark:text-slate-300">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
@@ -1455,7 +1459,7 @@ async function fetchCommitHistory() {
     }
 }
 
-// 👑 终极修复快照回溯：加入 currentSha 防止 GitHub 写入 409 冲突，增加反馈弹窗并重载
+// 👑 终极修复快照回溯：加入 currentSha 防止 GitHub 写入 409 冲突，增加实时动态进度条！
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
     if (!confirm(`⏳ 危险！此操作将覆盖云端源码，确定回退到快照 [#${shortSha}] 吗？`)) return;
     window.closeRollbackModal();
@@ -1466,21 +1470,32 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         return; 
     }
 
+    const overlay = document.getElementById("restoreProgressOverlay");
+    const bar = document.getElementById("restoreProgressBar");
+    const text = document.getElementById("restoreProgressText");
+
     try {
-        alert(`⏳ 开始回溯全站代码至快照 [#${shortSha}] ...\n由于涉及多个底层文件覆盖，预计需要 10-20 秒，请勿关闭或刷新页面！`);
-        
+        if (overlay) overlay.classList.remove("hidden");
+        if (text) text.innerText = `[1/3] 正在拉取目标快照 [#${shortSha}] 树结构...`;
+        if (bar) bar.style.width = "10%";
+
         const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
         if (!treeRes.ok) throw new Error("无法读取目标快照的文件树结构");
         
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
+        const totalFiles = filesToRestore.length;
         
         let successCount = 0;
         let skipCount = 0;
         appendLog(`⏳ 开始逐一回溯源码至快照 #${shortSha}...`);
         
-        for (const fileObj of filesToRestore) {
-            
+        for (let i = 0; i < totalFiles; i++) {
+            const fileObj = filesToRestore[i];
+            const percent = Math.floor(10 + (i / totalFiles) * 80);
+            if (text) text.innerText = `[2/3] 正在比对与覆盖文件: ${fileObj.path} (${i+1}/${totalFiles})`;
+            if (bar) bar.style.width = `${percent}%`;
+
             // 👑 获取线上文件的现存 SHA，防止 409 写入冲突
             let currentSha = null;
             try {
@@ -1512,10 +1527,16 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             if (updateRes.ok) successCount++;
         }
         
-        alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！\n📊 报告：修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将强制重载以应用旧版代码...`);
-        location.reload();
+        if (text) text.innerText = `[3/3] 覆盖完成，准备重载系统...`;
+        if (bar) bar.style.width = "100%";
+
+        setTimeout(() => {
+            alert(`✅ 成功回溯主仓库到快照 [#${shortSha}]！\n📊 报告：修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将强制重载以应用旧版代码...`);
+            location.reload();
+        }, 500);
         
     } catch(err) { 
+        if (overlay) overlay.classList.add("hidden");
         alert("❌ 还原异常: " + err.message);
         appendLog("❌ 还原异常: " + err.message, "text-rose-500"); 
     }
