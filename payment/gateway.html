@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APEXWORK 极速收银台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .payment-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .amount-display {
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .amount-label {
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .amount-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: #111827;
+            margin-top: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+        .amount-value span {
+            font-size: 24px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        .pay-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .pay-method-btn {
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .pay-method-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+        .pay-method-btn.active {
+            border-color: #667eea;
+            background: #f5f3ff;
+        }
+        .pay-method-btn svg {
+            width: 32px;
+            height: 32px;
+        }
+        .pay-method-btn span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .qr-container {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            display: none;
+        }
+        .qr-container.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #qrCode {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 16px;
+        }
+        .qr-status {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 12px;
+        }
+        .qr-status.loading {
+            color: #667eea;
+        }
+        .qr-status.success {
+            color: #10b981;
+        }
+        .qr-status.error {
+            color: #ef4444;
+        }
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-top: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .order-info span:last-child {
+            color: #111827;
+            font-weight: 500;
+        }
+        .pay-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+        .pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+        .pay-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            color: #6b7280;
+            font-size: 12px;
+        }
+        .secure-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #111827;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"></div>
+    
+    <div class="payment-card">
+        <div class="header">
+            <h1>APEXWORK 极速收银台</h1>
+            <p>安全 · 极速 · 零注册</p>
+        </div>
+
+        <div class="amount-display">
+            <div class="amount-label">应付金额</div>
+            <div class="amount-value"><span>¥</span><span id="amount">9.99</span></div>
+        </div>
+
+        <div class="pay-methods">
+            <button class="pay-method-btn active" data-method="alipay" onclick="selectMethod('alipay')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#1677ff" stroke-width="2">
+                    <rect x="3" y="5" width="18" height="14" rx="2"/>
+                    <path d="M3 10h18M7 15h4"/>
+                </svg>
+                <span>支付宝</span>
+            </button>
+            <button class="pay-method-btn" data-method="wechat" onclick="selectMethod('wechat')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="2">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+                <span>微信支付</span>
+            </button>
+        </div>
+
+        <div class="qr-container" id="qrContainer">
+            <div id="qrCode"></div>
+            <div class="qr-status" id="qrStatus">等待扫码支付...</div>
+        </div>
+
+        <div class="order-info">
+            <span>订单编号</span>
+            <span id="orderId">生成中...</span>
+        </div>
+        <div class="order-info">
+            <span>商品名称</span>
+            <span id="productName">APEXWORK 高级会员</span>
+        </div>
+
+        <button class="pay-btn" id="payBtn" onclick="initiatePayment()">
+            立即支付
+        </button>
+
+        <div class="secure-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <span>Ed25519 签名加密 · 银行级安全</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        // 支付网关核心逻辑
+        class PaymentGateway {
+            constructor() {
+                this.currentMethod = 'alipay';
+                this.orderId = this.generateOrderId();
+                this.amount = 9.99;
+                this.baseUrl = 'https://payment.apexwork.workers.dev'; // Cloudflare Worker 支付代理
+                this.init();
+            }
+
+            init() {
+                document.getElementById('orderId').textContent = this.orderId;
+                this.checkExistingLicense();
+            }
+
+            generateOrderId() {
+                return 'AW' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+
+            selectMethod(method) {
+                this.currentMethod = method;
+                document.querySelectorAll('.pay-method-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.method === method);
+                });
+                document.getElementById('qrContainer').classList.remove('show');
+            }
+
+            async initiatePayment() {
+                const payBtn = document.getElementById('payBtn');
+                payBtn.disabled = true;
+                payBtn.textContent = '正在创建订单...';
+
+                try {
+                    // 1. 创建订单
+                    const orderResponse = await fetch(`${this.baseUrl}/api/create-order`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            orderId: this.orderId,
+                            amount: this.amount,
+                            method: this.currentMethod,
+                            product: 'vip_membership'
+                        })
+                    });
+
+                    if (!orderResponse.ok) throw new Error('订单创建失败');
+                    const orderData = await orderResponse.json();
+
+                    // 2. 生成支付二维码
+                    const qrContainer = document.getElementById('qrContainer');
+                    qrContainer.classList.add('show');
+                    const qrStatus = document.getElementById('qrStatus');
+                    qrStatus.textContent = '等待扫码支付...';
+                    qrStatus.className = 'qr-status';
+
+                    QRCode.toCanvas(document.getElementById('qrCode'), orderData.qrCodeUrl, {
+                        width: 200,
+                        margin: 2,
+                        color: {
+                            dark: '#111827',
+                            light: '#ffffff'
+                        }
+                    }, function(error) {
+                        if (error) {
+                            console.error('二维码生成失败:', error);
+                            qrStatus.textContent = '二维码生成失败，请重试';
+                            qrStatus.className = 'qr-status error';
+                        }
+                    });
+
+                    // 3. 轮询支付状态
+                    this.pollPaymentStatus(orderData.paymentId);
+                    
+                } catch (error) {
+                    console.error('支付初始化失败:', error);
+                    this.showToast('支付初始化失败，请重试');
+                    payBtn.disabled = false;
+                    payBtn.textContent = '立即支付';
+                }
+            }
+
+            async pollPaymentStatus(paymentId) {
+                const qrStatus = document.getElementById('qrStatus');
+                let attempts = 0;
+                const maxAttempts = 60; // 2分钟超时
+
+                const pollTimer = setInterval(async () => {
+                    attempts++;
+                    
+                    try {
+                        const statusResponse = await fetch(`${this.baseUrl}/api/payment-status/${paymentId}`);
+                        const statusData = await statusResponse.json();
+
+                        if (statusData.status === 'success') {
+                            clearInterval(pollTimer);
+                            qrStatus.textContent = '✅ 支付成功！';
+                            qrStatus.className = 'qr-status success';
+                            
+                            // 4. 保存 Ed25519 签名授权
+                            this.saveLicense(statusData.license);
+                            
+                            // 5. 跳转至会员页面
+                            setTimeout(() => {
+                                window.location.href = '/vip/dashboard.html';
+                            }, 1500);
+                            
+                        } else if (statusData.status === 'failed' || attempts >= maxAttempts) {
+                            clearInterval(pollTimer);
+                            qrStatus.textContent = '支付超时，请重试';
+                            qrStatus.className = 'qr-status error';
+                            document.getElementById('payBtn').disabled = false;
+                            document.getElementById('payBtn').textContent = '重新支付';
+                        }
+                        
+                    } catch (error) {
+                        console.error('支付状态查询失败:', error);
+                        if (attempts >= maxAttempts) {
+                            clearInterval(pollTimer);
+                            qrStatus.textContent = '网络异常，请重试';
+                            qrStatus.className = 'qr-status error';
+                            document.getElementById('payBtn').disabled = false;
+                            document.getElementById('payBtn').textContent = '重新支付';
+                        }
+                    }
+                }, 2000);
+            }
+
+            saveLicense(license) {
+                // 使用 Web Crypto API 生成 Ed25519 密钥对
+                crypto.subtle.generateKey(
+                    {
+                        name: 'Ed25519',
+                        namedCurve: 'Ed25519',
+                    },
+                    true,
+                    ['sign', 'verify']
+                ).then((keyPair) => {
+                    // 保存私钥到 localStorage
+                    localStorage.setItem('apexwork_license', JSON.stringify({
+                        orderId: this.orderId,
+                        license: license,
+                        privateKey: keyPair.privateKey,
+                        timestamp: Date.now(),
+                        expiresAt: Date.now() + (365 * 24 * 60 * 60 * 1000) // 1年有效期
+                    }));
+                    
+                    // 触发全局事件，通知其他页面
+                    window.dispatchEvent(new CustomEvent('license-activated', {
+                        detail: { orderId: this.orderId }
+                    }));
+                });
+            }
+
+            checkExistingLicense() {
+                const existing = localStorage.getItem('apexwork_license');
+                if (existing) {
+                    const license = JSON.parse(existing);
+                    if (license.expiresAt > Date.now()) {
+                        // 已有有效授权，直接跳转
+                        window.location.href = '/vip/dashboard.html';
+                    }
+                }
+            }
+
+            showToast(message) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+        }
+
+        // 初始化支付网关
+        const gateway = new PaymentGateway();
+
+        // 全局方法
+        function selectMethod(method) {
+            gateway.selectMethod(method);
+        }
+
+        function initiatePayment() {
+            gateway.initiatePayment();
+        }
+    </script>
+</body>
+</html>
+```
+
+---
+
+###

@@ -1,0 +1,39 @@
+{
+  "gateway": {
+    "type": "hybrid",
+    "primary": "alipay",
+    "fallback": "wechat",
+    "currency": "CNY",
+    "locale": "zh-CN"
+  },
+  "endpoints": {
+    "createOrder": "/api/create-order",
+    "paymentStatus": "/api/payment-status/",
+    "alipayNotify": "/api/alipay/notify",
+    "wechatNotify": "/api/wechat/notify"
+  },
+  "security": {
+    "signatureAlgorithm": "Ed25519",
+    "keyExpiryDays": 365,
+    "encryption": "AES-256-GCM"
+  },
+  "ui": {
+    "theme": "gradient-purple",
+    "animation": "slide-up",
+    "qrSize": 200,
+    "pollingInterval": 2000
+  },
+  "products": {
+    "vip_membership": {
+      "name": "APEXWORK 高级会员",
+      "price": 9.99,
+      "currency": "CNY",
+      "duration": "1年"
+    }
+  }
+}
+```
+
+---
+
+###
