@@ -321,24 +321,25 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证码补签</span>';
 
+            // 👑 核心修复：强制单元格极宽且不换行，按钮强制定宽，防面条级挤压
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                    <td class="py-3 px-4">
+                    <td class="py-3 px-4 whitespace-nowrap min-w-[200px]">
                         <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc]">${user.email}</div>
                         <div class="text-[11px] text-slate-400 font-mono mt-0.5">USER ID: ${user.id}</div>
                     </td>
-                    <td class="py-3 px-4 font-mono text-blue-600 font-bold">${user.role}</td>
-                    <td class="py-3 px-4 font-mono">${verifyText}</td>
-                    <td class="py-3 px-4 font-mono text-slate-400">${user.date}</td>
-                    <td class="py-3 px-4 text-right whitespace-nowrap min-w-[280px]">
-                        <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap">
-                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0 whitespace-nowrap ${statusBtnCls}">
+                    <td class="py-3 px-4 font-mono text-blue-600 font-bold whitespace-nowrap">${user.role}</td>
+                    <td class="py-3 px-4 font-mono whitespace-nowrap">${verifyText}</td>
+                    <td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${user.date}</td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                        <div class="inline-flex items-center justify-end gap-2 flex-nowrap w-[240px]">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="w-[80px] py-1.5 rounded-lg text-xs font-bold transition shrink-0 ${statusBtnCls}">
                                 ${user.status ? '封禁账号' : '立即解封'}
                             </button>
-                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm shrink-0 whitespace-nowrap">
-                                发送验证码
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="w-[80px] py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm shrink-0">
+                                发送验证
                             </button>
-                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm shrink-0 whitespace-nowrap">
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="w-[80px] py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm shrink-0">
                                 销毁账号
                             </button>
                         </div>
