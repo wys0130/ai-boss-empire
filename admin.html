@@ -48,7 +48,7 @@
         <!-- Logo区 -->
         <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50 group cursor-pointer shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击更换企业 LOGO">
             <div class="flex items-center gap-2.5">
-                <img id="adminBrandLogo" src="assets/logo.webp" class="h-7 w-auto object-contain drop-shadow-sm" onerror="this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');" />
+                <img id="adminBrandLogo" src="assets/logo.webp" class="h-7 w-auto object-contain drop-shadow-sm" onerror="this.src='https://cdn.jsdelivr.net/gh/wys0130/ai-boss-empire@main/assets/logo.webp'; this.onerror=null; document.getElementById('adminFallbackBadge').classList.add('hidden');" />
                 <div id="adminFallbackBadge" class="hidden w-7 h-7 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shadow-md shrink-0 aspect-square">A</div>
                 <span class="font-black text-sm tracking-wide text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-500 transition">顶尖商务平台</span>
             </div>
@@ -440,7 +440,6 @@
                             </div>
 
                             <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3 relative overflow-hidden">
-                                <div class="absolute right-0 top-0 text-[60px] opacity-[0.03] pointer-events-none select-none -mt-4 -mr-2">✉️</div>
                                 <h4 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-slate-200 dark:border-blue-500/20 pb-1.5 uppercase">EmailJS 发信参数 (选填)</h4>
                                 <div>
                                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Service ID</label>
