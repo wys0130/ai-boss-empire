@@ -1198,19 +1198,27 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
+        // 👑 完美修复 @ 呼出 Bug：兼容 textarea / input 与 contenteditable
         cmdBox.addEventListener("input", function() {
-            const sel = window.getSelection();
             let text = "";
-            if (sel && sel.rangeCount > 0 && sel.anchorNode) {
-                text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+            if (typeof this.selectionStart === "number") {
+                // 如果是输入框或文本域
+                text = this.value.substring(0, this.selectionStart);
             } else {
-                text = cmdBox.innerText || "";
+                // 如果是富文本 div
+                const sel = window.getSelection();
+                if (sel.rangeCount > 0) {
+                    text = (sel.anchorNode.textContent || "").slice(0, sel.anchorOffset);
+                } else {
+                    text = this.innerText;
+                }
             }
+            // 匹配末尾的 @ 呼出菜单
             const match = text.match(/@([^\s@]*)$/);
             if (match) showMentionDropdown(match[1]);
             else hideMentionDropdown();
         });
-
+        
         cmdBox.addEventListener("keydown", function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
