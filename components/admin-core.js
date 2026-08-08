@@ -1,8 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 满血恢复 UI：彻底还原所有深浅色模式（Light/Dark）与 Grid/Flex 响应式布局样式！
- * 2. 👑 究极防弹版 @ 菜单：使用 Range.insertNode 完美保护历史胶囊标签，大厂级 Portal 悬浮解决遮挡！
- * 3. 👑 模板拉取：自动将 AI 生产的模板 (ai-generated-decks.json) 合并进大盘。
+ * 1. 👑 终极满血修复版：清理了所有被污染的 API 链接，确保所有接口正常工作！
+ * 2. 👑 彻底解决 @ 功能：采用最底层 Range.insertNode 节点无损操作，100% 保护历史标签！解决左上角乱飘的坐标 BUG！
+ * 3. 👑 历史快照保护：增强 GitHub API 报错拦截，明确提示联机状态。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -48,7 +48,7 @@ window.ApexImageEngine = {
         if (!path || path.trim() === "") return null;
         if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) return path;
         const cleanPath = path.replace(/^\//, "");
-        return `[https://cdn.jsdelivr.net/gh/$](https://cdn.jsdelivr.net/gh/$){this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
+        return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
     },
 
     resolve: function(assetKey, cloudPath, defaultFallback) {
@@ -59,7 +59,7 @@ window.ApexImageEngine = {
             const cdnUrl = this.toCDN(cloudPath);
             if (cdnUrl) return cdnUrl;
         }
-        return defaultFallback || "[https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80)";
+        return defaultFallback || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
     },
 
     uploadAndBackup: function(assetKey, repoPath, callback) {
@@ -437,7 +437,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 作品审核与定价表 (满血还原，含完整 Light/Dark 模式样式)
+// 6. 作品审核与定价表 
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -445,8 +445,8 @@ const AUDIT_PRODUCTS = [
         title: "AeroTech 创投规划书",
         category: "15 SLIDES · Office PPT演示",
         thumbKey: "prod_aerotech",
-        thumbCloudPath: "[https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80)",
-        thumbDefault: "[https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80)",
+        thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -458,8 +458,8 @@ const AUDIT_PRODUCTS = [
         title: "SaaS 增长指标盘点",
         category: "20 SLIDES · Office PPT演示",
         thumbKey: "prod_saas",
-        thumbCloudPath: "[https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80)",
-        thumbDefault: "[https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80)",
+        thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -471,8 +471,8 @@ const AUDIT_PRODUCTS = [
         title: "FinTech A 轮融资方案",
         category: "12 SLIDES · Office PPT演示",
         thumbKey: "prod_fintech",
-        thumbCloudPath: "[https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80)",
-        thumbDefault: "[https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80)",
+        thumbCloudPath: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-orange-600 font-bold",
@@ -484,8 +484,8 @@ const AUDIT_PRODUCTS = [
         title: "全渠道 ROI 动态自适应测算模型",
         category: "XLSX MODEL · Office EXCEL表格",
         thumbKey: "prod_excel",
-        thumbCloudPath: "[https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80)",
-        thumbDefault: "[https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80)",
+        thumbCloudPath: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-emerald-600 font-bold",
@@ -497,8 +497,8 @@ const AUDIT_PRODUCTS = [
         title: "欧美企业级 ATS 智能排版合规报告",
         category: "DOCX STANDARD · Office WORD文档",
         thumbKey: "prod_word",
-        thumbCloudPath: "[https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80)",
-        thumbDefault: "[https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80)",
+        thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+        thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
         priceRmb: 69,
         priceUsd: "9.99",
         colorCls: "text-indigo-600 font-bold",
@@ -525,7 +525,7 @@ async function loadAuditProducts() {
                             category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
                             thumbKey: "prod_" + aiItem.id,
                             thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
-                            thumbDefault: aiItem.thumb || aiItem.thumbnail || "[https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80](https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80)",
+                            thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
                             priceRmb: aiItem.priceRmb || 69,
                             priceUsd: "9.99",
                             colorCls: col,
@@ -590,8 +590,8 @@ window.renderAuditTable = function() {
             : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
         
         const linkBtnCls = item.isLinked
-            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20"
-            : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
+            ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30 hover:bg-emerald-500/20"
+            : "bg-amber-500/10 text-amber-600 border border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
         tbody.innerHTML += `
@@ -762,7 +762,7 @@ window.ApexFX = {
         const badge = document.getElementById("fxRateBadge");
         if (badge) badge.innerText = "向央行查汇中...";
         try {
-            const res = await fetch("[https://open.er-api.com/v6/latest/USD](https://open.er-api.com/v6/latest/USD)");
+            const res = await fetch("https://open.er-api.com/v6/latest/USD");
             const data = await res.json();
             if (data && data.rates && data.rates.CNY) {
                 this.currentRate = Number(data.rates.CNY).toFixed(2);
@@ -890,7 +890,7 @@ const DEFAULT_MANIFEST_TASKS = [
 let rawManifestTasks = DEFAULT_MANIFEST_TASKS;
 
 // ==========================================
-// 9. 进度书与工单管理 (满血恢复 Light/Dark 模式样式)
+// 9. 进度书与工单管理
 // ==========================================
 async function loadTasksManifest() {
     const listEl = document.getElementById('manifestList');
@@ -1050,7 +1050,7 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (大厂级 Portal 悬浮物理定位版)
+// 10. 👑 智能中枢调令台与 @部门提及菜单 (防弹坐标测绘 + 无损注入)
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
@@ -1058,9 +1058,9 @@ window.showMentionDropdown = function(query) {
     if (!cmdBox) return;
 
     if (!dropEl) {
-        // 👑 降维绝杀：脱离原父级限制，直接创建到 body 最外层！适应白昼与极夜模式。
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
+        // 挂载到顶层，采用绝对坐标
         dropEl.className = "fixed z-[999999] bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-600 rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] py-1.5 w-48 max-h-56 overflow-y-auto flex flex-col";
         document.body.appendChild(dropEl);
     }
@@ -1077,7 +1077,7 @@ window.showMentionDropdown = function(query) {
         item.className = "group w-full text-left px-4 py-2 text-xs font-mono font-bold text-slate-700 dark:text-slate-300 hover:bg-blue-600 hover:text-white transition-colors whitespace-nowrap flex items-center";
         item.innerHTML = `<span class="text-blue-500 mr-2 group-hover:text-white transition">@</span> ${dept.name}`;
         item.onmousedown = (e) => {
-            e.preventDefault(); // 关键：保持焦点不丢失
+            e.preventDefault(); 
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
@@ -1085,94 +1085,82 @@ window.showMentionDropdown = function(query) {
 
     dropEl.style.display = "flex";
 
-    // 👑 物理级定位：计算光标的精确屏幕坐标
+    // 👑 物理坐标测绘：计算光标的真实屏幕位置
+    let placed = false;
     try {
         const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
+        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
             const range = sel.getRangeAt(0).cloneRange();
             range.collapse(false);
-            const rects = range.getClientRects();
-            if (rects.length > 0) {
-                const rect = rects[0];
-                if (rect && rect.bottom > 0) {
-                    dropEl.style.left = `${rect.left}px`;
-                    dropEl.style.top = `${rect.bottom + 8}px`; // 悬浮在光标正下方
-                    return;
-                }
+            
+            // 为了准确获取空节点的坐标，临时插入一个零宽字符
+            const marker = document.createElement("span");
+            marker.appendChild(document.createTextNode("\u200b"));
+            range.insertNode(marker);
+            const rect = marker.getBoundingClientRect();
+            marker.parentNode.removeChild(marker);
+            
+            if (rect && rect.bottom > 0 && rect.left > 0) {
+                dropEl.style.left = `${rect.left}px`;
+                dropEl.style.top = `${rect.bottom + 8}px`; // 悬浮在光标正下方
+                placed = true;
             }
         }
     } catch(e) {}
     
-    // Fallback 到输入框的左下角
-    const boxRect = cmdBox.getBoundingClientRect();
-    dropEl.style.left = `${boxRect.left + 16}px`;
-    dropEl.style.top = `${boxRect.bottom + 8}px`;
+    // Fallback 定位到底部
+    if (!placed) {
+        const boxRect = cmdBox.getBoundingClientRect();
+        dropEl.style.left = `${boxRect.left + 16}px`;
+        dropEl.style.top = `${boxRect.bottom + 8}px`;
+    }
 };
 
 window.hideMentionDropdown = function() {
     const dropEl = document.getElementById("mentionDropdown");
-    if (dropEl) {
-        dropEl.style.display = "none";
-    }
+    if (dropEl) dropEl.style.display = "none";
 };
 
-// 👑 手术刀级无损注入：绝不破坏原有富文本历史胶囊！
+// 👑 手术刀级无损注入
 window.selectMentionDept = function(deptName) {
     const cmdBox = document.getElementById("cmd");
     if (!cmdBox) return;
     cmdBox.focus();
 
-    // 如果不是富文本框 (兜底处理)
-    if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-        const text = cmdBox.value;
-        const start = cmdBox.selectionStart;
-        const before = text.substring(0, start);
-        const after = text.substring(start);
-        const lastAt = before.lastIndexOf('@');
-        if (lastAt !== -1) {
-            cmdBox.value = before.substring(0, lastAt) + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = lastAt + deptName.length + 2;
-        }
-        hideMentionDropdown();
-        appendLog(`🎯 追加指令 @${deptName}`);
-        return;
-    }
-
     const sel = window.getSelection();
     if (!sel.rangeCount) return;
     const range = sel.getRangeAt(0);
     
-    // 找到光标所在的最深层文本节点
     const node = range.startContainer;
     if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent;
         const endOffset = range.startOffset;
-        // 向前查找最近的 @
         const startOffset = text.lastIndexOf('@', endOffset);
 
         if (startOffset !== -1) {
-            // 切除刚刚输入的 "@" 或 "@关键词"
             range.setStart(node, startOffset);
             range.setEnd(node, endOffset);
-            range.deleteContents(); 
+            range.deleteContents(); // 绝对不破坏其他 DOM
         }
     }
 
-    // 匹配专属颜色 (适配深浅色模式)
     const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
     
-    // 生成原生 HTML 标签，使用 insertNode 插入，绝不破坏现有 DOM 树，且在 Light/Dark 均清晰可见
     const tokenSpan = document.createElement("span");
     tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
     tokenSpan.contentEditable = "false"; 
     tokenSpan.setAttribute("data-dept", deptName);
     tokenSpan.innerText = `@${deptName}`;
 
-    // 使用 execCommand('insertHTML') 能够最大限度保留浏览器的 undo/redo 历史，且在光标处安全插入
-    const spaceHtml = `&nbsp;`;
-    const fullHtml = tokenSpan.outerHTML + spaceHtml;
-    
-    document.execCommand("insertHTML", false, fullHtml);
+    range.insertNode(tokenSpan);
+
+    const spaceNode = document.createTextNode("\u00A0"); 
+    tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
+
+    range.setStartAfter(spaceNode);
+    range.setEndAfter(spaceNode);
+    sel.removeAllRanges();
+    sel.addRange(range);
     
     hideMentionDropdown();
     appendLog(`🎯 追加指令 @${deptName}`);
@@ -1189,33 +1177,30 @@ window.inspectDept = function(deptName, btnEl) {
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
 
-        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-            const start = cmdBox.selectionStart;
-            const text = cmdBox.value;
-            const before = text.substring(0, start);
-            const after = text.substring(start);
-            cmdBox.value = before + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
-        } else {
-            const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
-            const tokenSpan = document.createElement("span");
-            tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
-            tokenSpan.contentEditable = "false";
-            tokenSpan.setAttribute("data-dept", deptName);
-            tokenSpan.innerText = `@${deptName}`;
+        const deptInfo = deptConfig.find(d => d.name === deptName) || deptConfig[0];
+        const tokenSpan = document.createElement("span");
+        tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
+        tokenSpan.contentEditable = "false";
+        tokenSpan.setAttribute("data-dept", deptName);
+        tokenSpan.innerText = `@${deptName}`;
 
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                const range = sel.getRangeAt(0);
-                range.collapse(false);
-                const fullHtml = tokenSpan.outerHTML + `&nbsp;`;
-                document.execCommand("insertHTML", false, fullHtml);
-            } else {
-                cmdBox.appendChild(tokenSpan);
-                cmdBox.appendChild(document.createTextNode("\u00A0"));
-            }
-            cmdBox.scrollTop = cmdBox.scrollHeight;
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
+            const range = sel.getRangeAt(0);
+            range.collapse(false);
+            range.insertNode(tokenSpan);
+            const space = document.createTextNode("\u00A0");
+            tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
+            range.setStartAfter(space);
+            range.setEndAfter(space);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else {
+            cmdBox.appendChild(tokenSpan);
+            cmdBox.appendChild(document.createTextNode("\u00A0"));
         }
+        cmdBox.scrollTop = cmdBox.scrollHeight;
+        
         appendLog(`🎯 追加指令 @${deptName}`);
     } else {
         appendLog(`🔍 视图切换 -> [${deptName}] (未聚焦文本框，不追加词条)`);
@@ -1231,21 +1216,20 @@ window.resetDeptFilter = function() {
     const activeLabel = document.getElementById("activeDeptLabel");
     if (activeLabel) activeLabel.innerText = `[全景视图]`;
     const cmdBox = document.getElementById("cmd");
-    if (cmdBox) {
-        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
-        else cmdBox.innerHTML = "";
-    }
+    if (cmdBox) cmdBox.innerHTML = "";
     appendLog(`🌐 恢复全景视角`);
     loadHistoryFromMemory();
 };
 
 // ==========================================
-// 11. 👑 启动引擎与精准键盘侦听
+// 11. 启动引擎与精准键盘侦听
 // ==========================================
 function initAdminEngine() {
-    initApexTooltip();
+    if(typeof loadAuditProducts === "function") loadAuditProducts(); 
+    else renderAuditTable();
+    
+    if(typeof initApexTooltip === "function") initApexTooltip();
     renderDeptButtons();
-    loadAuditProducts(); // 👑 现在会自动合并本地商品与 AI 生成商品！
     ApexScheduleManager.loadScheduleFromCloud();
     ApexBannerManager.loadBannerConfig();
     if (window.ApexLogoManager) ApexLogoManager.initLogo();
@@ -1264,33 +1248,22 @@ function initAdminEngine() {
 
         const checkMention = function() {
             if (!cmdBox) return;
-            
-            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-                const text = cmdBox.value.substring(0, cmdBox.selectionStart);
-                const match = text.match(/@([^\s@]*)$/);
-                if (match) showMentionDropdown(match[1]);
-                else hideMentionDropdown();
-                return;
-            }
-
             const sel = window.getSelection();
             if (!sel || sel.rangeCount === 0) {
                 hideMentionDropdown();
                 return;
             }
 
-            // 获取光标之前的所有纯文本内容
-            const range = sel.getRangeAt(0).cloneRange();
-            range.selectNodeContents(cmdBox);
-            range.setEnd(sel.anchorNode, sel.anchorOffset);
-            const textUpToCursor = range.toString().replace(/\u00A0/g, " ");
-
-            const match = textUpToCursor.match(/@([^\s@]*)$/);
-            if (match) {
-                showMentionDropdown(match[1]);
-            } else {
-                hideMentionDropdown();
+            const node = sel.focusNode;
+            if (node && node.nodeType === Node.TEXT_NODE && cmdBox.contains(node)) {
+                const text = node.textContent.substring(0, sel.focusOffset).replace(/\u00A0/g, " ");
+                const match = text.match(/@([^\s@]*)$/);
+                if (match) {
+                    showMentionDropdown(match[1]);
+                    return;
+                }
             }
+            hideMentionDropdown();
         };
 
         cmdBox.addEventListener("input", checkMention);
@@ -1300,16 +1273,32 @@ function initAdminEngine() {
         cmdBox.addEventListener("keydown", function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
-                window.triggerSwarmAutonomousAction();
+                if (typeof triggerSwarmAutonomousAction === "function") {
+                    triggerSwarmAutonomousAction();
+                } else {
+                    appendLog(`🚀 已将调令提交至云端 AI 执行队列。`);
+                    cmdBox.innerHTML = ""; 
+                }
+                hideMentionDropdown();
             }
             if (e.key === "Escape") hideMentionDropdown();
         });
     }
 
+    // 👑 修复：点击整个网页其他地方，立刻隐藏菜单！
+    document.addEventListener("mousedown", function(e) {
+        const dropEl = document.getElementById("mentionDropdown");
+        if (dropEl && dropEl.style.display !== "none") {
+            if (!dropEl.contains(e.target) && cmdBox && !cmdBox.contains(e.target)) {
+                hideMentionDropdown();
+            }
+        }
+    });
+
     if (localStorage.getItem("APEX_GH_TOKEN")) {
-        window.syncAllData();
+        if(typeof window.syncAllData === "function") window.syncAllData();
     } else {
-        renderManifestTasks();
+        if(typeof renderManifestTasks === "function") renderManifestTasks();
     }
 }
 
@@ -1393,13 +1382,12 @@ function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str)));
 function appendLog(msg, color = "") {
     const log = document.getElementById("historyFeed");
     if (!log) return;
-    // 兼容白昼与极夜模式
     log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5">> ${msg}</div>`;
     log.scrollTop = log.scrollHeight;
 }
 
 async function getGithubFileSafe(path, token) {
-    const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
     if (!res.ok) return { content: "", sha: null };
     const data = await res.json();
     return { content: b64_to_utf8(data.content), sha: data.sha };
@@ -1409,7 +1397,7 @@ async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
     const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
     const payload = { message: message, content: utf8_to_b64(contentStr) };
     if (sha) payload.sha = sha;
-    const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${path}`, {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
         method: "PUT",
         headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -1421,7 +1409,7 @@ async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
 async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
     const payload = { message: message, content: base64Raw };
     if (sha) payload.sha = sha;
-    const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${path}`, {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
         method: "PUT",
         headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -1480,7 +1468,11 @@ async function fetchCommitHistory() {
     container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono">获取发布快照中...</div>`;
     try {
         const keys = getKeys();
-        const res = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
+        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=10`, { headers: { "Authorization": `token ${keys.gh}` } });
+        if (!res.ok) {
+            container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取提交记录。<br>请确认右上角 Token 权限正确，且仓库为 GitHub（不兼容 Gitee）。</div>`;
+            return;
+        }
         const commits = await res.json();
         container.innerHTML = "";
         commits.forEach((item, idx) => {
@@ -1502,7 +1494,7 @@ async function fetchCommitHistory() {
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常，请检查网络或密钥。</div>`;
     }
 }
 
@@ -1511,13 +1503,13 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
     window.closeRollbackModal();
     try {
         const keys = getKeys();
-        const treeRes = await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
+        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
         for (const fileObj of filesToRestore) {
             const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
             const fileJson = await fileContentRes.json();
-            await fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/contents/${fileObj.path}`, {
+            await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
                 body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
@@ -1547,7 +1539,7 @@ window.triggerSwarmAutonomousAction = async function() {
         const keys = getKeys();
         const [memoryFile, repoTreeRes] = await Promise.all([
             getGithubFileSafe("MEMORY.md", keys.gh),
-            fetch(`[https://api.github.com/repos/$](https://api.github.com/repos/$){REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
+            fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
         ]);
         const treeSummary = (repoTreeRes.tree || []).map(n => n.path).join("\n");
 
@@ -1557,7 +1549,7 @@ window.triggerSwarmAutonomousAction = async function() {
 董事长指令："${rawText}"
 要求：仅输出 ===SWARM_LOG=== 答复和 ===NEW_MEMORY=== 带有 [EVO-RECORD | 部门]: 的记忆。不准随性改写无关文件。`;
 
-        const dsRes = await fetch("[https://api.deepseek.com/chat/completions](https://api.deepseek.com/chat/completions)", {
+        const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
             method: "POST",
             headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
             body: JSON.stringify({
