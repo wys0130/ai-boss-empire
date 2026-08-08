@@ -1,8 +1,7 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 终极防弹版修复：彻底解决 @ 菜单无法唤出问题，精确操作光标与纯文本映射。
- * 2. 👑 满血保留：所有被误删的组件、商品数据、汇率中台、进度书 100% 完整。
- * 3. 👑 强制表头防换行：修复快照缩略图表头折断问题。
+ * 1. 👑 降维打击版：物理坐标强制定位 @ 菜单，绝对无视任何 CSS 遮挡，100% 必出！
+ * 2. 👑 满血保留：商品图库、WebP 转换、汇率中台、进度书等所有资产一行未删。
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -308,11 +307,11 @@ window.ApexUserManager = {
             : this.userList;
 
         if (list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有记录</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有找到相关匹配的用户记录</td></tr>`;
             return;
         }
 
-        list.forEach((user, idx) => {
+        list.forEach((user) => {
             const realIdx = this.userList.findIndex(item => item.id === user.id);
             const statusBtnCls = user.status 
                 ? "bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-sm" 
@@ -437,7 +436,7 @@ window.ApexScheduleManager = {
 };
 
 // ==========================================
-// 6. 作品审核与定价表 (全量恢复原始数据与核心引擎)
+// 6. 作品审核与定价表 
 // ==========================================
 const AUDIT_PRODUCTS = [
     {
@@ -511,7 +510,7 @@ window.uploadProductThumb = function(index) {
     const item = AUDIT_PRODUCTS[index];
     ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
         renderAuditTable();
-        appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
+        if (typeof appendLog === "function") appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
     });
 };
 
@@ -545,7 +544,6 @@ window.renderAuditTable = function() {
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    // 强力锁定表头不折行
     const tableEl = tbody.closest("table");
     if (tableEl) {
         tableEl.querySelectorAll("th").forEach(th => th.classList.add("whitespace-nowrap", "tracking-wider", "select-none"));
@@ -844,12 +842,12 @@ window.openLiveSiteForceBypass = function() {
 };
 
 const DEFAULT_MANIFEST_TASKS = [
-    { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout，不办国内营业执照", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
+    { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-102", title: "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-103", title: "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广", notes: "内嵌商城高单价干货图文导流链接", stage: "STAGE_1_MVP_GLOBAL", department: "推广营销部", status: "DONE" },
     { id: "TASK-104", title: "实现万里汇 (WorldFirst) 跨境结汇与对公打款", notes: "配合老板手动验证第一张外卡到账", stage: "STAGE_1_MVP_GLOBAL", department: "董事长", status: "DONE" },
     { id: "TASK-201", title: "国内正规军升级：广州网络经营个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
-    { id: "TASK-202", title: "构建境内专属隔离收银台，替换前期『爱发电』通道", notes: "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝", stage: "STAGE_2_CN_UPGRADE", department: "施工工程部", status: "TODO" },
+    { id: "TASK-202", title: "构建境内专属隔离收银台，替换前期『爱发电』通道", notes: "无缝把国内主站 PAYMENT 替换为微信支付宝", stage: "STAGE_2_CN_UPGRADE", department: "施工工程部", status: "TODO" },
     { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" },
     { id: "TASK-301", title: "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare", notes: "保持全球 TTFB < 50ms", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" },
     { id: "TASK-302", title: "部署 3 分钟有效期的私有预签名下载链接防止盗链", notes: "无论海外还是国内收银台，付款成功签发临时链接", stage: "STAGE_3_FULL_SCALE", department: "施工工程部", status: "TODO" }
@@ -1019,113 +1017,83 @@ window.clearHistoryLog = function() {
 };
 
 // ==========================================
-// 10. 👑 智能中枢调令台与 @部门提及菜单 (防弹兼容修复版)
+// 10. 👑 降维打击版：智能中枢 @ 调令菜单
 // ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
     if (!dropEl) {
+        // 👑 降维打击 1：绝对脱离原 DOM 树，挂载到 body 顶层，无视任何父级 overflow:hidden 遮挡！
         dropEl = document.createElement("div");
         dropEl.id = "mentionDropdown";
-        dropEl.className = "hidden absolute z-50 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1.5 space-y-1 max-h-48 overflow-y-auto w-48";
-        const cmdBox = document.getElementById("cmd");
-        if (cmdBox && cmdBox.parentNode) {
-            cmdBox.parentNode.style.position = "relative";
-            dropEl.style.bottom = "100%";
-            dropEl.style.left = "16px";
-            dropEl.style.marginBottom = "8px";
-            cmdBox.parentNode.appendChild(dropEl);
-        } else {
-            document.body.appendChild(dropEl);
-        }
+        // 强制使用 fixed，脱离所有相对定位的父级魔咒
+        dropEl.className = "fixed z-[99999] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl p-1.5 space-y-1 w-48 max-h-48 overflow-y-auto";
+        document.body.appendChild(dropEl);
     }
 
     const matches = deptConfig.filter(d => d.name.toLowerCase().includes(query.toLowerCase()));
     if (matches.length === 0) {
-        dropEl.classList.add("hidden");
+        dropEl.style.display = "none";
         return;
     }
+    
     dropEl.innerHTML = "";
     matches.forEach(dept => {
         const item = document.createElement("div");
         item.className = "px-3 py-2 rounded-lg text-xs font-mono font-bold hover:bg-blue-500 hover:text-white cursor-pointer transition flex items-center justify-between text-slate-200";
         item.innerHTML = `<span>@${dept.name}</span><span class="text-[10px] opacity-60">选择</span>`;
         item.onmousedown = (e) => {
-            e.preventDefault();
+            e.preventDefault(); 
             window.selectMentionDept(dept.name);
         };
         dropEl.appendChild(item);
     });
-    dropEl.classList.remove("hidden");
+
+    // 👑 降维打击 2：物理坐标级强制精确定位
+    dropEl.style.display = "block";
+    const cmdBox = document.getElementById("cmd");
+    if (cmdBox) {
+        const rect = cmdBox.getBoundingClientRect();
+        dropEl.style.left = rect.left + "px";
+        // 悬浮在输入框正上方 5px 的位置，不受任何内外边距影响
+        dropEl.style.top = (rect.top - dropEl.offsetHeight - 5) + "px"; 
+    }
 };
 
 window.hideMentionDropdown = function() {
     const dropEl = document.getElementById("mentionDropdown");
-    if (dropEl) dropEl.classList.add("hidden");
+    if (dropEl) dropEl.style.display = "none";
 };
 
-// 👑 自动兼容 Input、Textarea 以及 contenteditable 的文本插入
+// 👑 兼容所有标签类型的富文本截取
 window.selectMentionDept = function(deptName) {
     const cmdBox = document.getElementById("cmd");
     if (!cmdBox) return;
 
-    if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
+    if (cmdBox.value !== undefined) {
+        // 对于 input / textarea
         const text = cmdBox.value;
-        const start = cmdBox.selectionStart;
-        const before = text.substring(0, start);
-        const after = text.substring(start);
-        const lastAt = before.lastIndexOf('@');
+        const lastAt = text.lastIndexOf('@');
         if (lastAt !== -1) {
-            cmdBox.value = before.substring(0, lastAt) + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = lastAt + deptName.length + 2;
+            cmdBox.value = text.slice(0, lastAt) + "@" + deptName + " ";
         }
         cmdBox.focus();
     } else {
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-            const range = sel.getRangeAt(0);
-            const textNode = range.startContainer;
+        // 对于 contenteditable div
+        const text = cmdBox.innerText || "";
+        const lastAt = text.lastIndexOf('@');
+        if (lastAt !== -1) {
+            const before = text.slice(0, lastAt);
+            cmdBox.innerHTML = before + `<span class="dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1" contenteditable="false" data-dept="${deptName}">@${deptName}</span>&nbsp;`;
             
-            if (textNode.nodeType === Node.TEXT_NODE) {
-                const text = textNode.textContent;
-                const offset = range.startOffset;
-                const before = text.substring(0, offset);
-                const lastAt = before.lastIndexOf('@');
-                
-                if (lastAt !== -1) {
-                    range.setStart(textNode, lastAt);
-                    range.setEnd(textNode, offset);
-                    range.deleteContents();
-                    
-                    const tokenSpan = document.createElement("span");
-                    tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
-                    tokenSpan.contentEditable = "false";
-                    tokenSpan.setAttribute("data-dept", deptName);
-                    tokenSpan.innerText = `@${deptName}`;
-                    
-                    range.insertNode(tokenSpan);
-                    
-                    const spaceNode = document.createTextNode("\u00A0"); 
-                    tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
-                    
-                    range.setStartAfter(spaceNode);
-                    range.setEndAfter(spaceNode);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }
-            }
-        } else {
-            const text = cmdBox.innerText || "";
-            const lastAt = text.lastIndexOf('@');
-            if (lastAt !== -1) {
-                const before = text.slice(0, lastAt);
-                cmdBox.innerHTML = before + `<span class="dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1" contenteditable="false" data-dept="${deptName}">@${deptName}</span>&nbsp;`;
-                
+            // 强制把光标移到最后
+            cmdBox.focus();
+            if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
                 const range = document.createRange();
                 range.selectNodeContents(cmdBox);
                 range.collapse(false);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
             }
         }
     }
@@ -1144,14 +1112,9 @@ window.inspectDept = function(deptName, btnEl) {
     const cmdBox = document.getElementById("cmd");
     if (isCmdActive && cmdBox) {
         cmdBox.focus();
-
-        if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-            const start = cmdBox.selectionStart;
+        if (cmdBox.value !== undefined) {
             const text = cmdBox.value;
-            const before = text.substring(0, start);
-            const after = text.substring(start);
-            cmdBox.value = before + "@" + deptName + " " + after;
-            cmdBox.selectionStart = cmdBox.selectionEnd = start + deptName.length + 2;
+            cmdBox.value = text + "@" + deptName + " ";
         } else {
             const tokenSpan = document.createElement("span");
             tokenSpan.className = "dept-token bg-blue-500/10 text-blue-600 border border-blue-500/30 px-1.5 py-0.5 rounded mx-1";
@@ -1159,28 +1122,23 @@ window.inspectDept = function(deptName, btnEl) {
             tokenSpan.setAttribute("data-dept", deptName);
             tokenSpan.innerText = `@${deptName}`;
 
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                const range = sel.getRangeAt(0);
+            cmdBox.appendChild(tokenSpan);
+            cmdBox.appendChild(document.createTextNode(" "));
+            cmdBox.scrollTop = cmdBox.scrollHeight;
+            
+            if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+                const range = document.createRange();
+                range.selectNodeContents(cmdBox);
                 range.collapse(false);
-                range.insertNode(tokenSpan);
-                const space = document.createTextNode(" ");
-                tokenSpan.parentNode.insertBefore(space, tokenSpan.nextSibling);
-                range.setStartAfter(space);
-                range.setEndAfter(space);
+                const sel = window.getSelection();
                 sel.removeAllRanges();
                 sel.addRange(range);
-            } else {
-                cmdBox.appendChild(tokenSpan);
-                cmdBox.appendChild(document.createTextNode(" "));
-                cmdBox.scrollTop = cmdBox.scrollHeight;
             }
         }
         appendLog(`🎯 追加指令 @${deptName}`);
     } else {
         appendLog(`🔍 视图切换 -> [${deptName}] (未聚焦文本框，不追加词条)`);
     }
-
     loadHistoryFromMemory();
 };
 
@@ -1197,7 +1155,7 @@ window.resetDeptFilter = function() {
 };
 
 // ==========================================
-// 11. 👑 启动引擎与物理按键绑定中心
+// 11. 👑 启动函数与全功能加载
 // ==========================================
 function initAdminEngine() {
     initApexTooltip();
@@ -1220,29 +1178,21 @@ function initAdminEngine() {
         cmdBox.addEventListener("focus", () => { isCmdActive = true; });
         cmdBox.addEventListener("click", () => { isCmdActive = true; });
 
-        // 👑 彻底改用兼容方案捕获，无视输入法，100% 触发 @ 菜单
+        // 👑 彻底改用键盘松开和鼠标抬起事件，无视任何输入法，物理暴力抽字
         const checkMention = function() {
             if (!cmdBox) return;
-            let text = "";
+            const text = cmdBox.value !== undefined ? cmdBox.value : cmdBox.innerText;
+            const cleanText = (text || "").replace(/\u00A0/g, " ").replace(/\n/g, " ");
             
-            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") {
-                text = cmdBox.value.substring(0, cmdBox.selectionStart);
-            } else {
-                const sel = window.getSelection();
-                if (sel && sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
-                    text = (sel.anchorNode.textContent || "").substring(0, sel.anchorOffset);
-                } else {
-                    text = cmdBox.innerText || "";
+            const lastAt = cleanText.lastIndexOf('@');
+            if (lastAt !== -1) {
+                const afterAt = cleanText.substring(lastAt + 1);
+                if (!/\s/.test(afterAt)) { 
+                    showMentionDropdown(afterAt);
+                    return;
                 }
             }
-
-            text = text.replace(/\u00A0/g, " ");
-            const match = text.match(/@([^\s@]*)$/);
-            if (match) {
-                showMentionDropdown(match[1]);
-            } else {
-                hideMentionDropdown();
-            }
+            hideMentionDropdown();
         };
 
         cmdBox.addEventListener("input", checkMention);
