@@ -1,192 +1,395 @@
-{
-  "products": [
-    {
-      "id": "aerotech",
-      "title": "AeroTech 创投规划书",
-      "category": "15 SLIDES · Office PPT演示",
-      "thumbKey": "prod_aerotech",
-      "thumbCloudPath": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-      "thumbDefault": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-      "priceRmb": 69,
-      "priceUsd": "9.99",
-      "colorCls": "text-orange-600 font-bold",
-      "isLinked": true,
-      "status": true
-    },
-    {
-      "id": "saas",
-      "title": "SaaS 增长指标盘点",
-      "category": "20 SLIDES · Office PPT演示",
-      "thumbKey": "prod_saas",
-      "thumbCloudPath": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
-      "thumbDefault": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
-      "priceRmb": 69,
-      "priceUsd": "9.99",
-      "colorCls": "text-orange-600 font-bold",
-      "isLinked": true,
-      "status": true
-    },
-    {
-      "id": "fintech",
-      "title": "FinTech A 轮融资方案",
-      "category": "12 SLIDES · Office PPT演示",
-      "thumbKey": "prod_fintech",
-      "thumbCloudPath": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
-      "thumbDefault": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
-      "priceRmb": 69,
-      "priceUsd": "9.99",
-      "colorCls": "text-orange-600 font-bold",
-      "isLinked": true,
-      "status": true
-    },
-    {
-      "id": "excel",
-      "title": "全渠道 ROI 动态自适应测算模型",
-      "category": "XLSX MODEL · Office EXCEL表格",
-      "thumbKey": "prod_excel",
-      "thumbCloudPath": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
-      "thumbDefault": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
-      "priceRmb": 69,
-      "priceUsd": "9.99",
-      "colorCls": "text-emerald-600 font-bold",
-      "isLinked": true,
-      "status": true
-    },
-    {
-      "id": "word",
-      "title": "欧美企业级 ATS 智能排版合规报告",
-      "category": "DOCX STANDARD · Office WORD文档",
-      "thumbKey": "prod_word",
-      "thumbCloudPath": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
-      "thumbDefault": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
-      "priceRmb": 69,
-      "priceUsd": "9.99",
-      "colorCls": "text-indigo-600 font-bold",
-      "isLinked": true,
-      "status": true
+[
+  {
+    "id": "legacy-1786205078726",
+    "name": "旧版默认存档归档",
+    "timestamp": "2026-08-08T15:39:47.479Z",
+    "data": {
+      "products": [
+        {
+          "id": "aerotech",
+          "title": "AeroTech 创投规划书",
+          "category": "15 SLIDES · Office PPT演示",
+          "thumbKey": "prod_aerotech",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-orange-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "saas",
+          "title": "SaaS 增长指标盘点",
+          "category": "20 SLIDES · Office PPT演示",
+          "thumbKey": "prod_saas",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-orange-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "fintech",
+          "title": "FinTech A 轮融资方案",
+          "category": "12 SLIDES · Office PPT演示",
+          "thumbKey": "prod_fintech",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-orange-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "excel",
+          "title": "全渠道 ROI 动态自适应测算模型",
+          "category": "XLSX MODEL · Office EXCEL表格",
+          "thumbKey": "prod_excel",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-emerald-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "word",
+          "title": "欧美企业级 ATS 智能排版合规报告",
+          "category": "DOCX STANDARD · Office WORD文档",
+          "thumbKey": "prod_word",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-indigo-600 font-bold",
+          "isLinked": true,
+          "status": true
+        }
+      ],
+      "pricing": {},
+      "banner": [
+        {
+          "tag": "",
+          "title": "",
+          "desc": "",
+          "bgStyle": "",
+          "bgImg": ""
+        },
+        {
+          "tag": "",
+          "title": "",
+          "desc": "",
+          "bgStyle": "",
+          "bgImg": ""
+        }
+      ],
+      "users": [
+        {
+          "id": "U-1001",
+          "email": "wys0130@apexwork.cn",
+          "role": "企业高级合伙人 [ADMIN]",
+          "verified": true,
+          "date": "2026-06-12",
+          "status": true
+        },
+        {
+          "id": "U-1002",
+          "email": "founder@invest-tech.com",
+          "role": "商业三件套终身版 [CLIENT]",
+          "verified": true,
+          "date": "2026-07-03",
+          "status": true
+        },
+        {
+          "id": "U-1003",
+          "email": "product_pm@saas-growth.org",
+          "role": "PPT 战略套件订阅 [CLIENT]",
+          "verified": false,
+          "date": "2026-08-01",
+          "status": true
+        }
+      ],
+      "tasks": [
+        {
+          "id": "TASK-101",
+          "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
+          "notes": "用极简代码嵌入 Checkout",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "施工工程部",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-102",
+          "title": "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约",
+          "notes": "检测中国 IP 时购买按钮自动变爱发电跳转",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "施工工程部",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-103",
+          "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广",
+          "notes": "内嵌商城高单价干货图文导流链接",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "推广营销部",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-104",
+          "title": "实现万里汇 (WorldFirst) 跨境结汇与对公打款",
+          "notes": "配合老板手动验证第一张外卡到账",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "董事长",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-201",
+          "title": "国内正规军升级：广州网络经营个体户执照与对公参数",
+          "notes": "办个体户无需实际租用办公楼",
+          "stage": "STAGE_2_CN_UPGRADE",
+          "department": "董事长",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "id": "TASK-202",
+          "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
+          "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
+          "stage": "STAGE_2_CN_UPGRADE",
+          "department": "施工工程部",
+          "status": "TODO"
+        },
+        {
+          "id": "TASK-203",
+          "title": "智能判断多模态设计组，建立每日自动生成模版流水线",
+          "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
+          "stage": "STAGE_2_CN_UPGRADE",
+          "department": "主动产品部",
+          "status": "TODO"
+        },
+        {
+          "id": "TASK-301",
+          "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare",
+          "notes": "保持全球 TTFB < 50ms",
+          "stage": "STAGE_3_FULL_SCALE",
+          "department": "施工工程部",
+          "status": "TODO"
+        },
+        {
+          "id": "TASK-302",
+          "title": "部署 3 分钟有效期的私有预签名下载链接防止盗链",
+          "notes": "无论海外还是国内收银台，付款成功签发临时链接",
+          "stage": "STAGE_3_FULL_SCALE",
+          "department": "施工工程部",
+          "status": "TODO"
+        }
+      ],
+      "schedule": {
+        "start": "0",
+        "end": "8",
+        "enabled": "true"
+      },
+      "timestamp": "2026-08-08T15:39:47.479Z"
     }
-  ],
-  "pricing": {},
-  "banner": [
-    {
-      "tag": "",
-      "title": "",
-      "desc": "",
-      "bgStyle": "",
-      "bgImg": ""
-    },
-    {
-      "tag": "",
-      "title": "",
-      "desc": "",
-      "bgStyle": "",
-      "bgImg": ""
-    }
-  ],
-  "users": [
-    {
-      "id": "U-1001",
-      "email": "wys0130@apexwork.cn",
-      "role": "企业高级合伙人 [ADMIN]",
-      "verified": true,
-      "date": "2026-06-12",
-      "status": true
-    },
-    {
-      "id": "U-1002",
-      "email": "founder@invest-tech.com",
-      "role": "商业三件套终身版 [CLIENT]",
-      "verified": true,
-      "date": "2026-07-03",
-      "status": true
-    },
-    {
-      "id": "U-1003",
-      "email": "product_pm@saas-growth.org",
-      "role": "PPT 战略套件订阅 [CLIENT]",
-      "verified": false,
-      "date": "2026-08-01",
-      "status": true
-    }
-  ],
-  "tasks": [
-    {
-      "id": "TASK-101",
-      "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
-      "notes": "用极简代码嵌入 Checkout",
-      "stage": "STAGE_1_MVP_GLOBAL",
-      "department": "施工工程部",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-102",
-      "title": "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约",
-      "notes": "检测中国 IP 时购买按钮自动变爱发电跳转",
-      "stage": "STAGE_1_MVP_GLOBAL",
-      "department": "施工工程部",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-103",
-      "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广",
-      "notes": "内嵌商城高单价干货图文导流链接",
-      "stage": "STAGE_1_MVP_GLOBAL",
-      "department": "推广营销部",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-104",
-      "title": "实现万里汇 (WorldFirst) 跨境结汇与对公打款",
-      "notes": "配合老板手动验证第一张外卡到账",
-      "stage": "STAGE_1_MVP_GLOBAL",
-      "department": "董事长",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-201",
-      "title": "国内正规军升级：广州网络经营个体户执照与对公参数",
-      "notes": "办个体户无需实际租用办公楼",
-      "stage": "STAGE_2_CN_UPGRADE",
-      "department": "董事长",
-      "status": "IN_PROGRESS"
-    },
-    {
-      "id": "TASK-202",
-      "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
-      "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
-      "stage": "STAGE_2_CN_UPGRADE",
-      "department": "施工工程部",
-      "status": "TODO"
-    },
-    {
-      "id": "TASK-203",
-      "title": "智能判断多模态设计组，建立每日自动生成模版流水线",
-      "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
-      "stage": "STAGE_2_CN_UPGRADE",
-      "department": "主动产品部",
-      "status": "TODO"
-    },
-    {
-      "id": "TASK-301",
-      "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare",
-      "notes": "保持全球 TTFB < 50ms",
-      "stage": "STAGE_3_FULL_SCALE",
-      "department": "施工工程部",
-      "status": "TODO"
-    },
-    {
-      "id": "TASK-302",
-      "title": "部署 3 分钟有效期的私有预签名下载链接防止盗链",
-      "notes": "无论海外还是国内收银台，付款成功签发临时链接",
-      "stage": "STAGE_3_FULL_SCALE",
-      "department": "施工工程部",
-      "status": "TODO"
-    }
-  ],
-  "schedule": {
-    "start": "0",
-    "end": "8",
-    "enabled": "true"
   },
-  "timestamp": "2026-08-08T15:39:47.479Z"
-}
+  {
+    "id": "SAVE-1786205131449",
+    "name": "2026-8-9：完善输入框@部门功能、优化UI界面",
+    "timestamp": "2026-08-08T16:05:31.449Z",
+    "data": {
+      "products": [
+        {
+          "id": "aerotech",
+          "title": "AeroTech 创投规划书",
+          "category": "15 SLIDES · Office PPT演示",
+          "thumbKey": "prod_aerotech",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-orange-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "saas",
+          "title": "SaaS 增长指标盘点",
+          "category": "20 SLIDES · Office PPT演示",
+          "thumbKey": "prod_saas",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-orange-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "fintech",
+          "title": "FinTech A 轮融资方案",
+          "category": "12 SLIDES · Office PPT演示",
+          "thumbKey": "prod_fintech",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-orange-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "excel",
+          "title": "全渠道 ROI 动态自适应测算模型",
+          "category": "XLSX MODEL · Office EXCEL表格",
+          "thumbKey": "prod_excel",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-emerald-600 font-bold",
+          "isLinked": true,
+          "status": true
+        },
+        {
+          "id": "word",
+          "title": "欧美企业级 ATS 智能排版合规报告",
+          "category": "DOCX STANDARD · Office WORD文档",
+          "thumbKey": "prod_word",
+          "thumbCloudPath": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+          "thumbDefault": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+          "priceRmb": 69,
+          "priceUsd": "9.99",
+          "colorCls": "text-indigo-600 font-bold",
+          "isLinked": true,
+          "status": true
+        }
+      ],
+      "pricing": {},
+      "banner": [
+        {
+          "tag": "",
+          "title": "",
+          "desc": "",
+          "bgStyle": "",
+          "bgImg": ""
+        },
+        {
+          "tag": "",
+          "title": "",
+          "desc": "",
+          "bgStyle": "",
+          "bgImg": ""
+        }
+      ],
+      "users": [
+        {
+          "id": "U-1001",
+          "email": "wys0130@apexwork.cn",
+          "role": "企业高级合伙人 [ADMIN]",
+          "verified": true,
+          "date": "2026-06-12",
+          "status": true
+        },
+        {
+          "id": "U-1002",
+          "email": "founder@invest-tech.com",
+          "role": "商业三件套终身版 [CLIENT]",
+          "verified": true,
+          "date": "2026-07-03",
+          "status": true
+        },
+        {
+          "id": "U-1003",
+          "email": "product_pm@saas-growth.org",
+          "role": "PPT 战略套件订阅 [CLIENT]",
+          "verified": false,
+          "date": "2026-08-01",
+          "status": true
+        }
+      ],
+      "tasks": [
+        {
+          "id": "TASK-101",
+          "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
+          "notes": "用极简代码嵌入 Checkout",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "施工工程部",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-102",
+          "title": "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约",
+          "notes": "检测中国 IP 时购买按钮自动变爱发电跳转",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "施工工程部",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-103",
+          "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广",
+          "notes": "内嵌商城高单价干货图文导流链接",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "推广营销部",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-104",
+          "title": "实现万里汇 (WorldFirst) 跨境结汇与对公打款",
+          "notes": "配合老板手动验证第一张外卡到账",
+          "stage": "STAGE_1_MVP_GLOBAL",
+          "department": "董事长",
+          "status": "DONE"
+        },
+        {
+          "id": "TASK-201",
+          "title": "国内正规军升级：广州网络经营个体户执照与对公参数",
+          "notes": "办个体户无需实际租用办公楼",
+          "stage": "STAGE_2_CN_UPGRADE",
+          "department": "董事长",
+          "status": "IN_PROGRESS"
+        },
+        {
+          "id": "TASK-202",
+          "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
+          "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
+          "stage": "STAGE_2_CN_UPGRADE",
+          "department": "施工工程部",
+          "status": "TODO"
+        },
+        {
+          "id": "TASK-203",
+          "title": "智能判断多模态设计组，建立每日自动生成模版流水线",
+          "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
+          "stage": "STAGE_2_CN_UPGRADE",
+          "department": "主动产品部",
+          "status": "TODO"
+        },
+        {
+          "id": "TASK-301",
+          "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare",
+          "notes": "保持全球 TTFB < 50ms",
+          "stage": "STAGE_3_FULL_SCALE",
+          "department": "施工工程部",
+          "status": "TODO"
+        },
+        {
+          "id": "TASK-302",
+          "title": "部署 3 分钟有效期的私有预签名下载链接防止盗链",
+          "notes": "无论海外还是国内收银台，付款成功签发临时链接",
+          "stage": "STAGE_3_FULL_SCALE",
+          "department": "施工工程部",
+          "status": "TODO"
+        }
+      ],
+      "schedule": {
+        "start": "0",
+        "end": "8",
+        "enabled": "true"
+      }
+    }
+  }
+]
