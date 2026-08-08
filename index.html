@@ -4,56 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>顶尖智能商务办公平台 (2026 RELEASE)</title>
-  
   <link rel="preconnect" href="https://pay.apexwork.cn">
   <link rel="dns-prefetch" href="https://pay.apexwork.cn">
-  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="components/vip-download-guard.js"></script>
   <script src="components/zero-auth.js"></script>
-  
   <style>
     body { -webkit-font-smoothing: antialiased; background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
-
-  <!-- 1. 顶部导航栏 -->
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
       <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员口令安全验证">
         <!-- 👑 修复：绝对稳健的 LOGO 兜底逻辑 -->
         <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
-             onerror="this.onerror=null; this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');" />
+             onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/gh/wys0130/ai-boss-empire@main/assets/logo.webp'; setTimeout(()=>{if(!this.complete || this.naturalWidth===0){this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');}}, 1500);" />
         <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
       </div>
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
-
-    <!-- 导航锚点 -->
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
       <!-- 👑 修复：PPT导航文字采用纯正橙色 -->
       <a href="#ppt-section" class="hover:opacity-80 transition font-bold text-orange-500" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
       <a href="#excel-section" class="hover:opacity-80 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
       <a href="#word-section" class="hover:opacity-80 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
       <span class="hidden md:inline h-4 w-[1px] bg-slate-200"></span>
-      
       <button id="langToggleBtn" onclick="window.ApexLang.toggle()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs px-3 py-1 rounded-lg border border-slate-300 font-bold transition">
         🌐 EN / 简
       </button>
-
       <span id="userRoleBadge" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-1 rounded-lg font-bold text-xs shadow-sm transition select-none" data-zh="👤 游客" data-en="👤 Visitor">👤 游客</span>
-      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black shadow-md hover:opacity-95 transition text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">
-        👑 驾驶舱 →
-      </a>
+      <a id="adminSecretPortal" href="admin.html" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black shadow-md hover:opacity-95 transition text-xs" data-zh="👑 驾驶舱 →" data-en="👑 Dashboard →">👑 驾驶舱 →</a>
     </div>
   </header>
 
-  <!-- 2. 主体工作区 -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 md:py-10 space-y-12">
-    
-    <!-- 动态轮播区 -->
     <div id="heroBannerBox" class="rounded-2xl p-6 md:p-8 text-white shadow-xl relative min-h-[180px] md:min-h-[240px] flex items-center overflow-hidden bg-slate-900 transition-all duration-500 bg-cover bg-center">
       <div id="dynamicHeroContainer" class="w-full z-10"></div>
       <div class="absolute bottom-3 right-5 flex gap-1.5 z-20">
@@ -62,7 +48,6 @@
       </div>
     </div>
 
-    <!-- 第一板块：PPT 模板区 (👑 修复：全局橙色主调) -->
     <section id="ppt-section">
       <div class="flex justify-between items-center mb-6">
         <div>
@@ -74,13 +59,10 @@
         </div>
       </div>
       <div id="mall-ppt-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          <div class="col-span-full py-10 text-center text-slate-400 font-mono text-sm animate-pulse border border-dashed border-slate-300 rounded-2xl">
-              ☁️ 正在初始化商城图库与 AI 数据...
-          </div>
+          <div class="col-span-full py-10 text-center text-slate-400 font-mono text-sm animate-pulse border border-dashed border-slate-300 rounded-2xl">☁️ 正在初始化商城图库与 AI 数据...</div>
       </div>
     </section>
 
-    <!-- 第二板块：EXCEL 模型区 -->
     <section id="excel-section">
       <div class="flex justify-between items-center mb-6 border-t border-slate-200 pt-8">
         <div>
@@ -94,7 +76,6 @@
       <div id="mall-excel-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
     </section>
 
-    <!-- 第三板块：WORD 报告区 -->
     <section id="word-section">
       <div class="flex justify-between items-center mb-6 border-t border-slate-200 pt-8">
         <div>
@@ -107,7 +88,6 @@
       </div>
       <div id="mall-word-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
     </section>
-
   </main>
 
   <div id="compliance-footer-container"></div>
@@ -116,7 +96,6 @@
   <!-- 👑 隐形的颜色保险箱：防止 Tailwind CSS 清除未引用的动态颜色 -->
   <div class="hidden text-orange-500 from-orange-500 to-red-500 text-emerald-600 from-emerald-500 to-teal-500 text-indigo-600 from-indigo-500 to-purple-500 text-blue-600 from-blue-500 to-indigo-500"></div>
 
-  <!-- 全新画廊渲染引擎 -->
   <script>
     window.ApexMallGallery = {
         baseProducts: [
@@ -126,7 +105,6 @@
             { id: "excel-roi", type: "excel", title: "全渠道 ROI 动态测算模型", titleEn: "Omnichannel ROI Model", category: "数据模型 · 自动计算", categoryEn: "Data Model · Auto Calc", thumb: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
             { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
         ],
-
         init: async function() {
             let allProducts = [...this.baseProducts];
             try {
@@ -140,9 +118,7 @@
             } catch(e) {}
             this.render(allProducts);
         },
-
         render: function(products) {
-            // 确保 PPT 模块强制传入 'orange' 主题
             const ppts = products.filter(p => !p.type || p.type === 'ppt' || (p.category && p.category.toLowerCase().includes('ppt')) || p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech');
             const excels = products.filter(p => p.type === 'excel' || (p.category && p.category.toLowerCase().includes('excel')) || p.id === 'excel-roi');
             const words = products.filter(p => p.type === 'word' || (p.category && p.category.toLowerCase().includes('word')) || p.id === 'word-ats');
@@ -153,21 +129,17 @@
             
             if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
         },
-
         renderGrid: function(containerId, items, themeColor, editorUrl) {
             const grid = document.getElementById(containerId);
             if (!grid) return;
             grid.innerHTML = "";
             const pricing = window.ApexPricing ? window.ApexPricing.getConfig() : { ppt: { rmb: 69, usd: 9.99 } };
-
             if (items.length === 0) {
                 grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-mono text-sm border border-dashed border-slate-300 rounded-2xl">该分区暂无模板数据</div>`;
                 return;
             }
-
             items.forEach(p => {
                 const finalImg = p.thumb || p.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
-                
                 const rmb = p.priceRmb || pricing.ppt.rmb;
                 const usd = p.priceUsd || pricing.ppt.usd || 9.99;
                 const titleZh = p.title;
@@ -175,7 +147,6 @@
                 const catZh = p.category ? p.category.split('·')[1]?.trim() : '精选模板';
                 const catEn = p.categoryEn || 'Premium Model';
 
-                // 核心渲染：严格根据传入的主题色渲染边框和文字
                 const textCol = themeColor === 'blue' ? 'text-blue-600' : (themeColor === 'emerald' ? 'text-emerald-600' : (themeColor === 'orange' ? 'text-orange-500' : 'text-indigo-600'));
                 const badgeGrad = themeColor === 'blue' ? 'from-blue-500 to-indigo-500' : (themeColor === 'emerald' ? 'from-emerald-500 to-teal-500' : (themeColor === 'orange' ? 'from-orange-500 to-red-500' : 'from-indigo-500 to-purple-500'));
 
@@ -193,11 +164,9 @@
                                 <span class="hero-product-price text-[15px] font-black ${textCol} font-mono" data-zh="￥${rmb} RMB" data-en="$${usd} USD">￥${rmb} RMB</span>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         },
-
         openDetailModal: function(id, title, img, priceRmb, editorUrl) {
             let modal = document.getElementById("productDetailModal");
             if (!modal) {
@@ -231,8 +200,7 @@
                             </button>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
             modal.classList.remove("hidden");
         }
     };
@@ -270,12 +238,10 @@
       applyPricing: function(lang = 'zh') {
         const config = this.getConfig();
         const isEn = lang === 'en';
-        
         document.querySelectorAll('.hero-bundle-price').forEach(el => {
           const zhText = `¥${config.bundle.rmb} RMB`; const enText = `$${config.bundle.usd} USD`;
           el.setAttribute('data-zh', zhText); el.setAttribute('data-en', enText); el.innerText = isEn ? enText : zhText;
         });
-
         document.querySelectorAll('.hero-product-price').forEach(el => {
             const text = el.getAttribute(`data-${lang}`);
             if (text) el.innerText = text;
@@ -299,8 +265,6 @@
         const btn = document.getElementById('langToggleBtn');
         if (btn) btn.innerText = lang === 'zh' ? '🌐 EN / 简' : '🌐 简 / EN';
         if (window.ApexPricing) window.ApexPricing.applyPricing(lang);
-        
-        // 👑 修复：每次切换语言，动态重载身份标签！
         if (typeof initUserRoleBadge === 'function') initUserRoleBadge();
       }
     };
@@ -314,17 +278,9 @@
           { tag: "GLOBAL COMPLIANCE 02", titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", titleEn: "Zero-Registration Seamless Checkout, GDPR Compliant", descZh: "一键导出标准格式，支持全球自动结算。", descEn: "One-click export standard formats, global automatic settlement.", bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", bgImg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" }
         ];
         let rawData = saved ? JSON.parse(saved) : defaultSlides;
-        
         this.slidesData = rawData.map((s, i) => {
             const fallback = defaultSlides[i] || defaultSlides[0];
-            return {
-                ...s,
-                titleZh: s.titleZh || s.title || fallback.titleZh,
-                titleEn: s.titleEn || fallback.titleEn,
-                descZh: s.descZh || s.desc || fallback.descZh,
-                descEn: s.descEn || fallback.descEn,
-                bgImg: s.bgImg || fallback.bgImg
-            };
+            return { ...s, titleZh: s.titleZh || s.title || fallback.titleZh, titleEn: s.titleEn || fallback.titleEn, descZh: s.descZh || s.desc || fallback.descZh, descEn: s.descEn || fallback.descEn, bgImg: s.bgImg || fallback.bgImg };
         });
 
         const container = document.getElementById('dynamicHeroContainer');
@@ -347,8 +303,6 @@
 
         this.jump(0);
         this.startAutoPlay(this.slidesData.length);
-        
-        // 👑 修复：如果从本地云同步完轮播图后，强行执行一次翻译指令，避免英文版闪断！
         if (window.ApexLang) window.ApexLang.apply(window.ApexLang.currentLang);
       },
       jump: function(idx) {
@@ -362,11 +316,7 @@
         }
         const box = document.getElementById('heroBannerBox');
         if (box && this.slidesData[idx]) {
-          if (this.slidesData[idx].bgImg) { 
-              box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.85), rgba(15,23,42,0.5)), url('${this.slidesData[idx].bgImg}')`; 
-              box.style.backgroundSize = "cover"; 
-              box.style.backgroundPosition = "center"; 
-          }
+          if (this.slidesData[idx].bgImg) { box.style.backgroundImage = `linear-gradient(rgba(15,23,42,0.85), rgba(15,23,42,0.5)), url('${this.slidesData[idx].bgImg}')`; box.style.backgroundSize = "cover"; box.style.backgroundPosition = "center"; }
           else { box.style.backgroundImage = this.slidesData[idx].bgStyle; }
         }
         this.currentIndex = idx;
@@ -385,7 +335,7 @@
       
       if (role === 'ADMIN' && badge) {
         badge.setAttribute('data-zh', '👑 董事长 [ADMIN]');
-        badge.setAttribute('data-en', '👑 Chairman [ADMIN]');
+        badge.setAttribute('data-en', '👑 Chairman [ADMIN]'); 
         badge.className = "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border border-blue-400/30 px-3 py-1 rounded-lg font-black text-xs shadow-md transition select-none";
         badge.innerText = isEn ? '👑 Chairman [ADMIN]' : '👑 董事长 [ADMIN]';
         if (portalBtn) portalBtn.classList.remove('hidden');
@@ -405,6 +355,17 @@
       window.ApexCloudSync.init();
       setTimeout(() => { if (window.ApexMallGallery) window.ApexMallGallery.init(); }, 100);
     });
+
+    (function initFrontLogo() {
+        const customLogo = localStorage.getItem('APEX_CUSTOM_LOGO');
+        const frontLogoEl = document.getElementById('frontBrandLogo');
+        const badgeEl = document.getElementById('frontFallbackBadge');
+        if (customLogo && frontLogoEl) {
+            frontLogoEl.src = customLogo; 
+            frontLogoEl.style.display = 'block';
+            if (badgeEl) badgeEl.classList.add('hidden');
+        }
+    })();
 
     function checkChairmanStealthAccess() {
         const validPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
