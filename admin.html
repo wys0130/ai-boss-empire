@@ -41,11 +41,12 @@
 </head>
 <body class="bg-slate-50 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 min-h-screen flex items-start selection:bg-blue-500/30">
 
+    <!-- 1. 侧边栏 (Sidebar) 👑 固定在屏幕左侧，内部独立滚动 -->
     <aside class="w-64 bg-white dark:bg-[#0f172a] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 z-40 sticky top-0 h-screen shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-colors duration-300">
-        <!-- 👑 修复：稳健的 LOGO 兜底显示逻辑 -->
+        <!-- 👑 修复：绝对稳健的 LOGO 兜底显示逻辑 -->
         <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50 group cursor-pointer shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击更换企业 LOGO">
             <div class="flex items-center gap-2.5">
-                <img id="adminBrandLogo" src="assets/logo.webp" class="h-7 w-auto object-contain drop-shadow-sm" onerror="this.onerror=null; this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');" />
+                <img id="adminBrandLogo" src="assets/logo.webp" class="h-7 w-auto object-contain drop-shadow-sm" onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/gh/wys0130/ai-boss-empire@main/assets/logo.webp'; setTimeout(()=>{if(!this.complete || this.naturalWidth===0){this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');}}, 1500);" />
                 <div id="adminFallbackBadge" class="hidden w-7 h-7 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-xs shadow-md shrink-0 aspect-square">A</div>
                 <span class="font-black text-sm tracking-wide text-slate-800 dark:text-slate-200 truncate group-hover:text-blue-500 transition">顶尖商务平台</span>
             </div>
@@ -82,6 +83,7 @@
         </div>
     </aside>
 
+    <!-- 2. 主控制区 (Main Workspace) -->
     <main class="flex-1 flex flex-col min-w-0 relative transition-colors duration-300 min-h-screen">
         
         <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/80 px-6 flex items-center justify-between shrink-0 shadow-sm sticky top-0 z-30 transition-colors duration-300">
@@ -95,15 +97,25 @@
                     <span>💱 汇率:</span>
                     <span id="fxRateBadge" class="tracking-wider">查询中...</span>
                 </div>
+                
                 <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+                
                 <button id="themeToggleBtn" onclick="toggleThemeMode()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm">
-                    <span>🌙 极夜模式</span>
+                    <span>🌙 极夜</span>
                 </button>
+
+                <!-- 👑 修复：解禁并重命名 代码备份 -->
+                <button onclick="openRollbackModal()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-1.5">
+                    ⏳ 代码备份
+                </button>
+                
+                <!-- 👑 修复：重命名 数据备份 -->
                 <button onclick="ApexVault.open()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold transition shadow-md shadow-indigo-500/30 flex items-center gap-1.5">
-                    🗄️ 独立金库
+                    🗄️ 数据备份
                 </button>
+
                 <button onclick="toggleConfig()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5 border border-slate-700">
-                    🔑 密钥设置
+                    🔑 密钥
                 </button>
             </div>
         </header>
@@ -117,18 +129,16 @@
                             <h3 class="text-lg font-black text-slate-900 dark:text-white">作品风控审查与上架清单</h3>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">编辑价格与上架状态，支持每一行的【🔗 联动 / 🔓 独立】状态快速切换</p>
                         </div>
-                        <span class="text-xs font-mono font-bold px-3 py-1 bg-orange-500/10 text-orange-600 dark:text-orange-400 rounded-lg border border-orange-500/20">可调价清单在线</span>
                     </div>
-
                     <div class="overflow-x-auto w-full pb-4 custom-scroll">
-                        <table class="w-full text-left border-collapse min-w-[900px]">
+                        <table class="w-full text-left border-collapse min-w-[700px]">
                             <thead>
                                 <tr class="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                    <th class="py-3 px-4 w-24 whitespace-nowrap">快照缩略图</th>
-                                    <th class="py-3 px-4 whitespace-nowrap">作品名 / Office 分类</th>
-                                    <th class="py-3 px-4 whitespace-nowrap">商用授权价 (RMB / USD) · 可行内独立脱钩</th>
-                                    <th class="py-3 px-4 w-28 whitespace-nowrap">当前状态</th>
-                                    <th class="py-3 px-4 text-right min-w-[220px] whitespace-nowrap">管理操作</th>
+                                    <th class="py-3 px-4 w-24 whitespace-nowrap">缩略图</th>
+                                    <th class="py-3 px-4 w-1/3">作品名 / Office 分类</th>
+                                    <th class="py-3 px-4 whitespace-nowrap">商用授权价 (RMB / USD)</th>
+                                    <th class="py-3 px-4 w-24 whitespace-nowrap">状态</th>
+                                    <th class="py-3 px-4 text-right w-48 whitespace-nowrap">管理操作</th>
                                 </tr>
                             </thead>
                             <tbody id="auditTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50"></tbody>
@@ -143,7 +153,6 @@
                         <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-center flex-wrap gap-3">
                             <div>
                                 <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2"><span class="text-blue-500">01.</span> 全局商业价格中台</h3>
-                                <p class="text-[11px] text-slate-500 mt-1">控制大盘全局统一定价，启用联动将根据最新汇率自动换算。</p>
                             </div>
                             <div class="flex gap-2 shrink-0">
                                 <button id="btnToggle99" onclick="ApexPricing.toggle99Rule()" class="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold text-[11px] border border-blue-500/30 transition whitespace-nowrap">✨ .99尾数: 开启</button>
@@ -153,7 +162,7 @@
 
                         <div class="space-y-4 flex-1">
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">商业三件套包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">BUNDLE</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">商业三件套包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span>
@@ -166,27 +175,24 @@
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一图解授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">PPT DECK</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一图解授权包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-ppt" type="number" onchange="ApexPricing.onRMBChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-ppt" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-ppt" type="number" step="0.01" onchange="ApexPricing.onUSDChange('ppt', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="9.99"></div>
                                 </div>
                             </div>
-
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一模型授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">EXCEL MODEL</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一模型授权包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-excel" type="number" onchange="ApexPricing.onRMBChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-excel" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold">$</span><input id="usd-excel" type="number" step="0.01" onchange="ApexPricing.onUSDChange('excel', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="9.99"></div>
                                 </div>
                             </div>
-
                             <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex-wrap sm:flex-nowrap">
-                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一报告授权包</div><div class="text-[10px] text-slate-400 font-mono mt-0.5">WORD REPORT</div></div>
+                                <div class="w-full sm:w-32 shrink-0"><div class="text-sm font-bold text-slate-800 dark:text-slate-200">单一报告授权包</div></div>
                                 <div class="flex-1 flex items-center gap-2 w-full">
                                     <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">￥</span><input id="rmb-word" type="number" onchange="ApexPricing.onRMBChange('word', this.value)" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-bold rounded-lg pl-8 pr-3 py-2 outline-none focus:border-blue-500" value="69"></div>
                                     <span id="linkIcon-word" class="text-xs text-emerald-500 font-bold font-mono">⇄</span>
@@ -203,61 +209,43 @@
                     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col">
                         <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
                             <h3 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2"><span class="text-blue-500">02.</span> 首页巨幕轮播管理</h3>
-                            <p class="text-[11px] text-slate-500 mt-1">配置首页双幕文案与背景，支持 WebP 图源上传或纯 CSS 渐变色块。</p>
                         </div>
-                        
                         <div class="space-y-6 flex-1 overflow-y-auto custom-scroll pr-2">
                             <div class="bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 pb-2">
                                     <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">#01 PRIMARY SLIDE</span>
-                                    <button onclick="ApexBannerManager.uploadBannerImg(0)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传展示底图</button>
+                                    <button onclick="ApexBannerManager.uploadBannerImg(0)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传图片</button>
                                 </div>
                                 <input id="banner-tag-0" type="text" placeholder="左上角小标签" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-title-0" type="text" placeholder="巨幕主标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500">
-                                <input id="banner-desc-0" type="text" placeholder="巨幕副标题介绍" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
-                                
-                                <div class="flex gap-2">
-                                    <input id="banner-img-0" type="text" placeholder="背景图 CDN 链接" class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
-                                </div>
-                                
-                                <div class="space-y-1.5">
-                                    <input id="banner-bg-0" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
-                                </div>
+                                <input id="banner-desc-0" type="text" placeholder="巨幕副标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
+                                <input id="banner-img-0" type="text" placeholder="背景图 CDN 链接" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
+                                <input id="banner-bg-0" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
                             </div>
-
                             <div class="bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                 <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/50 pb-2">
                                     <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">#02 SECONDARY SLIDE</span>
-                                    <button onclick="ApexBannerManager.uploadBannerImg(1)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传展示底图</button>
+                                    <button onclick="ApexBannerManager.uploadBannerImg(1)" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 text-white px-2 py-1 rounded shadow-sm">上传图片</button>
                                 </div>
                                 <input id="banner-tag-1" type="text" placeholder="左上角小标签" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
                                 <input id="banner-title-1" type="text" placeholder="巨幕主标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-blue-500">
-                                <input id="banner-desc-1" type="text" placeholder="巨幕副标题介绍" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
-                                
-                                <div class="flex gap-2">
-                                    <input id="banner-img-1" type="text" placeholder="背景图 CDN 链接" class="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
-                                </div>
-
-                                <div class="space-y-1.5">
-                                    <input id="banner-bg-1" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
-                                </div>
+                                <input id="banner-desc-1" type="text" placeholder="巨幕副标题" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-xs text-slate-900 dark:text-white outline-none focus:border-blue-500">
+                                <input id="banner-img-1" type="text" placeholder="背景图 CDN 链接" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-blue-500 outline-none focus:border-blue-500">
+                                <input id="banner-bg-1" type="text" placeholder="背景 CSS 样式" class="w-full bg-slate-100 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded p-2 text-[10px] font-mono text-slate-500 outline-none focus:border-blue-500">
                             </div>
                         </div>
-
                         <button onclick="ApexBannerManager.saveBannerConfig()" class="mt-5 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.4)] transition">
-                            🖼️ 编译轮播图元数据并同步
+                            🖼️ 编译轮播图同步
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- 模块 3：阶段开发工单进度书 -->
             <section id="tab-overview" class="hidden max-w-5xl mx-auto space-y-6">
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-8 border-b border-slate-200 dark:border-slate-800 pb-5 gap-4">
                         <div>
-                            <h3 class="text-lg font-black text-slate-900 dark:text-white">阶段开发进度书 / TASKS MANIFEST</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">研发与多语言市场投放清单</p>
+                            <h3 class="text-lg font-black text-slate-900 dark:text-white">阶段开发进度书</h3>
                         </div>
                         <div class="flex items-center gap-3 flex-wrap">
                             <button onclick="resetManifestToDefault()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-500/20 transition border border-rose-500/20 shadow-sm flex items-center gap-1.5">
@@ -266,20 +254,17 @@
                             <span id="manifestSummaryBadge" class="text-xs font-mono font-bold px-3 py-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-500/20">完成度: 0/0</span>
                             <div class="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
                                 <button onclick="filterManifest('ALL')" class="manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm whitespace-nowrap">全部</button>
-                                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition whitespace-nowrap">1.出海</button>
-                                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition whitespace-nowrap">2.国内</button>
-                                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition whitespace-nowrap">3.后期</button>
+                                <button onclick="filterManifest('STAGE_1_MVP_GLOBAL')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition">1.出海</button>
+                                <button onclick="filterManifest('STAGE_2_CN_UPGRADE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition">2.国内</button>
+                                <button onclick="filterManifest('STAGE_3_FULL_SCALE')" class="manifest-tab px-3 py-1 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 text-xs transition">3.后期</button>
                             </div>
                         </div>
                     </div>
-
-                    <div id="manifestList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <!-- 由 JS 动态渲染 -->
-                    </div>
+                    <div id="manifestList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                 </div>
             </section>
 
-            <!-- 模块 4：AI 智能体夜间排班与调令中心 -->
+            <!-- 👑 修复：恢复完整的战报区域和调令台 UI -->
             <section id="tab-swarm" class="hidden max-w-6xl mx-auto space-y-6">
                 <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -287,57 +272,51 @@
                         <div>
                             <h3 class="text-base font-black text-white flex items-center gap-2">
                                 ⏳ AI 蜂群夜间自主运行北京时间段控制
-                                <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono px-2 py-0.5 rounded uppercase">NIGHT-SHIFT CONTROL</span>
                             </h3>
-                            <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">预设时段内触发定时巡检才编写代码提交；其余白天时间自动静默，不抢发版队列</p>
                         </div>
-                        <button onclick="ApexScheduleManager.saveScheduleToCloud()" class="shrink-0 px-4 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white text-xs font-bold transition shadow-[0_0_15px_rgba(192,38,211,0.4)] flex items-center gap-2 border border-fuchsia-400/30">
-                            💾 同步排班区间到 GitHub 云端
+                        <button onclick="ApexScheduleManager.saveScheduleToCloud()" class="shrink-0 px-4 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500 text-white text-xs font-bold transition flex items-center gap-2 border border-fuchsia-400/30">
+                            💾 同步排班区间到 GitHub
                         </button>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-300 relative z-10 bg-slate-950/50 p-4 rounded-xl border border-slate-800">
                         <div class="flex items-center gap-2">
                             <span class="text-slate-400">开始点(0-23):</span>
-                            <input id="sched-start" type="number" min="0" max="23" value="0" class="w-16 bg-slate-900 border border-indigo-500/30 rounded p-1.5 text-center text-indigo-300 font-bold font-mono outline-none focus:border-indigo-400 transition shadow-inner">
-                            <span>点 (北京时间)</span>
+                            <input id="sched-start" type="number" min="0" max="23" value="0" class="w-16 bg-slate-900 border border-indigo-500/30 rounded p-1.5 text-center text-indigo-300 font-bold font-mono outline-none">
                         </div>
-                        <div class="h-4 w-[1px] bg-slate-700 mx-2 hidden sm:block"></div>
                         <div class="flex items-center gap-2">
-                            <span class="text-slate-400">静默退场点(1-24):</span>
-                            <input id="sched-end" type="number" min="1" max="24" value="8" class="w-16 bg-slate-900 border border-fuchsia-500/30 rounded p-1.5 text-center text-fuchsia-300 font-bold font-mono outline-none focus:border-fuchsia-400 transition shadow-inner">
-                            <span>点 (北京时间)</span>
+                            <span class="text-slate-400">静默点(1-24):</span>
+                            <input id="sched-end" type="number" min="1" max="24" value="8" class="w-16 bg-slate-900 border border-fuchsia-500/30 rounded p-1.5 text-center text-fuchsia-300 font-bold font-mono outline-none">
                         </div>
-                        <div class="h-4 w-[1px] bg-slate-700 mx-2 hidden sm:block"></div>
                         <div class="flex items-center gap-2">
-                            <span class="text-slate-400">自主施工许可:</span>
+                            <span class="text-slate-400">施工许可:</span>
                             <select id="sched-enabled" class="bg-slate-900 border border-emerald-500/30 text-emerald-400 font-bold rounded p-1.5 outline-none cursor-pointer">
-                                <option value="true">🟢 允许区间内自主运行</option>
-                                <option value="false">🔴 全天候强制静默禁用</option>
+                                <option value="true">🟢 允许区间内运行</option>
+                                <option value="false">🔴 强制静默禁用</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- 左侧战报 -->
                     <div class="lg:col-span-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col h-[500px]">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">系统进化战报</h3>
                             <div class="flex items-center gap-2">
                                 <span id="historyCount" class="text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">0条</span>
-                                <button onclick="clearHistoryLog()" class="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 text-[10px] font-bold rounded transition border border-blue-500/20">清空</button>
+                                <button onclick="clearHistoryLog()" class="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 text-[10px] font-bold rounded transition">清空</button>
                             </div>
                         </div>
-                        <div id="historyFeed" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2">
-                            <!-- 历史日志 -->
-                        </div>
+                        <div id="historyFeed" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2"></div>
                     </div>
 
+                    <!-- 右侧调令台 -->
                     <div class="lg:col-span-7 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col h-[500px]">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2">
                                 智能中枢调令台
-                                <span id="activeDeptLabel" class="text-[10px] font-mono font-normal text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20">[全景视图]</span>
+                                <span id="activeDeptLabel" class="text-[10px] font-mono font-normal text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded">[全景视图]</span>
                             </h3>
                             <span class="text-[10px] text-slate-400">先聚焦框内点击或按 @ 追加部门</span>
                         </div>
@@ -345,34 +324,25 @@
                         <div id="deptButtonsContainer" class="flex flex-wrap gap-2 mb-4 shrink-0"></div>
 
                         <div class="flex-1 flex flex-col gap-3 relative">
-                            <div id="cmd" contenteditable="true" spellcheck="false" placeholder="在此输入全局调令，键入 @ 呼出指定协作部门..." class="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-blue-300 dark:border-blue-500/50 rounded-xl p-4 text-sm text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition shadow-inner overflow-y-auto custom-scroll leading-relaxed whitespace-pre-wrap"></div>
+                            <div id="cmd" contenteditable="true" spellcheck="false" placeholder="在此输入全局调令，键入 @ 呼出指定协作部门..." class="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-blue-300 dark:border-blue-500/50 rounded-xl p-4 text-sm text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition custom-scroll whitespace-pre-wrap"></div>
                             
-                            <button id="runBtn" onclick="triggerSwarmAutonomousAction()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-[0_4px_14px_rgba(37,99,235,0.3)] dark:shadow-[0_4px_14px_rgba(37,99,235,0.5)] flex items-center justify-center gap-2 shrink-0">
+                            <button id="runBtn" onclick="triggerSwarmAutonomousAction()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shrink-0">
                                 <span>🚀 提交至云端 AI 协同执行</span>
                             </button>
-                        </div>
-                        
-                        <div class="mt-4 text-[10px] text-slate-500 dark:text-slate-400 font-mono bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800 shrink-0">
-                            >> 系统待命。严格遵循：只有聚焦 #cmd 时点选部门才写入词条。
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 模块 5：用户与权限管理中心 -->
+            <!-- 模块 5：用户与权限管理中心 (👑 修复：防挤压重构，允许邮箱换行) -->
             <section id="tab-users" class="hidden max-w-6xl mx-auto space-y-6">
                 <div class="bg-gradient-to-r from-blue-900 to-slate-900 border border-blue-500/30 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="relative z-10">
-                        <h3 class="text-base font-black text-white flex items-center gap-2">
-                            👥 全局客户身份与授权中心
-                            <span class="bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[9px] font-mono px-2 py-0.5 rounded uppercase">CLIENT IDENTITY</span>
-                        </h3>
-                        <p class="text-xs text-slate-300 mt-2 max-w-2xl leading-relaxed">
-                            此处管理所有购买过商业版的终端客户凭证。封禁账号后，其绑定的设备 Ed25519 签名将失效，无法再自动下载任何隐藏文件。
-                        </p>
+                        <h3 class="text-base font-black text-white flex items-center gap-2">👥 全局客户身份与授权中心</h3>
+                        <p class="text-xs text-slate-300 mt-2 max-w-2xl leading-relaxed">此处管理所有终端客户凭证。封禁账号后其设备授权将失效。</p>
                     </div>
-                    <button onclick="ApexUserManager.addNewMockUser()" class="relative z-10 shrink-0 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-[0_0_15px_rgba(37,99,235,0.4)] flex items-center gap-2">
+                    <button onclick="ApexUserManager.addNewMockUser()" class="relative z-10 shrink-0 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-2">
                         ➕ 手工特批新客户
                     </button>
                 </div>
@@ -381,67 +351,50 @@
                     <div class="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col">
                         <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2">🛡️ 系统安全与发信配置</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">配置主副口令与 EmailJS 第三方邮件网关参数</p>
                         </div>
                         
                         <div class="space-y-4 flex-1 overflow-y-auto custom-scroll pr-1">
                             <div class="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800">
-                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">最高权限驾驶舱验证口令</label>
-                                <input id="pwd-new-admin" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 outline-none focus:border-rose-500 shadow-inner" placeholder="默认: 8888">
+                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">最高权限口令</label>
+                                <input id="pwd-new-admin" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 outline-none focus:border-rose-500">
                             </div>
 
                             <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3 relative overflow-hidden">
-                                <h4 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-slate-200 dark:border-blue-500/20 pb-1.5 uppercase">EmailJS 发信参数 (选填)</h4>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Service ID</label>
-                                    <input id="emailjs-service-id" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500" placeholder="例如: service_xxx">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Template ID</label>
-                                    <input id="emailjs-template-id" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500" placeholder="例如: template_xxx">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Public Key</label>
-                                    <input id="emailjs-public-key" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none focus:border-blue-500" placeholder="例如: 1a2b3c...">
-                                </div>
+                                <h4 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-slate-200 dark:border-blue-500/20 pb-1.5 uppercase">EmailJS 发信参数</h4>
+                                <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Service ID</label><input id="emailjs-service-id" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Template ID</label><input id="emailjs-template-id" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none"></div>
+                                <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Public Key</label><input id="emailjs-public-key" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none"></div>
                             </div>
                         </div>
-
-                        <button onclick="ApexUserManager.saveAdminSecurity()" class="mt-4 w-full bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm border border-slate-700 dark:border-slate-600 flex items-center justify-center gap-2">
-                            💾 保存口令与网关配置
+                        <button onclick="ApexUserManager.saveAdminSecurity()" class="mt-4 w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm border border-slate-700">
+                            💾 保存口令配置
                         </button>
                     </div>
 
-                    <!-- 右侧：用户大名单 -->
                     <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col overflow-hidden">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">终端客户清单</h3>
                             <div class="relative w-full sm:w-64">
-                                <input id="user-search-input" type="text" placeholder="按邮箱或 ID 搜索..." oninput="ApexUserManager.filterUsers(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition">
-                                <button id="user-search-clear" onclick="ApexUserManager.clearSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden font-bold">✕</button>
+                                <input id="user-search-input" type="text" placeholder="按邮箱或 ID 搜索..." oninput="ApexUserManager.filterUsers(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs outline-none focus:border-blue-500">
                             </div>
                         </div>
 
-                        <!-- 👑 修复：防挤压表格，让内容舒展自如 -->
+                        <!-- 👑 修复：去除了导致挤压的面条代码，改为自然延展横向滚动 -->
                         <div class="overflow-x-auto w-full pb-4 custom-scroll">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[700px]">
                                 <thead>
                                     <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                        <th class="py-2.5 px-4 whitespace-nowrap">邮箱主体 / 终端 ID</th>
-                                        <th class="py-2.5 px-4 whitespace-nowrap">商用角色</th>
-                                        <th class="py-2.5 px-4 whitespace-nowrap">核验状态</th>
-                                        <th class="py-2.5 px-4 whitespace-nowrap">注册日期</th>
-                                        <th class="py-2.5 px-4 text-right whitespace-nowrap">安全操作</th>
+                                        <th class="py-2.5 px-4 w-1/3 whitespace-nowrap">邮箱主体 / ID</th>
+                                        <th class="py-2.5 px-4 w-40 whitespace-nowrap">商用角色</th>
+                                        <th class="py-2.5 px-4 w-28 whitespace-nowrap">核验状态</th>
+                                        <th class="py-2.5 px-4 w-28 whitespace-nowrap">注册日期</th>
+                                        <th class="py-2.5 px-4 text-right min-w-[180px] whitespace-nowrap">安全操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-800 dark:text-slate-200">
                                     <!-- 动态渲染 -->
                                 </tbody>
                             </table>
-                        </div>
-                        
-                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
-                            <button onclick="ApexUserManager.restoreDefaultUsers()" class="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white underline font-mono">↻ 还原演示数据</button>
                         </div>
                     </div>
                 </div>
@@ -450,128 +403,74 @@
         </div>
     </main>
 
-    <!-- 弹窗层 -->
-    
     <!-- 🔑 密钥配置 -->
     <div id="configArea" class="hidden fixed top-20 right-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-2xl z-50 w-80">
-        <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2">🔑 系统级云端密钥配置</h3>
+        <h3 class="text-sm font-bold text-slate-800 dark:text-white mb-3">🔑 密钥配置</h3>
         <div class="space-y-3">
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">GitHub Token (必备)</label>
-                <input type="password" id="ghTokenInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="ghp_xxxxxxxxxxxx">
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">DeepSeek API Key (AI 引擎)</label>
-                <input type="password" id="dsKeyInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="sk-xxxxxxxxxxxx">
-            </div>
-            
+            <div><label class="block text-[10px] font-bold text-slate-500 mb-1">GitHub Token</label><input type="password" id="ghTokenInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded p-1.5 text-xs outline-none"></div>
+            <div><label class="block text-[10px] font-bold text-slate-500 mb-1">DeepSeek API Key</label><input type="password" id="dsKeyInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded p-1.5 text-xs outline-none"></div>
             <div class="border-t border-slate-200 dark:border-slate-700 my-2 pt-2"></div>
-            
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Gitee Token (独立金库双写节点)</label>
-                <input type="password" id="giteeTokenInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Gitee 私人令牌">
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">Gitee 仓库路径</label>
-                <input type="text" id="giteeRepoInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="例如: wys0130/ai-boss-empire">
-            </div>
-            
+            <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Gitee Token</label><input type="password" id="giteeTokenInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded p-1.5 text-xs outline-none"></div>
+            <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Gitee Repo</label><input type="text" id="giteeRepoInput" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded p-1.5 text-xs outline-none"></div>
             <div class="flex gap-2 pt-2">
-                <button onclick="saveKeys()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-1.5 rounded-lg text-xs transition shadow">保存并连接</button>
-                <button onclick="toggleConfig()" class="px-4 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-1.5 rounded-lg text-xs transition">取消</button>
+                <button onclick="saveKeys()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-1.5 rounded-lg text-xs transition">保存并连接</button>
+                <button onclick="toggleConfig()" class="px-4 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-1.5 rounded-lg text-xs transition">取消</button>
             </div>
         </div>
     </div>
 
-    <!-- 👑 独立数据金库核心面板 (Vault Modal) -->
+    <!-- 🗄️ 数据备份 (原独立金库) -->
     <div id="vaultModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-3xl w-full rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col relative animate-[fadeIn_0.2s_ease-out] max-h-[85vh]">
-            <button onclick="ApexVault.close()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold transition">✕</button>
-            <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2 flex items-center gap-2">🗄️ 独立数据金库 (Vault)</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-5 leading-relaxed">
-                双端同步（GitHub + Gitee）的企业级数据档案管家。支持多槽位存档、覆盖与回档。
-            </p>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-3xl w-full rounded-2xl p-6 shadow-2xl flex flex-col relative max-h-[85vh]">
+            <button onclick="ApexVault.close()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold">✕</button>
+            <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2">🗄️ 数据备份 (Data Vault)</h3>
+            <p class="text-xs text-slate-500 mb-5">备份或恢复全站所有：商品列表、价格、用户清单、轮播图等【核心配置数据】。</p>
 
             <div class="flex gap-3 mb-5">
-                <input id="newSaveName" type="text" placeholder="输入自定义存档备注（如：双11大促定价备份）" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-indigo-500 transition shadow-inner">
-                <button onclick="ApexVault.createSave()" class="shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-[0_4px_15px_rgba(79,70,229,0.3)] flex items-center gap-1.5 whitespace-nowrap">
-                    ➕ 新建存档
-                </button>
+                <input id="newSaveName" type="text" placeholder="输入备份备注（如：大促降价备份）" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-4 py-2.5 text-xs outline-none focus:border-indigo-500">
+                <button onclick="ApexVault.createSave()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md">➕ 新建备份</button>
             </div>
 
-            <div class="flex-1 overflow-y-auto custom-scroll border border-slate-200 dark:border-slate-700/50 rounded-xl bg-slate-50/50 dark:bg-slate-950/20 p-3 space-y-2.5 min-h-[240px]" id="vaultSavesList">
-                <div class="flex items-center justify-center h-full text-xs text-slate-400 font-mono">加载中...</div>
-            </div>
-
-            <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-[10px] text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 p-2.5 rounded-lg leading-relaxed font-mono shrink-0">
-                ⚠️ 注意：金库双写机制强依赖【密钥设置】中的 Gitee Token 和 Repo 路径，未配置 Gitee 将仅作单节点备份。
-            </div>
+            <div class="flex-1 overflow-y-auto custom-scroll border border-slate-200 dark:border-slate-700/50 rounded-xl bg-slate-50/50 dark:bg-slate-950/20 p-3 space-y-2.5 min-h-[240px]" id="vaultSavesList"></div>
         </div>
     </div>
 
-    <!-- 邮箱验证码弹窗 -->
-    <div id="emailVerifyModal" class="hidden fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-sm w-full rounded-2xl p-8 shadow-2xl flex flex-col relative overflow-hidden">
-            <h3 class="text-lg font-black text-slate-900 dark:text-white mb-2">安全邮箱核验</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">系统已通过真实发信信道投递了一封带有 6 位数字校验码的邮件，请查收并填入下方以完成认证状态更新。</p>
-            <input id="verify-code-input" type="text" maxlength="6" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-center text-2xl font-mono font-black tracking-[0.5em] p-3 text-slate-800 dark:text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition shadow-inner mb-6" placeholder="------">
-            <div class="flex gap-3">
-                <button onclick="ApexUserManager.verifyAndBindEmail()" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(37,99,235,0.3)]">确认核验</button>
-                <button onclick="ApexUserManager.closeVerifyModal()" class="px-5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3 rounded-xl text-sm transition border border-slate-200 dark:border-slate-700">取消</button>
+    <!-- ⏳ 代码备份 (原历史快照) -->
+    <div id="rollbackModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh]">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 shrink-0">
+                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">⏳ 代码备份 (Code Snapshot)</h3>
+                <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
             </div>
+            <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 p-2.5 rounded-lg leading-relaxed">
+                <strong>⚠️ 仅用于恢复 HTML/JS 源码崩溃。</strong><br>此操作直接拉取 GitHub 的 Commit 记录，需在右上角配好 GitHub 密钥。
+            </div>
+            <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2"></div>
         </div>
     </div>
-
-    <div id="apexTooltip" class="hidden fixed z-[9999] bg-slate-900 text-white text-[10px] font-mono px-3 py-2 rounded-lg shadow-xl pointer-events-none max-w-xs whitespace-pre-wrap leading-relaxed border border-slate-700"></div>
 
     <script src="components/admin-core.js"></script>
-    
-    <!-- 👑 独立金库引擎脚本 (Gitee + GitHub 双写多槽位版) -->
     <script>
         async function pushToGitee(path, contentStr, message) {
             const token = localStorage.getItem("APEX_GITEE_TOKEN");
             const repoFull = localStorage.getItem("APEX_GITEE_REPO");
             if (!token || !repoFull) return false;
-
             const url = `https://gitee.com/api/v5/repos/${repoFull}/contents/${path}`;
             let sha = null;
-            try {
-                const res = await fetch(`${url}?access_token=${token}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    sha = data.sha;
-                }
-            } catch(e){}
-
-            const method = sha ? "PUT" : "POST";
-            // 👑 核心修复：彻底砍掉强行指定分叉的 branch: "main"，回归默认主分支！
-            const body = {
-                access_token: token,
-                content: btoa(unescape(encodeURIComponent(contentStr))),
-                message: message
-            };
-            if (sha) body.sha = sha;
-
+            try { const res = await fetch(`${url}?access_token=${token}`); if (res.ok) sha = (await res.json()).sha; } catch(e){}
             const pushRes = await fetch(url, {
-                method: method,
+                // 👑 修复：移除了强行的 branch:"main"，让它完美适配你 Gitee 原生的 master 主分支
+                method: sha ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body)
+                body: JSON.stringify({ access_token: token, content: btoa(unescape(encodeURIComponent(contentStr))), message: message, ...(sha && {sha}) })
             });
-            if (!pushRes.ok) throw new Error("Gitee 节点写入遭遇拦截或无权限。");
-            return true;
+            return pushRes.ok;
         }
 
         window.ApexVault = {
             saves: [],
-            
-            open: function() {
-                document.getElementById('vaultModal').classList.remove('hidden');
-                this.loadSaves();
-            },
-            close: function() {
-                document.getElementById('vaultModal').classList.add('hidden');
-            },
-
+            open: function() { document.getElementById('vaultModal').classList.remove('hidden'); this.loadSaves(); },
+            close: function() { document.getElementById('vaultModal').classList.add('hidden'); },
             _captureCurrentState: function() {
                 return {
                     products: typeof AUDIT_PRODUCTS !== 'undefined' ? AUDIT_PRODUCTS : [],
@@ -580,252 +479,84 @@
                     users: window.ApexUserManager ? window.ApexUserManager.userList : [],
                     tasks: typeof rawManifestTasks !== 'undefined' ? rawManifestTasks : [],
                     schedule: {
-                        start: document.getElementById("sched-start") ? document.getElementById("sched-start").value : 0,
-                        end: document.getElementById("sched-end") ? document.getElementById("sched-end").value : 8,
-                        enabled: document.getElementById("sched-enabled") ? document.getElementById("sched-enabled").value : "true"
+                        start: document.getElementById("sched-start")?.value || 0,
+                        end: document.getElementById("sched-end")?.value || 8,
+                        enabled: document.getElementById("sched-enabled")?.value || "true"
                     }
                 };
             },
-
             loadSaves: async function() {
                 const listEl = document.getElementById('vaultSavesList');
-                listEl.innerHTML = `<div class="flex items-center justify-center h-32 text-xs text-blue-500 font-mono animate-pulse">☁️ 正在连接双端金库拉取档案...</div>`;
-                
+                listEl.innerHTML = `<div class="flex items-center justify-center h-32 text-xs text-blue-500 font-mono animate-pulse">☁️ 拉取云端备份档案...</div>`;
                 try {
                     let vaultData = null;
                     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
-                    
-                    if (ghToken) {
-                        try {
-                            const fileObj = await getGithubFileSafe("data/vault-archive.json", ghToken);
-                            if (fileObj.content) vaultData = JSON.parse(fileObj.content);
-                        } catch(e) {}
-                    }
-                    
+                    if (ghToken) { try { const fileObj = await getGithubFileSafe("data/vault-archive.json", ghToken); if (fileObj.content) vaultData = JSON.parse(fileObj.content); } catch(e) {} }
                     if (!vaultData) {
                         const gToken = localStorage.getItem("APEX_GITEE_TOKEN");
                         const gRepo = localStorage.getItem("APEX_GITEE_REPO");
                         if (gToken && gRepo) {
                             try {
-                                // 👑 核心修复：砍掉强制附带的 ?ref=main 参数，让 Gitee 自动读取您的主库代码！
                                 const res = await fetch(`https://gitee.com/api/v5/repos/${gRepo}/contents/data/vault-archive.json?access_token=${gToken}`);
-                                if (res.ok) {
-                                    const data = await res.json();
-                                    vaultData = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-                                }
+                                if (res.ok) vaultData = JSON.parse(decodeURIComponent(escape(atob((await res.json()).content))));
                             } catch (e) {}
                         }
                     }
-
-                    if (vaultData && !Array.isArray(vaultData)) {
-                        vaultData = [{
-                            id: "legacy-" + Date.now(),
-                            name: "旧版默认存档归档",
-                            timestamp: vaultData.timestamp || new Date().toISOString(),
-                            data: vaultData
-                        }];
-                    }
-
                     this.saves = vaultData || [];
                     this.renderList();
-                } catch(err) {
-                    listEl.innerHTML = `<div class="flex items-center justify-center h-32 text-xs text-rose-500 font-mono">❌ 金库连接失败，请检查网络或密钥配置</div>`;
-                }
+                } catch(err) { listEl.innerHTML = `<div class="text-center text-xs text-rose-500 py-6">❌ 读取失败</div>`; }
             },
-
             renderList: function() {
                 const listEl = document.getElementById('vaultSavesList');
-                if (this.saves.length === 0) {
-                    listEl.innerHTML = `<div class="flex items-center justify-center h-32 text-xs text-slate-400 font-mono bg-slate-100/50 dark:bg-slate-900/50 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">📭 金库当前空空如也，请新建您的首个存档</div>`;
-                    return;
-                }
-
+                if (this.saves.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-400 py-6">📭 暂无备份数据</div>`; return; }
                 listEl.innerHTML = "";
-                const sortedSaves = [...this.saves].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                sortedSaves.forEach(save => {
-                    const timeStr = new Date(save.timestamp).toLocaleString('zh-CN', { hour12: false });
+                [...this.saves].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).forEach(save => {
                     listEl.innerHTML += `
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-colors gap-3 group shadow-sm">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">${save.name}</span>
-                                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono border border-slate-200 dark:border-slate-700 shrink-0">ID:${save.id.slice(-6)}</span>
-                                </div>
-                                <div class="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5">
-                                    <span>⏱️ ${timeStr}</span>
-                                </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-indigo-400 transition gap-3">
+                            <div class="flex-1 min-w-0"><div class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">${save.name}</div><div class="text-[11px] text-slate-500 mt-1">⏱️ ${new Date(save.timestamp).toLocaleString()}</div></div>
+                            <div class="flex gap-2 shrink-0">
+                                <button onclick="ApexVault.restoreSave('${save.id}')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 rounded text-xs font-bold transition hover:bg-emerald-500 hover:text-white border border-emerald-200 whitespace-nowrap">📥 读取</button>
+                                <button onclick="ApexVault.overwriteSave('${save.id}')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded text-xs font-bold transition hover:bg-blue-500 hover:text-white border border-blue-200 whitespace-nowrap">💾 覆盖</button>
+                                <button onclick="ApexVault.deleteSave('${save.id}')" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 rounded text-xs font-bold transition hover:bg-rose-500 hover:text-white border border-rose-200 whitespace-nowrap">🗑️ 删</button>
                             </div>
-                            <div class="flex flex-wrap items-center gap-2 shrink-0">
-                                <button onclick="ApexVault.restoreSave('${save.id}')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-200 dark:border-emerald-500/30 rounded-lg text-[11px] font-bold transition whitespace-nowrap">
-                                    📥 读取
-                                </button>
-                                <button onclick="ApexVault.overwriteSave('${save.id}')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-500 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-200 dark:border-blue-500/30 rounded-lg text-[11px] font-bold transition whitespace-nowrap">
-                                    💾 覆盖
-                                </button>
-                                <button onclick="ApexVault.deleteSave('${save.id}')" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-200 dark:border-rose-500/30 rounded-lg text-[11px] font-bold transition whitespace-nowrap">
-                                    🗑️ 删除
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             },
-
-            _syncToCloud: async function(newSavesArray, successMsg) {
-                const btn = document.querySelector('#vaultModal button[onclick="ApexVault.createSave()"]');
-                const origText = btn ? btn.innerHTML : "处理中...";
-                if (btn) { btn.innerHTML = "⏳ 同步双端..."; btn.disabled = true; }
-
-                const content = JSON.stringify(newSavesArray, null, 2);
-                let syncLog = [];
-                let success = false;
-
-                try {
-                    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
-                    if (ghToken) {
-                        try {
-                            let sha = null;
-                            try {
-                                const fileObj = await getGithubFileSafe("data/vault-archive.json", ghToken);
-                                sha = fileObj.sha;
-                            } catch(e){}
-                            await pushGithubJsonFile("data/vault-archive.json", newSavesArray, sha, "🗄️ Vault: Update saves array [skip ci]", ghToken);
-                            syncLog.push("GitHub 节点 [就绪]");
-                            success = true;
-                        } catch(e) { syncLog.push("GitHub 节点 [失败: "+e.message+"]"); }
-                    } else {
-                        syncLog.push("GitHub 节点 [跳过: 未配置 Token]");
-                    }
-
-                    try {
-                        const giteeResult = await pushToGitee("data/vault-archive.json", content, "🗄️ Vault: Update saves array [skip ci]");
-                        if (giteeResult) { syncLog.push("Gitee 节点 [就绪]"); success = true; }
-                        else syncLog.push("Gitee 节点 [跳过: 未配置完整参数]");
-                    } catch (e) {
-                        syncLog.push("Gitee 节点 [失败: "+e.message+"]");
-                    }
-
-                    if (success) {
-                        this.saves = newSavesArray;
-                        this.renderList();
-                        document.getElementById("newSaveName").value = "";
-                        alert(`✅ ${successMsg}\n\n同步报告:\n- ` + syncLog.join('\n- '));
-                    } else {
-                        alert("❌ 同步失败，没有可用的写入节点！\n" + syncLog.join('\n'));
-                        this.loadSaves(); 
-                    }
-                } catch(err) {
-                    alert("❌ 金库操作遭遇致命异常: " + err.message);
-                } finally {
-                    if (btn) { btn.innerHTML = origText; btn.disabled = false; }
+            _syncToCloud: async function(newArr, msg) {
+                const content = JSON.stringify(newArr, null, 2);
+                let log = [], ok = false;
+                const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+                if (ghToken) {
+                    try { let sha = null; try { sha = (await getGithubFileSafe("data/vault-archive.json", ghToken)).sha; } catch(e){}
+                        await pushGithubJsonFile("data/vault-archive.json", newArr, sha, "🗄️ Vault Update [skip ci]", ghToken);
+                        log.push("GitHub 成功"); ok = true;
+                    } catch(e) { log.push("GitHub 失败"); }
                 }
+                try { if(await pushToGitee("data/vault-archive.json", content, "Vault Update")) { log.push("Gitee 成功"); ok = true;} } catch(e) { log.push("Gitee 失败"); }
+                if(ok) { this.saves = newArr; this.renderList(); document.getElementById("newSaveName").value = ""; alert("✅ " + msg + "\n" + log.join(', ')); } 
+                else alert("❌ 备份失败！请检查密钥。");
             },
-
-            createSave: async function() {
-                const nameInput = document.getElementById('newSaveName');
-                let name = nameInput.value.trim();
-                if (!name) {
-                    name = `大盘存档 ${new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})}`;
-                }
-
-                const newSave = {
-                    id: "SAVE-" + Date.now(),
-                    name: name,
-                    timestamp: new Date().toISOString(),
-                    data: this._captureCurrentState()
-                };
-
-                const updatedSaves = [...this.saves, newSave];
-                await this._syncToCloud(updatedSaves, "新存档已成功封存在云端金库！");
-            },
-
-            overwriteSave: async function(id) {
-                if (!confirm("⚠️ 确定要用当前全站数据【覆盖】此存档吗？此操作不可逆！")) return;
-                
-                const updatedSaves = this.saves.map(s => {
-                    if (s.id === id) {
-                        return {
-                            ...s,
-                            timestamp: new Date().toISOString(),
-                            data: this._captureCurrentState()
-                        };
-                    }
-                    return s;
-                });
-                await this._syncToCloud(updatedSaves, "存档已被最新数据覆盖并同步！");
-            },
-
-            deleteSave: async function(id) {
-                if (!confirm("🗑️ 确定要彻底销毁此存档吗？双端云节点将同步抹除。")) return;
-                const updatedSaves = this.saves.filter(s => s.id !== id);
-                await this._syncToCloud(updatedSaves, "存档已销毁。");
-            },
-
+            createSave: async function() { await this._syncToCloud([...this.saves, { id: "SAVE-"+Date.now(), name: document.getElementById('newSaveName').value.trim() || `备份 ${new Date().toLocaleString()}`, timestamp: new Date().toISOString(), data: this._captureCurrentState() }], "备份已创建"); },
+            overwriteSave: async function(id) { if(confirm("⚠️ 确定用当前大盘数据覆盖此备份？")) await this._syncToCloud(this.saves.map(s => s.id === id ? {...s, timestamp: new Date().toISOString(), data: this._captureCurrentState()} : s), "备份已覆盖"); },
+            deleteSave: async function(id) { if(confirm("🗑️ 确定删除此备份？")) await this._syncToCloud(this.saves.filter(s => s.id !== id), "备份已删除"); },
             restoreSave: async function(id) {
-                if (!confirm("📥 确定要加载此存档吗？当前未保存的更改将会丢失。")) return;
-                const targetSave = this.saves.find(s => s.id === id);
-                if (!targetSave || !targetSave.data) {
-                    alert("❌ 读取失败：存档数据损坏或为空。");
-                    return;
+                if (!confirm("📥 确定加载此备份？当前未保存的修改将被覆盖！")) return;
+                const target = this.saves.find(s => s.id === id);
+                if (!target || !target.data) return alert("❌ 数据异常");
+                const d = target.data;
+                if(d.pricing) localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(d.pricing));
+                if(d.banner) localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(d.banner));
+                if(d.users) localStorage.setItem('APEX_USER_LIST', JSON.stringify(d.users));
+                if(d.tasks) localStorage.setItem('APEX_TASKS_CACHE', JSON.stringify(d.tasks));
+                if(d.products) localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(d.products));
+                if(d.schedule) localStorage.setItem('APEX_SCHEDULE_CACHE', JSON.stringify(d.schedule));
+                
+                const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+                if (ghToken) {
+                    const up = [ {p: "config/pricing.json", d: d.pricing}, {p: "config/banner.json", d: d.banner}, {p: "config/users.json", d: d.users}, {p: "TASKS_MANIFEST.json", d: d.tasks ? { summary: { completed: d.tasks.filter(t=>t.status==='DONE').length, todo: d.tasks.filter(t=>t.status==='TODO').length, total_tasks: d.tasks.length }, tasks: d.tasks, updated_at: new Date().toISOString() } : null } ];
+                    for(let f of up) { if(!f.d) continue; try { let sha=null; try{sha=(await getGithubFileSafe(f.p, ghToken)).sha;}catch(e){} await pushGithubJsonFile(f.p, f.d, sha, `📥 Restore ${f.p}`, ghToken); }catch(e){} }
                 }
-
-                const btn = document.querySelector(`button[onclick="ApexVault.restoreSave('${id}')"]`);
-                const origText = btn ? btn.innerHTML : "读取";
-                if (btn) { btn.innerHTML = "⏳ 覆盖云端..."; btn.disabled = true; }
-
-                try {
-                    const vaultData = targetSave.data;
-                    
-                    if (vaultData.pricing) localStorage.setItem('APEX_PRICING_CONFIG', JSON.stringify(vaultData.pricing));
-                    if (vaultData.banner) localStorage.setItem('APEX_BANNER_CONFIG', JSON.stringify(vaultData.banner));
-                    if (vaultData.users) localStorage.setItem('APEX_USER_LIST', JSON.stringify(vaultData.users));
-                    if (vaultData.tasks) localStorage.setItem('APEX_TASKS_CACHE', JSON.stringify(vaultData.tasks));
-                    if (vaultData.products) localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(vaultData.products));
-                    if (vaultData.schedule) {
-                        localStorage.setItem('APEX_SCHEDULE_CACHE', JSON.stringify(vaultData.schedule));
-                    }
-
-                    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
-                    if (ghToken) {
-                        const updates = [
-                            { path: "config/pricing.json", data: vaultData.pricing },
-                            { path: "config/banner.json", data: vaultData.banner },
-                            { path: "config/users.json", data: vaultData.users },
-                            { 
-                                path: "TASKS_MANIFEST.json", 
-                                data: vaultData.tasks ? { 
-                                    summary: { 
-                                        completed: vaultData.tasks.filter(t=>t.status==='DONE').length, 
-                                        todo: vaultData.tasks.filter(t=>t.status==='TODO').length, 
-                                        total_tasks: vaultData.tasks.length 
-                                    }, 
-                                    tasks: vaultData.tasks, 
-                                    updated_at: new Date().toISOString().slice(0,10) 
-                                } : null 
-                            }
-                        ];
-
-                        for (let file of updates) {
-                            if (!file.data || (Array.isArray(file.data) && file.data.length === 0)) continue;
-                            try {
-                                let sha = null;
-                                try {
-                                    const res = await getGithubFileSafe(file.path, ghToken);
-                                    sha = res.sha;
-                                } catch(e){}
-                                await pushGithubJsonFile(file.path, file.data, sha, `📥 Vault: Restore snapshot for ${file.path} [skip ci]`, ghToken);
-                            } catch(e) {}
-                        }
-                    }
-
-                    alert("✅ 提取档案并成功覆盖双端！页面即将重载以刷新底层数据。");
-                    location.reload();
-                } catch(err) {
-                    alert("❌ 金库档案提取失败: " + err.message);
-                } finally {
-                    if (btn) { btn.innerHTML = origText; btn.disabled = false; }
-                }
+                alert("✅ 数据已恢复！"); location.reload();
             }
         };
 
@@ -834,22 +565,14 @@
             localStorage.setItem("APEX_DS_KEY", document.getElementById("dsKeyInput").value.trim());
             localStorage.setItem("APEX_GITEE_TOKEN", document.getElementById("giteeTokenInput").value.trim());
             localStorage.setItem("APEX_GITEE_REPO", document.getElementById("giteeRepoInput").value.trim());
-            window.toggleConfig();
-            if(typeof window.syncAllData === 'function') window.syncAllData();
-            alert("✅ 系统密钥与 Gitee 金库节点参数已全量保存生效！");
+            window.toggleConfig(); if(typeof window.syncAllData === 'function') window.syncAllData(); alert("✅ 密钥已保存！");
         };
 
         window.toggleConfig = function() {
             const el = document.getElementById("configArea");
-            if (el) {
-                el.classList.toggle("hidden");
-                if (!el.classList.contains("hidden")) {
-                    if (document.getElementById("ghTokenInput")) document.getElementById("ghTokenInput").value = localStorage.getItem("APEX_GH_TOKEN") || "";
-                    if (document.getElementById("dsKeyInput")) document.getElementById("dsKeyInput").value = localStorage.getItem("APEX_DS_KEY") || "";
-                    if (document.getElementById("giteeTokenInput")) document.getElementById("giteeTokenInput").value = localStorage.getItem("APEX_GITEE_TOKEN") || "";
-                    if (document.getElementById("giteeRepoInput")) document.getElementById("giteeRepoInput").value = localStorage.getItem("APEX_GITEE_REPO") || "";
-                }
-            }
+            if (el) { el.classList.toggle("hidden"); if (!el.classList.contains("hidden")) {
+                document.getElementById("ghTokenInput").value = localStorage.getItem("APEX_GH_TOKEN") || ""; document.getElementById("dsKeyInput").value = localStorage.getItem("APEX_DS_KEY") || ""; document.getElementById("giteeTokenInput").value = localStorage.getItem("APEX_GITEE_TOKEN") || ""; document.getElementById("giteeRepoInput").value = localStorage.getItem("APEX_GITEE_REPO") || "";
+            }}
         };
     </script>
 </body>
