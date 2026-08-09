@@ -273,8 +273,8 @@ window.ApexUserManager = {
         this.searchQuery = val.trim();
         const clearBtn = document.getElementById("user-search-clear");
         if (clearBtn) {
-            if (this.searchQuery) clearBtn.classList.remove("hidden");
-            else clearBtn.classList.add("hidden");
+            // 👑 修复搜索框 X 按钮逻辑：强制展示/隐藏
+            clearBtn.style.display = this.searchQuery ? "block" : "none";
         }
         this.renderUserTable();
     },
@@ -284,7 +284,7 @@ window.ApexUserManager = {
         const input = document.getElementById("user-search-input");
         const clearBtn = document.getElementById("user-search-clear");
         if (input) input.value = "";
-        if (clearBtn) clearBtn.classList.add("hidden");
+        if (clearBtn) clearBtn.style.display = "none";
         this.renderUserTable();
     },
 
@@ -298,7 +298,7 @@ window.ApexUserManager = {
             : this.userList;
 
         if (list.length === 0) {
-            tbody.innerHTML = `<div class="text-center py-6 text-slate-400 font-mono text-xs">没有找到相关匹配的用户记录</div>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有找到相关匹配的用户记录</td></tr>`;
             return;
         }
 
@@ -311,29 +311,30 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：脱离定宽表格，采用 flex 卡片式响应式排版，邮箱自动截断，按钮绝不超出屏幕
+            // 👑 修复：防挤压排版，给邮箱容器允许折行，操作区强制宽度并折行自适应
             tbody.innerHTML += `
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 mb-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-blue-400 transition gap-3">
-                    <div class="flex-1 min-w-0">
-                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] truncate" title="${user.email}">${user.email}</div>
-                        <div class="flex items-center gap-3 mt-1.5 flex-wrap">
-                            <span class="text-[10px] text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">ID: ${user.id}</span>
-                            <span class="font-mono text-blue-600 font-bold text-[10px]">${user.role}</span>
-                            <span class="font-mono text-[10px]">${verifyText}</span>
+                <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    <td class="py-3 px-3 min-w-[180px]">
+                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight break-all">${user.email}</div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${user.id}</div>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
+                    <td class="py-3 px-3 font-mono text-xs whitespace-nowrap">${verifyText}</td>
+                    <td class="py-3 px-3 font-mono text-slate-400 text-xs whitespace-nowrap hidden xl:table-cell">${user.date}</td>
+                    <td class="py-3 px-3 text-right">
+                        <div class="inline-flex flex-wrap items-center justify-end gap-1.5 min-w-[140px]">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2.5 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
+                                ${user.status ? '封禁' : '解封'}
+                            </button>
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">
+                                验证
+                            </button>
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-2.5 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">
+                                销毁
+                            </button>
                         </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
-                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
-                            ${user.status ? '封禁' : '解封'}
-                        </button>
-                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">
-                            验证
-                        </button>
-                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">
-                            销毁
-                        </button>
-                    </div>
-                </div>
+                    </td>
+                </tr>
             `;
         });
     },
@@ -1418,20 +1419,21 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
-// 👑 修复：利用 ID 获取按钮防止报错，加上 Date.now() 强制刺穿 GitHub API 缓存！
+// 👑 修复：瞬间打标，强制更新 GitHub，并刺穿缓存立刻展示！
 window.createCodeSnapshot = async function() {
     const token = localStorage.getItem("APEX_GH_TOKEN");
     if (!token) return alert("❌ 请先在【🔑 密钥设置】配置 GitHub Token");
     
     const tagInput = document.getElementById("customSnapshotName");
     const tagName = tagInput ? tagInput.value.trim() : "";
-    const commitMsg = tagName ? `📸 代码标记: ${tagName}` : `📸 代码标记: 手动存档 ${new Date().toLocaleString('zh-CN')}`;
+    const commitMsg = tagName ? `📸 代码标记: ${tagName} [skip ci]` : `📸 代码标记: 手动存档 ${new Date().toLocaleString('zh-CN')} [skip ci]`;
     
-    const btn = document.getElementById("btnCreateSnapshot");
+    // 利用 querySelector 获取按钮状态
+    const btn = document.querySelector('#rollbackModal button[onclick*="createCodeSnapshot"]');
     let originalText = "💾 瞬间打标";
     if (btn) {
         originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ 打标中...";
+        btn.innerHTML = "⏳ 提交中...";
         btn.disabled = true;
     }
 
@@ -1445,12 +1447,12 @@ window.createCodeSnapshot = async function() {
         const pushRes = await pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
         
         if (pushRes) {
-            alert("✅ 成功创建代码标记！");
+            alert("✅ 成功创建自定义代码标记！");
             if (tagInput) tagInput.value = "";
-            fetchCommitHistory(true); 
+            fetchCommitHistory(true); // 传入 true 强刷列表
         }
     } catch (err) {
-        alert("❌ 创建标记失败: " + err.message);
+        alert("❌ 创建代码快照失败: " + err.message);
     } finally {
         if (btn) {
             btn.innerHTML = originalText;
@@ -1466,16 +1468,18 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
     if (!ghToken) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取记录。<br>请在右上角【密钥设置】中配置 GitHub Token。</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取提交记录。<br>请在右上角【🔑 密钥设置】填入 GitHub Token。</div>`;
         return;
     }
 
     try {
-        // 👑 加入时间戳强制绕过缓存
+        // 👑 缓存刺穿：强行附加时间戳 ?_t=... 阻断 Github API 延迟，实现秒刷！
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
         const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!res.ok) throw new Error();
-        
+        if (!res.ok) {
+            container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无权访问或仓库错误。<br>请确认仓库为 GitHub 且 Token 有效。</div>`;
+            return;
+        }
         const commits = await res.json();
         container.innerHTML = "";
         
@@ -1483,14 +1487,15 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             
+            // 为手动打标和还原记录定制高亮UI
             const isTag = item.commit.message.includes("代码标记:");
-            const isRollback = item.commit.message.includes("代码还原");
+            const isRollback = item.commit.message.includes("真实代码还原");
             let bgCls = "bg-slate-50 dark:bg-slate-900/50";
-            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800";
-            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800";
+            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800";
+            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800";
 
             container.innerHTML += `
-                <div class="border rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
+                <div class="rounded-xl p-3 flex items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
@@ -1498,35 +1503,52 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
                         </div>
                         <div class="text-xs font-mono truncate ${isTag || isRollback ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-800 dark:text-slate-300'}">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取异常，请检查网络或密钥。</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常，请检查网络。</div>`;
     }
-};
+}
 
-// 👑 修复 4：解决假还原。真实物理覆盖 Github 文件，并强制清空本地所有缓存，确保页面重载后读取的是云端数据！
+// 👑 终极物理还原：直接覆盖云端文件，并在完成后强制抹除本地缓存，根治假还原！
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定将代码真实回退到快照 [#${shortSha}] 吗？\n\n(将物理覆盖文件并清空本地缓存，此操作耗时约10-20秒)`)) return;
+    if (!confirm(`⏳ 确定将全站代码回退到快照 [#${shortSha}] 吗？\n(这会真实覆盖云端文件并清空你的本地页面缓存)`)) return;
+    window.closeRollbackModal();
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
-    if (!ghToken) return alert("❌ 缺少 GitHub Token");
+    if (!ghToken) return alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
 
-    const overlay = document.getElementById("restoreProgressOverlay");
-    const bar = document.getElementById("restoreProgressBar");
-    const text = document.getElementById("restoreProgressText");
+    // 如果 HTML 里没写进度条，动态注入一个全屏进度遮罩
+    let overlay = document.getElementById("restoreProgressOverlay");
+    let bar = document.getElementById("restoreProgressBar");
+    let text = document.getElementById("restoreProgressText");
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "restoreProgressOverlay";
+        overlay.className = "fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-md flex flex-col items-center justify-center p-6";
+        overlay.innerHTML = `
+            <div class="w-full max-w-md">
+                <h3 id="restoreProgressText" class="text-white text-sm font-bold mb-4 text-center font-mono animate-pulse">正在提取文件树...</h3>
+                <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                    <div id="restoreProgressBar" class="h-full bg-blue-500 w-0 transition-all duration-300 ease-out"></div>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        bar = document.getElementById("restoreProgressBar");
+        text = document.getElementById("restoreProgressText");
+    }
 
     try {
-        if (overlay) overlay.classList.remove("hidden");
-        if (text) text.innerText = `[1/3] 拉取快照 [#${shortSha}] 文件树...`;
-        if (bar) bar.style.width = "10%";
+        overlay.classList.remove("hidden");
+        text.innerText = `[1/3] 正在拉取目标快照 [#${shortSha}] ...`;
+        bar.style.width = "10%";
 
         const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!treeRes.ok) throw new Error("读取快照失败");
+        if (!treeRes.ok) throw new Error("无法读取目标快照");
         
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
@@ -1538,8 +1560,8 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         for (let i = 0; i < totalFiles; i++) {
             const fileObj = filesToRestore[i];
             const percent = Math.floor(10 + (i / totalFiles) * 80);
-            if (text) text.innerText = `[2/3] 正在真实覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
-            if (bar) bar.style.width = `${percent}%`;
+            text.innerText = `[2/3] 正在真实覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
+            bar.style.width = `${percent}%`;
 
             let currentSha = null;
             try {
@@ -1547,6 +1569,7 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
                 if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
             } catch(e){}
 
+            // 智能跳过未改动文件
             if (currentSha === fileObj.sha) {
                 skipCount++;
                 continue;
@@ -1555,12 +1578,11 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
             const fileJson = await fileContentRes.json();
 
-            // ⚠️ 绝不加 [skip ci]，必须触发编译
             const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha}`, 
+                    message: `⏪ 真实代码还原: 回溯至 #${shortSha} [skip ci]`, 
                     content: fileJson.content, 
                     ...(currentSha && {sha: currentSha}) 
                 })
@@ -1568,25 +1590,21 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             if (updateRes.ok) successCount++;
         }
         
-        if (text) text.innerText = `[3/3] 覆盖完成！正在清理本地缓存...`;
-        if (bar) bar.style.width = "100%";
+        text.innerText = `[3/3] 覆盖完成！正在清理系统缓存...`;
+        bar.style.width = "100%";
 
-        // 👑 彻底杀除所有的 localStorage 缓存，让浏览器被逼无奈只能去拉取刚刚还原好的新代码！
-        localStorage.removeItem('APEX_PRICING_CONFIG');
-        localStorage.removeItem('APEX_BANNER_CONFIG');
-        localStorage.removeItem('APEX_USER_LIST');
-        localStorage.removeItem('APEX_TASKS_CACHE');
-        localStorage.removeItem('APEX_AUDIT_PRODUCTS');
-        localStorage.removeItem('APEX_SCHEDULE_CACHE');
+        // 👑 终极机制：强行抹除浏览器缓存。防止页面刷新后继续读取假数据！
+        const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
 
         setTimeout(() => {
-            alert(`✅ 还原成功！\n覆盖 ${successCount} 个文件，跳过 ${skipCount} 个。\n\n正在强制刷新系统...`);
-            // 追加强行时间戳，破除浏览器强缓存机制
+            alert(`✅ 已成功将代码还原至 [#${shortSha}]！\n覆盖了 ${successCount} 个文件。\n浏览器即将强制重载最新数据！`);
+            // 附带时间戳刷新，强行阻断 HTML 缓存
             window.location.href = window.location.pathname + '?_t=' + Date.now();
         }, 1000);
         
     } catch(err) { 
-        if (overlay) overlay.classList.add("hidden");
+        overlay.classList.add("hidden");
         alert("❌ 还原异常: " + err.message);
     }
 };
