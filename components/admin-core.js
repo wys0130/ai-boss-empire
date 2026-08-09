@@ -683,8 +683,11 @@ window.ApexBannerManager = {
     }
 };
 
+// 👑 终极增强：汇率联动与全站重算中台
 window.ApexFX = {
     currentRate: 7.18,
+    
+    // 初始化：如果超过7天（604800000毫秒）没更新，才自动更新
     initWeeklyRate: async function() {
         const cache = JSON.parse(localStorage.getItem("APEX_FX_RATE_CACHE") || "{}");
         const now = Date.now();
@@ -695,27 +698,82 @@ window.ApexFX = {
         }
         await this.forceRefreshRate();
     },
-    forceRefreshRate: async function() {
+
+    // 👑 新增：手动触发更新逻辑
+    manualRefresh: async function() {
+        if (!confirm("🔄 确定要手动向央行节点拉取最新汇率吗？\n\n(拉取成功后，系统将自动重算全站所有已开启【汇率联动】的美元定价)")) return;
+        await this.forceRefreshRate(true);
+    },
+
+    forceRefreshRate: async function(isManual = false) {
         const badge = document.getElementById("fxRateBadge");
         if (badge) badge.innerText = "向央行查汇中...";
         try {
             const res = await fetch("https://open.er-api.com/v6/latest/USD");
             const data = await res.json();
             if (data && data.rates && data.rates.CNY) {
-                this.currentRate = Number(data.rates.CNY).toFixed(2);
+                const newRate = Number(data.rates.CNY).toFixed(2);
+                const isRateChanged = this.currentRate !== newRate;
+                this.currentRate = newRate;
+                
+                // 写入缓存并刷新时间戳
                 localStorage.setItem("APEX_FX_RATE_CACHE", JSON.stringify({ rate: this.currentRate, timestamp: Date.now() }));
                 this.updateBadge(this.currentRate, true);
                 appendLog(`>> [汇率中台] 抓取最新外汇：1 USD = ${this.currentRate} CNY`);
+                
+                // 👑 如果是手动触发，或者汇率相比上一次真的发生了变化，强制触发全站重算！
+                if (isManual || isRateChanged) {
+                    this.syncAllLinkedPrices();
+                    if (isManual) alert(`✅ 最新外汇挂牌价拉取成功：1 USD = ${this.currentRate} CNY\n\n已为您自动重算所有开启了【汇率联动】的美元定价！`);
+                }
                 return;
             }
         } catch (err) {
             appendLog(`>> [汇率中台] 查询超时，沿用缓存：1 USD = ${this.currentRate} CNY`);
+            if (isManual) alert("❌ 查询超时或网络异常，请稍后再试。");
         }
         this.updateBadge(this.currentRate, false);
     },
+
     updateBadge: function(rate, isFresh) {
         const badge = document.getElementById("fxRateBadge");
         if (badge) badge.innerText = `1 : ${rate} ${isFresh ? '(最新)' : ''}`;
+    },
+
+    // 👑 核心联动：一键同步刷新全站依赖汇率的模块！
+    syncAllLinkedPrices: function() {
+        // 1. 同步【01. 全局商业价格中台】里的套餐包价格
+        if (window.ApexPricing && window.ApexPricing.isLinked) {
+            const keys = ["bundle", "ppt", "excel", "word"];
+            keys.forEach(key => {
+                const rmbInput = document.getElementById(`rmb-${key}`);
+                if (rmbInput && rmbInput.value) {
+                    ApexPricing.onRMBChange(key, rmbInput.value); // 借用已有的转换函数强制刷新 input 的值
+                }
+            });
+        }
+
+        // 2. 同步【作品风控审查与上架清单】里单个作品的价格
+        if (typeof AUDIT_PRODUCTS !== "undefined" && Array.isArray(AUDIT_PRODUCTS)) {
+            let productsChanged = false;
+            AUDIT_PRODUCTS.forEach((item) => {
+                if (item.isLinked) {
+                    const rmb = parseFloat(item.priceRmb) || 0;
+                    let usd = rmb / this.currentRate;
+                    usd = (window.ApexPricing && window.ApexPricing.use99Rule && rmb > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
+                    item.priceUsd = usd > 0 ? usd : "0.00";
+                    productsChanged = true;
+                }
+            });
+            
+            // 如果数据变了，保存进 localStorage 并重新渲染列表
+            if (productsChanged) {
+                localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+                if (typeof renderAuditTable === "function") renderAuditTable();
+            }
+        }
+        
+        appendLog(`>> [汇率中台] 全站已开启联动的美元定价，已按 1:${this.currentRate} 重新核算完毕。`);
     }
 };
 
