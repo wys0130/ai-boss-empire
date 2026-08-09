@@ -308,26 +308,25 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：放宽表格列宽度限制，使用 break-all whitespace-normal 允许超长邮箱换行
-            // 按钮极致微缩紧凑
+            // 👑 修复：加入 whitespace-nowrap 强制不换行，确立单元格最小宽度，保住最右侧操作栏
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                    <td class="py-2 px-2 w-1/3 break-all whitespace-normal">
+                    <td class="py-3 px-3 whitespace-nowrap min-w-[200px]">
                         <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${user.email}</div>
-                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: ${user.id}</div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${user.id}</div>
                     </td>
-                    <td class="py-2 px-2 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
-                    <td class="py-2 px-2 font-mono text-xs whitespace-nowrap">${verifyText}</td>
-                    <td class="py-2 px-2 font-mono text-slate-400 text-xs whitespace-nowrap">${user.date}</td>
-                    <td class="py-2 px-2 text-right whitespace-nowrap">
-                        <div class="inline-flex items-center justify-end gap-1.5 flex-nowrap">
-                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2 py-1 rounded text-[10px] font-bold transition ${statusBtnCls}">
+                    <td class="py-3 px-3 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
+                    <td class="py-3 px-3 font-mono text-xs whitespace-nowrap">${verifyText}</td>
+                    <td class="py-3 px-3 font-mono text-slate-400 text-xs whitespace-nowrap">${user.date}</td>
+                    <td class="py-3 px-3 text-right whitespace-nowrap">
+                        <div class="inline-flex items-center justify-end gap-1.5">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-xs font-bold transition ${statusBtnCls}">
                                 ${user.status ? '封禁' : '解封'}
                             </button>
-                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold transition shadow-sm shrink-0">
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm">
                                 验证
                             </button>
-                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold transition shadow-sm shrink-0">
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm">
                                 销毁
                             </button>
                         </div>
@@ -1392,26 +1391,98 @@ async function fetchCommitHistory() {
     }
 }
 
+// 👑 终极修复：物理级覆盖真实文件，强制清理本地数据缓存，绝不骗人
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定还原至快照 [#${shortSha}] 吗？`)) return;
+    if (!confirm(`⏳ 确定将全站代码一键回退到快照 [#${shortSha}] 吗？`)) return;
     window.closeRollbackModal();
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
+    if (!ghToken) {
+        alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
+        return; 
+    }
+
+    const overlay = document.getElementById("restoreProgressOverlay");
+    const bar = document.getElementById("restoreProgressBar");
+    const text = document.getElementById("restoreProgressText");
+
     try {
-        const keys = getKeys();
-        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } });
+        if (overlay) overlay.classList.remove("hidden");
+        if (text) text.innerText = `[1/3] 正在拉取目标快照 [#${shortSha}] 的底层文件树...`;
+        if (bar) bar.style.width = "10%";
+
+        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!treeRes.ok) throw new Error("无法读取目标快照的文件树结构");
+        
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
-        for (const fileObj of filesToRestore) {
-            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${keys.gh}` } });
+        const totalFiles = filesToRestore.length;
+        
+        let successCount = 0;
+        let skipCount = 0;
+        appendLog(`⏳ 开始逐一真实覆盖源码至快照 #${shortSha}...`);
+        
+        for (let i = 0; i < totalFiles; i++) {
+            const fileObj = filesToRestore[i];
+            const percent = Math.floor(10 + (i / totalFiles) * 80);
+            if (text) text.innerText = `[2/3] 正在比对与覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
+            if (bar) bar.style.width = `${percent}%`;
+
+            // 1. 获取线上现存 SHA，防止 409 写入冲突
+            let currentSha = null;
+            try {
+                const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, { headers: { "Authorization": `token ${ghToken}` } });
+                if(curFileRes.ok) {
+                    currentSha = (await curFileRes.json()).sha;
+                }
+            } catch(e){}
+
+            // 2. 如果线上代码和旧版一模一样，直接跳过，不仅加速还免除了报错！
+            if (currentSha === fileObj.sha) {
+                skipCount++;
+                continue;
+            }
+
+            // 3. 提取旧版真实代码
+            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
             const fileJson = await fileContentRes.json();
-            await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+
+            // 4. 强制实体写入 GitHub
+            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
-                headers: { "Authorization": `token ${keys.gh}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify({ message: `⏳ VETO: Rollback repo to #${shortSha} (${fileObj.path})`, content: fileJson.content })
+                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha} [skip ci]`, 
+                    content: fileJson.content, 
+                    ...(currentSha && {sha: currentSha}) 
+                })
             });
+            
+            if (updateRes.ok) successCount++;
         }
-        appendLog(`✅ 成功还原主仓库到快照 [#${shortSha}]`);
-        loadHistoryFromMemory();
-    } catch(err) { appendLog("❌ 还原异常: " + err.message, "text-rose-500"); }
+        
+        if (text) text.innerText = `[3/3] 覆盖完成！正在清理本地缓存数据...`;
+        if (bar) bar.style.width = "100%";
+
+        // 👑 核心：清空浏览器本地数据库，让浏览器被迫重新拉取刚刚还原好的新配置！
+        localStorage.removeItem('APEX_PRICING_CONFIG');
+        localStorage.removeItem('APEX_BANNER_CONFIG');
+        localStorage.removeItem('APEX_USER_LIST');
+        localStorage.removeItem('APEX_TASKS_CACHE');
+        localStorage.removeItem('APEX_AUDIT_PRODUCTS');
+        localStorage.removeItem('APEX_SCHEDULE_CACHE');
+
+        setTimeout(() => {
+            alert(`✅ 成功回溯真实代码至 [#${shortSha}]！\n📊 覆盖修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将重载最新大盘！`);
+            // 携带随机数强制刷新浏览器
+            window.location.href = window.location.pathname + '?_t=' + Date.now();
+        }, 1000);
+        
+    } catch(err) { 
+        if (overlay) overlay.classList.add("hidden");
+        alert("❌ 还原异常: " + err.message);
+        appendLog("❌ 还原异常: " + err.message, "text-rose-500"); 
+    }
 };
 
 window.triggerSwarmAutonomousAction = async function() {
