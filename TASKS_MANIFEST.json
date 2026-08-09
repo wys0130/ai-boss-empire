@@ -1,7 +1,7 @@
 {
   "summary": {
-    "completed": 9,
-    "todo": 0,
+    "completed": 4,
+    "todo": 5,
     "total_tasks": 9
   },
   "tasks": [
@@ -43,7 +43,7 @@
       "notes": "办个体户无需实际租用办公楼",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "董事长",
-      "status": "DONE"
+      "status": "IN_PROGRESS"
     },
     {
       "id": "TASK-202",
@@ -51,7 +51,7 @@
       "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-203",
@@ -59,7 +59,7 @@
       "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "主动产品部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-301",
@@ -67,7 +67,7 @@
       "notes": "保持全球 TTFB < 50ms",
       "stage": "STAGE_3_FULL_SCALE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-302",
@@ -75,8 +75,8 @@
       "notes": "无论海外还是国内收银台，付款成功签发临时链接",
       "stage": "STAGE_3_FULL_SCALE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     }
   ],
-  "updated_at": "2026-08-08"
+  "updated_at": "2026-08-09"
 }
