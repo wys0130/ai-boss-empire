@@ -93,7 +93,8 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold shadow-sm" title="实时外汇挂牌价">
+                <!-- 👑 修复：将汇率展示区改为可点击的按钮，绑定手动刷新事件 -->
+                <div onclick="ApexFX.manualRefresh()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold shadow-sm cursor-pointer hover:bg-emerald-500/20 transition active:scale-95" title="点击手动拉取最新汇率，并同步重算全站美元定价">
                     <span>💱 汇率:</span>
                     <span id="fxRateBadge" class="tracking-wider">查询中...</span>
                 </div>
