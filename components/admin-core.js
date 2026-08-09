@@ -308,25 +308,24 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：加入 whitespace-nowrap 强制不换行，确立单元格最小宽度，保住最右侧操作栏
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                    <td class="py-3 px-3 whitespace-nowrap min-w-[200px]">
+                    <td class="py-3 px-2 w-[40%] min-w-[140px] break-all whitespace-normal">
                         <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${user.email}</div>
                         <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${user.id}</div>
                     </td>
-                    <td class="py-3 px-3 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
-                    <td class="py-3 px-3 font-mono text-xs whitespace-nowrap">${verifyText}</td>
-                    <td class="py-3 px-3 font-mono text-slate-400 text-xs whitespace-nowrap">${user.date}</td>
-                    <td class="py-3 px-3 text-right whitespace-nowrap">
-                        <div class="inline-flex items-center justify-end gap-1.5">
-                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-xs font-bold transition ${statusBtnCls}">
+                    <td class="py-3 px-2 w-[20%] font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
+                    <td class="py-3 px-2 w-[15%] font-mono text-xs whitespace-nowrap">${verifyText}</td>
+                    <td class="py-3 px-2 w-[10%] font-mono text-slate-400 text-xs whitespace-nowrap hidden lg:table-cell">${user.date}</td>
+                    <td class="py-3 px-2 w-[15%] text-right min-w-[130px]">
+                        <div class="inline-flex justify-end gap-1 flex-wrap w-full">
+                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2.5 py-1.5 rounded text-[10px] font-bold transition ${statusBtnCls}">
                                 ${user.status ? '封禁' : '解封'}
                             </button>
-                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-sm">
+                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold transition shadow-sm">
                                 验证
                             </button>
-                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-sm">
+                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-2.5 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold transition shadow-sm">
                                 销毁
                             </button>
                         </div>
@@ -1391,16 +1390,12 @@ async function fetchCommitHistory() {
     }
 }
 
-// 👑 终极修复：物理级覆盖真实文件，强制清理本地数据缓存，绝不骗人
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定将全站代码一键回退到快照 [#${shortSha}] 吗？`)) return;
+    if (!confirm(`⏳ 确定将全站代码回退到快照 [#${shortSha}] 吗？`)) return;
     window.closeRollbackModal();
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
-    if (!ghToken) {
-        alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
-        return; 
-    }
+    if (!ghToken) return alert("❌ 缺少 GitHub Token");
 
     const overlay = document.getElementById("restoreProgressOverlay");
     const bar = document.getElementById("restoreProgressBar");
@@ -1428,31 +1423,26 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             if (text) text.innerText = `[2/3] 正在比对与覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
             if (bar) bar.style.width = `${percent}%`;
 
-            // 1. 获取线上现存 SHA，防止 409 写入冲突
             let currentSha = null;
             try {
                 const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, { headers: { "Authorization": `token ${ghToken}` } });
-                if(curFileRes.ok) {
-                    currentSha = (await curFileRes.json()).sha;
-                }
+                if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
             } catch(e){}
 
-            // 2. 如果线上代码和旧版一模一样，直接跳过，不仅加速还免除了报错！
+            // 智能跳过完全一致的文件，不产生冗余记录
             if (currentSha === fileObj.sha) {
                 skipCount++;
                 continue;
             }
 
-            // 3. 提取旧版真实代码
             const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
             const fileJson = await fileContentRes.json();
 
-            // 4. 强制实体写入 GitHub
             const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha} [skip ci]`, 
+                    message: `⏪ 真实代码还原: 回溯至 #${shortSha} [skip ci]`, 
                     content: fileJson.content, 
                     ...(currentSha && {sha: currentSha}) 
                 })
@@ -1464,17 +1454,13 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         if (text) text.innerText = `[3/3] 覆盖完成！正在清理本地缓存数据...`;
         if (bar) bar.style.width = "100%";
 
-        // 👑 核心：清空浏览器本地数据库，让浏览器被迫重新拉取刚刚还原好的新配置！
-        localStorage.removeItem('APEX_PRICING_CONFIG');
-        localStorage.removeItem('APEX_BANNER_CONFIG');
-        localStorage.removeItem('APEX_USER_LIST');
-        localStorage.removeItem('APEX_TASKS_CACHE');
-        localStorage.removeItem('APEX_AUDIT_PRODUCTS');
-        localStorage.removeItem('APEX_SCHEDULE_CACHE');
+        // 👑 致命修复核心：强行清空本地业务数据缓存，迫使浏览器下一次加载时向 GitHub 索要还原好的最新版！
+        const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
 
         setTimeout(() => {
-            alert(`✅ 成功回溯真实代码至 [#${shortSha}]！\n📊 覆盖修改了 ${successCount} 个文件，跳过了 ${skipCount} 个未变动文件。\n系统即将重载最新大盘！`);
-            // 携带随机数强制刷新浏览器
+            alert(`✅ 成功回溯真实代码至 [#${shortSha}]！\n📊 覆盖修改了 ${successCount} 个文件，跳过了 ${skipCount} 个。\n系统即将重载最新大盘！`);
+            // 追加强刷随机数
             window.location.href = window.location.pathname + '?_t=' + Date.now();
         }, 1000);
         
