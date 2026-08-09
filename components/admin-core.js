@@ -1509,7 +1509,44 @@ window.createCodeSnapshot = async function() {
     }
 };
 
-// 👑 轨道1：专门拉取 data/.snapshot 的持久化标记，原生支持分页！
+// 👑 新增：软删除(取消打标)的云端记录黑名单机制
+window.deleteSnapshotTag = async function(sha, shortSha, e) {
+    if (e) e.stopPropagation();
+    if (!confirm(`⚠️ 确定要取消快照 [#${shortSha}] 的永久保留标记吗？\n\n(取消后它将从本列表中永久隐藏，但底层 Git 记录依然安全存在)`)) return;
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+    if (!ghToken) return alert("❌ 缺少 GitHub Token");
+
+    const btn = e.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ 取消中...";
+    btn.disabled = true;
+
+    try {
+        // 1. 获取云端已删除的标记黑名单
+        const fileObj = await getGithubFileSafe("config/deleted_tags.json", ghToken);
+        let blacklist = [];
+        if (fileObj.content) {
+            try { blacklist = JSON.parse(fileObj.content); } catch(err){}
+        }
+        
+        // 2. 将当前 SHA 加入黑名单并推送到 GitHub
+        if (!blacklist.includes(sha)) {
+            blacklist.push(sha);
+            await pushGithubJsonFile("config/deleted_tags.json", blacklist, fileObj.sha, `🗑️ User removed tag [${shortSha}] from permanent list [skip ci]`, ghToken);
+        }
+        
+        alert(`✅ 标记 [#${shortSha}] 已成功取消！`);
+        // 3. 强行重载永久标记列表
+        fetchTaggedCommits(true);
+    } catch(err) {
+        alert("❌ 取消标记失败: " + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+};
+
+// 👑 升级 轨道1：拉取永久标记，并结合云端黑名单进行过滤，增加【取消标记】按钮
 window.fetchTaggedCommits = async function(forceRefresh = false) {
     const container = document.getElementById("commitListTagsContainer");
     if (!container) return;
@@ -1521,9 +1558,19 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
 
     try {
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
-        // 通过 path 参数精准过滤出仅针对标记文件的提交记录！天然实现分类和持久化。
-        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?path=data/.snapshot&page=${currentTagsPage}&per_page=${TAGS_PER_PAGE}${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!res.ok) throw new Error();
+        
+        // 👑 并发黑科技：同时拉取 Git 提交树 和 我们的云端黑名单配置
+        const [res, blacklistRes] = await Promise.all([
+            fetch(`https://api.github.com/repos/${REPO}/commits?path=data/.snapshot&page=${currentTagsPage}&per_page=${TAGS_PER_PAGE}${ts}`, { headers: { "Authorization": `token ${ghToken}` } }),
+            getGithubFileSafe("config/deleted_tags.json", ghToken)
+        ]);
+        
+        if (!res.ok) throw new Error("无法读取提交记录");
+        
+        let blacklist = [];
+        if (blacklistRes.content) {
+            try { blacklist = JSON.parse(blacklistRes.content); } catch(e){}
+        }
         
         const commits = await res.json();
         container.innerHTML = "";
@@ -1535,11 +1582,18 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
             return;
         }
 
-        // 动态控制分页按钮状态
         document.getElementById("btnPrevTags").disabled = (currentTagsPage === 1);
         document.getElementById("btnNextTags").disabled = (commits.length < TAGS_PER_PAGE);
 
-        commits.forEach((item, idx) => {
+        // 👑 智能过滤：剔除所有在黑名单里的版本
+        const filteredCommits = commits.filter(c => !blacklist.includes(c.sha));
+
+        if (filteredCommits.length === 0) {
+            container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono leading-relaxed">本页的标记均已被您取消。<br>请点击【下一页】查看更多历史。</div>`;
+            return;
+        }
+
+        filteredCommits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             
@@ -1553,9 +1607,15 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
                         </div>
                         <div class="text-xs font-mono truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-blue-300 dark:border-blue-600 rounded-lg text-xs font-mono font-bold hover:bg-blue-100 dark:hover:bg-blue-800 transition shrink-0 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm">
-                        ${(currentTagsPage === 1 && idx === 0) ? '当前状态' : '还原'}
-                    </button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <!-- 👑 新增：取消标记的专用按钮 -->
+                        <button onclick="deleteSnapshotTag('${item.sha}', '${shaShort}', event)" class="px-2.5 py-1.5 border border-rose-200 dark:border-rose-800/50 rounded-lg text-xs font-mono font-bold hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-500 dark:text-rose-400 transition bg-white dark:bg-slate-800 shadow-sm" title="取消此标记，不再显示">
+                            取消标记
+                        </button>
+                        <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-blue-300 dark:border-blue-600 rounded-lg text-xs font-mono font-bold hover:bg-blue-100 dark:hover:bg-blue-800 transition bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm">
+                            ${(currentTagsPage === 1 && idx === 0) ? '当前状态' : '还原'}
+                        </button>
+                    </div>
                 </div>
             `;
         });
