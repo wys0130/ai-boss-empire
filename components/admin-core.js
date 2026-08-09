@@ -1,3 +1,4 @@
+new_code = """
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
  * 1. 👑 修复防挤压排版：恢复 @ 功能的底层无损插入，表格允许换行。
@@ -310,7 +311,6 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：防挤压设计。允许超长邮箱换行 (break-all whitespace-normal)，按钮精简 (px-2 py-1) 且加入 flex-wrap 自动折行
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                     <td class="py-2 px-2 w-1/3 min-w-[160px] break-all whitespace-normal">
@@ -532,7 +532,6 @@ window.renderAuditTable = function() {
             : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
-        // 👑 修复：防挤压表格样式，允许文字自然换行，按钮加入 flex-wrap
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-2 px-2 w-16 whitespace-nowrap text-center">
@@ -798,7 +797,11 @@ const deptConfig = [
     { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30" },
     { name: "主动产品部", cls: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30" },
     { name: "施工工程部", cls: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/30" },
-    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" }
+    { name: "视觉策划部", cls: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30" },
+    { name: "审核质量部", cls: "bg-purple-500/10 text-purple-600 border-purple-500/30 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500/40" },
+    { name: "转化销售部", cls: "bg-pink-500/10 text-pink-600 border-pink-500/30 dark:bg-pink-500/20 dark:text-pink-400 dark:border-pink-500/40" },
+    { name: "推广营销部", cls: "bg-cyan-500/10 text-cyan-600 border-cyan-500/30 dark:bg-cyan-500/20 dark:text-cyan-400 dark:border-cyan-500/40" },
+    { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
 window.openLiveSiteForceBypass = function() {
@@ -1468,6 +1471,7 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
 }
 
 // 👑 终极架构级更新：单极原子回退算法（Git Tree Pointer Reversal）
+// 彻底解决之前逐个文件覆盖导致“当前版本被几十个提交淹没消失”的问题！且只需 1 秒！
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
     if (!confirm(`⏳ 确定将全站代码一键回退到快照 [#${shortSha}] 吗？\n\n注意：当前状态将被自动保存为上一级记录，绝对不会丢失！`)) return;
     window.closeRollbackModal();
@@ -1487,6 +1491,7 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         if (text) text.innerText = `[1/4] 正在抓取系统当前状态...`;
         if (bar) bar.style.width = "25%";
 
+        // 1. 获取当前分支的最新 commit SHA
         const refRes = await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, { headers: { "Authorization": `token ${ghToken}` } });
         if (!refRes.ok) throw new Error("无法读取主分支信息");
         const currentCommitSha = (await refRes.json()).object.sha;
@@ -1494,19 +1499,21 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         if (text) text.innerText = `[2/4] 正在提取目标快照 [#${shortSha}] 的底层蓝图...`;
         if (bar) bar.style.width = "50%";
 
+        // 2. 获取目标历史 commit 的树结构 SHA
         const targetCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits/${targetSha}`, { headers: { "Authorization": `token ${ghToken}` } });
         const targetTreeSha = (await targetCommitRes.json()).tree.sha;
 
         if (text) text.innerText = `[3/4] 正在生成全新的时空回溯节点...`;
         if (bar) bar.style.width = "75%";
 
+        // 3. 创建一个新的 commit，直接指向这个历史树结构（瞬间完成所有文件的覆盖）
         const newCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits`, {
             method: "POST",
             headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 message: `⏪ 代码时空回溯：还原至快照 [#${shortSha}] [skip ci]`,
                 tree: targetTreeSha,
-                parents: [currentCommitSha]
+                parents: [currentCommitSha] // 👑 核心：将当前状态设为父节点，完美保留当前版本不会消失！
             })
         });
         const newCommitSha = (await newCommitRes.json()).sha;
@@ -1514,6 +1521,7 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         if (text) text.innerText = `[4/4] 正在强制刷新云端大盘代码...`;
         if (bar) bar.style.width = "90%";
 
+        // 4. 将 main 分支的指针强制更新为新 commit
         await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, {
             method: "PATCH",
             headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
