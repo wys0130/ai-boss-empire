@@ -1,7 +1,7 @@
 {
   "summary": {
-    "completed": 8,
-    "todo": 0,
+    "completed": 7,
+    "todo": 1,
     "total_tasks": 9
   },
   "tasks": [
@@ -67,7 +67,7 @@
       "notes": "保持全球 TTFB < 50ms",
       "stage": "STAGE_3_FULL_SCALE",
       "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     },
     {
       "id": "TASK-302",
