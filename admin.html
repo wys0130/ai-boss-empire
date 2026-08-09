@@ -427,11 +427,10 @@
         </div>
     </div>
 
-    <!-- ⏳ 代码备份 (原历史快照) -->
+    <!-- ⏳ 代码备份 (双轨隔离架构) -->
     <div id="rollbackModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 max-w-lg w-full rounded-2xl p-6 shadow-2xl flex flex-col max-h-[80vh] relative overflow-hidden">
             
-            <!-- 👑 修复：内嵌进度条遮罩层，还原时显示 -->
             <div id="restoreProgressOverlay" class="hidden absolute inset-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm flex flex-col items-center justify-center p-6">
                 <div class="w-full max-w-sm">
                     <h3 id="restoreProgressText" class="text-slate-800 dark:text-white text-sm font-bold mb-4 text-center font-mono animate-pulse">正在提取文件树...</h3>
@@ -444,15 +443,9 @@
 
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 mb-4 shrink-0">
                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">⏳ 代码备份 (Code Snapshot)</h3>
-                <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-slate-800 dark:hover:text-white text-lg font-bold">✕</button>
+                <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
             </div>
             
-            <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 p-2.5 rounded-lg leading-relaxed shrink-0">
-                <strong>💡 核心原理：</strong><br>
-                此列表直连 GitHub 记录。每次“还原”都是生成一条新记录物理覆盖系统，旧历史**永远不会丢失**。
-            </div>
-            
-            <!-- 👑 修复：赋予按钮唯一的 ID: btnCreateSnapshot 供 JS 调用 -->
             <div class="flex gap-2 mb-4 shrink-0">
                 <input id="customSnapshotName" type="text" placeholder="为当前代码打个标记 (例如: 上线前稳定版)" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition shadow-inner">
                 <button id="btnCreateSnapshot" onclick="createCodeSnapshot()" class="shrink-0 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm border border-slate-700 whitespace-nowrap">
@@ -460,7 +453,25 @@
                 </button>
             </div>
 
-            <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2">
+            <!-- 👑 新增：双轨道 Tab 切换栏 -->
+            <div class="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 mb-3 shrink-0">
+                <button id="tab-btn-tags" onclick="switchSnapshotTab('tags')" class="flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition">📌 永久保留版本</button>
+                <button id="tab-btn-normal" onclick="switchSnapshotTab('normal')" class="flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition">🕒 最近30条常规</button>
+            </div>
+
+            <!-- 列表滚动区 -->
+            <div id="commitScrollArea" class="flex-1 overflow-y-auto custom-scroll pr-2 pb-2">
+                <!-- 容器1：永久打标区 -->
+                <div id="commitListTagsContainer" class="space-y-2"></div>
+                <!-- 容器2：常规记录区 -->
+                <div id="commitListNormalContainer" class="hidden space-y-2"></div>
+            </div>
+
+            <!-- 👑 新增：分页控件 (仅在永久标记页下展示) -->
+            <div id="snapshotPagination" class="mt-2 pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between shrink-0">
+                <button onclick="changeTagsPage(-1)" id="btnPrevTags" class="px-3 py-1.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition">上一页</button>
+                <span class="text-xs font-mono text-slate-500">第 <span id="currentTagsPageLabel" class="text-blue-500 font-bold">1</span> 页</span>
+                <button onclick="changeTagsPage(1)" id="btnNextTags" class="px-3 py-1.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition">下一页</button>
             </div>
         </div>
     </div>
