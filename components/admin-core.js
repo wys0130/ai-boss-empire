@@ -1459,53 +1459,77 @@ window.createCodeSnapshot = async function() {
     }
 };
 
+// 👑 终极修复：双轨并行拉取技术，打标版本永久固化防丢失！
 window.fetchCommitHistory = async function(forceRefresh = false) {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
-    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono animate-pulse">获取发布快照中...</div>`;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono animate-pulse">正在获取全量快照与打标记录...</div>`;
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
     if (!ghToken) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取记录。<br>请在右上角【密钥设置】中配置 GitHub Token。</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取提交记录。<br>请在右上角【🔑 密钥设置】填入 GitHub Token。</div>`;
         return;
     }
 
     try {
-        // 👑 加入时间戳强制绕过缓存
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
-        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!res.ok) throw new Error();
         
-        const commits = await res.json();
+        // 👑 核心绝招：双轨并发拉取！
+        // 轨道 1：拉取最新 30 条全局流水账
+        // 轨道 2：单独追踪 data/.snapshot 文件历史 (强行捞回所有手动打标记录，无视时间跨度！)
+        const [resAll, resTags] = await Promise.all([
+            fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } }),
+            fetch(`https://api.github.com/repos/${REPO}/commits?path=data/.snapshot&per_page=50${ts}`, { headers: { "Authorization": `token ${ghToken}` } })
+        ]);
+
+        if (!resAll.ok) throw new Error();
+        
+        const commitsAll = await resAll.json();
+        const commitsTags = resTags.ok ? await resTags.json() : [];
+
+        // 👑 合并并去重：将最新流水账记录和所有的“历史标记”无缝融合
+        let mergedMap = new Map();
+        commitsAll.forEach(c => mergedMap.set(c.sha, c));
+        commitsTags.forEach(c => mergedMap.set(c.sha, c)); // 标记过的旧记录强行并入！
+        
+        // 按时间倒序重新梳理时间线
+        let finalCommits = Array.from(mergedMap.values());
+        finalCommits.sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
+
         container.innerHTML = "";
         
-        commits.forEach((item, idx) => {
+        finalCommits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             
             const isTag = item.commit.message.includes("代码标记:");
-            const isRollback = item.commit.message.includes("代码还原");
+            const isRollback = item.commit.message.includes("真实代码还原");
+            
             let bgCls = "bg-slate-50 dark:bg-slate-900/50";
-            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800";
-            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800";
+            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 shadow-sm";
+            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800";
+
+            // 👑 为所有手工保留的历史标记打上钉子图标徽章
+            const pinBadge = isTag ? `<span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1.5 tracking-widest shadow-sm">📌 永久保留</span>` : '';
 
             container.innerHTML += `
                 <div class="border rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
+                            ${pinBadge}
                         </div>
-                        <div class="text-xs font-mono truncate ${isTag || isRollback ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-800 dark:text-slate-300'}">${item.commit.message}</div>
+                        <div class="text-xs font-mono truncate ${isTag || isRollback ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-800 dark:text-slate-300'}" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取异常，请检查网络或密钥。</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常，请检查网络或密钥。</div>`;
     }
 };
 
