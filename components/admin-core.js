@@ -271,7 +271,22 @@ window.ApexUserManager = {
 
     filterUsers: function(val) {
         this.searchQuery = val.trim();
-        const clearBtn = document.getElementById("user-search-clear");
+        
+        // 👑 修复：动态注入清空按钮（防止你的 HTML 里漏写了此按钮）
+        let clearBtn = document.getElementById("user-search-clear");
+        if (!clearBtn) {
+            const inputEl = document.getElementById("user-search-input");
+            if (inputEl && inputEl.parentNode) {
+                inputEl.parentNode.classList.add("relative");
+                clearBtn = document.createElement("button");
+                clearBtn.id = "user-search-clear";
+                clearBtn.innerHTML = "✕";
+                clearBtn.className = "absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white font-bold text-xs";
+                clearBtn.onclick = () => ApexUserManager.clearSearch();
+                inputEl.parentNode.appendChild(clearBtn);
+            }
+        }
+
         if (clearBtn) {
             if (this.searchQuery) clearBtn.classList.remove("hidden");
             else clearBtn.classList.add("hidden");
@@ -288,7 +303,6 @@ window.ApexUserManager = {
         this.renderUserTable();
     },
 
-    // 👑 修复：防挤压设计，保证用户名单可以自适应，长邮箱安全换行，按钮不再被遮盖
     renderUserTable: function() {
         const tbody = document.getElementById("userTableBody");
         if (!tbody) return;
@@ -312,17 +326,18 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
+            // 👑 修复防挤压：邮箱允许换行，但最右侧操作栏强制 whitespace-nowrap 不换行！
             tbody.innerHTML += `
                 <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                    <td class="py-3 px-3 min-w-[180px]">
-                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight break-all">${user.email}</div>
+                    <td class="py-3 px-3 min-w-[180px] break-all whitespace-normal">
+                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight">${user.email}</div>
                         <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${user.id}</div>
                     </td>
                     <td class="py-3 px-3 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
                     <td class="py-3 px-3 font-mono text-xs whitespace-nowrap">${verifyText}</td>
-                    <td class="py-3 px-3 font-mono text-slate-400 text-xs whitespace-nowrap hidden xl:table-cell">${user.date}</td>
-                    <td class="py-3 px-3 text-right">
-                        <div class="inline-flex flex-wrap items-center justify-end gap-1.5 min-w-[140px]">
+                    <td class="py-3 px-3 font-mono text-slate-400 text-xs whitespace-nowrap hidden lg:table-cell">${user.date}</td>
+                    <td class="py-3 px-3 text-right whitespace-nowrap">
+                        <div class="inline-flex items-center justify-end gap-1.5 min-w-[130px]">
                             <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2.5 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
                                 ${user.status ? '封禁' : '解封'}
                             </button>
@@ -533,6 +548,7 @@ window.renderAuditTable = function() {
             : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
+        // 👑 修复排版：为操作区增加 whitespace-nowrap 绝对锁定，保证按钮永远不被裁切！
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
                 <td class="py-2 px-2 w-16 whitespace-nowrap text-center">
@@ -552,7 +568,7 @@ window.renderAuditTable = function() {
                         <span class="text-slate-400 mx-1">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-16 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-blue-600 outline-none" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap inline-flex items-center justify-center select-none ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
                             ${linkBtnText}
                         </button>
                     </div>
@@ -564,8 +580,10 @@ window.renderAuditTable = function() {
                     </button>
                 </td>
                 <td class="py-2 px-2 text-right whitespace-nowrap">
-                    <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
-                    <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition ml-1">销毁</button>
+                    <div class="inline-flex justify-end gap-1.5 min-w-[120px]">
+                        <button onclick="uploadProductThumb(${index})" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shadow-sm transition">上传WebP</button>
+                        <button onclick="forceRemoveProduct(${index})" class="px-2 py-1 rounded bg-rose-600 hover:bg-rose-500 text-white font-bold text-[10px] shadow-sm transition">销毁</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -791,7 +809,7 @@ window.ApexPricing = {
     }
 };
 
-// 👑 修复：全量恢复 9 大核心 AI 部门
+// 👑 修复 1：全量恢复 9 大核心 AI 部门
 const deptConfig = [
     { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30" },
     { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30" },
@@ -1416,45 +1434,40 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
-// 👑 修复：打标功能重构，不依赖 event，彻底解决点击无反应
+// 👑 修复：脱离 event 绑定，加入时间戳强行刺穿 API 缓存，打标后秒刷新！
 window.createCodeSnapshot = async function() {
     const token = localStorage.getItem("APEX_GH_TOKEN");
-    if (!token) {
-        alert("❌ 请先在【🔑 密钥设置】配置 GitHub Token");
-        return;
-    }
+    if (!token) return alert("❌ 请先在【🔑 密钥设置】配置 GitHub Token");
+    
     const tagInput = document.getElementById("customSnapshotName");
     const tagName = tagInput ? tagInput.value.trim() : "";
     const commitMsg = tagName ? `📸 代码标记: ${tagName} [skip ci]` : `📸 代码标记: 手动存档 ${new Date().toLocaleString('zh-CN')} [skip ci]`;
     
-    // 兼容通过 onclick 直接调用的情况，不再依赖传入的 event
-    const btns = document.querySelectorAll('button[onclick*="createCodeSnapshot"]');
-    const btn = btns.length > 0 ? btns[0] : null;
-    
-    let originalText = "💾 瞬间打标";
+    const btn = document.querySelector('#rollbackModal button[onclick*="createCodeSnapshot"]');
+    let originalText = "💾 打标记";
     if (btn) {
         originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ 打标中...";
+        btn.innerHTML = "⏳ 提交中...";
         btn.disabled = true;
     }
 
     try {
         let sha = null;
         try {
-            const f = await getGithubFileSafe("config/.snapshot", token);
+            const f = await getGithubFileSafe("data/.snapshot", token);
             sha = f.sha;
         } catch(e){}
         
-        // 强行塞入时间戳改变文件指纹，确保每次提交都能成功写入
-        const pushRes = await pushGithubJsonFile("config/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
+        // 提交一个带时间戳的文件，物理上强制 GitHub 生成新的 Commit 节点
+        const pushRes = await pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
         
         if (pushRes) {
             alert("✅ 成功创建自定义代码标记！");
             if (tagInput) tagInput.value = "";
-            fetchCommitHistory(true); // 强制刷新列表
+            fetchCommitHistory(true); 
         }
     } catch (err) {
-        alert("❌ 创建代码快照失败: " + err.message);
+        alert("❌ 创建代码标记失败: " + err.message);
     } finally {
         if (btn) {
             btn.innerHTML = originalText;
@@ -1463,7 +1476,6 @@ window.createCodeSnapshot = async function() {
     }
 };
 
-// 👑 修复：防报错机制，扩大拉取条数到 30 条，并识别我们自定义的标签。强制破除 API 缓存。
 window.fetchCommitHistory = async function(forceRefresh = false) {
     const container = document.getElementById("commitListContainer");
     if (!container) return;
@@ -1476,11 +1488,11 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
     }
 
     try {
-        // 强行附加无用的查询参数，刺穿 GitHub 的只读缓存机制
+        // 时间戳刺穿 Github 只读缓存
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
         const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
         if (!res.ok) {
-            container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无权访问或仓库错误。<br>请确认仓库地址为 GitHub（不支持Gitee），且 Token 有效。</div>`;
+            container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无权访问或仓库错误。<br>请确认仓库地址为 GitHub，且 Token 有效。</div>`;
             return;
         }
         const commits = await res.json();
@@ -1490,15 +1502,14 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             
-            // 为手动打标记和回溯历史专门配置高亮底色
             const isTag = item.commit.message.includes("代码标记:");
-            const isRollback = item.commit.message.includes("代码时空回溯");
+            const isRollback = item.commit.message.includes("真实代码还原");
             let bgCls = "bg-slate-50 dark:bg-slate-900/50";
-            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800";
-            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800";
+            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800";
+            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800";
 
             container.innerHTML += `
-                <div class="border rounded-xl p-3 flex items-center justify-between gap-3 saas-input ${bgCls} mb-2 transition hover:shadow-md">
+                <div class="rounded-xl p-3 flex items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
@@ -1506,7 +1517,7 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
                         </div>
                         <div class="text-xs font-mono truncate ${isTag || isRollback ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-800 dark:text-slate-300'}">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
@@ -1517,17 +1528,13 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
     }
 }
 
-// 👑 终极架构级更新：单极原子回退算法（Git Tree Pointer Reversal）
-// 彻底解决之前逐个文件覆盖导致“当前版本被几十个提交淹没消失”的问题！且只需 1 秒！
+// 👑 终极修复：物理级覆盖真实文件，强制清理本地数据缓存，重载后绝对不显示旧数据！
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定将全站代码一键回退到快照 [#${shortSha}] 吗？\n\n注意：当前状态将被自动保存为上一级记录，绝对不会丢失！`)) return;
+    if (!confirm(`⏳ 确定将全站代码真实回退到快照 [#${shortSha}] 吗？\n(这会物理覆盖文件并清除本地缓存)`)) return;
     window.closeRollbackModal();
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
-    if (!ghToken) {
-        alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
-        return; 
-    }
+    if (!ghToken) return alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
 
     const overlay = document.getElementById("restoreProgressOverlay");
     const bar = document.getElementById("restoreProgressBar");
@@ -1535,52 +1542,59 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
 
     try {
         if (overlay) overlay.classList.remove("hidden");
-        if (text) text.innerText = `[1/4] 正在抓取系统当前状态...`;
-        if (bar) bar.style.width = "25%";
+        if (text) text.innerText = `[1/3] 正在拉取目标快照 [#${shortSha}] 的文件树...`;
+        if (bar) bar.style.width = "10%";
 
-        // 1. 获取当前分支的最新 commit SHA
-        const refRes = await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!refRes.ok) throw new Error("无法读取主分支信息");
-        const currentCommitSha = (await refRes.json()).object.sha;
-
-        if (text) text.innerText = `[2/4] 正在提取目标快照 [#${shortSha}] 的底层蓝图...`;
-        if (bar) bar.style.width = "50%";
-
-        // 2. 获取目标历史 commit 的树结构 SHA
-        const targetCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits/${targetSha}`, { headers: { "Authorization": `token ${ghToken}` } });
-        const targetTreeSha = (await targetCommitRes.json()).tree.sha;
-
-        if (text) text.innerText = `[3/4] 正在生成全新的时空回溯节点...`;
-        if (bar) bar.style.width = "75%";
-
-        // 3. 创建一个新的 commit，直接指向这个历史树结构（瞬间完成所有文件的覆盖）
-        const newCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits`, {
-            method: "POST",
-            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: `⏪ 代码时空回溯：还原至快照 [#${shortSha}]`,
-                tree: targetTreeSha,
-                parents: [currentCommitSha] // 👑 核心：将当前状态设为父节点，完美保留当前版本不会消失！
-            })
-        });
-        const newCommitSha = (await newCommitRes.json()).sha;
-
-        if (text) text.innerText = `[4/4] 正在强制刷新云端大盘代码...`;
-        if (bar) bar.style.width = "90%";
-
-        // 4. 将 main 分支的指针强制更新为新 commit
-        const patchRes = await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, {
-            method: "PATCH",
-            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ sha: newCommitSha, force: true })
-        });
+        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!treeRes.ok) throw new Error("无法读取目标快照的文件树结构");
         
-        if (!patchRes.ok) throw new Error("无法更新主分支指针，可能是权限不足。");
+        const treeData = await treeRes.json();
+        const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
+        const totalFiles = filesToRestore.length;
+        
+        let successCount = 0;
+        let skipCount = 0;
+        appendLog(`⏳ 开始逐一真实覆盖源码至快照 #${shortSha}...`);
+        
+        for (let i = 0; i < totalFiles; i++) {
+            const fileObj = filesToRestore[i];
+            const percent = Math.floor(10 + (i / totalFiles) * 80);
+            if (text) text.innerText = `[2/3] 正在覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
+            if (bar) bar.style.width = `${percent}%`;
 
+            let currentSha = null;
+            try {
+                // 读取主分支当前状态，防止写入冲突 409
+                const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}?ref=main`, { headers: { "Authorization": `token ${ghToken}` } });
+                if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
+            } catch(e){}
+
+            // 智能跳过，防止大量多余的提交记录
+            if (currentSha === fileObj.sha) {
+                skipCount++;
+                continue;
+            }
+
+            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
+            const fileJson = await fileContentRes.json();
+
+            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+                method: "PUT",
+                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha} [skip ci]`, 
+                    content: fileJson.content, 
+                    ...(currentSha && {sha: currentSha}) 
+                })
+            });
+            
+            if (updateRes.ok) successCount++;
+        }
+        
+        if (text) text.innerText = `[3/3] 覆盖完成！正在清理系统缓存...`;
         if (bar) bar.style.width = "100%";
-        if (text) text.innerText = `🎉 还原大功告成！正在清理缓存并重载...`;
 
-        // 👑 彻底解决假还原：清空业务缓存，迫使重载后拉取真正的云端数据
+        // 👑 彻底清理本地缓存，强制重载后必然读取刚复原的 GitHub 云端数据
         localStorage.removeItem('APEX_PRICING_CONFIG');
         localStorage.removeItem('APEX_BANNER_CONFIG');
         localStorage.removeItem('APEX_USER_LIST');
@@ -1589,8 +1603,8 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         localStorage.removeItem('APEX_SCHEDULE_CACHE');
 
         setTimeout(() => {
-            alert(`✅ 已成功通过时空跃迁将代码还原至 [#${shortSha}]！\n\n💡 你的上一个版本安全地躺在这个还原记录的正下方，随时可以再次找回。`);
-            // 附带时间戳强制刷新，刺穿浏览器 HTML 缓存
+            alert(`✅ 成功回溯真实代码至 [#${shortSha}]！\n📊 覆盖了 ${successCount} 个文件，跳过了 ${skipCount} 个。\n即将重载大盘！`);
+            // 附带时间戳重载，破除浏览器强缓存
             window.location.href = window.location.pathname + '?_t=' + Date.now();
         }, 1000);
         
