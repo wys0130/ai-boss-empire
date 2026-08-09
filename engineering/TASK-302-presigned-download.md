@@ -1,167 +1,160 @@
-# TASK-302 部署记录：3分钟预签名下载链接（防盗链）
+# TASK-302：施工工程部 - 私有预签名下载链接部署
 
-## 1. 目标确认
-- **部门**：施工工程部
-- **需求**：为大型施工图纸 / BIM 模型 / 现场视频提供临时下载链接
-- **安全要求**：链接有效期 3 分钟，过期即失效，防止外部盗链与长期分享
+## 1. 目标概述
+为施工工程部提供**3分钟有效期**的私有预签名下载链接，防止图纸、BOM清单、施工日志等敏感文件被盗链或长期暴露。
 
-## 2. 技术选型（基于现有 APEXWORK 平台）
-| 组件 | 方案 |
-|------|------|
-| 对象存储 | AWS S3（或兼容 MinIO） |
-| 签名算法 | AWS Signature V4（预签名 URL） |
-| 有效期 | 180 秒（3 分钟） |
-| 触发方式 | 工程部后台点击“生成临时链接” |
-| 审计 | 记录生成人、文件名、IP、时间戳 |
+## 2. 核心机制（S3 / OSS 兼容）
 
-## 3. 核心代码（Node.js / TypeScript）
+### 2.1 预签名 URL 生成（服务端）
+```python
+# Python (boto3 for AWS S3)
+import boto3
+from datetime import timedelta
 
-```typescript
-// services/presignedDownload.service.ts
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+s3 = boto3.client('s3', region_name='ap-southeast-1')
 
-const s3 = new S3Client({ region: process.env.AWS_REGION });
+def generate_presigned_url(bucket: str, key: str, expires_minutes: int = 3):
+    url = s3.generate_presigned_url(
+        'get_object',
+        Params={'Bucket': bucket, 'Key': key},
+        ExpiresIn=expires_minutes * 60
+    )
+    return url
+```
 
-/**
- * 生成3分钟有效的私有下载链接
- * @param bucket 存储桶
- * @param key 对象键（如：projects/2025/structural-model.rvt）
- * @param userId 操作人ID（用于审计）
- */
-export async function generatePresignedDownloadUrl(
-  bucket: string,
-  key: string,
-  userId: string
-): Promise<{ url: string; expiresAt: Date }> {
-  // 1. 校验权限（此处可接入 RBAC）
-  await assertCanDownload(userId, key);
+### 2.2 关键参数
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| `ExpiresIn` | 180 秒 | 3分钟硬限制 |
+| `ResponseContentDisposition` | `attachment; filename="..."` | 强制下载，不预览 |
+| `ResponseCacheControl` | `no-store, no-cache` | 禁止缓存 |
 
-  // 2. 创建命令
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
-
-  // 3. 设置 180 秒有效期（3分钟）
-  const expiresIn = 180;
-  const url = await getSignedUrl(s3, command, { expiresIn });
-
-  // 4. 审计日志
-  await auditLog({
-    action: "PRESIGNED_URL_GENERATED",
-    userId,
-    key,
-    expiresIn,
-    timestamp: new Date().toISOString(),
-  });
-
-  return {
-    url,
-    expiresAt: new Date(Date.now() + expiresIn * 1000),
-  };
+### 2.3 权限模型（最小权限）
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject"],
+      "Resource": "arn:aws:s3:::construction-eng-private/*",
+      "Condition": {
+        "IpAddress": {"aws:SourceIp": "10.20.0.0/16"},
+        "NumericLessThan": {"s3:ExistingObjectTag/expiry": "180"}
+      }
+    }
+  ]
 }
 ```
 
-## 4. API 路由（Express 示例）
+## 3. 部署步骤（施工工程部）
 
-```typescript
-// routes/download.route.ts
-import { Router } from "express";
-import { generatePresignedDownloadUrl } from "../services/presignedDownload.service";
-
-const router = Router();
-
-/**
- * POST /api/v1/engineering/download-link
- * Body: { "fileKey": "projects/2025/structural-model.rvt" }
- * 响应: { "url": "https://...", "expiresAt": "2025-01-01T12:00:00Z" }
- */
-router.post("/download-link", async (req, res) => {
-  const { fileKey } = req.body;
-  const userId = req.user.id; // 来自 JWT 中间件
-
-  try {
-    const result = await generatePresignedDownloadUrl(
-      process.env.S3_BUCKET!,
-      fileKey,
-      userId
-    );
-
-    // 前端可显示倒计时，3分钟后按钮置灰
-    res.json({
-      success: true,
-      data: result,
-      message: "链接将在 3 分钟后失效，请及时下载",
-    });
-  } catch (error) {
-    res.status(403).json({ success: false, message: "无权生成或文件不存在" });
-  }
-});
+### 3.1 文件上传（私有桶）
+```bash
+aws s3 cp ./drawings/A-101.pdf s3://construction-eng-private/drawings/A-101.pdf \
+  --storage-class STANDARD_IA \
+  --metadata "department=construction,owner=pm-lee"
 ```
 
-## 5. 前端交互（工程部后台）
+### 3.2 生成链接（API 端点）
+**POST /api/v1/secure-download**
+```json
+{
+  "file_key": "drawings/A-101.pdf",
+  "expires_in": 180
+}
+```
 
-```html
-<!-- 工程部下载面板 -->
-<div id="download-panel">
-  <select id="file-select">
-    <option value="projects/2025/structural-model.rvt">结构模型 RVT</option>
-    <option value="projects/2025/site-photos.zip">现场照片 ZIP</option>
-  </select>
-  <button id="generate-btn" onclick="generateLink()">生成3分钟临时链接</button>
-  <div id="result-area"></div>
-</div>
+**响应：**
+```json
+{
+  "url": "https://construction-eng-private.s3.ap-southeast-1.amazonaws.com/drawings/A-101.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA...&X-Amz-Date=20250617T030000Z&X-Amz-Expires=180&X-Amz-Signature=...",
+  "expires_at": "2025-06-17T03:03:00Z",
+  "policy": "3-minute-private-download"
+}
+```
 
-<script>
-async function generateLink() {
-  const fileKey = document.getElementById("file-select").value;
-  const res = await fetch("/api/v1/engineering/download-link", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fileKey }),
+### 3.3 前端调用（施工平板 / 桌面）
+```javascript
+// 3分钟倒计时，过期自动隐藏下载按钮
+const downloadBtn = document.getElementById('downloadBtn');
+let countdown = 180;
+
+function refreshLink() {
+  fetch('/api/v1/secure-download', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({file_key: currentFileKey})
+  })
+  .then(res => res.json())
+  .then(data => {
+    downloadBtn.href = data.url;
+    startCountdown(data.expires_at);
   });
-  const { data } = await res.json();
+}
 
-  // 显示链接 + 倒计时
-  const area = document.getElementById("result-area");
-  area.innerHTML = `
-    <p>下载链接（3分钟内有效）：</p>
-    <a href="${data.url}" target="_blank">点击下载</a>
-    <p>剩余时间：<span id="countdown">180</span> 秒</p>
-  `;
-
-  // 倒计时逻辑
-  let remaining = 180;
-  const timer = setInterval(() => {
-    remaining--;
-    document.getElementById("countdown").textContent = remaining;
+function startCountdown(expiry) {
+  const interval = setInterval(() => {
+    const remaining = Math.floor((new Date(expiry) - Date.now()) / 1000);
     if (remaining <= 0) {
-      clearInterval(timer);
-      area.innerHTML = "<p style='color:red'>链接已过期，请重新生成</p>";
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = '链接已过期，请重新获取';
+      clearInterval(interval);
+    } else {
+      downloadBtn.textContent = `下载 (${remaining}s)`;
     }
   }, 1000);
 }
-</script>
 ```
 
-## 6. 安全加固说明
-1. **防盗链**：链接签名包含 `X-Amz-Signature`，无法篡改或延长有效期
-2. **IP 绑定（可选）**：可在生成时记录 IP，下载时校验（需自定义中间件）
-3. **文件权限**：S3 Bucket 必须为 **私有**（Block Public Access 开启）
-4. **审计追踪**：所有生成记录写入 `audit_log` 表，保留 180 天
-5. **限流**：同一用户每分钟最多生成 5 个链接，防止滥用
+## 4. 安全加固（防盗链）
 
-## 7. 部署检查清单
-- [ ] S3 Bucket 策略：`{"Effect": "Deny", "Principal": "*", "Action": "s3:GetObject", "Resource": "arn:aws:s3:::bucket/*", "Condition": {"Bool": {"aws:SecureTransport": "false"}}}`
-- [ ] 环境变量：`AWS_REGION`, `S3_BUCKET`, `JWT_SECRET`
-- [ ] 日志监控：CloudWatch 告警（异常高频生成）
-- [ ] 前端倒计时与后端过期时间保持一致（以服务器时间为准）
+### 4.1 防盗链策略
+- **Referer 白名单**：仅允许 `*.apexwork.internal` 域名
+- **IP 限制**：仅允许施工工程部 VPN 网段（10.20.0.0/16）
+- **User-Agent 校验**：拒绝非标准浏览器/脚本
 
-## 8. 验收标准
-- [ ] 生成的 URL 在 180 秒内可正常下载
-- [ ] 超过 180 秒后访问返回 `403 Forbidden`
-- [ ] 非工程部角色调用 API 返回 `403`
-- [ ] 审计日志完整记录每次生成操作
+### 4.2 日志审计
+```json
+{
+  "event": "presigned_url_issued",
+  "file": "drawings/A-101.pdf",
+  "issued_by": "pm-lee@apexwork",
+  "ip": "10.20.3.45",
+  "expires_in": 180,
+  "timestamp": "2025-06-17T03:00:00Z"
+}
+```
+
+### 4.3 失败熔断
+- 同一 IP 每分钟超过 10 次请求 → 封禁 15 分钟
+- 同一文件 5 分钟内超过 3 次生成 → 需管理员审批
+
+## 5. 验证清单
+
+| 检查项 | 预期结果 |
+|--------|----------|
+| 链接生成后 3 分钟访问 | 200 OK |
+| 链接生成后 4 分钟访问 | 403 AccessDenied |
+| 非白名单 Referer 访问 | 403 Forbidden |
+| 非 VPN IP 访问 | 403 Forbidden |
+| 重复使用同一链接 | 仅首次有效（若启用一次性） |
+| 下载文件名 | 正确显示 `A-101.pdf` |
+| 浏览器缓存 | 无缓存（no-store） |
+
+## 6. 回滚方案
+```bash
+# 紧急撤销所有预签名 URL
+aws s3api delete-bucket-policy --bucket construction-eng-private
+# 或切换至静态 IP 白名单模式
+```
+
+## 7. 运维监控
+- CloudWatch 告警：`PresignedUrlIssued` 速率异常
+- 审计日志保留 90 天
+- 每周自动扫描过期链接
 
 ---
-**部署人**：平台运维组  
-**日期**：2025-01-15  
-**状态**：✅ 已上线
+**部署负责人**：施工工程部 - 王工  
+**审批人**：信息安全组 - 李总监  
+**生效日期**：2025-06-17 03:00 UTC
