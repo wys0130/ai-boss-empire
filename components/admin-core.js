@@ -1405,12 +1405,22 @@ async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
 }
 
 // ==========================================
-// 👑 终极降维打击：代码快照与还原引擎
+// 👑 终极降维打击：双轨并行拉取引擎 + 分页系统
 // ==========================================
+
+let currentSnapTab = 'tags';
+let currentTagsPage = 1;
+const TAGS_PER_PAGE = 8; // 每页展示 8 个永久标记
+
 window.openRollbackModal = function() {
     const el = document.getElementById("rollbackModal");
     if (el) el.classList.remove("hidden");
-    fetchCommitHistory(true);
+    // 初始化强制刷新当前所在的 tab
+    if (currentSnapTab === 'tags') {
+        fetchTaggedCommits(true);
+    } else {
+        fetchNormalCommits(true);
+    }
 };
 
 window.closeRollbackModal = function() {
@@ -1418,7 +1428,43 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
-// 👑 修复：利用 ID 获取按钮防止报错，加上 Date.now() 强制刺穿 GitHub API 缓存！
+// 👑 Tab 切换逻辑
+window.switchSnapshotTab = function(tab) {
+    currentSnapTab = tab;
+    const btnTags = document.getElementById("tab-btn-tags");
+    const btnNormal = document.getElementById("tab-btn-normal");
+    const contTags = document.getElementById("commitListTagsContainer");
+    const contNormal = document.getElementById("commitListNormalContainer");
+    const pagination = document.getElementById("snapshotPagination");
+
+    if (tab === 'tags') {
+        btnTags.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
+        btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        contTags.classList.remove("hidden");
+        contNormal.classList.add("hidden");
+        pagination.classList.remove("hidden");
+        fetchTaggedCommits();
+    } else {
+        btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
+        btnTags.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        contNormal.classList.remove("hidden");
+        contTags.classList.add("hidden");
+        pagination.classList.add("hidden");
+        fetchNormalCommits();
+    }
+};
+
+// 👑 分页上一页/下一页控制
+window.changeTagsPage = function(delta) {
+    if (delta === -1 && currentTagsPage > 1) {
+        currentTagsPage--;
+        fetchTaggedCommits();
+    } else if (delta === 1) {
+        currentTagsPage++;
+        fetchTaggedCommits();
+    }
+};
+
 window.createCodeSnapshot = async function() {
     const token = localStorage.getItem("APEX_GH_TOKEN");
     if (!token) return alert("❌ 请先在【🔑 密钥设置】配置 GitHub Token");
@@ -1442,15 +1488,19 @@ window.createCodeSnapshot = async function() {
             sha = f.sha;
         } catch(e){}
         
+        // 写入带时间戳的文件，强制 Github 生成真实永久 Commit
         const pushRes = await pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
         
         if (pushRes) {
-            alert("✅ 成功创建代码标记！");
+            alert("✅ 成功创建永久代码标记！");
             if (tagInput) tagInput.value = "";
-            fetchCommitHistory(true); 
+            // 强行切回“永久标签”页，跳回第一页并刷新
+            switchSnapshotTab('tags');
+            currentTagsPage = 1;
+            fetchTaggedCommits(true); 
         }
     } catch (err) {
-        alert("❌ 创建标记失败: " + err.message);
+        alert("❌ 打标失败: " + err.message);
     } finally {
         if (btn) {
             btn.innerHTML = originalText;
@@ -1459,68 +1509,92 @@ window.createCodeSnapshot = async function() {
     }
 };
 
-// 👑 终极修复：双轨并行拉取技术，打标版本永久固化防丢失！
-window.fetchCommitHistory = async function(forceRefresh = false) {
-    const container = document.getElementById("commitListContainer");
+// 👑 轨道1：专门拉取 data/.snapshot 的持久化标记，原生支持分页！
+window.fetchTaggedCommits = async function(forceRefresh = false) {
+    const container = document.getElementById("commitListTagsContainer");
     if (!container) return;
-    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-4 font-mono animate-pulse">正在获取全量快照与打标记录...</div>`;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono animate-pulse">正在从 GitHub 底层索引永久标记...</div>`;
+    document.getElementById("currentTagsPageLabel").innerText = currentTagsPage;
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
-    if (!ghToken) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">无法读取提交记录。<br>请在右上角【🔑 密钥设置】填入 GitHub Token。</div>`;
-        return;
-    }
+    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token。</div>`;
 
     try {
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
+        // 通过 path 参数精准过滤出仅针对标记文件的提交记录！天然实现分类和持久化。
+        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?path=data/.snapshot&page=${currentTagsPage}&per_page=${TAGS_PER_PAGE}${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!res.ok) throw new Error();
         
-        // 👑 核心绝招：双轨并发拉取！
-        // 轨道 1：拉取最新 30 条全局流水账
-        // 轨道 2：单独追踪 data/.snapshot 文件历史 (强行捞回所有手动打标记录，无视时间跨度！)
-        const [resAll, resTags] = await Promise.all([
-            fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } }),
-            fetch(`https://api.github.com/repos/${REPO}/commits?path=data/.snapshot&per_page=50${ts}`, { headers: { "Authorization": `token ${ghToken}` } })
-        ]);
-
-        if (!resAll.ok) throw new Error();
-        
-        const commitsAll = await resAll.json();
-        const commitsTags = resTags.ok ? await resTags.json() : [];
-
-        // 👑 合并并去重：将最新流水账记录和所有的“历史标记”无缝融合
-        let mergedMap = new Map();
-        commitsAll.forEach(c => mergedMap.set(c.sha, c));
-        commitsTags.forEach(c => mergedMap.set(c.sha, c)); // 标记过的旧记录强行并入！
-        
-        // 按时间倒序重新梳理时间线
-        let finalCommits = Array.from(mergedMap.values());
-        finalCommits.sort((a, b) => new Date(b.commit.committer.date) - new Date(a.commit.committer.date));
-
+        const commits = await res.json();
         container.innerHTML = "";
         
-        finalCommits.forEach((item, idx) => {
+        if (commits.length === 0) {
+            container.innerHTML = `<div class="text-center text-xs text-slate-500 py-6 font-mono">第 ${currentTagsPage} 页已无更多记录</div>`;
+            document.getElementById("btnNextTags").disabled = true;
+            if(currentTagsPage === 1) document.getElementById("btnPrevTags").disabled = true;
+            return;
+        }
+
+        // 动态控制分页按钮状态
+        document.getElementById("btnPrevTags").disabled = (currentTagsPage === 1);
+        document.getElementById("btnNextTags").disabled = (commits.length < TAGS_PER_PAGE);
+
+        commits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             
-            const isTag = item.commit.message.includes("代码标记:");
-            const isRollback = item.commit.message.includes("真实代码还原");
-            
-            let bgCls = "bg-slate-50 dark:bg-slate-900/50";
-            if (isTag) bgCls = "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 shadow-sm";
-            if (isRollback) bgCls = "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800";
+            container.innerHTML += `
+                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 shadow-sm transition hover:shadow-md mb-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400">[#${shaShort}]</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${timeStr}</span>
+                            <span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1 tracking-widest shadow-sm shrink-0">📌 永久保留</span>
+                        </div>
+                        <div class="text-xs font-mono truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
+                    </div>
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-blue-300 dark:border-blue-600 rounded-lg text-xs font-mono font-bold hover:bg-blue-100 dark:hover:bg-blue-800 transition shrink-0 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm">
+                        ${(currentTagsPage === 1 && idx === 0) ? '当前状态' : '还原'}
+                    </button>
+                </div>
+            `;
+        });
+    } catch (err) {
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`;
+    }
+};
 
-            // 👑 为所有手工保留的历史标记打上钉子图标徽章
-            const pinBadge = isTag ? `<span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1.5 tracking-widest shadow-sm">📌 永久保留</span>` : '';
+// 👑 轨道2：纯粹拉取最近 30 条全局流水账
+window.fetchNormalCommits = async function(forceRefresh = false) {
+    const container = document.getElementById("commitListNormalContainer");
+    if (!container) return;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono animate-pulse">正在获取最近30条流水记录...</div>`;
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token。</div>`;
+
+    try {
+        const ts = forceRefresh ? `&_t=${Date.now()}` : '';
+        const res = await fetch(`https://api.github.com/repos/${REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!res.ok) throw new Error();
+        
+        const commits = await res.json();
+        container.innerHTML = "";
+        
+        commits.forEach((item, idx) => {
+            const shaShort = item.sha.slice(0, 7);
+            const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
+            const isRollback = item.commit.message.includes("真实代码还原") || item.commit.message.includes("回溯");
+            const bgCls = isRollback ? "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800" : "bg-slate-50 dark:bg-slate-900/50 border border-transparent";
 
             container.innerHTML += `
-                <div class="border rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
+                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
-                            ${pinBadge}
                         </div>
-                        <div class="text-xs font-mono truncate ${isTag || isRollback ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-800 dark:text-slate-300'}" title="${item.commit.message}">${item.commit.message}</div>
+                        <div class="text-xs font-mono truncate ${isRollback ? 'text-purple-600 dark:text-purple-400 font-bold' : 'text-slate-800 dark:text-slate-300'}" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
                     <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm">
                         ${idx === 0 ? '当前状态' : '还原'}
@@ -1529,16 +1603,16 @@ window.fetchCommitHistory = async function(forceRefresh = false) {
             `;
         });
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">获取历史异常，请检查网络或密钥。</div>`;
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`;
     }
 };
 
-// 👑 修复 4：解决假还原。真实物理覆盖 Github 文件，并强制清空本地所有缓存，确保页面重载后读取的是云端数据！
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定将代码真实回退到快照 [#${shortSha}] 吗？\n\n(将物理覆盖文件并清空本地缓存，此操作耗时约10-20秒)`)) return;
+    if (!confirm(`⏳ 确定将全站代码真实回退到快照 [#${shortSha}] 吗？\n(这会物理覆盖云端文件并清空本地页面缓存)`)) return;
+    window.closeRollbackModal();
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
-    if (!ghToken) return alert("❌ 缺少 GitHub Token");
+    if (!ghToken) return alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
 
     const overlay = document.getElementById("restoreProgressOverlay");
     const bar = document.getElementById("restoreProgressBar");
@@ -1546,11 +1620,11 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
 
     try {
         if (overlay) overlay.classList.remove("hidden");
-        if (text) text.innerText = `[1/3] 拉取快照 [#${shortSha}] 文件树...`;
+        if (text) text.innerText = `[1/3] 正在拉取目标快照 [#${shortSha}] 的文件树...`;
         if (bar) bar.style.width = "10%";
 
         const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!treeRes.ok) throw new Error("读取快照失败");
+        if (!treeRes.ok) throw new Error("无法读取目标快照");
         
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
@@ -1579,7 +1653,6 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
             const fileJson = await fileContentRes.json();
 
-            // ⚠️ 绝不加 [skip ci]，必须触发编译
             const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
                 method: "PUT",
                 headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
@@ -1592,87 +1665,19 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
             if (updateRes.ok) successCount++;
         }
         
-        if (text) text.innerText = `[3/3] 覆盖完成！正在清理本地缓存...`;
+        if (text) text.innerText = `[3/3] 覆盖完成！正在清理系统缓存...`;
         if (bar) bar.style.width = "100%";
 
-        // 👑 彻底杀除所有的 localStorage 缓存，让浏览器被逼无奈只能去拉取刚刚还原好的新代码！
-        localStorage.removeItem('APEX_PRICING_CONFIG');
-        localStorage.removeItem('APEX_BANNER_CONFIG');
-        localStorage.removeItem('APEX_USER_LIST');
-        localStorage.removeItem('APEX_TASKS_CACHE');
-        localStorage.removeItem('APEX_AUDIT_PRODUCTS');
-        localStorage.removeItem('APEX_SCHEDULE_CACHE');
+        const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
 
         setTimeout(() => {
-            alert(`✅ 还原成功！\n覆盖 ${successCount} 个文件，跳过 ${skipCount} 个。\n\n正在强制刷新系统...`);
-            // 追加强行时间戳，破除浏览器强缓存机制
+            alert(`✅ 已成功将代码还原至 [#${shortSha}]！\n覆盖了 ${successCount} 个文件。\n浏览器即将强制重载最新数据！`);
             window.location.href = window.location.pathname + '?_t=' + Date.now();
         }, 1000);
         
     } catch(err) { 
         if (overlay) overlay.classList.add("hidden");
         alert("❌ 还原异常: " + err.message);
-    }
-};
-
-window.triggerSwarmAutonomousAction = async function() {
-    const btn = document.getElementById("runBtn");
-    const cmdBox = document.getElementById("cmd");
-    let rawText = "常规进展汇报";
-    if (cmdBox) {
-        rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" 
-            ? cmdBox.value 
-            : cmdBox.innerText;
-        rawText = rawText.replace(/@[^ ]+/g, "").trim() || "常规进展汇报";
-    }
-    
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = "<span>⚙️ AI 智能体推演中...</span>";
-    }
-    try {
-        const keys = getKeysSafe();
-        if (!keys.ds) {
-            appendLog("❌ 缺少 DeepSeek API Key，调令推演中止。", "text-rose-500");
-            if (btn) { btn.disabled = false; btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>"; }
-            return;
-        }
-
-        const [memoryFile, repoTreeRes] = await Promise.all([
-            getGithubFileSafe("MEMORY.md", keys.gh),
-            fetch(`https://api.github.com/repos/${REPO}/git/trees/main?recursive=1`, { headers: { "Authorization": `token ${keys.gh}` } }).then(r => r.json())
-        ]);
-        const treeSummary = (repoTreeRes.tree || []).map(n => n.path).join("\n");
-
-        const prompt = `你是 APEXWORK 智能体中枢。
-目录树：\n${treeSummary}
-记忆：\n${memoryFile.content || "无"}
-董事长指令："${rawText}"
-要求：仅输出 ===SWARM_LOG=== 答复和 ===NEW_MEMORY=== 带有 [EVO-RECORD | 部门]: 的记忆。不准随性改写无关文件。`;
-
-        const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: [{ role: "system", content: "极简商务平台后台架构中枢。" }, { role: "user", content: prompt }],
-                temperature: 0.4
-            })
-        });
-        const aiAnswer = (await dsRes.json()).choices[0].message.content;
-        const swarmLogText = aiAnswer.split("===SWARM_LOG===")[1]?.split("===NEW_MEMORY===")[0].trim() || "调令执行完毕。";
-        appendLog(`🤖 回复:\n${swarmLogText}`);
-        if (cmdBox) {
-            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
-            else cmdBox.innerHTML = "";
-        }
-        loadHistoryFromMemory();
-    } catch (err) {
-        appendLog("❌ 调令执行异常: " + err.message, "text-rose-500");
-    } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>";
-        }
     }
 };
