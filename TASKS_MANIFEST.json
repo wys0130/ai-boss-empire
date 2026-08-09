@@ -1,7 +1,7 @@
 {
   "summary": {
-    "completed": 6,
-    "todo": 3,
+    "completed": 7,
+    "todo": 2,
     "total_tasks": 9
   },
   "tasks": [
@@ -59,7 +59,7 @@
       "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "主动产品部",
-      "status": "TODO"
+      "status": "DONE"
     },
     {
       "id": "TASK-301",
