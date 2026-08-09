@@ -442,22 +442,10 @@
                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">⏳ 代码备份 (Code Snapshot)</h3>
                 <button onclick="closeRollbackModal()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
             </div>
-            
-            <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 p-2.5 rounded-lg leading-relaxed shrink-0">
-                <strong>💡 核心原理说明：</strong><br>
-                此列表直连 GitHub 的底层记录。每次“还原”其实是把旧代码作为新记录盖在最新层，你的历史记录**永远不会丢失**。
+            <div class="mb-4 text-[10px] bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 p-2.5 rounded-lg leading-relaxed">
+                <strong>⚠️ 仅用于恢复 HTML/JS 源码崩溃。</strong><br>此操作直接拉取 GitHub 的 Commit 记录，需在右上角配好 GitHub 密钥。
             </div>
-            
-            <!-- 👑 修复：加入手工打标签输入框与按钮 -->
-            <div class="flex gap-2 mb-4 shrink-0">
-                <input id="customSnapshotName" type="text" placeholder="为当前代码打个标记 (例如: 上线前稳定版)" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-800 dark:text-slate-200 outline-none focus:border-blue-500 transition shadow-inner">
-                <button onclick="createCodeSnapshot()" class="shrink-0 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm border border-slate-700 whitespace-nowrap">
-                    💾 瞬间打标
-                </button>
-            </div>
-
-            <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2">
-            </div>
+            <div id="commitListContainer" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2 pb-2"></div>
         </div>
     </div>
 
@@ -526,10 +514,10 @@
                     listEl.innerHTML += `
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-indigo-400 transition gap-3">
                             <div class="flex-1 min-w-0"><div class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">${save.name}</div><div class="text-[11px] text-slate-500 mt-1">⏱️ ${new Date(save.timestamp).toLocaleString()}</div></div>
-                            <div class="flex flex-wrap gap-2 shrink-0">
-                                <button onclick="ApexVault.restoreSave('${save.id}')" class="px-3 py-1.5 bg-emerald-600 text-white rounded shadow-sm text-xs font-bold transition hover:bg-emerald-500 whitespace-nowrap">📥 读取</button>
-                                <button onclick="ApexVault.overwriteSave('${save.id}')" class="px-3 py-1.5 bg-blue-600 text-white rounded shadow-sm text-xs font-bold transition hover:bg-blue-500 whitespace-nowrap">💾 覆盖</button>
-                                <button onclick="ApexVault.deleteSave('${save.id}')" class="px-3 py-1.5 bg-rose-600 text-white rounded shadow-sm text-xs font-bold transition hover:bg-rose-500 whitespace-nowrap">🗑️ 删除</button>
+                            <div class="flex gap-2 shrink-0">
+                                <button onclick="ApexVault.restoreSave('${save.id}')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 rounded text-xs font-bold transition hover:bg-emerald-500 hover:text-white border border-emerald-200 whitespace-nowrap">📥 读取</button>
+                                <button onclick="ApexVault.overwriteSave('${save.id}')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 rounded text-xs font-bold transition hover:bg-blue-500 hover:text-white border border-blue-200 whitespace-nowrap">💾 覆盖</button>
+                                <button onclick="ApexVault.deleteSave('${save.id}')" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 rounded text-xs font-bold transition hover:bg-rose-500 hover:text-white border border-rose-200 whitespace-nowrap">🗑️ 删</button>
                             </div>
                         </div>`;
                 });
