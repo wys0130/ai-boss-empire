@@ -1,5 +1,13 @@
 [
   {
+    "id": "U-6203",
+    "email": "client@apexwork.cn",
+    "role": "商业授权套件 [CLIENT]",
+    "verified": false,
+    "date": "2026-08-09",
+    "status": true
+  },
+  {
     "id": "U-1001",
     "email": "wys0130@apexwork.cn",
     "role": "企业高级合伙人 [ADMIN]",
