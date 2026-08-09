@@ -273,8 +273,8 @@ window.ApexUserManager = {
         this.searchQuery = val.trim();
         const clearBtn = document.getElementById("user-search-clear");
         if (clearBtn) {
-            // 👑 修复搜索框 X 按钮逻辑：强制展示/隐藏
-            clearBtn.style.display = this.searchQuery ? "block" : "none";
+            if (this.searchQuery) clearBtn.classList.remove("hidden");
+            else clearBtn.classList.add("hidden");
         }
         this.renderUserTable();
     },
@@ -284,7 +284,7 @@ window.ApexUserManager = {
         const input = document.getElementById("user-search-input");
         const clearBtn = document.getElementById("user-search-clear");
         if (input) input.value = "";
-        if (clearBtn) clearBtn.style.display = "none";
+        if (clearBtn) clearBtn.classList.add("hidden");
         this.renderUserTable();
     },
 
@@ -298,7 +298,7 @@ window.ApexUserManager = {
             : this.userList;
 
         if (list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400 font-mono">没有找到相关匹配的用户记录</td></tr>`;
+            tbody.innerHTML = `<div class="text-center py-6 text-slate-400 font-mono text-xs">没有找到相关匹配的用户记录</div>`;
             return;
         }
 
@@ -311,30 +311,29 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：防挤压排版，给邮箱容器允许折行，操作区强制宽度并折行自适应
+            // 👑 修复：脱离定宽表格，采用 flex 卡片式响应式排版，邮箱自动截断，按钮绝不超出屏幕
             tbody.innerHTML += `
-                <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                    <td class="py-3 px-3 min-w-[180px]">
-                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] leading-tight break-all">${user.email}</div>
-                        <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${user.id}</div>
-                    </td>
-                    <td class="py-3 px-3 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">${user.role}</td>
-                    <td class="py-3 px-3 font-mono text-xs whitespace-nowrap">${verifyText}</td>
-                    <td class="py-3 px-3 font-mono text-slate-400 text-xs whitespace-nowrap hidden xl:table-cell">${user.date}</td>
-                    <td class="py-3 px-3 text-right">
-                        <div class="inline-flex flex-wrap items-center justify-end gap-1.5 min-w-[140px]">
-                            <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-2.5 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
-                                ${user.status ? '封禁' : '解封'}
-                            </button>
-                            <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-2.5 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">
-                                验证
-                            </button>
-                            <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-2.5 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">
-                                销毁
-                            </button>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 mb-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-blue-400 transition gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="font-extrabold text-sm text-[#0f172a] dark:text-[#f8fafc] truncate" title="${user.email}">${user.email}</div>
+                        <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+                            <span class="text-[10px] text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">ID: ${user.id}</span>
+                            <span class="font-mono text-blue-600 font-bold text-[10px]">${user.role}</span>
+                            <span class="font-mono text-[10px]">${verifyText}</span>
                         </div>
-                    </td>
-                </tr>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
+                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
+                            ${user.status ? '封禁' : '解封'}
+                        </button>
+                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">
+                            验证
+                        </button>
+                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">
+                            销毁
+                        </button>
+                    </div>
+                </div>
             `;
         });
     },
