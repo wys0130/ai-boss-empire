@@ -348,17 +348,15 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col">
+                    <div class="lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col min-w-0">
                         <div class="mb-5 border-b border-slate-200 dark:border-slate-800 pb-4">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2">🛡️ 系统安全与发信配置</h3>
                         </div>
-                        
                         <div class="space-y-4 flex-1 overflow-y-auto custom-scroll pr-1">
                             <div class="p-3 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800">
                                 <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">最高权限口令</label>
                                 <input id="pwd-new-admin" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400 outline-none focus:border-rose-500">
                             </div>
-
                             <div class="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3 relative overflow-hidden">
                                 <h4 class="text-[11px] font-bold text-blue-600 dark:text-blue-400 border-b border-slate-200 dark:border-blue-500/20 pb-1.5 uppercase">EmailJS 发信参数</h4>
                                 <div><label class="block text-[10px] font-bold text-slate-500 mb-1">Service ID</label><input id="emailjs-service-id" type="text" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-mono p-1.5 text-slate-700 dark:text-slate-300 outline-none"></div>
@@ -371,30 +369,24 @@
                         </button>
                     </div>
 
-                    <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col overflow-hidden">
+                    <!-- 👑 修改：采用 Flex 布局彻底重构清单，杜绝横向滚动条，防止按钮被挤压 -->
+                    <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col min-w-0 overflow-hidden">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
-                            <h3 class="text-sm font-black text-slate-800 dark:text-white">终端客户清单</h3>
+                            <h3 class="text-sm font-black text-slate-800 dark:text-white shrink-0">终端客户清单</h3>
                             <div class="relative w-full sm:w-64">
                                 <input id="user-search-input" type="text" placeholder="按邮箱或 ID 搜索..." oninput="ApexUserManager.filterUsers(this.value)" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs outline-none focus:border-blue-500">
+                                <!-- 👑 修复：增加清除按钮，配合 JS 动态显隐 -->
+                                <button id="user-search-clear" onclick="ApexUserManager.clearSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white hidden font-bold text-sm">✕</button>
                             </div>
                         </div>
 
-                        <!-- 👑 修复：去除了导致挤压的面条代码，改为自然延展横向滚动 -->
-                        <div class="overflow-x-auto w-full pb-4 custom-scroll">
-                            <table class="w-full text-left border-collapse min-w-[700px]">
-                                <thead>
-                                    <tr class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                        <th class="py-2.5 px-4 w-1/3 whitespace-nowrap">邮箱主体 / ID</th>
-                                        <th class="py-2.5 px-4 w-40 whitespace-nowrap">商用角色</th>
-                                        <th class="py-2.5 px-4 w-28 whitespace-nowrap">核验状态</th>
-                                        <th class="py-2.5 px-4 w-28 whitespace-nowrap">注册日期</th>
-                                        <th class="py-2.5 px-4 text-right min-w-[180px] whitespace-nowrap">安全操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="userTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-800 dark:text-slate-200">
-                                    <!-- 动态渲染 -->
-                                </tbody>
-                            </table>
+                        <!-- 废弃 table 标签，采用自适应列表容器 -->
+                        <div class="w-full flex-1 overflow-y-auto custom-scroll pr-1" id="userTableBody">
+                            <!-- 动态渲染数据 -->
+                        </div>
+                        
+                        <div class="mt-auto pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-end">
+                            <button onclick="ApexUserManager.restoreDefaultUsers()" class="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white underline font-mono">↻ 还原演示数据</button>
                         </div>
                     </div>
                 </div>
