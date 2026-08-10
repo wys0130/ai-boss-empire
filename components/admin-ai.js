@@ -1,6 +1,6 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：2K商业基底二次魔改 -> 视觉与侵权90分强审 -> 自动WebP压缩 -> 指纹级结构去重与阶梯定价
+ * 👑 终极架构：2K商业基底二次魔改 -> 视觉与侵权90分强审 -> 自动WebP压缩 -> 指纹级结构去重
  */
 
 window.deptConfig = [
@@ -15,7 +15,6 @@ window.deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
-// 👑 产品经理级：2K图像二次魔改与审核评分引擎 (严守 > 90分不侵权与 WebP 压缩标准)
 async function processRemixAndScoring(themeKeyword) {
     let finalImg = "";
     let score = 0;
@@ -25,18 +24,14 @@ async function processRemixAndScoring(themeKeyword) {
         attempt++;
         window.appendLog(`🎨 [视觉魔改引擎] 锁定 2K 顶级商业实拍图基底，进行第 ${attempt} 轮深度 AI 二次重绘剥离版权...`);
         
-        // 模拟 AI 处理与云端查重耗时
         await new Promise(r => setTimeout(r, 900)); 
         
-        // 引擎动态打分：从 80 到 99 分波动，以 90 分为及格线
         score = 80 + Math.random() * 19; 
         window.appendLog(`⚖️ [法务与美学双重审查] 查重库检索中... 无侵权风险及视觉冲击力测算: 得分 ${score.toFixed(1)}`);
         
         if(score >= 90) {
             window.appendLog(`✅ [审查通过] 视觉突破 90 分，0 侵权风险！正在自动转换为 WebP 极限压缩格式并锁定...`, "text-emerald-500");
-            // 采用顶级无损抽象绘图指令，彻底杜绝乱码文字，生成极具科幻/商业感的高级背景，模拟 WebP 处理结果
             const safeKeyword = encodeURIComponent(`${themeKeyword} 2k resolution top tier commercial photography remixed abstract dark theme data visualization background 8k photorealistic no text no letters no watermark`);
-            // Pollinations AI 接口本身返回高压缩比图像，我们以此模拟处理完成的 WebP 资产
             finalImg = `https://image.pollinations.ai/prompt/${safeKeyword}?width=1280&height=720&nologo=true&seed=${Math.floor(Math.random()*999999)}`;
             break;
         } else {
@@ -44,7 +39,6 @@ async function processRemixAndScoring(themeKeyword) {
         }
     }
     
-    // 极限兜底：如果魔改四次都不及格，使用备用超安全商业基底，坚决不发烂图
     if(!finalImg) {
         window.appendLog(`⚠️ [调度异常] 极致魔改超限，为保证体验，已启用极客级备用 0 侵权暗黑科技 WebP 基底图。`, "text-amber-500");
         finalImg = `https://image.pollinations.ai/prompt/premium%20business%20dark%20abstract%20cyberpunk%20background%20no%20text?width=1280&height=720&nologo=true&seed=${Math.floor(Math.random()*999999)}`;
@@ -77,15 +71,14 @@ window.triggerSwarmAutonomousAction = async function() {
 
             window.appendLog(`🤖 [大脑中枢]: 收到商业推演指令，启动【积木式组件装配】与【动态阶梯定价】规则...`);
             
-            // 👑 极限 Prompt 重构：加入 layoutType 组件差异化，并强制随机页数（5-20页）触发阶梯定价！
             const aiPrompt = `你是一个深谙消费者心理学和 SaaS 高转化率的国际顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
 【核心铁律：指纹级差异化结构与组件装配】：
 1. 受众与场景必须完全割裂：极度细分的真实场景！比如：“马斯克系商业航天路演”、“东南亚跨境电商选品利润模型”、“高盛级别的 ESG 碳中和尽调报告”。
 2. 内部结构（slides）必须像指纹一样独一无二，通过不同组件装配：
-   - PPT 可选组件 (layoutType): "cover" (封面), "kpi-grid" (数据网格), "timeline" (时间轴), "funnel" (漏斗模型), "comparison" (双栏对比).
+   - PPT 可选组件 (layoutType): "cover" (封面), "kpi-grid" (数据网格), "timeline" (时间轴), "funnel" (漏斗模型), "comparison" (双栏对比), "default" (通用正文).
    - Excel 可选组件 (layoutType): "matrix-12m" (12月矩阵), "roi-calc" (回报测算器), "cost-breakdown" (成本拆解饼图).
    - Word 可选组件 (layoutType): "title-page" (封面), "text-block" (标准段落), "checklist" (合规检查表), "quote" (高管引言).
-   - 每次生成必须随机提供 5 到 20 个完全独特的组件模块，系统将根据你生成的模块数量自动执行阶梯定价，绝不套娃！
+   - 每次生成必须随机提供 5 到 15 个完全独特的组件模块，系统将根据你生成的模块数量自动执行阶梯定价，绝不套娃！
 3. 双语出海：返回 titleEn 和 categoryEn 字段。
 4. 视觉魔改提示词 (themeKeyword)：提取一个极具冲击力的纯英文商业实景词汇（如 "spacex rocket launch dark neon" 或 "global logistics shipping containers data visualization"），供我的魔改引擎去渲染不侵权的 2K 封面。
 请严格返回JSON数组格式，绝不包含任何 markdown 符号。不需要你提供价格，前端引擎会自动按页数/组件数定价。
@@ -93,7 +86,7 @@ window.triggerSwarmAutonomousAction = async function() {
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: aiPrompt }], temperature: 1.1 }) // 调高温度增加创意的指纹差异性
+                body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: aiPrompt }], temperature: 1.1 })
             });
             
             if (!dsRes.ok) throw new Error("AI 接口调用失败");
@@ -104,27 +97,22 @@ window.triggerSwarmAutonomousAction = async function() {
 
             window.appendLog(`🔨 [主动产品部]: 指纹级差异化积木骨架生成完毕！拒绝同质化套娃。产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             
-            // 👑 逐个进行商业级图像魔改与法务风控审查
             const newTemplates = [];
             for (let t of generatedData) {
                 const rId = "AI-" + Math.floor(10000 + Math.random()*90000);
                 const typeStr = t.type ? t.type.toLowerCase() : 'ppt';
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
-                // 等待魔改引擎产出通过 >90 分审核的高清无侵权封面 WebP
                 let finalImg = await processRemixAndScoring(t.themeKeyword || "high end abstract corporate data");
                 if (!finalImg || finalImg.trim() === "") {
-                    // 彻底兜底：防止 API 异常导致裂图
                     finalImg = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
                 }
 
-                // 👑 阶梯定价物理拦截阀门：根据 AI 生成的组件数量自动定档
                 const slideCount = t.slides ? t.slides.length : 8;
                 const isPremium = slideCount >= 10; 
                 const finalRmb = isPremium ? 139 : 69;
                 const finalUsd = isPremium ? "19.99" : "9.99";
                 
-                // 动态单位后缀
                 const unitZh = typeStr === 'ppt' ? '页' : (typeStr === 'excel' ? '表' : '章');
                 const unitEn = typeStr === 'ppt' ? 'P' : 'UNITS';
                 const catStr = `${slideCount}${unitZh} · ${t.category}`;
@@ -137,11 +125,10 @@ window.triggerSwarmAutonomousAction = async function() {
                     thumbCloudPath: finalImg, thumbDefault: finalImg,
                     priceRmb: finalRmb, priceUsd: finalUsd, colorCls: col,
                     isLinked: true, status: true,
-                    slides: t.slides || null // 保存带有 layoutType 组件类型的指纹内部结构
+                    slides: t.slides || null 
                 });
             }
 
-            // 👑 安全队列锁定
             while(window.isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
             window.isCloudSyncing = true;
             
@@ -446,20 +433,28 @@ window.initAdminEngine = function() {
         });
     }
 
-    document.addEventListener("mousedown", function(e) {
-        const dropEl = document.getElementById("mentionDropdown");
-        if (dropEl && dropEl.style.display !== "none") {
-            if (!dropEl.contains(e.target) && cmdBox && !cmdBox.contains(e.target)) {
-                if(typeof window.hideMentionDropdown === "function") window.hideMentionDropdown();
-            }
-        }
-    });
-
     if (localStorage.getItem("APEX_GH_TOKEN")) {
         if(typeof window.syncAllData === "function") window.syncAllData();
     } else {
         if(typeof window.renderManifestTasks === "function") window.renderManifestTasks();
     }
 };
+
+// 👑 终极防僵尸复活拦截器：无视 CDN 延迟，强制物理过滤
+setTimeout(() => {
+    const origLoad = window.loadAuditProducts;
+    if (origLoad && !window._hijackedLoad) {
+        window._hijackedLoad = true;
+        window.loadAuditProducts = async function() {
+            await origLoad();
+            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+            if (window.AUDIT_PRODUCTS) {
+                window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
+                if (window.renderAuditTable) window.renderAuditTable();
+            }
+        };
+        window.loadAuditProducts();
+    }
+}, 300);
 
 document.addEventListener("DOMContentLoaded", window.initAdminEngine);
