@@ -108,18 +108,30 @@
             const localAudit = localStorage.getItem('APEX_AUDIT_PRODUCTS');
             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
             
-            // 🚀 1. 立刻用本地/默认数据渲染，消灭加载白屏延迟，实现秒开！
+            // 👑 修复 1：秒开渲染，如果有缓存直接读取，不被 await 阻塞
             if (localAudit) {
-                displayProducts = JSON.parse(localAudit);
+                const parsed = JSON.parse(localAudit);
+                // 👑 修复 2：缝合英文翻译，找回丢失的 titleEn 和 categoryEn
+                displayProducts = parsed.map(p => {
+                    const baseP = this.baseProducts.find(b => b.id === p.id);
+                    if (baseP) {
+                        p.titleEn = baseP.titleEn;
+                        p.categoryEn = baseP.categoryEn;
+                    } else if (!p.titleEn && p.id.startsWith('AI-')) {
+                        // AI 生成商品的英文兜底
+                        p.titleEn = 'Premium ' + (p.type ? p.type.toUpperCase() : 'PRO') + ' Template';
+                        p.categoryEn = 'AI Generated Model';
+                    }
+                    return p;
+                });
             } else {
                 displayProducts = [...this.baseProducts];
             }
-            
-            let safeProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
-            safeProducts = safeProducts.filter(p => p.status !== false);
-            this.render(safeProducts);
 
-            // ☁️ 2. 如果之前没有从后台提取过数据，再去云端拉取更新
+            let safeProducts = displayProducts.filter(p => p.status !== false && (!p.id.startsWith('AI-') || !blacklist.includes(p.id)));
+            this.render(safeProducts); // 立刻渲染，实现0延迟
+
+            // 👑 修复 3：如果没有本地缓存数据，才去异步云端静默拉取，并在完成后无感刷新
             if (!localAudit) {
                 try {
                     const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
@@ -127,16 +139,22 @@
                         const aiData = await res.json();
                         if (Array.isArray(aiData) && aiData.length > 0) {
                             displayProducts = [...this.baseProducts, ...aiData];
-                            safeProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
-                            safeProducts = safeProducts.filter(p => p.status !== false);
-                            this.render(safeProducts); // 拉取到了新数据再重新渲染一次
+                            safeProducts = displayProducts.filter(p => p.status !== false && (!p.id.startsWith('AI-') || !blacklist.includes(p.id)));
+                            
+                            // 同样为 AI 生成商品添加英文兜底
+                            safeProducts.forEach(p => {
+                                if (p.id.startsWith('AI-') && !p.titleEn) {
+                                    p.titleEn = 'Premium ' + (p.type ? p.type.toUpperCase() : 'PRO') + ' Template';
+                                    p.categoryEn = 'AI Generated Model';
+                                }
+                            });
+                            this.render(safeProducts);
                         }
                     }
                 } catch(e) {}
             }
         },
         render: function(products) {
-            // 👑 精准分类逻辑：严格按照 type 或特定原厂 id 划分，杜绝乱入
             const ppts = products.filter(p => p.type === 'ppt' || (!p.type && (p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech')));
             const excels = products.filter(p => p.type === 'excel' || (!p.type && p.id === 'excel-roi'));
             const words = products.filter(p => p.type === 'word' || (!p.type && p.id === 'word-ats'));
@@ -168,15 +186,13 @@
                 const rmb = p.priceRmb || pricing.ppt.rmb;
                 const usd = p.priceUsd || pricing.ppt.usd || 9.99;
                 const titleZh = p.title || p.name;
-                
-                // 👑 自动兜底英文翻译机制：如果 AI 没生成英文标题，就套用商务格式
-                const titleEn = p.titleEn || (p.id.startsWith('AI-') ? 'Premium ' + (p.type ? p.type.toUpperCase() : 'PRO') + ' Template' : titleZh);
+                const titleEn = p.titleEn || titleZh; 
                 
                 let catZh = '精选模板';
                 if (p.category) {
                     catZh = p.category.includes('·') ? p.category.split('·')[1].trim() : p.category;
                 }
-                const catEn = p.categoryEn || (p.id.startsWith('AI-') ? 'AI Generated Model' : 'Premium Model');
+                const catEn = p.categoryEn || 'Premium Model';
 
                 const textCol = themeColor === 'blue' ? 'text-blue-600' : (themeColor === 'emerald' ? 'text-emerald-600' : (themeColor === 'orange' ? 'text-orange-500' : 'text-indigo-600'));
                 const badgeGrad = themeColor === 'blue' ? 'from-blue-500 to-indigo-500' : (themeColor === 'emerald' ? 'from-emerald-500 to-teal-500' : (themeColor === 'orange' ? 'from-orange-500 to-red-500' : 'from-indigo-500 to-purple-500'));
@@ -382,7 +398,7 @@
       window.ApexLang.init();
       initUserRoleBadge();
       window.ApexCloudSync.init();
-      setTimeout(() => { if (window.ApexMallGallery) window.ApexMallGallery.init(); }, 100);
+      setTimeout(() => { if (window.ApexMallGallery) window.ApexMallGallery.init(); }, 10);
     });
 
     (function initFrontLogo() {
