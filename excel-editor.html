@@ -53,15 +53,13 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <aside class="lg:col-span-2 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📅 模块控制台</h2>
-      <!-- 👑 修复侧边栏消失问题：确保无论是 AI 还是默认模式，都能正确生成列表 -->
-      <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer">
-        <!-- JS 动态填入 -->
-      </div>
+      <!-- 👑 侧边栏消失的罪魁祸首已修复：非 AI 模式也会 100% 渲染 12 个月 -->
+      <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer"></div>
     </aside>
 
     <main class="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
       <div id="dynamicMainArea">
-        <!-- 👑 核心矩阵渲染区 -->
+        <!-- 核心矩阵渲染区 -->
       </div>
 
       <div class="mt-8 pt-6 border-t border-slate-100">
@@ -377,7 +375,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         let targetAiDeck = null;
         try {
             const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-            targetAiDeck = localDecks.find(d => d.id === deckId);
+            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+            targetAiDeck = localDecks.find(d => d.id === deckId && !blacklist.includes(d.id));
         } catch(e) {}
 
         if (!targetAiDeck) {
@@ -385,7 +384,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
                 if (res.ok) {
                     const decks = await res.json();
-                    targetAiDeck = decks.find(d => d.id === deckId);
+                    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                    targetAiDeck = decks.find(d => d.id === deckId && !blacklist.includes(d.id));
                 }
             } catch (e) {}
         }
@@ -417,7 +417,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('growthRate').value = 3 + Math.floor(Math.random() * 12);
         }
     } else {
-        // 👑 修复：如果不是 AI 模式，绝对渲染你原原本本的 12 个月侧边栏！
+        // 👑 必须执行的兜底：如果是默认模板，完美生成原版 12 个月按钮
         navContainer.innerHTML = '';
         months.forEach((m, idx) => {
             navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${m}预测</button>`;
