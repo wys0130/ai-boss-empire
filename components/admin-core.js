@@ -595,13 +595,39 @@ window.toggleAuditStatus = function(index) {
     appendLog(`>> [风控审查] 更改作品 [${AUDIT_PRODUCTS[index].title}] 上架状态 -> ${AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
 };
 
-window.forceRemoveProduct = function(index) {
-    if (!confirm(`⚠️ 危险操作！确定要在商城强制下架并销毁 [${AUDIT_PRODUCTS[index].title}] 吗？`)) return;
-    const title = AUDIT_PRODUCTS[index].title;
-    AUDIT_PRODUCTS.splice(index, 1);
-    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
-    renderAuditTable();
-    appendLog(`>> [风控审查] 已销毁作品: ${title}`);
+// 👑 修复版：物理级强制销毁，彻底从 GitHub 云端抹除数据
+window.forceRemoveProduct = async function(index) {
+    if (!confirm(`⚠️ 危险操作！确定要在商城强制下架并销毁 [${AUDIT_PRODUCTS[index].title}] 吗？\n(此操作将物理删除云端数据库记录，刷新也不会复活！)`)) return;
+    
+    const btn = window.event ? window.event.currentTarget : null;
+    const originalText = btn ? btn.innerHTML : "强制销毁";
+    if (btn) { btn.innerHTML = "销毁中..."; btn.disabled = true; }
+    
+    try {
+        const targetId = AUDIT_PRODUCTS[index].id;
+        const title = AUDIT_PRODUCTS[index].title;
+        
+        // 1. 斩断本地缓存
+        AUDIT_PRODUCTS.splice(index, 1);
+        localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+        renderAuditTable();
+        
+        // 2. 物理斩断 GitHub 云端数据
+        const keys = getKeysSafe();
+        if (keys && keys.gh) {
+            const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
+            if (f.content) {
+                let cloudDecks = JSON.parse(f.content);
+                // 过滤掉被删除的那个 ID
+                cloudDecks = cloudDecks.filter(d => d.id !== targetId);
+                await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 删除下架商品: ${title} [skip ci]`, keys.gh);
+            }
+        }
+        appendLog(`>> [风控审查] 已彻底销毁作品并同步云端: ${title}`);
+    } catch(e) {
+        alert("❌ 销毁失败，云端同步异常：" + e.message);
+        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    }
 };
 
 window.toggleThemeMode = function() {
@@ -1739,26 +1765,22 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 终极满血版：DeepSeek 文本大脑 + Pollinations 顶级商业画师 (90分+画质)
+// 👑 终极版：AI 脑力 + 顶流商业实拍图库 (95分画质)
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
     let rawText = "常规进展汇报";
     if (cmdBox) {
         rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" 
-            ? cmdBox.value 
-            : cmdBox.innerText;
+            ? cmdBox.value : cmdBox.innerText;
         rawText = rawText.replace(/@[^ ]+/g, "").trim() || cmdBox.innerText.trim();
     }
     
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = "<span>⚙️ AI 蜂群全自动推演与设计中...</span>";
-    }
+    if (btn) { btn.disabled = true; btn.innerHTML = "<span>⚙️ AI 生产线运作中...</span>"; }
 
     try {
         const keys = getKeysSafe();
-        if (!keys.ds || !keys.gh) throw new Error("缺少 DeepSeek API Key 或 GitHub Token");
+        if (!keys.ds || !keys.gh) throw new Error("缺少 DeepSeek 或 GitHub 密钥");
         
         if (rawText.includes("主动产品部") || rawText.includes("审核质量部") || rawText.includes("生成") || rawText.includes("模板")) {
             
@@ -1767,129 +1789,96 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在唤醒 DeepSeek 大模型构思商业产品...`);
+            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在构思高转化率商业产品...`);
             
-            const aiPrompt = `你是一个顶尖SaaS产品经理。请根据不同的商业需求，自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
-请严格返回JSON数组格式，绝对不要包含任何 markdown 符号(如 \`\`\`json)或解释文本，直接以 [ 开始，以 ] 结束。
+            const aiPrompt = `你是一个顶尖SaaS产品经理。请自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
+请严格返回JSON数组格式，绝不包含任何 markdown 符号。
 要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串)。
 样例：[{"type": "ppt", "name": "硅谷级商业计划书", "category": "25 SLIDES · 极简黑", "priceRmb": 129, "priceUsd": "19.99"}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    model: "deepseek-chat", 
-                    messages: [{ role: "user", content: aiPrompt }], 
-                    temperature: 0.8 
-                })
+                method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: aiPrompt }], temperature: 0.8 })
             });
             
             if (!dsRes.ok) throw new Error("AI 接口调用失败");
             const aiAnswer = (await dsRes.json()).choices[0].message.content;
-            
             const jsonMatch = aiAnswer.match(/\[[\s\S]*\]/);
-            if (!jsonMatch) throw new Error("AI 返回的数据格式无法解析");
+            if (!jsonMatch) throw new Error("AI 数据格式异常");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            appendLog(`🔨 [主动产品部]: 文本与数据框架搭建完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            appendLog(`🔨 [主动产品部]: 框架产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             await new Promise(r => setTimeout(r, 1000));
-            appendLog(`🎨 [视觉策划部]: 正在注入顶级商业 3D 渲染提示词，剔除乱码，生成 90 分以上质感封面...`);
+            appendLog(`🎨 [视觉策划部]: 正在从顶级商业图库匹配 95分+ 质感的实景封面...`);
 
-            // 👑 核心视觉增强：采用 Dribbble/Behance 霸榜级别的 3D Mockup 提示词，并强制要求不含文字(no text)
+            // 👑 核心抢救：摒弃劣质 AI 画图，采用顶流商业实景图库，绝对逼真、高级！
+            const premiumImages = {
+                ppt: [
+                    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&w=800&q=90"
+                ],
+                excel: [
+                    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=90"
+                ],
+                word: [
+                    "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90"
+                ]
+            };
+
             const newTemplates = generatedData.map((t) => {
                 const rId = "AI-" + Math.floor(10000 + Math.random()*90000);
-                let col = 'text-orange-500 font-bold';
+                const typeStr = t.type ? t.type.toLowerCase() : 'ppt';
+                let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
-                // 默认 PPT 的顶级 Prompt
-                let imagePrompt = `Premium 3D mockup of a sleek business presentation slide hovering on a dark minimalist studio background, cinematic lighting, elegant corporate design, Behance trending, Unreal Engine 5 render, 8k resolution, masterpiece, completely empty without any text, no letters, clean graphics`;
-
-                if (t.type && t.type.toLowerCase() === 'excel') {
-                    col = 'text-emerald-600 font-bold';
-                    // Excel/数据的顶级 Prompt
-                    imagePrompt = `Premium 3D isometric mockup of a futuristic financial data dashboard UI, glowing neon data charts on dark glass screens, sleek tech environment, professional fintech design, Octane render, masterpiece, completely empty without any text, no letters, clean UI graphics`;
-                }
-                if (t.type && t.type.toLowerCase() === 'word') {
-                    col = 'text-indigo-600 font-bold';
-                    // Word/文档的顶级 Prompt
-                    imagePrompt = `Premium 3D mockup of elegant corporate document papers with minimal abstract blue graphics, lying on a sleek matte desk, cinematic studio lighting, top tier professional layout, 8k, masterpiece, completely empty without any text, no letters, clean paper`;
-                }
-                
-                // 拼接 API 链接：增加 enhance=true 让底层开启自动润色优化，nologo=true 去除水印
-                const seed = Math.floor(Math.random() * 999999);
-                const aiImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=600&nologo=true&enhance=true&seed=${seed}`;
+                // 根据不同品类抽取顶级图
+                const imgPool = premiumImages[typeStr] || premiumImages.ppt;
+                const imgUrl = imgPool[Math.floor(Math.random() * imgPool.length)];
 
                 return {
-                    id: rId,
-                    title: t.name,
-                    name: t.name, 
-                    category: t.category,
-                    type: t.type ? t.type.toLowerCase() : 'ppt',
-                    thumb: aiImageUrl, 
-                    thumbnail: aiImageUrl, 
-                    thumbKey: "prod_" + rId, 
-                    thumbCloudPath: aiImageUrl, 
-                    thumbDefault: aiImageUrl,
+                    id: rId, title: t.name, name: t.name, category: t.category, type: typeStr,
+                    thumb: imgUrl, thumbnail: imgUrl, thumbKey: "prod_" + rId, 
+                    thumbCloudPath: imgUrl, thumbDefault: imgUrl,
                     priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
                     isLinked: true, status: true
                 };
             });
 
-            await new Promise(r => setTimeout(r, 1500));
-            appendLog(`🛡️ [审核质量部]: 视觉画册与风控合规审查通过！正在封装并上传至 GitHub 商城数据库...`);
-
             let existingDecks = [];
             let decksSha = null;
             try {
                 const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
-                if (f.content) {
-                    const parsed = JSON.parse(f.content);
-                    if (Array.isArray(parsed)) existingDecks = parsed;
-                }
+                if (f.content) { const parsed = JSON.parse(f.content); if (Array.isArray(parsed)) existingDecks = parsed; }
                 decksSha = f.sha;
             } catch(e){}
             
             const combinedDecks = [...newTemplates, ...existingDecks];
-            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 生成并上架 3 款带独立 AI 封面的新产品 [skip ci]", keys.gh);
+            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 上架 3 款全新产品 [skip ci]", keys.gh);
 
             if (typeof AUDIT_PRODUCTS !== "undefined") {
                 newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
             }
-
-            try {
-                const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                let memContent = memFile.content || "";
-                const timeStr = new Date().toLocaleString('zh-CN', { hour12: false });
-                memContent = `- [EVO-RECORD | 跨域协同]: ${timeStr} 文本AI与绘图AI联合生成并上架了《${newTemplates.map(t=>t.title).join('》、《')}》。\n` + memContent;
-                await pushGithubJsonFile("MEMORY.md", memContent, memFile.sha, "📝 AI Brain: 记录生产战报 [skip ci]", keys.gh);
-            } catch(e){}
-
             appendLog(`✅ [系统广播]: 自动化生产完毕！商品已成功写入云端数据库！`);
 
         } else {
-            const prompt = `董事长指令：${rawText}。请用一句话简短回复，带上处理部门前缀。`;
+            const prompt = `董事长指令：${rawText}。简短回复，带部门前缀。`;
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
+                method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                 body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], temperature: 0.4 })
             });
-            const aiAnswer = (await dsRes.json()).choices[0].message.content;
-            appendLog(`🤖 回复: ${aiAnswer}`);
-            
-            if (cmdBox) {
-                if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
-                else cmdBox.innerHTML = "";
-            }
+            appendLog(`🤖 回复: ${(await dsRes.json()).choices[0].message.content}`);
+            if (cmdBox) { cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" ? cmdBox.value = "" : cmdBox.innerHTML = ""; }
         }
-        
     } catch (err) {
         appendLog(`❌ 执行异常: ${err.message}`, "text-rose-500");
     } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>";
-        }
+        if (btn) { btn.disabled = false; btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>"; }
     }
 };
 
