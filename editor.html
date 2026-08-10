@@ -95,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- 高频 Office 插入组件 -->
             <div class="flex items-center gap-1.5 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50 shadow-inner">
                 <button onclick="document.execCommand('insertHTML', false, '<div contenteditable=\'true\' class=\'p-3 border border-blue-500/50 bg-blue-500/10 rounded min-w-[120px] min-h-[40px] inline-block m-2 shadow text-white\'>双击编辑文本框</div>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-blue-600/20 text-slate-300 hover:text-blue-400 transition group" title="插入排版文本框">
                     <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h8M4 18h16"></path></svg>
@@ -201,61 +200,68 @@
         let currentLayoutAlign = 'center';
         let currentCardMask = 'normal';
 
-        const bgStyles = {
-            "tech": "bg-photo-tech text-white", "finance": "bg-photo-finance text-white",
-            "team": "bg-photo-team text-white", "mesh": "bg-style-mesh text-white"
-        };
-
-        // 👑 核心：动态加载 AI 深度差异化结构，完美渲染专属内页
+        // 👑 降维打击：绝对无延迟的本地优先路由，彻底抹杀 CDN 脱节问题！
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
             let preset = DECK_PRESETS[key];
 
             if (!preset && key.startsWith('AI-')) {
-                try {
-                    const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
-                    if (res.ok) {
-                        const aiDecks = await res.json();
-                        const targetAiDeck = aiDecks.find(d => d.id === key);
-                        
-                        if (targetAiDeck) {
-                            const aiSlides = targetAiDeck.slides || [];
-                            const slideCount = aiSlides.length > 0 ? aiSlides.length : 5;
+                let targetAiDeck = null;
 
-                            preset = {
-                                brand: "APEXWORK AI",
-                                titleName: targetAiDeck.name || targetAiDeck.title,
-                                badge: targetAiDeck.category || "AI GENERATED PRO",
-                                total: slideCount,
-                                defaultBg: targetAiDeck.type === 'excel' ? 'finance' : (targetAiDeck.type === 'word' ? 'mesh' : 'tech'),
-                                slides: Array.from({length: slideCount}).map((_, i) => {
-                                    const aiSec = aiSlides[i] || {};
-                                    return {
-                                        id: i + 1, 
-                                        // 注入 AI 生成的独家标题与文案
-                                        title: aiSec.title || `${targetAiDeck.name} - 核心模块 ${i+1}`, 
-                                        sub: aiSec.sub || "此页面由 AI 智能体自动构建骨架，请双击输入具体商业内容。", 
-                                        kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
-                                        label: aiSec.label || "核心业务指标", 
-                                        progress: aiSec.progress || Math.floor(60 + Math.random() * 40), 
-                                        tag: `0${i+1}. ${aiSec.tag || 'MODULE'}` 
-                                    };
-                                })
-                            };
-                            
-                            const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
-                            document.getElementById('priceUsdLabel').innerText = priceStr;
-                            document.getElementById('exportBoxPrice').innerText = priceStr;
-                            document.getElementById('exportBtnLabel').innerText = `⚡ 支付 ${priceStr} 导出包`;
-                            document.getElementById('exportBtnSub').innerHTML = `💳 ${priceStr} 立即导出 (.pptx)`;
-                            
-                            currentDeckKey = key;
+                // 1. 优先从浏览器本地金库极速读取 (零延迟，即刻生成即刻打开)
+                try {
+                    const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+                    targetAiDeck = localDecks.find(d => d.id === key);
+                } catch(e) {}
+
+                // 2. 如果本地缓存没命中，再去请求云端 (防丢兜底)
+                if (!targetAiDeck) {
+                    try {
+                        const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
+                        if (res.ok) {
+                            const aiDecks = await res.json();
+                            targetAiDeck = aiDecks.find(d => d.id === key);
                         }
-                    }
-                } catch(e) { console.warn("拉取AI云端数据失败", e); }
+                    } catch(e) { console.warn("拉取AI云端数据失败", e); }
+                }
+
+                // 3. 完美映射 AI 独家生成的内部幻灯片结构 (拒绝旧结构套娃)
+                if (targetAiDeck) {
+                    const aiSlides = targetAiDeck.slides || [];
+                    const slideCount = aiSlides.length > 0 ? aiSlides.length : 5;
+
+                    preset = {
+                        brand: "APEXWORK AI",
+                        titleName: targetAiDeck.name || targetAiDeck.title,
+                        badge: targetAiDeck.category || "AI GENERATED PRO",
+                        total: slideCount,
+                        defaultBg: targetAiDeck.type === 'excel' ? 'finance' : (targetAiDeck.type === 'word' ? 'mesh' : 'tech'),
+                        slides: Array.from({length: slideCount}).map((_, i) => {
+                            const aiSec = aiSlides[i] || {};
+                            return {
+                                id: i + 1, 
+                                title: aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`, 
+                                sub: aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。", 
+                                kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
+                                label: aiSec.label || "核心业务指标", 
+                                progress: aiSec.progress || Math.floor(60 + Math.random() * 40), 
+                                tag: `0${i+1}. ${aiSec.tag || 'MODULE'}` 
+                            };
+                        })
+                    };
+                    
+                    const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
+                    document.getElementById('priceUsdLabel').innerText = priceStr;
+                    document.getElementById('exportBoxPrice').innerText = priceStr;
+                    document.getElementById('exportBtnLabel').innerText = `⚡ 支付 ${priceStr} 导出包`;
+                    document.getElementById('exportBtnSub').innerHTML = `💳 ${priceStr} 立即导出 (.pptx)`;
+                    
+                    currentDeckKey = key;
+                }
             }
 
+            // 极限容灾兜底，防止报错白屏
             if (!preset) {
                 currentDeckKey = 'aerotech';
                 preset = DECK_PRESETS['aerotech'];
@@ -346,7 +352,6 @@
                 </div>
             `;
 
-            // GSAP 弹性入场
             if (window.gsap) {
                 gsap.fromTo(canvas, 
                     { opacity: 0, y: 20, scale: 0.98 }, 
