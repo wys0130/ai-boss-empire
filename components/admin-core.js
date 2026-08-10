@@ -1739,7 +1739,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 终极版：真实写入 GitHub 数据库，真正上架商城的 AI 生产引擎
+// 👑 修复：真实写入 GitHub 数据库，真正上架商城的 AI 生产引擎
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1783,7 +1783,7 @@ window.triggerSwarmAutonomousAction = async function() {
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🛡️ [审核质量部]: 版权与合规风控审查通过！正在提交至 GitHub 云端数据库...`);
 
-            // 👑 核心修复 1：将新模板真实写入 GitHub 的 data/ai-generated-decks.json
+            // 👑 真实写入 GitHub 的 data/ai-generated-decks.json
             let existingDecks = [];
             let decksSha = null;
             try {
@@ -1794,7 +1794,7 @@ window.triggerSwarmAutonomousAction = async function() {
             const combinedDecks = [...newTemplates, ...existingDecks];
             await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 自动生成并上架 3 款新模板 [skip ci]", keys.gh);
 
-            // 👑 核心修复 2：同步更新本地审核大盘 UI
+            // 👑 同步更新本地审核大盘 UI
             if (typeof AUDIT_PRODUCTS !== "undefined") {
                 newTemplates.forEach(t => {
                     let col = 'text-orange-500 font-bold';
@@ -1811,7 +1811,7 @@ window.triggerSwarmAutonomousAction = async function() {
                 if (typeof renderAuditTable === "function") renderAuditTable();
             }
 
-            // 👑 核心修复 3：将战报写入 GitHub 的 MEMORY.md，防止被刷新冲掉
+            // 👑 将战报写入 GitHub 的 MEMORY.md，固化记录
             try {
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 let memContent = memFile.content || "";
@@ -1841,6 +1841,9 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
         }
+        
+        // ⛔️ 注意！这里绝对没有 loadHistoryFromMemory(); 绝不会再吞你的日志！
+        
     } catch (err) {
         appendLog(`❌ 执行异常: ${err.message}`, "text-rose-500");
     } finally {
@@ -1851,72 +1854,65 @@ window.triggerSwarmAutonomousAction = async function() {
     }
 };
 
+// 👑 修复：真·物理还原引擎，1秒级底层指针跳跃 + 本地强制清空缓存
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定将全站代码真实回退到快照 [#${shortSha}] 吗？\n(这会物理覆盖云端文件并清空本地页面缓存)`)) return;
+    if (!confirm(`⏳ 确定将全站代码真实回退到快照 [#${shortSha}] 吗？`)) return;
     window.closeRollbackModal();
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
     if (!ghToken) return alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
 
-    const overlay = document.getElementById("restoreProgressOverlay");
-    const bar = document.getElementById("restoreProgressBar");
-    const text = document.getElementById("restoreProgressText");
+    let overlay = document.getElementById("restoreProgressOverlay");
+    let bar = document.getElementById("restoreProgressBar");
+    let text = document.getElementById("restoreProgressText");
 
     try {
         if (overlay) overlay.classList.remove("hidden");
-        if (text) text.innerText = `[1/3] 正在拉取目标快照 [#${shortSha}] 的文件树...`;
-        if (bar) bar.style.width = "10%";
+        if (text) text.innerText = `[1/4] 正在抓取系统当前状态...`;
+        if (bar) bar.style.width = "25%";
 
-        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!treeRes.ok) throw new Error("无法读取目标快照");
-        
-        const treeData = await treeRes.json();
-        const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
-        const totalFiles = filesToRestore.length;
-        
-        let successCount = 0;
-        let skipCount = 0;
-        
-        for (let i = 0; i < totalFiles; i++) {
-            const fileObj = filesToRestore[i];
-            const percent = Math.floor(10 + (i / totalFiles) * 80);
-            if (text) text.innerText = `[2/3] 正在真实覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
-            if (bar) bar.style.width = `${percent}%`;
+        const refRes = await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!refRes.ok) throw new Error("读取主分支失败");
+        const currentCommitSha = (await refRes.json()).object.sha;
 
-            let currentSha = null;
-            try {
-                const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}?ref=main`, { headers: { "Authorization": `token ${ghToken}` } });
-                if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
-            } catch(e){}
+        if (text) text.innerText = `[2/4] 正在提取快照 [#${shortSha}] 底层结构...`;
+        if (bar) bar.style.width = "50%";
 
-            if (currentSha === fileObj.sha) {
-                skipCount++;
-                continue;
-            }
+        const targetCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits/${targetSha}`, { headers: { "Authorization": `token ${ghToken}` } });
+        const targetTreeSha = (await targetCommitRes.json()).tree.sha;
 
-            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
-            const fileJson = await fileContentRes.json();
+        if (text) text.innerText = `[3/4] 正在云端进行底层原子覆盖...`;
+        if (bar) bar.style.width = "75%";
 
-            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
-                method: "PUT",
-                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha}`, 
-                    content: fileJson.content, 
-                    ...(currentSha && {sha: currentSha}) 
-                })
-            });
-            if (updateRes.ok) successCount++;
-        }
-        
-        if (text) text.innerText = `[3/3] 覆盖完成！正在清理系统缓存...`;
+        // ⚠️ 绝不加 [skip ci]，必须触发编译！生成真实的 Commit！
+        const newCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits`, {
+            method: "POST",
+            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: `⏪ 真实代码还原: 整体回溯至快照 [#${shortSha}]`,
+                tree: targetTreeSha,
+                parents: [currentCommitSha]
+            })
+        });
+        const newCommitSha = (await newCommitRes.json()).sha;
+
+        if (text) text.innerText = `[4/4] 正在刷新大盘指针并清理缓存...`;
+        if (bar) bar.style.width = "90%";
+
+        await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, {
+            method: "PATCH",
+            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ sha: newCommitSha, force: true })
+        });
+
         if (bar) bar.style.width = "100%";
 
+        // 👑 彻底清理本地缓存，让浏览器被逼无奈只能去拉取新代码
         const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
         keysToRemove.forEach(k => localStorage.removeItem(k));
 
         setTimeout(() => {
-            alert(`✅ 已成功将代码还原至 [#${shortSha}]！\n覆盖了 ${successCount} 个文件。\n浏览器即将强制重载最新数据！`);
+            alert(`✅ 还原指令已成功提交至 GitHub！\n\n本地缓存已清空，系统即将强制刷新！\n(如果未立即生效，请等待30秒 GitHub Pages 编译后手动刷新)`);
             window.location.href = window.location.pathname + '?_t=' + Date.now();
         }, 1000);
         
