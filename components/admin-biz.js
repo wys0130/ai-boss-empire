@@ -1,6 +1,7 @@
-// ==========================================
-// APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
-// ==========================================
+/**
+ * APEXWORK 模块 2：业务风控、产品大盘与代码快照引擎 (admin-biz.js)
+ * 👑 修复：去除重复代码，修复极夜模式全白 Bug，移除内置商品弹窗
+ */
 
 window.ApexImageEngine = {
     cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
@@ -508,7 +509,6 @@ window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
-// 👑 修复前后台不同步：强制把被误杀的默认模板重新加回列表
 window.loadAuditProducts = async function() {
     let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
@@ -551,14 +551,6 @@ window.loadAuditProducts = async function() {
         }
     } catch(e) { console.warn("拉取云端模板失败", e); }
     
-    // 👑 绝对防线：不管之前发生了什么，系统出厂自带的商品不能在后台消失
-    const defaultIds = window.DEFAULT_AUDIT_PRODUCTS.map(d => d.id);
-    window.DEFAULT_AUDIT_PRODUCTS.forEach(defItem => {
-        if (!window.AUDIT_PRODUCTS.find(p => p.id === defItem.id)) {
-            window.AUDIT_PRODUCTS.push(defItem);
-        }
-    });
-
     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
     window.renderAuditTable();
 };
@@ -571,7 +563,7 @@ window.toggleAllCheckboxes = function(masterCb) {
 
 window.bulkDeleteSelected = async function() {
     const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
-    if (checkedBoxes.length === 0) return alert("⚠️ 请先勾选需要删除的 AI 作品！");
+    if (checkedBoxes.length === 0) return alert("⚠️ 请先勾选需要删除的作品！");
     
     if (!confirm(`⚠️ 确定要强制销毁选中的 ${checkedBoxes.length} 个作品吗？\n(此操作将物理删除云端记录，并加入防复活黑名单，绝对无法恢复！)`)) return;
 
@@ -640,9 +632,7 @@ window.renderAuditTable = function() {
     }
 
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    const defaultIds = window.DEFAULT_AUDIT_PRODUCTS.map(d => d.id);
-    // 保护默认商品，其他 AI 生成的如果在黑名单则隐藏
-    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => defaultIds.includes(p.id) || !blacklist.includes(p.id));
+    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
 
     window.AUDIT_PRODUCTS.forEach((item, index) => {
         const isDefault = !item.id.startsWith('AI-');
@@ -688,7 +678,7 @@ window.renderAuditTable = function() {
                     <div class="inline-flex flex-wrap justify-end gap-1 min-w-[140px]">
                         <button onclick="window.uploadProductThumb(${index})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition whitespace-nowrap">上传WebP图</button>
                         ${isDefault
-                            ? `<button onclick="alert('这是内嵌在网站 index.html 源码里的前台商品，系统已锁定保护后台不被删空。\\n\\n如果你想在前台隐藏它，请打开你的 index.html 源码删除。')" class="px-3 py-1.5 rounded-lg bg-slate-600 text-slate-300 font-bold text-xs shadow-sm transition whitespace-nowrap cursor-not-allowed opacity-60">内置商品</button>`
+                            ? `<button class="px-3 py-1.5 rounded-lg bg-slate-600 text-slate-300 font-bold text-xs shadow-sm transition whitespace-nowrap cursor-not-allowed opacity-60">内置商品</button>`
                             : `<button onclick="window.forceRemoveProduct('${item.id}')" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition whitespace-nowrap">强制销毁</button>`
                         }
                     </div>
@@ -796,7 +786,6 @@ window.loadTasksManifest = async function() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
     
-    // 强制防空锁：避免为空导致 filter 崩溃
     if (!window.rawManifestTasks || window.rawManifestTasks.length === 0) {
         window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
     }
@@ -859,7 +848,6 @@ window.renderManifestTasks = function() {
     if (!listEl) return;
     listEl.innerHTML = "";
     
-    // 如果无数据则返回
     if (!window.rawManifestTasks) return;
 
     const filtered = window.currentManifestFilter === 'ALL' ? window.rawManifestTasks : window.rawManifestTasks.filter(t => t.stage === window.currentManifestFilter || (!t.stage && window.currentManifestFilter === 'ALL'));
@@ -974,7 +962,10 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
     if(label) label.innerText = window.currentTagsPage;
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
-    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token，请点击右上角配置。</div>`;
+    if (!ghToken) {
+        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token，无法读取云端代码备份树。</div>`;
+        return;
+    }
 
     try {
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
@@ -1015,16 +1006,16 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             
-            // 👑 修复白板问题：加上了完美的 dark 模式兼容色，在极夜模式下依然层次分明清晰！
+            // 👑 完美深浅色适配
             container.innerHTML += `
-                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 shadow-sm transition hover:shadow-md mb-2">
+                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition hover:shadow-md mb-2">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="font-bold text-blue-600 dark:text-blue-400">[#${shaShort}]</span>
                             <span class="text-[10px] text-slate-500">${timeStr}</span>
                             <span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1 tracking-widest shadow-sm">📌 永久保留</span>
                         </div>
-                        <div class="text-xs truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
+                        <div class="text-xs truncate text-slate-800 dark:text-slate-200 font-bold" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                         <button onclick="window.deleteSnapshotTag('${item.sha}', '${shaShort}', event)" class="px-2.5 py-1.5 border border-rose-200 dark:border-rose-800/50 rounded-lg text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-500 dark:text-rose-400 transition shadow-sm bg-white dark:bg-slate-800">取消标记</button>
@@ -1064,17 +1055,18 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             const isRollback = item.commit.message.includes("真实代码还原") || item.commit.message.includes("回溯");
             
-            // 👑 修复白板问题：加上完整的 dark 类名支持
-            const bgCls = isRollback ? "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/50" : "bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800";
+            // 👑 完美深色模式兼容
+            const bgCls = isRollback ? "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50" : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700";
+            const textCls = isRollback ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-800 dark:text-slate-200";
 
             container.innerHTML += `
-                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
+                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border shadow-sm transition hover:shadow-md mb-2 ${bgCls}">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="font-bold text-amber-500">[#${shaShort}]</span>
-                            <span class="text-[10px] text-slate-400">${timeStr}</span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400">${timeStr}</span>
                         </div>
-                        <div class="text-xs truncate ${isRollback ? 'text-purple-600 dark:text-purple-400 font-bold' : 'text-slate-800 dark:text-slate-300'}" title="${item.commit.message}">${item.commit.message}</div>
+                        <div class="text-xs truncate ${textCls}" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
                     <button onclick="window.revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 shadow-sm bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                         ${idx === 0 ? '当前状态' : '还原'}
