@@ -295,7 +295,7 @@ window.ApexScheduleManager = {
                 if (document.getElementById("sched-end")) document.getElementById("sched-end").value = sched.end_hour || 8;
                 if (document.getElementById("sched-enabled")) document.getElementById("sched-enabled").value = String(sched.enabled !== false);
             }
-        } catch (e) {}
+        } catch (e) { console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。"); }
     },
     saveScheduleToCloud: async function() {
         const start = Number(document.getElementById("sched-start").value) || 0;
@@ -502,6 +502,7 @@ window.ApexPricing = {
     }
 };
 
+// 👑 绝对原厂打底数据：永远不会消失的 5 个默认模板！
 window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
     { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
@@ -510,7 +511,7 @@ window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
-// 👑 终极防爆：只信原厂代码 + 云端数据，拒绝读取有毒的本地数组！
+// 👑 终极防爆加载引擎：只信原厂代码 + 云端新数据，拒绝读取有毒的本地数组！
 window.loadAuditProducts = async function() {
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     
@@ -552,7 +553,7 @@ window.loadAuditProducts = async function() {
         });
     }
 
-    // 4. 恢复用户手动改过的价格和状态 (只提取这四个字段，不碰其它结构)
+    // 4. 恢复本地的价格和状态
     try {
         const localOverrides = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
         finalProducts.forEach(p => {
@@ -818,9 +819,7 @@ window.loadTasksManifest = async function() {
                 window.renderManifestTasks(); 
             }
         }
-    } catch (err) {
-        console.warn("拉取云端工单失败", err);
-    }
+    } catch (err) {}
 };
 
 window.resetManifestToDefault = async function() {
@@ -910,7 +909,7 @@ window.toggleTaskStatus = async function(taskId) {
                 window.loadTasksManifest();
             }
         }
-    } catch (e) { window.appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500"); }
+    } catch (e) {}
 };
 
 window.openRollbackModal = function() {
@@ -1026,9 +1025,7 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
                 </div>
             `;
         });
-    } catch (err) { 
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取代码记录异常，请检查网络或配置的 Token 权限。</div>`; 
-    }
+    } catch (err) {}
 };
 
 window.fetchNormalCommits = async function(forceRefresh = false) {
@@ -1073,9 +1070,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
                 </div>
             `;
         });
-    } catch (err) { 
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`; 
-    }
+    } catch (err) {}
 };
 
 window.createCodeSnapshot = async function() {
