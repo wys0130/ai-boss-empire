@@ -1,6 +1,5 @@
 /**
- * APEXWORK 模块 2：业务风控、产品大盘与代码快照引擎 (admin-biz.js)
- * 👑 修复：去除重复代码，修复极夜模式全白 Bug，移除内置商品弹窗
+ * APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
  */
 
 window.ApexImageEngine = {
@@ -512,6 +511,8 @@ window.DEFAULT_AUDIT_PRODUCTS = [
 window.loadAuditProducts = async function() {
     let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
+    
+    // 👑 强力自我修复：强制将所有出厂默认商品补回，无视过去的黑名单！
     if (localProducts) {
         window.AUDIT_PRODUCTS.length = 0; 
         JSON.parse(localProducts).forEach(p => window.AUDIT_PRODUCTS.push(p));
@@ -532,7 +533,8 @@ window.loadAuditProducts = async function() {
 
         if (Array.isArray(aiData)) {
             aiData.forEach(aiItem => {
-                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && !blacklist.includes(aiItem.id)) {
+                // 👑 过滤逻辑：只屏蔽"属于 AI 生成"且"在黑名单内"的数据。原版数据享有免死金牌！
+                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && (!aiItem.id.startsWith('AI-') || !blacklist.includes(aiItem.id))) {
                     let col = 'text-orange-500 font-bold';
                     if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
                     if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
@@ -551,6 +553,13 @@ window.loadAuditProducts = async function() {
         }
     } catch(e) { console.warn("拉取云端模板失败", e); }
     
+    // 👑 再次执行强制保底校验，确保原生的 5 个绝不丢失
+    window.DEFAULT_AUDIT_PRODUCTS.forEach(def => {
+        if (!window.AUDIT_PRODUCTS.find(p => p.id === def.id)) {
+            window.AUDIT_PRODUCTS.push(def);
+        }
+    });
+
     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
     window.renderAuditTable();
 };
@@ -632,7 +641,8 @@ window.renderAuditTable = function() {
     }
 
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
+    // 👑 强力过滤保护：只有带有 AI- 前缀并且在黑名单里的，才会被干掉
+    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
 
     window.AUDIT_PRODUCTS.forEach((item, index) => {
         const isDefault = !item.id.startsWith('AI-');
@@ -772,9 +782,6 @@ window.forceRemoveProduct = async function(id) {
     }
 };
 
-// ==========================================
-// 👑 2. 阶段开发进度书模块 (修复无内容白屏)
-// ==========================================
 window.DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-101", title: "配置海外主力 Lemon Squeezy 结账网关", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
     { id: "TASK-102", title: "国内临时过渡方案：引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
@@ -785,16 +792,10 @@ window.DEFAULT_MANIFEST_TASKS = [
 window.loadTasksManifest = async function() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
-    
-    if (!window.rawManifestTasks || window.rawManifestTasks.length === 0) {
-        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
-    }
-
     try {
         const localCache = localStorage.getItem("APEX_TASKS_CACHE");
         if (localCache) {
             window.rawManifestTasks = JSON.parse(localCache);
-            if (window.rawManifestTasks.length === 0) window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
             window.renderManifestTasks();
             return;
         }
@@ -847,17 +848,7 @@ window.renderManifestTasks = function() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
     listEl.innerHTML = "";
-    
-    if (!window.rawManifestTasks) return;
-
     const filtered = window.currentManifestFilter === 'ALL' ? window.rawManifestTasks : window.rawManifestTasks.filter(t => t.stage === window.currentManifestFilter || (!t.stage && window.currentManifestFilter === 'ALL'));
-    
-    const badge = document.getElementById('manifestSummaryBadge');
-    if (badge) {
-        const doneCnt = window.rawManifestTasks.filter(t => t.status === 'DONE').length;
-        badge.innerText = `完成度: ${doneCnt}/${window.rawManifestTasks.length}`;
-    }
-
     if (filtered.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该阶段无任务</div>`; return; }
 
     filtered.forEach(task => {
@@ -909,9 +900,6 @@ window.toggleTaskStatus = async function(taskId) {
     } catch (e) { window.appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500"); }
 };
 
-// ==========================================
-// 👑 3. Git 代码快照回溯模块 (修复极夜模式全白和无法点击)
-// ==========================================
 window.openRollbackModal = function() {
     const el = document.getElementById("rollbackModal");
     if (el) el.classList.remove("hidden");
@@ -1005,8 +993,6 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
         filteredCommits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
-            
-            // 👑 完美深浅色适配
             container.innerHTML += `
                 <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition hover:shadow-md mb-2">
                     <div class="flex-1 min-w-0">
@@ -1055,7 +1041,6 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             const isRollback = item.commit.message.includes("真实代码还原") || item.commit.message.includes("回溯");
             
-            // 👑 完美深色模式兼容
             const bgCls = isRollback ? "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800/50" : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700";
             const textCls = isRollback ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-800 dark:text-slate-200";
 
