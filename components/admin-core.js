@@ -1,10 +1,8 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 修复防挤压排版：恢复 @ 功能的底层无损插入，表格允许换行。
- * 2. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据，9大部门满血回归。
- * 3. 👑 终极 Git 引擎重构：引入 Tree API 原子级时空跃迁还原！秒级覆盖，不产垃圾记录，完美保留上一版本！
- * 4. 👑 修复代码快照打标：强制刺穿 API 缓存，打标后秒刷新。
- * 5. 👑 修复假还原：还原后强制清理本地存储，强制浏览器重新拉取云端旧版数据！
+ * 1. 👑 彻底重构 GitHub 并发与缓存问题，实现多选批量安全删除
+ * 2. 👑 终极 AI 引擎：深度生成内部页差异化结构 + 匹配顶级商业实拍图库
+ * 3. 👑 彻底根除删除后刷新“僵尸数据”复活 Bug
  */
 
 const REPO = "wys0130/ai-boss-empire";
@@ -30,7 +28,6 @@ window.switchAdminTab = function(tabId) {
         if (sectionEl) {
             if (id === tabId) {
                 sectionEl.classList.remove('hidden');
-                // 👑 利用 GSAP 为旧页面注入现代化的高级弹性入场动效
                 if (window.gsap) {
                     gsap.fromTo(sectionEl, 
                         { opacity: 0, y: 15, scale: 0.99 }, 
@@ -325,7 +322,6 @@ window.ApexUserManager = {
                 ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
                 : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
 
-            // 👑 修复：脱离定宽表格，采用 flex 卡片式响应式排版，邮箱自动截断，按钮绝不超出屏幕
             tbody.innerHTML += `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 mb-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-blue-400 transition gap-3">
                     <div class="flex-1 min-w-0">
@@ -446,7 +442,7 @@ const DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
-// 👑 终极防御：带本地黑名单与强穿透 API 的加载引擎
+// 👑 终极防御：带本地黑名单、强穿透 CDN 的加载引擎
 async function loadAuditProducts() {
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     if (localProducts) {
@@ -457,7 +453,6 @@ async function loadAuditProducts() {
     }
 
     try {
-        // 尝试读取 GitHub API 绝对真实的数据（无视 CDN 缓存）
         let aiData = null;
         const keys = getKeysSafe();
         if (keys && keys.gh) {
@@ -469,11 +464,9 @@ async function loadAuditProducts() {
         }
 
         if (Array.isArray(aiData)) {
-            // 读取本地黑名单（存放刚刚被删掉的死刑 ID）
             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
             
             aiData.forEach(aiItem => {
-                // 只有本地没有，且【绝对不在黑名单里】的数据，才允许从云端拉入！
                 if (!AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && !blacklist.includes(aiItem.id)) {
                     let col = 'text-orange-500 font-bold';
                     if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
@@ -537,6 +530,58 @@ window.onAuditPriceChange = function(index, field, val) {
     renderAuditTable();
 };
 
+// ==========================================
+// 👑 带多选批量删除的风控列表引擎
+// ==========================================
+let isCloudSyncing = false;
+
+window.toggleAllCheckboxes = function(masterCb) {
+    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = masterCb.checked);
+};
+
+// 👑 多选批量删除 (带有防并发锁与黑名单防复活)
+window.bulkDeleteSelected = async function() {
+    const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+    if (checkedBoxes.length === 0) return alert("⚠️ 请先勾选需要删除的作品！");
+    
+    if (!confirm(`⚠️ 确定要强制销毁选中的 ${checkedBoxes.length} 个作品吗？\n(此操作将物理删除云端记录，并加入防复活黑名单，绝对无法恢复！)`)) return;
+
+    const idsToDelete = checkedBoxes.map(cb => cb.value);
+    const btn = document.getElementById('bulkDeleteBtn');
+    if (btn) { btn.innerHTML = "销毁中..."; btn.disabled = true; }
+
+    try {
+        let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+        idsToDelete.forEach(id => { if (!blacklist.includes(id)) blacklist.push(id); });
+        localStorage.setItem('APEX_DELETED_ZOMBIES', JSON.stringify(blacklist));
+
+        AUDIT_PRODUCTS = AUDIT_PRODUCTS.filter(p => !idsToDelete.includes(p.id));
+        localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+        renderAuditTable();
+
+        while(isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
+        isCloudSyncing = true;
+
+        const keys = getKeysSafe();
+        if (keys && keys.gh) {
+            const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
+            if (f.content) {
+                let cloudDecks = JSON.parse(f.content);
+                cloudDecks = cloudDecks.filter(d => !idsToDelete.includes(d.id) && !blacklist.includes(d.id));
+                await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 批量销毁 ${checkedBoxes.length} 个商品 [skip ci]`, keys.gh);
+            }
+        }
+        appendLog(`>> [风控审查] 批量销毁成功！已彻底清理 ${checkedBoxes.length} 个作品。`);
+    } catch(e) {
+        alert("❌ 云端同步异常：" + e.message);
+    } finally {
+        isCloudSyncing = false;
+        if (btn) { btn.innerHTML = "🗑️ 批量删除选中"; btn.disabled = false; }
+        const masterCb = document.getElementById('selectAllCheckbox');
+        if (masterCb) masterCb.checked = false;
+    }
+};
+
 window.renderAuditTable = function() {
     const tbody = document.getElementById("auditTableBody");
     if (!tbody) return;
@@ -545,22 +590,41 @@ window.renderAuditTable = function() {
     const tableEl = tbody.closest("table");
     if (tableEl) {
         tableEl.querySelectorAll("th").forEach(th => th.classList.add("whitespace-nowrap", "tracking-wider", "select-none"));
+        
+        const theadTr = tableEl.querySelector('thead tr');
+        if (theadTr && !document.getElementById('selectAllCheckbox')) {
+            const th = document.createElement('th');
+            th.className = "py-3 px-2 w-10 text-center";
+            th.innerHTML = '<input type="checkbox" id="selectAllCheckbox" class="w-4 h-4 cursor-pointer accent-blue-600" onchange="window.toggleAllCheckboxes(this)">';
+            theadTr.insertBefore(th, theadTr.firstChild);
+        }
     }
+
+    const titleArea = document.querySelector('#tab-audit h3');
+    if (titleArea && !document.getElementById('bulkDeleteBtn')) {
+        titleArea.classList.add('flex', 'items-center');
+        const btn = document.createElement('button');
+        btn.id = 'bulkDeleteBtn';
+        btn.className = "ml-4 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[11px] font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer tracking-wider";
+        btn.innerHTML = "🗑️ 批量删除选中";
+        btn.onclick = window.bulkDeleteSelected;
+        titleArea.appendChild(btn);
+    }
+
+    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+    AUDIT_PRODUCTS = AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
 
     AUDIT_PRODUCTS.forEach((item, index) => {
         const finalThumbUrl = ApexImageEngine.resolve(item.thumbKey, item.thumbCloudPath, item.thumbDefault);
-        const badgeCls = item.status 
-            ? "bg-emerald-500 text-white font-bold shadow-sm" 
-            : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
-        
-        const linkBtnCls = item.isLinked
-            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20"
-            : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
+        const badgeCls = item.status ? "bg-emerald-500 text-white font-bold shadow-sm" : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
+        const linkBtnCls = item.isLinked ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
-        // 👑 修复排版：为操作区增加 whitespace-nowrap 绝对锁定，保证按钮永远不被裁切！
         tbody.innerHTML += `
             <tr class="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                <td class="py-2 px-2 w-10 text-center">
+                    <input type="checkbox" class="row-checkbox w-4 h-4 cursor-pointer accent-blue-600" value="${item.id}">
+                </td>
                 <td class="py-2 px-2 w-16 whitespace-nowrap text-center">
                     <div class="relative group w-12 h-16 mx-auto">
                         <img src="${finalThumbUrl}" alt="快照" class="w-12 h-16 object-cover rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm" />
@@ -574,25 +638,22 @@ window.renderAuditTable = function() {
                 <td class="py-2 px-2 font-mono whitespace-nowrap">
                     <div class="flex items-center gap-1 flex-nowrap whitespace-nowrap">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-[#0f172a] dark:text-[#f8fafc] outline-none ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center outline-none ${item.colorCls}" />
                         <span class="text-slate-400 mx-1">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-16 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-blue-600 outline-none" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
-                            ${linkBtnText}
-                        </button>
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap ${linkBtnCls}">${linkBtnText}</button>
                     </div>
                 </td>
                 <td class="py-2 px-2 whitespace-nowrap text-center">
                     <button onclick="toggleAuditStatus(${index})" class="px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 transition ${badgeCls}">
-                        <span>●</span>
-                        <span>${item.status ? '已上架' : '已隐藏'}</span>
+                        <span>●</span><span>${item.status ? '已上架' : '已隐藏'}</span>
                     </button>
                 </td>
                 <td class="py-3 px-4 text-right">
                     <div class="inline-flex flex-wrap justify-end gap-1 min-w-[140px]">
                         <button onclick="uploadProductThumb(${index})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition whitespace-nowrap">上传WebP图</button>
-                        <button onclick="forceRemoveProduct(${index})" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition whitespace-nowrap">强制销毁</button>
+                        <button onclick="forceRemoveProduct('${item.id}')" class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition whitespace-nowrap">强制销毁</button>
                     </div>
                 </td>
             </tr>
@@ -607,36 +668,36 @@ window.toggleAuditStatus = function(index) {
     appendLog(`>> [风控审查] 更改作品 [${AUDIT_PRODUCTS[index].title}] 上架状态 -> ${AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
 };
 
-// 👑 物理级强制销毁，彻底抹除云端记录并打入黑名单
-window.forceRemoveProduct = async function(index) {
-    if (!confirm(`⚠️ 危险操作！确定要在商城强制下架并销毁 [${AUDIT_PRODUCTS[index].title}] 吗？\n(此操作将彻底物理删除云端记录，并加入本地防御黑名单，绝对无法复活！)`)) return;
+// 单条物理销毁
+window.forceRemoveProduct = async function(id) {
+    const idx = AUDIT_PRODUCTS.findIndex(p => p.id === id);
+    if (idx === -1) return;
+    const title = AUDIT_PRODUCTS[idx].title;
+
+    if (!confirm(`⚠️ 危险操作！确定要在商城强制下架并销毁 [${title}] 吗？`)) return;
     
     const btn = window.event ? window.event.currentTarget : null;
     const originalText = btn ? btn.innerHTML : "强制销毁";
     if (btn) { btn.innerHTML = "销毁中..."; btn.disabled = true; }
     
     try {
-        const targetId = AUDIT_PRODUCTS[index].id;
-        const title = AUDIT_PRODUCTS[index].title;
-        
-        // 1. 记入死刑黑名单（绝对防御 GitHub Pages 的 CDN 延迟重发）
         const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-        if (!blacklist.includes(targetId)) blacklist.push(targetId);
+        if (!blacklist.includes(id)) blacklist.push(id);
         localStorage.setItem('APEX_DELETED_ZOMBIES', JSON.stringify(blacklist));
 
-        // 2. 斩断本地当前列表缓存
-        AUDIT_PRODUCTS.splice(index, 1);
+        AUDIT_PRODUCTS.splice(idx, 1);
         localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
         renderAuditTable();
         
-        // 3. 物理斩断 GitHub 云端源文件数据
+        while(isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
+        isCloudSyncing = true;
+
         const keys = getKeysSafe();
         if (keys && keys.gh) {
             const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
             if (f.content) {
                 let cloudDecks = JSON.parse(f.content);
-                // 过滤掉被删除的那个 ID，重新推回云端
-                cloudDecks = cloudDecks.filter(d => d.id !== targetId);
+                cloudDecks = cloudDecks.filter(d => d.id !== id && !blacklist.includes(d.id));
                 await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 强制销毁下架商品: ${title} [skip ci]`, keys.gh);
             }
         }
@@ -644,6 +705,8 @@ window.forceRemoveProduct = async function(index) {
     } catch(e) {
         alert("❌ 销毁失败，云端同步异常：" + e.message);
         if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    } finally {
+        isCloudSyncing = false;
     }
 };
 
@@ -740,11 +803,9 @@ window.ApexBannerManager = {
     }
 };
 
-// 👑 终极增强：汇率联动与全站重算中台
 window.ApexFX = {
     currentRate: 7.18,
     
-    // 初始化：如果超过7天（604800000毫秒）没更新，才自动更新
     initWeeklyRate: async function() {
         const cache = JSON.parse(localStorage.getItem("APEX_FX_RATE_CACHE") || "{}");
         const now = Date.now();
@@ -756,7 +817,6 @@ window.ApexFX = {
         await this.forceRefreshRate();
     },
 
-    // 👑 新增：手动触发更新逻辑
     manualRefresh: async function() {
         if (!confirm("🔄 确定要手动向央行节点拉取最新汇率吗？\n\n(拉取成功后，系统将自动重算全站所有已开启【汇率联动】的美元定价)")) return;
         await this.forceRefreshRate(true);
@@ -773,12 +833,10 @@ window.ApexFX = {
                 const isRateChanged = this.currentRate !== newRate;
                 this.currentRate = newRate;
                 
-                // 写入缓存并刷新时间戳
                 localStorage.setItem("APEX_FX_RATE_CACHE", JSON.stringify({ rate: this.currentRate, timestamp: Date.now() }));
                 this.updateBadge(this.currentRate, true);
                 appendLog(`>> [汇率中台] 抓取最新外汇：1 USD = ${this.currentRate} CNY`);
                 
-                // 👑 如果是手动触发，或者汇率相比上一次真的发生了变化，强制触发全站重算！
                 if (isManual || isRateChanged) {
                     this.syncAllLinkedPrices();
                     if (isManual) alert(`✅ 最新外汇挂牌价拉取成功：1 USD = ${this.currentRate} CNY\n\n已为您自动重算所有开启了【汇率联动】的美元定价！`);
@@ -797,20 +855,17 @@ window.ApexFX = {
         if (badge) badge.innerText = `1 : ${rate} ${isFresh ? '(最新)' : ''}`;
     },
 
-    // 👑 核心联动：一键同步刷新全站依赖汇率的模块！
     syncAllLinkedPrices: function() {
-        // 1. 同步【01. 全局商业价格中台】里的套餐包价格
         if (window.ApexPricing && window.ApexPricing.isLinked) {
             const keys = ["bundle", "ppt", "excel", "word"];
             keys.forEach(key => {
                 const rmbInput = document.getElementById(`rmb-${key}`);
                 if (rmbInput && rmbInput.value) {
-                    ApexPricing.onRMBChange(key, rmbInput.value); // 借用已有的转换函数强制刷新 input 的值
+                    ApexPricing.onRMBChange(key, rmbInput.value); 
                 }
             });
         }
 
-        // 2. 同步【作品风控审查与上架清单】里单个作品的价格
         if (typeof AUDIT_PRODUCTS !== "undefined" && Array.isArray(AUDIT_PRODUCTS)) {
             let productsChanged = false;
             AUDIT_PRODUCTS.forEach((item) => {
@@ -823,7 +878,6 @@ window.ApexFX = {
                 }
             });
             
-            // 如果数据变了，保存进 localStorage 并重新渲染列表
             if (productsChanged) {
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
@@ -908,7 +962,6 @@ window.ApexPricing = {
     }
 };
 
-// 👑 修复：全量恢复 9 大核心 AI 部门
 const deptConfig = [
     { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30" },
     { name: "缺陷与QA质检部", cls: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30" },
@@ -921,9 +974,7 @@ const deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
-window.openLiveSiteForceBypass = function() {
-    window.open('index.html', '_blank');
-};
+window.openLiveSiteForceBypass = function() { window.open('index.html', '_blank'); };
 
 const DEFAULT_MANIFEST_TASKS = [
     { id: "TASK-101", title: "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
@@ -974,7 +1025,6 @@ async function loadTasksManifest() {
     }
 }
 
-// 兜底辅助函数
 function getKeysSafe() {
     return {
         gh: localStorage.getItem("APEX_GH_TOKEN") || "",
@@ -1099,9 +1149,6 @@ window.clearHistoryLog = function() {
     appendLog(">> [系统战报] 已手动清除页面日志信息。");
 };
 
-// ==========================================
-// 10. 智能中枢调令台与 @部门提及菜单 
-// ==========================================
 window.showMentionDropdown = function(query) {
     let dropEl = document.getElementById("mentionDropdown");
     const cmdBox = document.getElementById("cmd");
@@ -1298,7 +1345,6 @@ async function loadHistoryFromMemory() {
         }
     } catch (err) {}
     
-    // 如果没有配置密钥或者云端没有日志，展示出厂 Mock 战报
     const mockLogs = [
         "🤖 [大脑中枢]: 系统启动并注入全局异常捕获钩子。",
         "👁️ [视觉策划部]: 轮播图资源尺寸及 WebP 转化效验完成。状态：🟢 健康",
@@ -1316,9 +1362,6 @@ async function loadHistoryFromMemory() {
     `).join('');
 }
 
-// ==========================================
-// 11. 启动引擎与精准键盘侦听
-// ==========================================
 function renderDeptButtons() {
     const container = document.getElementById("deptButtonsContainer");
     if (!container) return;
@@ -1483,54 +1526,17 @@ function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str)));
 function appendLog(msg, color = "") {
     const log = document.getElementById("historyFeed");
     if (!log) return;
-    log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5">> ${msg}</div>`;
+    log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5 ${color}">> ${msg}</div>`;
     log.scrollTop = log.scrollHeight;
 }
 
-async function getGithubFileSafe(path, token) {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, { headers: { "Authorization": `token ${token}` } });
-    if (!res.ok) return { content: "", sha: null };
-    const data = await res.json();
-    return { content: b64_to_utf8(data.content), sha: data.sha };
-}
-
-async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
-    const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
-    const payload = { message: message, content: utf8_to_b64(contentStr) };
-    if (sha) payload.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-        method: "PUT",
-        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`提交配置文件 ${path} 失败: ` + res.statusText);
-    return await res.json();
-}
-
-async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
-    const payload = { message: message, content: base64Raw };
-    if (sha) payload.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-        method: "PUT",
-        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`提交图片 ${path} 失败: ` + res.statusText);
-    return await res.json();
-}
-
-// ==========================================
-// 👑 终极降维打击：双轨并行拉取引擎 + 分页系统
-// ==========================================
-
 let currentSnapTab = 'tags';
 let currentTagsPage = 1;
-const TAGS_PER_PAGE = 8; // 每页展示 8 个永久标记
+const TAGS_PER_PAGE = 8; 
 
 window.openRollbackModal = function() {
     const el = document.getElementById("rollbackModal");
     if (el) el.classList.remove("hidden");
-    // 初始化强制刷新当前所在的 tab
     if (currentSnapTab === 'tags') {
         fetchTaggedCommits(true);
     } else {
@@ -1543,7 +1549,6 @@ window.closeRollbackModal = function() {
     if (el) el.classList.add("hidden");
 };
 
-// 👑 Tab 切换逻辑
 window.switchSnapshotTab = function(tab) {
     currentSnapTab = tab;
     const btnTags = document.getElementById("tab-btn-tags");
@@ -1553,23 +1558,22 @@ window.switchSnapshotTab = function(tab) {
     const pagination = document.getElementById("snapshotPagination");
 
     if (tab === 'tags') {
-        btnTags.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
-        btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
-        contTags.classList.remove("hidden");
-        contNormal.classList.add("hidden");
-        pagination.classList.remove("hidden");
+        if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
+        if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        if(contTags) contTags.classList.remove("hidden");
+        if(contNormal) contNormal.classList.add("hidden");
+        if(pagination) pagination.classList.remove("hidden");
         fetchTaggedCommits();
     } else {
-        btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
-        btnTags.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
-        contNormal.classList.remove("hidden");
-        contTags.classList.add("hidden");
-        pagination.classList.add("hidden");
+        if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
+        if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        if(contNormal) contNormal.classList.remove("hidden");
+        if(contTags) contTags.classList.add("hidden");
+        if(pagination) pagination.classList.add("hidden");
         fetchNormalCommits();
     }
 };
 
-// 👑 分页上一页/下一页控制
 window.changeTagsPage = function(delta) {
     if (delta === -1 && currentTagsPage > 1) {
         currentTagsPage--;
@@ -1603,13 +1607,11 @@ window.createCodeSnapshot = async function() {
             sha = f.sha;
         } catch(e){}
         
-        // 写入带时间戳的文件，强制 Github 生成真实永久 Commit
         const pushRes = await pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
         
         if (pushRes) {
             alert("✅ 成功创建永久代码标记！");
             if (tagInput) tagInput.value = "";
-            // 强行切回“永久标签”页，跳回第一页并刷新
             switchSnapshotTab('tags');
             currentTagsPage = 1;
             fetchTaggedCommits(true); 
@@ -1624,7 +1626,6 @@ window.createCodeSnapshot = async function() {
     }
 };
 
-// 👑 新增：软删除(取消打标)的云端记录黑名单机制
 window.deleteSnapshotTag = async function(sha, shortSha, e) {
     if (e) e.stopPropagation();
     if (!confirm(`⚠️ 确定要取消快照 [#${shortSha}] 的永久保留标记吗？\n\n(取消后它将从本列表中永久隐藏，但底层 Git 记录依然安全存在)`)) return;
@@ -1638,21 +1639,18 @@ window.deleteSnapshotTag = async function(sha, shortSha, e) {
     btn.disabled = true;
 
     try {
-        // 1. 获取云端已删除的标记黑名单
         const fileObj = await getGithubFileSafe("config/deleted_tags.json", ghToken);
         let blacklist = [];
         if (fileObj.content) {
             try { blacklist = JSON.parse(fileObj.content); } catch(err){}
         }
         
-        // 2. 将当前 SHA 加入黑名单并推送到 GitHub
         if (!blacklist.includes(sha)) {
             blacklist.push(sha);
             await pushGithubJsonFile("config/deleted_tags.json", blacklist, fileObj.sha, `🗑️ User removed tag [${shortSha}] from permanent list [skip ci]`, ghToken);
         }
         
         alert(`✅ 标记 [#${shortSha}] 已成功取消！`);
-        // 3. 强行重载永久标记列表
         fetchTaggedCommits(true);
     } catch(err) {
         alert("❌ 取消标记失败: " + err.message);
@@ -1661,20 +1659,18 @@ window.deleteSnapshotTag = async function(sha, shortSha, e) {
     }
 };
 
-// 👑 升级 轨道1：拉取永久标记，并结合云端黑名单进行过滤，增加【取消标记】按钮
 window.fetchTaggedCommits = async function(forceRefresh = false) {
     const container = document.getElementById("commitListTagsContainer");
     if (!container) return;
     container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono animate-pulse">正在从 GitHub 底层索引永久标记...</div>`;
-    document.getElementById("currentTagsPageLabel").innerText = currentTagsPage;
+    const label = document.getElementById("currentTagsPageLabel");
+    if(label) label.innerText = currentTagsPage;
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
     if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token。</div>`;
 
     try {
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
-        
-        // 👑 并发黑科技：同时拉取 Git 提交树 和 我们的云端黑名单配置
         const [res, blacklistRes] = await Promise.all([
             fetch(`https://api.github.com/repos/${REPO}/commits?path=data/.snapshot&page=${currentTagsPage}&per_page=${TAGS_PER_PAGE}${ts}`, { headers: { "Authorization": `token ${ghToken}` } }),
             getGithubFileSafe("config/deleted_tags.json", ghToken)
@@ -1692,15 +1688,18 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
         
         if (commits.length === 0) {
             container.innerHTML = `<div class="text-center text-xs text-slate-500 py-6 font-mono">第 ${currentTagsPage} 页已无更多记录</div>`;
-            document.getElementById("btnNextTags").disabled = true;
-            if(currentTagsPage === 1) document.getElementById("btnPrevTags").disabled = true;
+            const btnNext = document.getElementById("btnNextTags");
+            const btnPrev = document.getElementById("btnPrevTags");
+            if(btnNext) btnNext.disabled = true;
+            if(currentTagsPage === 1 && btnPrev) btnPrev.disabled = true;
             return;
         }
 
-        document.getElementById("btnPrevTags").disabled = (currentTagsPage === 1);
-        document.getElementById("btnNextTags").disabled = (commits.length < TAGS_PER_PAGE);
+        const btnPrev = document.getElementById("btnPrevTags");
+        const btnNext = document.getElementById("btnNextTags");
+        if(btnPrev) btnPrev.disabled = (currentTagsPage === 1);
+        if(btnNext) btnNext.disabled = (commits.length < TAGS_PER_PAGE);
 
-        // 👑 智能过滤：剔除所有在黑名单里的版本
         const filteredCommits = commits.filter(c => !blacklist.includes(c.sha));
 
         if (filteredCommits.length === 0) {
@@ -1723,7 +1722,6 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
                         <div class="text-xs font-mono truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
-                        <!-- 👑 新增：取消标记的专用按钮 -->
                         <button onclick="deleteSnapshotTag('${item.sha}', '${shaShort}', event)" class="px-2.5 py-1.5 border border-rose-200 dark:border-rose-800/50 rounded-lg text-xs font-mono font-bold hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-500 dark:text-rose-400 transition bg-white dark:bg-slate-800 shadow-sm" title="取消此标记，不再显示">
                             取消标记
                         </button>
@@ -1739,7 +1737,6 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 轨道2：纯粹拉取最近 30 条全局流水账
 window.fetchNormalCommits = async function(forceRefresh = false) {
     const container = document.getElementById("commitListNormalContainer");
     if (!container) return;
@@ -1782,18 +1779,88 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 终极版：AI 脑力 + 顶流商业实拍图库 (95分画质，绝无乱码)
+window.revertToSelectedCommit = async function(targetSha, shortSha) {
+    if (!confirm(`⏳ 确定将代码真实回退到快照 [#${shortSha}] 吗？\n(物理覆盖云端文件并清空本地页面缓存)`)) return;
+    window.closeRollbackModal();
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
+    if (!ghToken) return alert("❌ 缺少 GitHub Token");
+
+    const overlay = document.getElementById("restoreProgressOverlay");
+    const bar = document.getElementById("restoreProgressBar");
+    const text = document.getElementById("restoreProgressText");
+
+    try {
+        if (overlay) overlay.classList.remove("hidden");
+        if (text) text.innerText = `[1/3] 提取目标快照 [#${shortSha}] 文件树...`;
+        if (bar) bar.style.width = "10%";
+
+        const treeRes = await fetch(`https://api.github.com/repos/${REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!treeRes.ok) throw new Error("读取快照失败");
+        
+        const treeData = await treeRes.json();
+        const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
+        const totalFiles = filesToRestore.length;
+        
+        let successCount = 0;
+        
+        for (let i = 0; i < totalFiles; i++) {
+            const fileObj = filesToRestore[i];
+            const percent = Math.floor(10 + (i / totalFiles) * 80);
+            if (text) text.innerText = `[2/3] 真实覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
+            if (bar) bar.style.width = `${percent}%`;
+
+            let currentSha = null;
+            try {
+                const curFileRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}?ref=main`, { headers: { "Authorization": `token ${ghToken}` } });
+                if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
+            } catch(e){}
+
+            if (currentSha === fileObj.sha) continue;
+
+            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
+            const fileJson = await fileContentRes.json();
+
+            const updateRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${fileObj.path}`, {
+                method: "PUT",
+                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha}`, 
+                    content: fileJson.content, 
+                    ...(currentSha && {sha: currentSha}) 
+                })
+            });
+            if (updateRes.ok) successCount++;
+        }
+        
+        if (text) text.innerText = `[3/3] 覆盖完成！正在清理系统缓存...`;
+        if (bar) bar.style.width = "100%";
+
+        const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+
+        setTimeout(() => {
+            alert(`✅ 成功回溯至 [#${shortSha}]！\n覆盖了 ${successCount} 个文件。\n即将强制重载数据！`);
+            window.location.href = window.location.pathname + '?_t=' + Date.now();
+        }, 1000);
+        
+    } catch(err) { 
+        if (overlay) overlay.classList.add("hidden");
+        alert("❌ 还原异常: " + err.message);
+    }
+};
+
+// 👑 终极 AI 引擎：深度生成内部页差异化结构 + 匹配顶级商业实拍图库
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
     let rawText = "常规进展汇报";
     if (cmdBox) {
-        rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" 
-            ? cmdBox.value : cmdBox.innerText;
+        rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" ? cmdBox.value : cmdBox.innerText;
         rawText = rawText.replace(/@[^ ]+/g, "").trim() || cmdBox.innerText.trim();
     }
     
-    if (btn) { btn.disabled = true; btn.innerHTML = "<span>⚙️ AI 生产线运作中...</span>"; }
+    if (btn) { btn.disabled = true; btn.innerHTML = "<span>⚙️ AI 大脑深度推演中...</span>"; }
 
     try {
         const keys = getKeysSafe();
@@ -1806,16 +1873,17 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在构思高转化率商业产品...`);
+            appendLog(`🤖 [大脑中枢]: 收到深度生成指令，正在构建差异化的业务骨架与文案...`);
             
+            // 要求 AI 深度生成 slides 内部数据！
             const aiPrompt = `你是一个顶尖SaaS产品经理。请自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
 请严格返回JSON数组格式，绝不包含任何 markdown 符号。
-要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串)。
-样例：[{"type": "ppt", "name": "硅谷级商业计划书", "category": "25 SLIDES · 极简黑", "priceRmb": 129, "priceUsd": "19.99"}]`;
+要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串), "slides" (生成5个差异化的页面骨架对象数组，包含: "title" 标题, "sub" 副标题, "kpi" 百分比或金额数据, "label" 指标名称, "progress" 进度数字)。
+样例：[{"type":"ppt", "name":"星舰战略舱", "category":"5 SLIDES", "priceRmb":129, "priceUsd":"19.99", "slides":[{"title":"执行摘要","sub":"核心痛点与解法","kpi":"+200%","label":"增长率","progress":85}]}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: aiPrompt }], temperature: 0.8 })
+                body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: aiPrompt }], temperature: 0.85 })
             });
             
             if (!dsRes.ok) throw new Error("AI 接口调用失败");
@@ -1824,26 +1892,31 @@ window.triggerSwarmAutonomousAction = async function() {
             if (!jsonMatch) throw new Error("AI 数据格式异常");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            appendLog(`🔨 [主动产品部]: 框架产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            appendLog(`🔨 [主动产品部]: 深度结构创作完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🎨 [视觉策划部]: 正在从顶级商业图库匹配 95分+ 质感的实景封面...`);
 
-            // 👑 核心抢救：摒弃劣质 AI 绘图，采用顶流商业实景图库，绝对逼真、高级、零乱码！
+            // 彻底解决图库重复：大幅扩充 Unsplash 顶流无缝商业授权图片
             const premiumImages = {
                 ppt: [
                     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=90",
                     "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=90",
-                    "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&w=800&q=90"
+                    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90"
                 ],
                 excel: [
+                    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
                     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
                     "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=90",
-                    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90"
+                    "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1531538512162-262fac7fb818?auto=format&fit=crop&w=800&q=90"
                 ],
                 word: [
                     "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
                     "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=800&q=90",
-                    "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90"
+                    "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1618044733300-9472054094ee?auto=format&fit=crop&w=800&q=90"
                 ]
             };
 
@@ -1852,7 +1925,6 @@ window.triggerSwarmAutonomousAction = async function() {
                 const typeStr = t.type ? t.type.toLowerCase() : 'ppt';
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
-                // 根据不同品类抽取顶级图
                 const imgPool = premiumImages[typeStr] || premiumImages.ppt;
                 const imgUrl = imgPool[Math.floor(Math.random() * imgPool.length)];
 
@@ -1861,36 +1933,39 @@ window.triggerSwarmAutonomousAction = async function() {
                     thumb: imgUrl, thumbnail: imgUrl, thumbKey: "prod_" + rId, 
                     thumbCloudPath: imgUrl, thumbDefault: imgUrl,
                     priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
-                    isLinked: true, status: true
+                    isLinked: true, status: true,
+                    slides: t.slides || null // 保存深度数据
                 };
             });
 
-            let existingDecks = [];
-            let decksSha = null;
-            try {
-                const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
-                if (f.content) { const parsed = JSON.parse(f.content); if (Array.isArray(parsed)) existingDecks = parsed; }
-                decksSha = f.sha;
-            } catch(e){}
+            // 安全队列写入机制
+            while(isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
+            isCloudSyncing = true;
             
-            const combinedDecks = [...newTemplates, ...existingDecks];
-            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 上架 3 款全新产品 [skip ci]", keys.gh);
+            try {
+                let existingDecks = [];
+                let decksSha = null;
+                const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                try {
+                    const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
+                    if (f.content) { const parsed = JSON.parse(f.content); if (Array.isArray(parsed)) existingDecks = parsed; }
+                    decksSha = f.sha;
+                } catch(e){}
+                
+                // 剔除黑名单的僵尸数据，合并新数据
+                existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
+                const combinedDecks = [...newTemplates, ...existingDecks];
+                await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 上架 3 款差异化产品 [skip ci]", keys.gh);
 
-            if (typeof AUDIT_PRODUCTS !== "undefined") {
-                newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
-                localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
-                if (typeof renderAuditTable === "function") renderAuditTable();
+                if (typeof AUDIT_PRODUCTS !== "undefined") {
+                    newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
+                    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+                    if (typeof renderAuditTable === "function") renderAuditTable();
+                }
+                appendLog(`✅ [系统广播]: 自动化生产完毕！商品已成功写入云端数据库！`);
+            } finally {
+                isCloudSyncing = false;
             }
-            
-            try {
-                const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
-                let memContent = memFile.content || "";
-                const timeStr = new Date().toLocaleString('zh-CN', { hour12: false });
-                memContent = `- [EVO-RECORD | 主动产品部]: ${timeStr} 自动生成并上架了《${newTemplates.map(t=>t.title).join('》、《')}》。\n` + memContent;
-                await pushGithubJsonFile("MEMORY.md", memContent, memFile.sha, "📝 AI Brain: 记录生产战报 [skip ci]", keys.gh);
-            } catch(e){}
-
-            appendLog(`✅ [系统广播]: 自动化生产完毕！商品已成功写入云端数据库！`);
 
         } else {
             const prompt = `董事长指令：${rawText}。简短回复，带部门前缀。`;
@@ -1905,73 +1980,5 @@ window.triggerSwarmAutonomousAction = async function() {
         appendLog(`❌ 执行异常: ${err.message}`, "text-rose-500");
     } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>"; }
-    }
-};
-
-// 👑 修复：真·物理还原引擎，1秒级底层指针跳跃 + 本地强制清空缓存
-window.revertToSelectedCommit = async function(targetSha, shortSha) {
-    if (!confirm(`⏳ 确定将全站代码真实回退到快照 [#${shortSha}] 吗？`)) return;
-    window.closeRollbackModal();
-    
-    const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
-    if (!ghToken) return alert("❌ 缺少 GitHub Token，无法执行代码回溯！");
-
-    let overlay = document.getElementById("restoreProgressOverlay");
-    let bar = document.getElementById("restoreProgressBar");
-    let text = document.getElementById("restoreProgressText");
-
-    try {
-        if (overlay) overlay.classList.remove("hidden");
-        if (text) text.innerText = `[1/4] 正在抓取系统当前状态...`;
-        if (bar) bar.style.width = "25%";
-
-        const refRes = await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, { headers: { "Authorization": `token ${ghToken}` } });
-        if (!refRes.ok) throw new Error("读取主分支失败");
-        const currentCommitSha = (await refRes.json()).object.sha;
-
-        if (text) text.innerText = `[2/4] 正在提取快照 [#${shortSha}] 底层结构...`;
-        if (bar) bar.style.width = "50%";
-
-        const targetCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits/${targetSha}`, { headers: { "Authorization": `token ${ghToken}` } });
-        const targetTreeSha = (await targetCommitRes.json()).tree.sha;
-
-        if (text) text.innerText = `[3/4] 正在云端进行底层原子覆盖...`;
-        if (bar) bar.style.width = "75%";
-
-        // ⚠️ 绝不加 [skip ci]，必须触发编译！生成真实的 Commit！
-        const newCommitRes = await fetch(`https://api.github.com/repos/${REPO}/git/commits`, {
-            method: "POST",
-            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: `⏪ 真实代码还原: 整体回溯至快照 [#${shortSha}]`,
-                tree: targetTreeSha,
-                parents: [currentCommitSha]
-            })
-        });
-        const newCommitSha = (await newCommitRes.json()).sha;
-
-        if (text) text.innerText = `[4/4] 正在刷新大盘指针并清理缓存...`;
-        if (bar) bar.style.width = "90%";
-
-        await fetch(`https://api.github.com/repos/${REPO}/git/refs/heads/main`, {
-            method: "PATCH",
-            headers: { "Authorization": `token ${ghToken}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ sha: newCommitSha, force: true })
-        });
-
-        if (bar) bar.style.width = "100%";
-
-        // 👑 彻底清理本地缓存，让浏览器被逼无奈只能去拉取新代码
-        const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
-        keysToRemove.forEach(k => localStorage.removeItem(k));
-
-        setTimeout(() => {
-            alert(`✅ 还原指令已成功提交至 GitHub！\n\n本地缓存已清空，系统即将强制刷新！\n(如果未立即生效，请等待30秒 GitHub Pages 编译后手动刷新)`);
-            window.location.href = window.location.pathname + '?_t=' + Date.now();
-        }, 1000);
-        
-    } catch(err) { 
-        if (overlay) overlay.classList.add("hidden");
-        alert("❌ 还原异常: " + err.message);
     }
 };
