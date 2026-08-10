@@ -888,3 +888,421 @@ window.toggleTaskStatus = async function(taskId) {
         }
     } catch (e) { window.appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500"); }
 };
+
+// ==========================================
+// 👑 补充遗漏模块 1：阶段开发进度书 (Tasks Manifest)
+// ==========================================
+window.DEFAULT_MANIFEST_TASKS = [
+    { id: "TASK-101", title: "配置海外主力 Lemon Squeezy 结账网关", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
+    { id: "TASK-102", title: "国内临时过渡方案：引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
+    { id: "TASK-201", title: "国内正规军升级：广州个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
+    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" }
+];
+
+window.loadTasksManifest = async function() {
+    const listEl = document.getElementById('manifestList');
+    if (!listEl) return;
+    try {
+        const localCache = localStorage.getItem("APEX_TASKS_CACHE");
+        if (localCache) {
+            window.rawManifestTasks = JSON.parse(localCache);
+            window.renderManifestTasks();
+            return;
+        }
+        const keys = window.getKeysSafe();
+        if (keys && keys.gh) {
+            const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            if (fileObj.content) {
+                const manifest = JSON.parse(fileObj.content);
+                window.rawManifestTasks = (manifest.tasks && manifest.tasks.length > 0) ? manifest.tasks : JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+                window.renderManifestTasks();
+                return;
+            }
+        }
+        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+        window.renderManifestTasks();
+    } catch (err) {
+        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+        window.renderManifestTasks();
+    }
+};
+
+window.resetManifestToDefault = async function() {
+    if (!confirm("确定将所有阶段工单重置为初始待办进度 (TODO) 吗？")) return;
+    window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+    localStorage.setItem("APEX_TASKS_CACHE", JSON.stringify(window.rawManifestTasks));
+    window.renderManifestTasks();
+    window.appendLog(">> [进度书] 已将工单重置为初始待办进度！", "text-emerald-500");
+    try {
+        const keys = window.getKeysSafe();
+        if (keys.gh) {
+            const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            const manifest = { summary: { completed: 2, todo: 2, total_tasks: 4 }, tasks: window.rawManifestTasks, updated_at: new Date().toISOString().slice(0, 10) };
+            await window.pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, "🔄 Reset tasks to realistic default [skip ci]", keys.gh);
+            alert("✅ 云端 GitHub 仓库及页面工单已全部重置！");
+            return;
+        }
+    } catch(e) {}
+    alert("✅ 本地工单已完成重置！");
+};
+
+window.filterManifest = function(stageKey) {
+    window.currentManifestFilter = stageKey;
+    document.querySelectorAll('.manifest-tab').forEach(btn => btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600");
+    const targetBtn = window.event?.target;
+    if (targetBtn) targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold";
+    window.renderManifestTasks();
+};
+
+window.renderManifestTasks = function() {
+    const listEl = document.getElementById('manifestList');
+    if (!listEl) return;
+    listEl.innerHTML = "";
+    const filtered = window.currentManifestFilter === 'ALL' ? window.rawManifestTasks : window.rawManifestTasks.filter(t => t.stage === window.currentManifestFilter || (!t.stage && window.currentManifestFilter === 'ALL'));
+    
+    // 动态计算完成度
+    const badge = document.getElementById('manifestSummaryBadge');
+    if (badge) {
+        const doneCnt = window.rawManifestTasks.filter(t => t.status === 'DONE').length;
+        badge.innerText = `完成度: ${doneCnt}/${window.rawManifestTasks.length}`;
+    }
+
+    if (filtered.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该阶段无任务</div>`; return; }
+
+    filtered.forEach(task => {
+        const isDone = task.status === 'DONE';
+        const isInProg = task.status === 'IN_PROGRESS';
+        let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-400");
+        let statusText = isDone ? "已达成" : (isInProg ? "执行中" : "待落实");
+        let btnCls = isDone ? "bg-slate-700 hover:bg-slate-600 text-slate-200" : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
+        
+        listEl.innerHTML += `
+            <div class="saas-card rounded-xl p-4 flex flex-col justify-between transition hover:border-blue-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                <div>
+                    <div class="flex items-center justify-between text-[10px] font-mono mb-1.5 text-slate-500 dark:text-slate-400">
+                        <span class="font-bold text-blue-600 dark:text-blue-500">[${task.id}] · ${task.department.split('&')[0].trim()}</span>
+                        <span class="flex items-center gap-1 font-bold"><i class="w-1.5 h-1.5 rounded-full ${dotCls} inline-block"></i>${statusText}</span>
+                    </div>
+                    <span class="text-xs font-bold truncate mb-1 block text-slate-900 dark:text-slate-100">${task.title}</span>
+                    <span class="text-[11px] text-slate-500 font-mono truncate block">${task.notes || '暂无说明'}</span>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end text-xs font-mono">
+                    <button onclick="window.toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">${isDone ? "↩ 撤销" : "✓ 达成"}</button>
+                </div>
+            </div>
+        `;
+    });
+};
+
+window.toggleTaskStatus = async function(taskId) {
+    const task = window.rawManifestTasks.find(t => t.id === taskId);
+    if (!task) return;
+    task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
+    localStorage.setItem("APEX_TASKS_CACHE", JSON.stringify(window.rawManifestTasks));
+    window.appendLog(`✏️ 变更工单状态 -> [${taskId}] ${task.status}`);
+    window.renderManifestTasks();
+    try {
+        const keys = window.getKeysSafe();
+        if(keys.gh) {
+            const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            const manifest = JSON.parse(fileObj.content);
+            const targetInManifest = manifest.tasks.find(t => t.id === taskId);
+            if (targetInManifest) {
+                targetInManifest.status = task.status;
+                manifest.updated_at = new Date().toISOString().slice(0, 10);
+                await window.pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status} [skip ci]`, keys.gh);
+                window.appendLog(`✅ 工单进度写入成功！`);
+                window.loadTasksManifest();
+            }
+        }
+    } catch (e) { window.appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500"); }
+};
+
+// ==========================================
+// 👑 补充遗漏模块 2：代码备份与时空引擎 (Git Snapshots)
+// ==========================================
+window.openRollbackModal = function() {
+    const el = document.getElementById("rollbackModal");
+    if (el) el.classList.remove("hidden");
+    if (window.currentSnapTab === 'tags') window.fetchTaggedCommits(true);
+    else window.fetchNormalCommits(true);
+};
+
+window.closeRollbackModal = function() {
+    const el = document.getElementById("rollbackModal");
+    if (el) el.classList.add("hidden");
+};
+
+window.switchSnapshotTab = function(tab) {
+    window.currentSnapTab = tab;
+    const btnTags = document.getElementById("tab-btn-tags");
+    const btnNormal = document.getElementById("tab-btn-normal");
+    const contTags = document.getElementById("commitListTagsContainer");
+    const contNormal = document.getElementById("commitListNormalContainer");
+    const pagination = document.getElementById("snapshotPagination");
+
+    if (tab === 'tags') {
+        if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
+        if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        if(contTags) contTags.classList.remove("hidden");
+        if(contNormal) contNormal.classList.add("hidden");
+        if(pagination) pagination.classList.remove("hidden");
+        window.fetchTaggedCommits();
+    } else {
+        if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
+        if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        if(contNormal) contNormal.classList.remove("hidden");
+        if(contTags) contTags.classList.add("hidden");
+        if(pagination) pagination.classList.add("hidden");
+        window.fetchNormalCommits();
+    }
+};
+
+window.changeTagsPage = function(delta) {
+    if (delta === -1 && window.currentTagsPage > 1) { window.currentTagsPage--; window.fetchTaggedCommits(); } 
+    else if (delta === 1) { window.currentTagsPage++; window.fetchTaggedCommits(); }
+};
+
+window.createCodeSnapshot = async function() {
+    const token = localStorage.getItem("APEX_GH_TOKEN");
+    if (!token) return alert("❌ 请先在【🔑 密钥设置】配置 GitHub Token");
+    
+    const tagInput = document.getElementById("customSnapshotName");
+    const tagName = tagInput ? tagInput.value.trim() : "";
+    const commitMsg = tagName ? `📸 代码标记: ${tagName}` : `📸 代码标记: 手动存档 ${new Date().toLocaleString('zh-CN')}`;
+    
+    const btn = document.getElementById("btnCreateSnapshot");
+    let originalText = "💾 瞬间打标";
+    if (btn) { originalText = btn.innerHTML; btn.innerHTML = "⏳ 打标中..."; btn.disabled = true; }
+
+    try {
+        let sha = null;
+        try {
+            const f = await window.getGithubFileSafe("data/.snapshot", token);
+            sha = f.sha;
+        } catch(e){}
+        
+        const pushRes = await window.pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
+        if (pushRes) {
+            alert("✅ 成功创建永久代码标记！");
+            if (tagInput) tagInput.value = "";
+            window.switchSnapshotTab('tags');
+            window.currentTagsPage = 1;
+            window.fetchTaggedCommits(true); 
+        }
+    } catch (err) {
+        alert("❌ 打标失败: " + err.message);
+    } finally {
+        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    }
+};
+
+window.deleteSnapshotTag = async function(sha, shortSha, e) {
+    if (e) e.stopPropagation();
+    if (!confirm(`⚠️ 确定要取消快照 [#${shortSha}] 的永久保留标记吗？\n\n(取消后它将从本列表中永久隐藏，但底层 Git 记录依然安全存在)`)) return;
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+    if (!ghToken) return alert("❌ 缺少 GitHub Token");
+
+    const btn = e.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ 取消中...";
+    btn.disabled = true;
+
+    try {
+        const fileObj = await window.getGithubFileSafe("config/deleted_tags.json", ghToken);
+        let blacklist = [];
+        if (fileObj.content) { try { blacklist = JSON.parse(fileObj.content); } catch(err){} }
+        
+        if (!blacklist.includes(sha)) {
+            blacklist.push(sha);
+            await window.pushGithubJsonFile("config/deleted_tags.json", blacklist, fileObj.sha, `🗑️ User removed tag [${shortSha}] from permanent list [skip ci]`, ghToken);
+        }
+        alert(`✅ 标记 [#${shortSha}] 已成功取消！`);
+        window.fetchTaggedCommits(true);
+    } catch(err) {
+        alert("❌ 取消标记失败: " + err.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+};
+
+window.fetchTaggedCommits = async function(forceRefresh = false) {
+    const container = document.getElementById("commitListTagsContainer");
+    if (!container) return;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono animate-pulse">正在从 GitHub 底层索引永久标记...</div>`;
+    const label = document.getElementById("currentTagsPageLabel");
+    if(label) label.innerText = window.currentTagsPage;
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token。</div>`;
+
+    try {
+        const ts = forceRefresh ? `&_t=${Date.now()}` : '';
+        const [res, blacklistRes] = await Promise.all([
+            fetch(`https://api.github.com/repos/${window.REPO}/commits?path=data/.snapshot&page=${window.currentTagsPage}&per_page=${window.TAGS_PER_PAGE}${ts}`, { headers: { "Authorization": `token ${ghToken}` } }),
+            window.getGithubFileSafe("config/deleted_tags.json", ghToken)
+        ]);
+        
+        if (!res.ok) throw new Error("无法读取提交记录");
+        
+        let blacklist = [];
+        if (blacklistRes.content) { try { blacklist = JSON.parse(blacklistRes.content); } catch(e){} }
+        
+        const commits = await res.json();
+        container.innerHTML = "";
+        
+        if (commits.length === 0) {
+            container.innerHTML = `<div class="text-center text-xs text-slate-500 py-6 font-mono">第 ${window.currentTagsPage} 页已无更多记录</div>`;
+            const btnNext = document.getElementById("btnNextTags");
+            const btnPrev = document.getElementById("btnPrevTags");
+            if(btnNext) btnNext.disabled = true;
+            if(window.currentTagsPage === 1 && btnPrev) btnPrev.disabled = true;
+            return;
+        }
+
+        const btnPrev = document.getElementById("btnPrevTags");
+        const btnNext = document.getElementById("btnNextTags");
+        if(btnPrev) btnPrev.disabled = (window.currentTagsPage === 1);
+        if(btnNext) btnNext.disabled = (commits.length < window.TAGS_PER_PAGE);
+
+        const filteredCommits = commits.filter(c => !blacklist.includes(c.sha));
+        if (filteredCommits.length === 0) {
+            container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono leading-relaxed">本页的标记均已被您取消。<br>请点击【下一页】查看更多历史。</div>`;
+            return;
+        }
+
+        filteredCommits.forEach((item, idx) => {
+            const shaShort = item.sha.slice(0, 7);
+            const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
+            container.innerHTML += `
+                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 shadow-sm transition hover:shadow-md mb-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="font-bold text-blue-600 dark:text-blue-400">[#${shaShort}]</span>
+                            <span class="text-[10px] text-slate-500">${timeStr}</span>
+                            <span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1 tracking-widest shadow-sm">📌 永久保留</span>
+                        </div>
+                        <div class="text-xs truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="window.deleteSnapshotTag('${item.sha}', '${shaShort}', event)" class="px-2.5 py-1.5 border border-rose-200 rounded-lg text-xs font-bold hover:bg-rose-100 text-rose-500 transition shadow-sm">取消标记</button>
+                        <button onclick="window.revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-blue-300 rounded-lg text-xs font-bold hover:bg-blue-100 transition text-blue-600 shadow-sm">
+                            ${(window.currentTagsPage === 1 && idx === 0) ? '当前状态' : '还原'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`; }
+};
+
+window.fetchNormalCommits = async function(forceRefresh = false) {
+    const container = document.getElementById("commitListNormalContainer");
+    if (!container) return;
+    container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono animate-pulse">正在获取最近30条流水记录...</div>`;
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN");
+    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4">缺少 GitHub Token。</div>`;
+
+    try {
+        const ts = forceRefresh ? `&_t=${Date.now()}` : '';
+        const res = await fetch(`https://api.github.com/repos/${window.REPO}/commits?per_page=30${ts}`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!res.ok) throw new Error();
+        
+        const commits = await res.json();
+        container.innerHTML = "";
+        
+        commits.forEach((item, idx) => {
+            const shaShort = item.sha.slice(0, 7);
+            const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
+            const isRollback = item.commit.message.includes("真实代码还原") || item.commit.message.includes("回溯");
+            const bgCls = isRollback ? "bg-purple-50 border border-purple-200" : "bg-slate-50 border border-transparent";
+
+            container.innerHTML += `
+                <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="font-bold text-amber-500">[#${shaShort}]</span>
+                            <span class="text-[10px] text-slate-400">${timeStr}</span>
+                        </div>
+                        <div class="text-xs truncate ${isRollback ? 'text-purple-600 font-bold' : 'text-slate-800'}" title="${item.commit.message}">${item.commit.message}</div>
+                    </div>
+                    <button onclick="window.revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 transition shrink-0 shadow-sm">
+                        ${idx === 0 ? '当前状态' : '还原'}
+                    </button>
+                </div>
+            `;
+        });
+    } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`; }
+};
+
+window.revertToSelectedCommit = async function(targetSha, shortSha) {
+    if (!confirm(`⏳ 确定将代码真实回退到快照 [#${shortSha}] 吗？\n(物理覆盖云端文件并清空本地页面缓存)`)) return;
+    window.closeRollbackModal();
+    
+    const ghToken = localStorage.getItem("APEX_GH_TOKEN"); 
+    if (!ghToken) return alert("❌ 缺少 GitHub Token");
+
+    const overlay = document.getElementById("restoreProgressOverlay");
+    const bar = document.getElementById("restoreProgressBar");
+    const text = document.getElementById("restoreProgressText");
+
+    try {
+        if (overlay) overlay.classList.remove("hidden");
+        if (text) text.innerText = `[1/3] 提取目标快照 [#${shortSha}] 文件树...`;
+        if (bar) bar.style.width = "10%";
+
+        const treeRes = await fetch(`https://api.github.com/repos/${window.REPO}/git/trees/${targetSha}?recursive=1`, { headers: { "Authorization": `token ${ghToken}` } });
+        if (!treeRes.ok) throw new Error("读取快照失败");
+        
+        const treeData = await treeRes.json();
+        const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
+        const totalFiles = filesToRestore.length;
+        let successCount = 0;
+        
+        for (let i = 0; i < totalFiles; i++) {
+            const fileObj = filesToRestore[i];
+            const percent = Math.floor(10 + (i / totalFiles) * 80);
+            if (text) text.innerText = `[2/3] 真实覆盖: ${fileObj.path} (${i+1}/${totalFiles})`;
+            if (bar) bar.style.width = `${percent}%`;
+
+            let currentSha = null;
+            try {
+                const curFileRes = await fetch(`https://api.github.com/repos/${window.REPO}/contents/${fileObj.path}?ref=main`, { headers: { "Authorization": `token ${ghToken}` } });
+                if(curFileRes.ok) currentSha = (await curFileRes.json()).sha;
+            } catch(e){}
+
+            if (currentSha === fileObj.sha) continue;
+
+            const fileContentRes = await fetch(fileObj.url, { headers: { "Authorization": `token ${ghToken}` } });
+            const fileJson = await fileContentRes.json();
+
+            const updateRes = await fetch(`https://api.github.com/repos/${window.REPO}/contents/${fileObj.path}`, {
+                method: "PUT",
+                headers: { "Authorization": `token ${ghToken}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    message: `⏪ 真实代码还原: 物理覆盖文件 ${fileObj.path} 回溯至 #${shortSha}`, 
+                    content: fileJson.content, 
+                    ...(currentSha && {sha: currentSha}) 
+                })
+            });
+            if (updateRes.ok) successCount++;
+        }
+        
+        if (text) text.innerText = `[3/3] 覆盖完成！正在清理系统缓存...`;
+        if (bar) bar.style.width = "100%";
+
+        const keysToRemove = ['APEX_PRICING_CONFIG', 'APEX_BANNER_CONFIG', 'APEX_USER_LIST', 'APEX_TASKS_CACHE', 'APEX_AUDIT_PRODUCTS', 'APEX_SCHEDULE_CACHE'];
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+
+        setTimeout(() => {
+            alert(`✅ 成功回溯至 [#${shortSha}]！\n覆盖了 ${successCount} 个文件。\n即将强制重载数据！`);
+            window.location.href = window.location.pathname + '?_t=' + Date.now();
+        }, 1000);
+        
+    } catch(err) { 
+        if (overlay) overlay.classList.add("hidden");
+        alert("❌ 还原异常: " + err.message);
+    }
+};
