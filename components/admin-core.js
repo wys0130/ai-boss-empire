@@ -25,8 +25,22 @@ window.switchAdminTab = function(tabId) {
     tabs.forEach(id => {
         const sectionEl = document.getElementById(`tab-${id}`);
         const navEl = document.getElementById(`nav-${id}`);
-        if (sectionEl) sectionEl.classList.toggle('hidden', id !== tabId);
         if (navEl) navEl.classList.toggle('active', id === tabId);
+        
+        if (sectionEl) {
+            if (id === tabId) {
+                sectionEl.classList.remove('hidden');
+                // 👑 利用 GSAP 为旧页面注入现代化的高级弹性入场动效
+                if (window.gsap) {
+                    gsap.fromTo(sectionEl, 
+                        { opacity: 0, y: 15, scale: 0.99 }, 
+                        { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "power2.out" }
+                    );
+                }
+            } else {
+                sectionEl.classList.add('hidden');
+            }
+        }
     });
 
     const headerTitle = document.getElementById('pageHeaderTitle');
