@@ -310,12 +310,52 @@
             "mesh": "bg-style-mesh text-white"
         };
 
-        function loadDeckByRouter() {
+        // 👑 核心修复：支持 AI 新品的动态加载与渲染引擎
+        async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
-            // 兜底防崩溃：如果 AI 传来的新模板不在 DECK_PRESETS 里，退回 aerotech，实际生产中应从远端接口补充
-            currentDeckKey = DECK_PRESETS[key] ? key : 'aerotech';
-            const preset = DECK_PRESETS[currentDeckKey];
+            let preset = DECK_PRESETS[key];
+
+            // 🚀 拦截判定：如果是在线 AI 生成的随机 ID，立刻启动云端拉取与动态骨架构建！
+            if (!preset && key.startsWith('AI-')) {
+                try {
+                    // 拉取 GitHub 上最新的 AI 生产库
+                    const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+                    if (res.ok) {
+                        const aiDecks = await res.json();
+                        const targetAiDeck = aiDecks.find(d => d.id === key);
+                        
+                        if (targetAiDeck) {
+                            // 💎 实时为 AI 新产品锻造 15 页专属数据骨架
+                            preset = {
+                                brand: "APEXWORK AI",
+                                titleName: targetAiDeck.name || targetAiDeck.title,
+                                badge: targetAiDeck.category || "AI GENERATED PRO",
+                                total: 15,
+                                defaultBg: targetAiDeck.type === 'excel' ? 'finance' : (targetAiDeck.type === 'word' ? 'mesh' : 'tech'),
+                                slides: Array.from({length: 15}).map((_, i) => ({
+                                    id: i + 1, 
+                                    title: `${targetAiDeck.name || targetAiDeck.title} - 核心模块 ${i+1}`, 
+                                    sub: "此页面由 AI 智能体自动构建骨架，请通过上方工具栏或双击此处输入具体商业内容。", 
+                                    kpi: "+" + Math.floor(Math.random() * 500) + "%", 
+                                    label: "AI 预测关键指标", 
+                                    progress: Math.floor(60 + Math.random() * 40), 
+                                    tag: `0${i+1}. MODULE` 
+                                }))
+                            };
+                            currentDeckKey = key;
+                        }
+                    }
+                } catch(e) {
+                    console.warn("拉取AI云端数据失败", e);
+                }
+            }
+
+            // 极限兜底：如果网络断掉导致拉取失败，退回初始套件
+            if (!preset) {
+                currentDeckKey = 'aerotech';
+                preset = DECK_PRESETS['aerotech'];
+            }
 
             slidesData = preset.slides;
             currentBgStyle = preset.defaultBg;
@@ -329,6 +369,9 @@
             renderAll();
         }
 
+        // 修改 onload 为 async 支持异步拉取
+        window.onload = async () => { await loadDeckByRouter(); };
+        
         function renderAll() {
             renderThumbnails();
             renderMainSlide();
