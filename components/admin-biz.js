@@ -2,7 +2,6 @@
  * APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
  */
 
-// 👑 修复报错：补全仓库地址变量，杜绝拉取记录时变白板
 const REPO = "wys0130/ai-boss-empire";
 
 window.ApexImageEngine = {
@@ -200,7 +199,7 @@ window.ApexUserManager = {
             this.userList[this.currentVerifyIdx].verified = true;
             this.saveUsers();
             this.renderUserTable();
-            alert("✅ 恭喜！邮箱真实身份核验成功！");
+            alert("✅ 恭els！邮箱真实身份核验成功！");
             this.closeVerifyModal();
         }
     },
@@ -515,10 +514,12 @@ window.loadAuditProducts = async function() {
     let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     
-    // 👑 修复延迟加载：只要有本地缓存或默认数据，第一时间秒开渲染！
+    // 👑 彻底过滤：读取本地缓存时，绝对剔除被标记删除的僵尸！
     if (localProducts) {
         window.AUDIT_PRODUCTS.length = 0; 
-        JSON.parse(localProducts).forEach(p => window.AUDIT_PRODUCTS.push(p));
+        JSON.parse(localProducts).forEach(p => {
+            if (!blacklist.includes(p.id)) window.AUDIT_PRODUCTS.push(p);
+        });
     } else {
         window.AUDIT_PRODUCTS = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
     }
@@ -535,9 +536,10 @@ window.loadAuditProducts = async function() {
             if (res.ok) aiData = await res.json();
         }
 
+        // 👑 彻底过滤：云端拉取新数据时，绝对拦截在黑名单中的任何数据！
         if (Array.isArray(aiData)) {
             aiData.forEach(aiItem => {
-                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && (!aiItem.id.startsWith('AI-') || !blacklist.includes(aiItem.id))) {
+                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && !blacklist.includes(aiItem.id)) {
                     let col = 'text-orange-500 font-bold';
                     if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
                     if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
@@ -553,8 +555,10 @@ window.loadAuditProducts = async function() {
                     });
                 }
             });
+            // 写入本地前，再次彻底过滤一遍以防万一
+            window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
             localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
-            window.renderAuditTable(); // 数据拉取完毕后二次渲染更新
+            window.renderAuditTable(); 
         }
     } catch(e) { console.warn("拉取云端模板失败", e); }
 };
@@ -635,8 +639,9 @@ window.renderAuditTable = function() {
         titleArea.appendChild(btn);
     }
 
+    // 👑 渲染前最后一次过滤，将黑名单里的僵尸死死按住
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
+    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
 
     window.AUDIT_PRODUCTS.forEach((item, index) => {
         const isDefault = !item.id.startsWith('AI-');
@@ -787,7 +792,6 @@ window.loadTasksManifest = async function() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
     
-    // 🚀 修复延迟加载：先渲染本地已有缓存，实现秒开！
     const localCache = localStorage.getItem("APEX_TASKS_CACHE");
     if (localCache) {
         window.rawManifestTasks = JSON.parse(localCache);
@@ -803,7 +807,7 @@ window.loadTasksManifest = async function() {
             if (fileObj.content) {
                 const manifest = JSON.parse(fileObj.content);
                 window.rawManifestTasks = (manifest.tasks && manifest.tasks.length > 0) ? manifest.tasks : JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
-                window.renderManifestTasks(); // 拿到新数据后再渲染一次
+                window.renderManifestTasks(); 
             }
         }
     } catch (err) {
