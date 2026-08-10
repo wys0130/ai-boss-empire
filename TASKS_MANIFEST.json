@@ -1,7 +1,7 @@
 {
   "summary": {
-    "completed": 2,
-    "todo": 2,
+    "completed": 3,
+    "todo": 1,
     "total_tasks": 4
   },
   "tasks": [
@@ -27,7 +27,7 @@
       "notes": "办个体户无需实际租用办公楼",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "董事长",
-      "status": "IN_PROGRESS"
+      "status": "DONE"
     },
     {
       "id": "TASK-203",
