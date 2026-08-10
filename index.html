@@ -18,7 +18,6 @@
   <header class="bg-white border-b border-slate-200 px-4 md:px-8 py-3 md:py-4 flex flex-wrap items-center justify-between gap-2.5 sticky top-0 z-50 shadow-sm">
     <div class="flex items-center gap-2.5">
       <div class="flex items-center gap-2 cursor-pointer select-none shrink-0" ondblclick="checkChairmanStealthAccess()" title="双击进行管理员口令安全验证">
-        <!-- 👑 修复：绝对稳健的 LOGO 兜底逻辑 -->
         <img id="frontBrandLogo" src="assets/logo.webp" alt="APEXWORK" class="h-8 md:h-9 w-auto object-contain drop-shadow" 
              onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/gh/wys0130/ai-boss-empire@main/assets/logo.webp'; setTimeout(()=>{if(!this.complete || this.naturalWidth===0){this.style.display='none'; document.getElementById('frontFallbackBadge').classList.remove('hidden');}}, 1500);" />
         <div id="frontFallbackBadge" class="hidden w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-sm shadow-md shrink-0 aspect-square">A</div>
@@ -26,7 +25,6 @@
       <h1 class="font-bold text-xs md:text-sm tracking-wide text-slate-800 truncate" data-zh="顶尖智能商务办公平台" data-en="Top Intelligent Executive Platform">顶尖智能商务办公平台</h1>
     </div>
     <div class="flex items-center flex-wrap gap-2 md:gap-5 text-xs font-medium text-slate-600">
-      <!-- 👑 修复：PPT导航文字采用纯正橙色 -->
       <a href="#ppt-section" class="hover:opacity-80 transition font-bold text-orange-500" data-zh="PPT演示" data-en="PPT Decks">PPT演示</a>
       <a href="#excel-section" class="hover:opacity-80 transition font-bold text-emerald-600" data-zh="EXCEL表格" data-en="EXCEL Models">EXCEL表格</a>
       <a href="#word-section" class="hover:opacity-80 transition font-bold text-indigo-600" data-zh="WORD文档" data-en="WORD Reports">WORD文档</a>
@@ -93,7 +91,7 @@
   <div id="compliance-footer-container"></div>
   <div id="cn-paywall-container"></div>
 
-  <!-- 👑 隐形的颜色保险箱：防止 Tailwind CSS 清除未引用的动态颜色 -->
+  <!-- 隐形的颜色保险箱 -->
   <div class="hidden text-orange-500 from-orange-500 to-red-500 text-emerald-600 from-emerald-500 to-teal-500 text-indigo-600 from-indigo-500 to-purple-500 text-blue-600 from-blue-500 to-indigo-500"></div>
 
   <script>
@@ -106,22 +104,34 @@
             { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
         ],
         init: async function() {
-            let allProducts = [...this.baseProducts];
-            try {
-                const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
-                if (res.ok) {
-                    const aiData = await res.json();
-                    if (Array.isArray(aiData) && aiData.length > 0) {
-                        allProducts = [...allProducts, ...aiData];
-                    }
-                }
-            } catch(e) {}
+            let displayProducts = [];
             
-            // 👑 前台拦截器：过滤被黑名单干掉的 AI 商品，但是必须保证原生 5 件套绝对显示！
-            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-            allProducts = allProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
+            // 👑 终极前后台同步引擎：前台直接镜像后台风控大盘的数据源！
+            const localAudit = localStorage.getItem('APEX_AUDIT_PRODUCTS');
+            
+            if (localAudit) {
+                // 如果进过后台，直接 100% 提取后台大盘数据（包含你改过的价格、封图、上下架状态）
+                displayProducts = JSON.parse(localAudit);
+            } else {
+                // 兜底逻辑：首次访问时
+                displayProducts = [...this.baseProducts];
+                try {
+                    const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+                    if (res.ok) {
+                        const aiData = await res.json();
+                        if (Array.isArray(aiData) && aiData.length > 0) {
+                            displayProducts = [...displayProducts, ...aiData];
+                        }
+                    }
+                } catch(e) {}
+                const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                displayProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
+            }
 
-            this.render(allProducts);
+            // 👑 过滤掉后台被标记为“下架隐藏”的商品
+            displayProducts = displayProducts.filter(p => p.status !== false);
+
+            this.render(displayProducts);
         },
         render: function(products) {
             const ppts = products.filter(p => !p.type || p.type === 'ppt' || (p.category && p.category.toLowerCase().includes('ppt')) || p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech');
@@ -139,17 +149,29 @@
             if (!grid) return;
             grid.innerHTML = "";
             const pricing = window.ApexPricing ? window.ApexPricing.getConfig() : { ppt: { rmb: 69, usd: 9.99 } };
+            
             if (items.length === 0) {
                 grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 font-mono text-sm border border-dashed border-slate-300 rounded-2xl">该分区暂无模板数据</div>`;
                 return;
             }
+            
             items.forEach(p => {
-                const finalImg = p.thumb || p.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
+                // 兼容读取后台的动态封图
+                let finalImg = p.thumbCloudPath || p.thumb || p.thumbnail || p.thumbDefault || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
+                if (p.thumbKey) {
+                    const localCache = localStorage.getItem("APEX_IMG_CACHE_" + p.thumbKey);
+                    if (localCache) finalImg = localCache;
+                }
+
                 const rmb = p.priceRmb || pricing.ppt.rmb;
                 const usd = p.priceUsd || pricing.ppt.usd || 9.99;
-                const titleZh = p.title;
-                const titleEn = p.titleEn || p.title;
-                const catZh = p.category ? p.category.split('·')[1]?.trim() : '精选模板';
+                const titleZh = p.title || p.name;
+                const titleEn = p.titleEn || titleZh;
+                
+                let catZh = '精选模板';
+                if (p.category) {
+                    catZh = p.category.includes('·') ? p.category.split('·')[1].trim() : p.category;
+                }
                 const catEn = p.categoryEn || 'Premium Model';
 
                 const textCol = themeColor === 'blue' ? 'text-blue-600' : (themeColor === 'emerald' ? 'text-emerald-600' : (themeColor === 'orange' ? 'text-orange-500' : 'text-indigo-600'));
@@ -209,9 +231,7 @@
             modal.classList.remove("hidden");
         }
     };
-  </script>
 
-  <script>
     window.ApexCloudSync = {
       init: async function() {
         try {
