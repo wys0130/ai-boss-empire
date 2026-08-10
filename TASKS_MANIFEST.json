@@ -1,13 +1,13 @@
 {
   "summary": {
-    "completed": 9,
-    "todo": 0,
-    "total_tasks": 9
+    "completed": 2,
+    "todo": 2,
+    "total_tasks": 4
   },
   "tasks": [
     {
       "id": "TASK-101",
-      "title": "配置海外主力 Lemon Squeezy (MoR) 结账网关与美元直抛",
+      "title": "配置海外主力 Lemon Squeezy 结账网关",
       "notes": "用极简代码嵌入 Checkout",
       "stage": "STAGE_1_MVP_GLOBAL",
       "department": "施工工程部",
@@ -15,43 +15,19 @@
     },
     {
       "id": "TASK-102",
-      "title": "国内临时过渡方案：内地 IP 访问引流至『爱发电』免签约",
+      "title": "国内临时过渡方案：引流至『爱发电』免签约",
       "notes": "检测中国 IP 时购买按钮自动变爱发电跳转",
       "stage": "STAGE_1_MVP_GLOBAL",
       "department": "施工工程部",
       "status": "DONE"
     },
     {
-      "id": "TASK-103",
-      "title": "全自动化推文发车：针对欧美 Pinterest / Reddit 生成软广",
-      "notes": "内嵌商城高单价干货图文导流链接",
-      "stage": "STAGE_1_MVP_GLOBAL",
-      "department": "推广营销部",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-104",
-      "title": "实现万里汇 (WorldFirst) 跨境结汇与对公打款",
-      "notes": "配合老板手动验证第一张外卡到账",
-      "stage": "STAGE_1_MVP_GLOBAL",
-      "department": "董事长",
-      "status": "DONE"
-    },
-    {
       "id": "TASK-201",
-      "title": "国内正规军升级：广州网络经营个体户执照与对公参数",
+      "title": "国内正规军升级：广州个体户执照与对公参数",
       "notes": "办个体户无需实际租用办公楼",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "董事长",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-202",
-      "title": "构建境内专属隔离收银台，替换前期『爱发电』通道",
-      "notes": "无缝把国内主站 PAYMENT_GATEWAY 替换为微信支付宝",
-      "stage": "STAGE_2_CN_UPGRADE",
-      "department": "施工工程部",
-      "status": "DONE"
+      "status": "IN_PROGRESS"
     },
     {
       "id": "TASK-203",
@@ -59,24 +35,8 @@
       "notes": "AI 每日印钞：研发多样式 PPT/Excel 模版",
       "stage": "STAGE_2_CN_UPGRADE",
       "department": "主动产品部",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-301",
-      "title": "实现智能 DNS 分流：国内走境内镜像，海外走 Cloudflare",
-      "notes": "保持全球 TTFB < 50ms",
-      "stage": "STAGE_3_FULL_SCALE",
-      "department": "施工工程部",
-      "status": "DONE"
-    },
-    {
-      "id": "TASK-302",
-      "title": "部署 3 分钟有效期的私有预签名下载链接防止盗链",
-      "notes": "无论海外还是国内收银台，付款成功签发临时链接",
-      "stage": "STAGE_3_FULL_SCALE",
-      "department": "施工工程部",
-      "status": "DONE"
+      "status": "TODO"
     }
   ],
-  "updated_at": "2026-08-09"
+  "updated_at": "2026-08-10"
 }
