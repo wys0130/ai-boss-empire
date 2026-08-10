@@ -2,13 +2,17 @@
  * APEXWORK 模块 1：底层核心网络通信与全局状态引擎 (admin-base.js)
  */
 
+// 👑 强制声明所有全局变量，跨文件共享
 window.REPO = "wys0130/ai-boss-empire";
 window.activeFilterDept = "";
 window.currentManifestFilter = 'ALL';
 window.isCmdActive = false;
-window.isCloudSyncing = false; // 队列锁，防止 GitHub 并发 409 报错
+window.isCloudSyncing = false; // 队列锁，防止删除时 GitHub 并发冲突
 window.AUDIT_PRODUCTS = [];
 window.rawManifestTasks = [];
+window.currentSnapTab = 'tags';
+window.currentTagsPage = 1;
+window.TAGS_PER_PAGE = 8;
 
 window.getKeysSafe = function() {
     return {
