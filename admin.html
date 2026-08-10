@@ -481,9 +481,10 @@
         </div>
     </div>
 
-    <script src="components/admin-api.js"></script>
+    <!-- 必须严格按照这个顺序加载 -->
+    <script src="components/admin-base.js"></script>
+    <script src="components/admin-biz.js"></script>
     <script src="components/admin-ai.js"></script>
-    <script src="components/admin-core.js"></script>
     <script>
         async function pushToGitee(path, contentStr, message) {
             const token = localStorage.getItem("APEX_GITEE_TOKEN");
