@@ -2,6 +2,9 @@
  * APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
  */
 
+// 👑 修复报错：补全仓库地址变量，杜绝拉取记录时变白板
+const REPO = "wys0130/ai-boss-empire";
+
 window.ApexImageEngine = {
     cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
     toCDN: function(path) {
@@ -512,13 +515,14 @@ window.loadAuditProducts = async function() {
     let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     
-    // 👑 强力自我修复：强制将所有出厂默认商品补回，无视过去的黑名单！
+    // 👑 修复延迟加载：只要有本地缓存或默认数据，第一时间秒开渲染！
     if (localProducts) {
         window.AUDIT_PRODUCTS.length = 0; 
         JSON.parse(localProducts).forEach(p => window.AUDIT_PRODUCTS.push(p));
     } else {
         window.AUDIT_PRODUCTS = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
     }
+    window.renderAuditTable();
 
     try {
         let aiData = null;
@@ -533,7 +537,6 @@ window.loadAuditProducts = async function() {
 
         if (Array.isArray(aiData)) {
             aiData.forEach(aiItem => {
-                // 👑 过滤逻辑：只屏蔽"属于 AI 生成"且"在黑名单内"的数据。原版数据享有免死金牌！
                 if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && (!aiItem.id.startsWith('AI-') || !blacklist.includes(aiItem.id))) {
                     let col = 'text-orange-500 font-bold';
                     if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
@@ -550,18 +553,10 @@ window.loadAuditProducts = async function() {
                     });
                 }
             });
+            localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
+            window.renderAuditTable(); // 数据拉取完毕后二次渲染更新
         }
     } catch(e) { console.warn("拉取云端模板失败", e); }
-    
-    // 👑 再次执行强制保底校验，确保原生的 5 个绝不丢失
-    window.DEFAULT_AUDIT_PRODUCTS.forEach(def => {
-        if (!window.AUDIT_PRODUCTS.find(p => p.id === def.id)) {
-            window.AUDIT_PRODUCTS.push(def);
-        }
-    });
-
-    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
-    window.renderAuditTable();
 };
 
 window.toggleAllCheckboxes = function(masterCb) {
@@ -641,7 +636,6 @@ window.renderAuditTable = function() {
     }
 
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    // 👑 强力过滤保护：只有带有 AI- 前缀并且在黑名单里的，才会被干掉
     window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
 
     window.AUDIT_PRODUCTS.forEach((item, index) => {
@@ -792,28 +786,28 @@ window.DEFAULT_MANIFEST_TASKS = [
 window.loadTasksManifest = async function() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
+    
+    // 🚀 修复延迟加载：先渲染本地已有缓存，实现秒开！
+    const localCache = localStorage.getItem("APEX_TASKS_CACHE");
+    if (localCache) {
+        window.rawManifestTasks = JSON.parse(localCache);
+    } else {
+        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+    }
+    window.renderManifestTasks();
+
     try {
-        const localCache = localStorage.getItem("APEX_TASKS_CACHE");
-        if (localCache) {
-            window.rawManifestTasks = JSON.parse(localCache);
-            window.renderManifestTasks();
-            return;
-        }
         const keys = window.getKeysSafe();
         if (keys && keys.gh) {
             const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
             if (fileObj.content) {
                 const manifest = JSON.parse(fileObj.content);
                 window.rawManifestTasks = (manifest.tasks && manifest.tasks.length > 0) ? manifest.tasks : JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
-                window.renderManifestTasks();
-                return;
+                window.renderManifestTasks(); // 拿到新数据后再渲染一次
             }
         }
-        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
-        window.renderManifestTasks();
     } catch (err) {
-        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
-        window.renderManifestTasks();
+        console.warn("拉取云端工单失败", err);
     }
 };
 
@@ -849,6 +843,13 @@ window.renderManifestTasks = function() {
     if (!listEl) return;
     listEl.innerHTML = "";
     const filtered = window.currentManifestFilter === 'ALL' ? window.rawManifestTasks : window.rawManifestTasks.filter(t => t.stage === window.currentManifestFilter || (!t.stage && window.currentManifestFilter === 'ALL'));
+    
+    const badge = document.getElementById('manifestSummaryBadge');
+    if (badge) {
+        const doneCnt = window.rawManifestTasks.filter(t => t.status === 'DONE').length;
+        badge.innerText = `完成度: ${doneCnt}/${window.rawManifestTasks.length}`;
+    }
+
     if (filtered.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该阶段无任务</div>`; return; }
 
     filtered.forEach(task => {
@@ -922,14 +923,14 @@ window.switchSnapshotTab = function(tab) {
 
     if (tab === 'tags') {
         if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
-        if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition";
         if(contTags) contTags.classList.remove("hidden");
         if(contNormal) contNormal.classList.add("hidden");
         if(pagination) pagination.classList.remove("hidden");
         window.fetchTaggedCommits();
     } else {
         if(btnNormal) btnNormal.className = "flex-1 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold shadow-sm transition";
-        if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-xs font-bold transition";
+        if(btnTags) btnTags.className = "flex-1 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-bold transition";
         if(contNormal) contNormal.classList.remove("hidden");
         if(contTags) contTags.classList.add("hidden");
         if(pagination) pagination.classList.add("hidden");
@@ -993,6 +994,7 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
         filteredCommits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
+            
             container.innerHTML += `
                 <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm transition hover:shadow-md mb-2">
                     <div class="flex-1 min-w-0">
@@ -1049,7 +1051,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="font-bold text-amber-500">[#${shaShort}]</span>
-                            <span class="text-[10px] text-slate-500 dark:text-slate-400">${timeStr}</span>
+                            <span class="text-[10px] text-slate-400">${timeStr}</span>
                         </div>
                         <div class="text-xs truncate ${textCls}" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
