@@ -182,31 +182,27 @@
     </div>
 
     <script>
-        // 👑 修复：帮你补齐了 15 页默认数据！绝不再让你看到光秃秃的 3 页列表！
-        const defaultAeroTechSlides = [
-            { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
-            { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
-            { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" }
-        ];
-        
-        // 自动用循环把默认演示模板补满 15 页
-        for(let i=4; i<=15; i++) {
-            defaultAeroTechSlides.push({ 
-                id: i, 
-                layoutType: "default", 
-                title: `核心战略模块 ${i}`, 
-                sub: "可视化数据展示架构...", 
-                kpi: `+${10+i*5}%`, 
-                label: "预期增长指标", 
-                progress: 40 + i*3, 
-                tag: `${i < 10 ? '0'+i : i}. MODULE` 
-            });
-        }
-
+        // 👑 绝不再用报错的循环！15 页满血高品质硬编码原版数据，一字不删！
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
-                slides: defaultAeroTechSlides
+                slides: [
+                    { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
+                    { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
+                    { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" },
+                    { id: 4, layoutType: "timeline", title: "产品演进路线图", sub: "季度里程碑与核心功能发布计划", kpi: "Q4", label: "旗舰版上线时间", progress: 65, tag: "04. ROADMAP" },
+                    { id: 5, layoutType: "funnel", title: "市场转化漏斗模型", sub: "从曝光到成交的全链路追踪", kpi: "12.5%", label: "末端转化率", progress: 88, tag: "05. FUNNEL" },
+                    { id: 6, layoutType: "default", title: "全球市场规模扩张", sub: "北美与亚太区市场渗透分析", kpi: "$4.2B", label: "可触达市场规模", progress: 75, tag: "06. MARKET" },
+                    { id: 7, layoutType: "default", title: "精准受众定位画像", sub: "聚焦B端高净值决策人群", kpi: "85%", label: "目标客户匹配度", progress: 92, tag: "07. AUDIENCE" },
+                    { id: 8, layoutType: "default", title: "核心产品技术壁垒", sub: "自研 AI 算法与数据中台", kpi: "0.2s", label: "系统响应延迟", progress: 99, tag: "08. TECH" },
+                    { id: 9, layoutType: "comparison", title: "竞品优劣势矩阵对比", sub: "我们在成本控制与效率上的绝对领先", kpi: "-30%", label: "综合运营成本下降", progress: 80, tag: "09. COMPETITOR" },
+                    { id: 10, layoutType: "kpi-grid", title: "多元化商业变现矩阵", sub: "SaaS 订阅与增值服务双引擎", kpi: "$12M", label: "预期年度经常性收入", progress: 60, tag: "10. REVENUE" },
+                    { id: 11, layoutType: "default", title: "GTM 市场进入策略", sub: "全渠道内容营销与闭环增长", kpi: "500K", label: "初期目标用户触达", progress: 45, tag: "11. GTM" },
+                    { id: 12, layoutType: "funnel", title: "三年期财务增长预测", sub: "保守与激进双模动态模型", kpi: "+150%", label: "复合年均增长率", progress: 55, tag: "12. FINANCE" },
+                    { id: 13, layoutType: "default", title: "核心创始与管理团队", sub: "具备顶尖大厂与连续创业基因", kpi: "10+", label: "平均行业深耕年限", progress: 100, tag: "13. TEAM" },
+                    { id: 14, layoutType: "default", title: "A 轮融资金额与用途", sub: "主要用于研发扩容与海外市场开拓", kpi: "$5M", label: "计划融资金额", progress: 30, tag: "14. ASK" },
+                    { id: 15, layoutType: "cover", title: "感谢聆听与提问环节", sub: "APEXWORK 期待与您共创未来", kpi: "100%", label: "准备就绪", progress: 100, tag: "15. Q&A" }
+                ]
             }
         };
 
@@ -224,10 +220,9 @@
 
             if (!preset && key.startsWith('AI-')) {
                 let targetAiDeck = null;
-                
+
                 try {
                     const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-                    // 👑 防僵尸机制：读取本地缓存前，确保过滤掉被加入黑名单(销毁)的僵尸模板
                     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
                     targetAiDeck = localDecks.find(d => d.id === key && !blacklist.includes(d.id));
                 } catch(e) {}
@@ -240,7 +235,7 @@
                             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
                             targetAiDeck = aiDecks.find(d => d.id === key && !blacklist.includes(d.id));
                         }
-                    } catch(e) {}
+                    } catch(e) { console.warn("拉取AI云端数据失败", e); }
                 }
 
                 if (targetAiDeck) {
@@ -278,6 +273,7 @@
                 }
             }
 
+            // 极限容灾兜底
             if (!preset) {
                 currentDeckKey = 'aerotech';
                 preset = DECK_PRESETS['aerotech'];
@@ -329,6 +325,7 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
+        // 👑 积木化画布渲染引擎：根据 AI 下发的 layoutType 动态变异 UI 结构！
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
@@ -410,6 +407,7 @@
                         </div>
                     </div>`;
             } else {
+                // Default / Generic content
                 innerContent = `
                     <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
                         <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
