@@ -502,7 +502,6 @@ window.ApexPricing = {
     }
 };
 
-// 👑 绝对原厂打底数据：永远不会消失的 5 个默认模板！
 window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
     { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
@@ -511,82 +510,65 @@ window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
+// 👑 绝对防爆的数据加载核心
 window.loadAuditProducts = async function() {
-    // 取得销毁黑名单
+    // 第一道闸门：获取黑名单
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     
-    // 👑 修复1：绝对物理保底，不管本地坏没坏，先把 5 个原装货铺上
-    let baseProducts = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
-    
-    if (localProducts) {
-        try {
-            const parsedLocal = JSON.parse(localProducts);
-            // 将本地缓存里保存的价格、上下架状态覆盖给原装模板
-            baseProducts.forEach(bp => {
-                const found = parsedLocal.find(lp => lp.id === bp.id);
-                if (found) {
-                    bp.priceRmb = found.priceRmb;
-                    bp.priceUsd = found.priceUsd;
-                    bp.isLinked = found.isLinked;
-                    bp.status = found.status;
-                }
-            });
-            
-            // 将本地缓存里的 AI 生成产品加载进来（并且严格剔除黑名单里的僵尸）
-            parsedLocal.forEach(lp => {
-                if (lp.id.startsWith('AI-') && !blacklist.includes(lp.id)) {
-                    // 确保不重复添加
-                    if (!baseProducts.find(p => p.id === lp.id)) {
-                        baseProducts.push(lp);
-                    }
-                }
-            });
-        } catch(e) {}
-    }
-    
-    window.AUDIT_PRODUCTS = baseProducts;
-    window.renderAuditTable();
+    // 第二道防线：永远以原厂 5 大件作为底座，绝不被本地脏数据覆盖掉默认项！
+    let finalProducts = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
 
+    // 第三步：去云端拉取 AI 新生成的模板
+    let cloudData = [];
     try {
-        let aiData = null;
         const keys = window.getKeysSafe();
         if (keys && keys.gh) {
             const f = await window.getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
-            if (f.content) aiData = JSON.parse(f.content);
+            if (f.content) cloudData = JSON.parse(f.content);
         } else {
             const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
-            if (res.ok) aiData = await res.json();
+            if (res.ok) cloudData = await res.json();
         }
+    } catch(e) { console.warn("拉取云端AI模板失败", e); }
 
-        if (Array.isArray(aiData)) {
-            // 👑 修复2：再次拿最新黑名单，在拉取云端旧数据时物理拦截僵尸复活！
-            const currentBlacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-            
-            aiData.forEach(aiItem => {
-                // 如果 ID 在销毁黑名单里，天王老子来了也拦住它！
-                if (currentBlacklist.includes(aiItem.id)) return;
-                
-                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id)) {
+    // 第四步：合并 AI 模板（在此处物理拦截任何在黑名单里的僵尸）
+    if (Array.isArray(cloudData)) {
+        cloudData.forEach(item => {
+            // 只有是 AI 模板，且【绝对不在】黑名单里，才允许进入大盘！
+            if (item.id && item.id.startsWith('AI-') && !blacklist.includes(item.id)) {
+                if (!finalProducts.find(p => p.id === item.id)) {
                     let col = 'text-orange-500 font-bold';
-                    if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
-                    if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
+                    if (item.type === 'excel') col = 'text-emerald-600 font-bold';
+                    if (item.type === 'word') col = 'text-indigo-600 font-bold';
                     
-                    window.AUDIT_PRODUCTS.push({
-                        id: aiItem.id, title: aiItem.title || aiItem.name,
-                        category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
-                        thumbKey: "prod_" + aiItem.id,
-                        thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
-                        thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-                        priceRmb: aiItem.priceRmb || 69, priceUsd: aiItem.priceUsd || "14.99",
-                        colorCls: col, isLinked: true, status: true
-                    });
+                    item.colorCls = col;
+                    item.isLinked = true;
+                    if(typeof item.status === 'undefined') item.status = true;
+                    if(!item.thumbDefault) item.thumbDefault = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80";
+                    if(!item.thumbKey) item.thumbKey = "prod_" + item.id;
+                    
+                    finalProducts.push(item);
                 }
-            });
-            localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
-            window.renderAuditTable(); 
+            }
+        });
+    }
+
+    // 第五步：读取本地的价格、上下架修改状态，覆盖上去
+    const localOverrides = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+    finalProducts.forEach(p => {
+        const lp = localOverrides.find(l => l.id === p.id);
+        if (lp) {
+            if(lp.priceRmb !== undefined) p.priceRmb = lp.priceRmb;
+            if(lp.priceUsd !== undefined) p.priceUsd = lp.priceUsd;
+            if(lp.isLinked !== undefined) p.isLinked = lp.isLinked;
+            if(lp.status !== undefined) p.status = lp.status;
         }
-    } catch(e) { console.warn("拉取云端模板失败", e); }
+    });
+
+    // 最终写入大盘并渲染
+    window.AUDIT_PRODUCTS = finalProducts;
+    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
+    window.renderAuditTable();
 };
 
 window.toggleAllCheckboxes = function(masterCb) {
