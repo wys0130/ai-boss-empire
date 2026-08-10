@@ -1765,7 +1765,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 终极版：AI 脑力 + 顶流商业实拍图库 (95分画质)
+// 👑 终极版：AI 脑力 + 顶流商业实拍图库 (95分画质，绝无乱码)
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1811,7 +1811,7 @@ window.triggerSwarmAutonomousAction = async function() {
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🎨 [视觉策划部]: 正在从顶级商业图库匹配 95分+ 质感的实景封面...`);
 
-            // 👑 核心抢救：摒弃劣质 AI 画图，采用顶流商业实景图库，绝对逼真、高级！
+            // 👑 核心抢救：摒弃劣质 AI 绘图，采用顶流商业实景图库，绝对逼真、高级、零乱码！
             const premiumImages = {
                 ppt: [
                     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
@@ -1820,8 +1820,8 @@ window.triggerSwarmAutonomousAction = async function() {
                 ],
                 excel: [
                     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
-                    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
-                    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=90"
+                    "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=90",
+                    "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90"
                 ],
                 word: [
                     "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
@@ -1864,6 +1864,15 @@ window.triggerSwarmAutonomousAction = async function() {
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
             }
+            
+            try {
+                const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
+                let memContent = memFile.content || "";
+                const timeStr = new Date().toLocaleString('zh-CN', { hour12: false });
+                memContent = `- [EVO-RECORD | 主动产品部]: ${timeStr} 自动生成并上架了《${newTemplates.map(t=>t.title).join('》、《')}》。\n` + memContent;
+                await pushGithubJsonFile("MEMORY.md", memContent, memFile.sha, "📝 AI Brain: 记录生产战报 [skip ci]", keys.gh);
+            } catch(e){}
+
             appendLog(`✅ [系统广播]: 自动化生产完毕！商品已成功写入云端数据库！`);
 
         } else {
