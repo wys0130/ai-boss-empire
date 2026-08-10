@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V18 Office-Ribbon Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="components/vip-download-guard.js"></script>
     <script src="components/zero-auth.js"></script>
     <style>
@@ -95,7 +94,6 @@
                 </div>
             </div>
 
-            <!-- 高频 Office 插入组件 -->
             <div class="flex items-center gap-1.5 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50 shadow-inner">
                 <button onclick="document.execCommand('insertHTML', false, '<div contenteditable=\'true\' class=\'p-3 border border-blue-500/50 bg-blue-500/10 rounded min-w-[120px] min-h-[40px] inline-block m-2 shadow text-white\'>双击编辑文本框</div>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-blue-600/20 text-slate-300 hover:text-blue-400 transition group" title="插入排版文本框">
                     <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h8M4 18h16"></path></svg>
@@ -183,13 +181,26 @@
     </div>
 
     <script>
+        // 👑 绝不使用报错的循环！15 页满血硬编码数据
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
                 slides: [
-                    { id: 1, title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
-                    { id: 2, title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
-                    { id: 3, title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" }
+                    { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
+                    { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
+                    { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" },
+                    { id: 4, layoutType: "timeline", title: "产品演进路线图", sub: "季度里程碑与核心功能发布计划", kpi: "Q4", label: "旗舰版上线时间", progress: 65, tag: "04. ROADMAP" },
+                    { id: 5, layoutType: "funnel", title: "市场转化漏斗模型", sub: "从曝光到成交的全链路追踪", kpi: "12.5%", label: "末端转化率", progress: 88, tag: "05. FUNNEL" },
+                    { id: 6, layoutType: "default", title: "全球市场规模扩张", sub: "北美与亚太区市场渗透分析", kpi: "$4.2B", label: "可触达市场规模", progress: 75, tag: "06. MARKET" },
+                    { id: 7, layoutType: "default", title: "精准受众定位画像", sub: "聚焦B端高净值决策人群", kpi: "85%", label: "目标客户匹配度", progress: 92, tag: "07. AUDIENCE" },
+                    { id: 8, layoutType: "default", title: "核心产品技术壁垒", sub: "自研 AI 算法与数据中台", kpi: "0.2s", label: "系统响应延迟", progress: 99, tag: "08. TECH" },
+                    { id: 9, layoutType: "comparison", title: "竞品优劣势矩阵对比", sub: "我们在成本控制与效率上的绝对领先", kpi: "-30%", label: "综合运营成本下降", progress: 80, tag: "09. COMPETITOR" },
+                    { id: 10, layoutType: "kpi-grid", title: "多元化商业变现矩阵", sub: "SaaS 订阅与增值服务双引擎", kpi: "$12M", label: "预期年度经常性收入", progress: 60, tag: "10. REVENUE" },
+                    { id: 11, layoutType: "default", title: "GTM 市场进入策略", sub: "全渠道内容营销与闭环增长", kpi: "500K", label: "初期目标用户触达", progress: 45, tag: "11. GTM" },
+                    { id: 12, layoutType: "funnel", title: "三年期财务增长预测", sub: "保守与激进双模动态模型", kpi: "+150%", label: "复合年均增长率", progress: 55, tag: "12. FINANCE" },
+                    { id: 13, layoutType: "default", title: "核心创始与管理团队", sub: "具备顶尖大厂与连续创业基因", kpi: "10+", label: "平均行业深耕年限", progress: 100, tag: "13. TEAM" },
+                    { id: 14, layoutType: "default", title: "A 轮融资金额与用途", sub: "主要用于研发扩容与海外市场开拓", kpi: "$5M", label: "计划融资金额", progress: 30, tag: "14. ASK" },
+                    { id: 15, layoutType: "cover", title: "感谢聆听与提问环节", sub: "APEXWORK 期待与您共创未来", kpi: "100%", label: "准备就绪", progress: 100, tag: "15. Q&A" }
                 ]
             }
         };
@@ -201,61 +212,67 @@
         let currentLayoutAlign = 'center';
         let currentCardMask = 'normal';
 
-        const bgStyles = {
-            "tech": "bg-photo-tech text-white", "finance": "bg-photo-finance text-white",
-            "team": "bg-photo-team text-white", "mesh": "bg-style-mesh text-white"
-        };
-
-        // 👑 核心：动态加载 AI 深度差异化结构，完美渲染专属内页
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
             let preset = DECK_PRESETS[key];
 
             if (!preset && key.startsWith('AI-')) {
-                try {
-                    const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
-                    if (res.ok) {
-                        const aiDecks = await res.json();
-                        const targetAiDeck = aiDecks.find(d => d.id === key);
-                        
-                        if (targetAiDeck) {
-                            const aiSlides = targetAiDeck.slides || [];
-                            const slideCount = aiSlides.length > 0 ? aiSlides.length : 5;
+                let targetAiDeck = null;
 
-                            preset = {
-                                brand: "APEXWORK AI",
-                                titleName: targetAiDeck.name || targetAiDeck.title,
-                                badge: targetAiDeck.category || "AI GENERATED PRO",
-                                total: slideCount,
-                                defaultBg: targetAiDeck.type === 'excel' ? 'finance' : (targetAiDeck.type === 'word' ? 'mesh' : 'tech'),
-                                slides: Array.from({length: slideCount}).map((_, i) => {
-                                    const aiSec = aiSlides[i] || {};
-                                    return {
-                                        id: i + 1, 
-                                        // 注入 AI 生成的独家标题与文案
-                                        title: aiSec.title || `${targetAiDeck.name} - 核心模块 ${i+1}`, 
-                                        sub: aiSec.sub || "此页面由 AI 智能体自动构建骨架，请双击输入具体商业内容。", 
-                                        kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
-                                        label: aiSec.label || "核心业务指标", 
-                                        progress: aiSec.progress || Math.floor(60 + Math.random() * 40), 
-                                        tag: `0${i+1}. ${aiSec.tag || 'MODULE'}` 
-                                    };
-                                })
-                            };
-                            
-                            const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
-                            document.getElementById('priceUsdLabel').innerText = priceStr;
-                            document.getElementById('exportBoxPrice').innerText = priceStr;
-                            document.getElementById('exportBtnLabel').innerText = `⚡ 支付 ${priceStr} 导出包`;
-                            document.getElementById('exportBtnSub').innerHTML = `💳 ${priceStr} 立即导出 (.pptx)`;
-                            
-                            currentDeckKey = key;
+                try {
+                    const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+                    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                    targetAiDeck = localDecks.find(d => d.id === key && !blacklist.includes(d.id));
+                } catch(e) {}
+
+                if (!targetAiDeck) {
+                    try {
+                        const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
+                        if (res.ok) {
+                            const aiDecks = await res.json();
+                            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                            targetAiDeck = aiDecks.find(d => d.id === key && !blacklist.includes(d.id));
                         }
-                    }
-                } catch(e) { console.warn("拉取AI云端数据失败", e); }
+                    } catch(e) { console.warn("拉取AI云端数据失败", e); }
+                }
+
+                if (targetAiDeck) {
+                    const aiSlides = targetAiDeck.slides || [];
+                    const slideCount = aiSlides.length > 0 ? aiSlides.length : 5;
+
+                    preset = {
+                        brand: "APEXWORK AI",
+                        titleName: targetAiDeck.name || targetAiDeck.title,
+                        badge: targetAiDeck.category || "AI GENERATED PRO",
+                        total: slideCount,
+                        defaultBg: targetAiDeck.type === 'excel' ? 'finance' : (targetAiDeck.type === 'word' ? 'mesh' : 'tech'),
+                        slides: Array.from({length: slideCount}).map((_, i) => {
+                            const aiSec = aiSlides[i] || {};
+                            return {
+                                id: i + 1, 
+                                layoutType: aiSec.layoutType || 'default', 
+                                title: aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`, 
+                                sub: aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。", 
+                                kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
+                                label: aiSec.label || "核心业务指标", 
+                                progress: aiSec.progress || Math.floor(60 + Math.random() * 40), 
+                                tag: `0${i+1}. ${aiSec.tag || 'MODULE'}` 
+                            };
+                        })
+                    };
+                    
+                    const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
+                    document.getElementById('priceUsdLabel').innerText = priceStr;
+                    document.getElementById('exportBoxPrice').innerText = priceStr;
+                    document.getElementById('exportBtnLabel').innerText = `⚡ 支付 ${priceStr} 导出包`;
+                    document.getElementById('exportBtnSub').innerHTML = `💳 ${priceStr} 立即导出 (.pptx)`;
+                    
+                    currentDeckKey = key;
+                }
             }
 
+            // 极限容灾兜底
             if (!preset) {
                 currentDeckKey = 'aerotech';
                 preset = DECK_PRESETS['aerotech'];
@@ -293,12 +310,13 @@
             list.innerHTML = "";
             slidesData.forEach((item, idx) => {
                 const activeCls = idx === currentSlideIdx ? "border-blue-500 bg-slate-800 shadow-md ring-1 ring-blue-500" : "border-slate-800 bg-slate-900/60 hover:bg-slate-800/40";
-                const pureTitle = item.title.replace(/<[^>]+>/g, '');
+                const pureTitle = (item.title || "标题加载中").replace(/<[^>]+>/g, '');
+                const pureKpi = (item.kpi || "0%").replace(/<[^>]+>/g, '');
                 list.innerHTML += `
                     <div id="thumb-item-${idx}" onclick="selectSlide(${idx})" class="p-2.5 border rounded-xl cursor-pointer transition ${activeCls}">
                         <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1">
                             <span>#${idx+1<10?'0'+(idx+1):idx+1}</span>
-                            <span class="font-bold text-emerald-400">${item.kpi.replace(/<[^>]+>/g, '')}</span>
+                            <span class="font-bold text-emerald-400">${pureKpi}</span>
                         </div>
                         <div class="text-xs font-bold text-slate-200 truncate" title="${pureTitle}">${pureTitle}</div>
                     </div>
@@ -307,52 +325,133 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
+        // 👑 彻底修复画布白屏：抛弃不稳的第三方类名，强行渲染白字
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
+            
+            // 极限防崩溃兜底
+            if (!item) {
+                canvas.innerHTML = '<div class="text-white text-2xl m-auto bg-rose-500 px-4 py-2 rounded">⚠️ 数据结构缺失，请刷新重试。</div>';
+                return;
+            }
+
             const bgCls = bgStyles[currentBgStyle] || bgStyles["tech"];
             const alignCls = currentLayoutAlign === 'center' ? "text-center items-center" : "text-left items-start";
             const maskCls = currentCardMask === 'normal' ? "bg-slate-900/80" : "bg-slate-950/95";
 
             canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls} my-auto`;
             
-            canvas.innerHTML = `
-                <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10">
+            const layout = item.layoutType || 'default';
+            const sTitle = item.title || '标题加载中';
+            const sSub = item.sub || '副标题加载中';
+            const sLabel = item.label || '核心指标';
+            const sKpi = item.kpi || '100%';
+            const sTag = item.tag || 'MODULE';
+            const sProg = item.progress || 50;
+
+            let innerContent = '';
+
+            const topHeader = `
+                <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10 w-full">
                     <span class="text-xs font-bold font-mono tracking-widest text-slate-300">APEXWORK · DECK</span>
-                    <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag}</span>
-                </div>
+                    <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${sTag}</span>
+                </div>`;
 
-                <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
-                    <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
-                        class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none">${item.title}</div>
-                    <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
-                        class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${item.sub}</div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center">
-                    <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${item.kpi}</div>
-                    </div>
-                    <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
-                        <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
-                            <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
-                            <span class="text-blue-400 font-bold">${item.progress}%</span>
+            if (layout === 'cover' || layout === 'title-page') {
+                innerContent = `
+                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col text-center items-center w-full mx-auto">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-5xl md:text-6xl font-black tracking-tight leading-tight mb-6 drop-shadow-lg w-full outline-none text-white">${sTitle}</div>
+                        <div class="w-24 h-1.5 bg-blue-500 mb-6 rounded-full"></div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-lg text-slate-200 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${sSub}</div>
+                    </div>`;
+            } else if (layout === 'kpi-grid') {
+                innerContent = `
+                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 mb-8 outline-none">${sSub}</div>
+                        <div class="grid grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">${sLabel}</div>
+                                <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-5xl font-black font-mono text-emerald-400 outline-none">${sKpi}</div>
+                            </div>
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">年度增幅 B</div>
+                                <div contenteditable="true" class="text-5xl font-black font-mono text-blue-400 outline-none">+124K</div>
+                            </div>
                         </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-                            <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${item.progress}%"></div>
+                    </div>`;
+            } else if (layout === 'timeline' || layout === 'funnel') {
+                innerContent = `
+                    <div class="z-10 w-full mt-4 flex flex-col h-full">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 mb-6 outline-none">${sSub}</div>
+                        <div class="flex-1 flex flex-col justify-center gap-6 w-full max-w-2xl mx-auto">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-blue-400 text-xl">01</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-blue-500 w-full rounded-full shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold text-white">${sLabel}</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-emerald-400 text-xl">02</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-emerald-500 w-3/4 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold text-white">中段激活阶段</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-amber-400 text-xl">03</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-amber-500 w-1/2 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold text-white">末端营收转化</div>
+                            </div>
                         </div>
+                    </div>`;
+            } else if (layout === 'comparison') {
+                innerContent = `
+                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-8 text-center outline-none text-white">${sTitle}</div>
+                        <div class="grid grid-cols-2 gap-8 w-full max-w-3xl mx-auto">
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-8 shadow-lg text-center">
+                                <div class="text-xl font-bold text-slate-300 mb-6 border-b border-white/10 pb-3">传统模式痛点</div>
+                                <div class="text-base text-slate-400 space-y-4"><p>✖ 成本高昂难控</p><p>✖ 人工效率低下</p><p>✖ 数据存在黑盒</p></div>
+                            </div>
+                            <div class="${maskCls} backdrop-blur-md border border-blue-500/40 rounded-xl p-8 shadow-[0_0_30px_rgba(59,130,246,0.15)] text-center relative overflow-hidden">
+                                <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] px-3 py-1 font-bold rounded-bl-lg tracking-widest">APEX OURS</div>
+                                <div class="text-xl font-bold text-blue-400 mb-6 border-b border-blue-500/20 pb-3">${sLabel}</div>
+                                <div class="text-base text-slate-200 space-y-4"><p>✔ 极致自动化降本</p><p>✔ AI 工作流加速</p><p>✔ 全局透明可追溯</p></div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                innerContent = `
+                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
+                            class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none text-white">${sTitle}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
+                            class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${sSub}</div>
                     </div>
-                </div>
-            `;
-
-            // GSAP 弹性入场
-            if (window.gsap) {
-                gsap.fromTo(canvas, 
-                    { opacity: 0, y: 20, scale: 0.98 }, 
-                    { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" }
-                );
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center w-full">
+                        <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${sLabel}</div>
+                            <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${sKpi}</div>
+                        </div>
+                        <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
+                            <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
+                                <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
+                                <span class="text-blue-400 font-bold">${sProg}%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${sProg}%"></div>
+                            </div>
+                        </div>
+                    </div>`;
             }
+
+            // 用纯原生 DOM 替换强制渲染，不依赖任何第三方动画
+            canvas.style.opacity = '0';
+            canvas.innerHTML = topHeader + innerContent;
+            setTimeout(() => {
+                canvas.style.transition = 'opacity 0.3s ease-in';
+                canvas.style.opacity = '1';
+            }, 50);
         }
 
         function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
@@ -378,8 +477,8 @@
         }
         
         function syncFormInputs() {
-            document.getElementById("bindKpi").value = slidesData[currentSlideIdx].kpi.replace(/<[^>]+>/g, '');
-            document.getElementById("bindLabel").value = slidesData[currentSlideIdx].label.replace(/<[^>]+>/g, '');
+            document.getElementById("bindKpi").value = (slidesData[currentSlideIdx].kpi || '').replace(/<[^>]+>/g, '');
+            document.getElementById("bindLabel").value = (slidesData[currentSlideIdx].label || '').replace(/<[^>]+>/g, '');
         }
 
         function exportPPT() {
