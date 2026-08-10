@@ -1,5 +1,170 @@
 [
   {
+    "id": "AI-30642",
+    "title": "星舰资本作战室",
+    "titleEn": "Starship Capital War Room",
+    "category": "32页 · 深空路演",
+    "categoryEn": "32 P · Deep Space",
+    "type": "ppt",
+    "thumb": "https://image.pollinations.ai/prompt/spacex%20rocket%20launch%20dark%20neon%20exhaust%20plume%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=523176",
+    "thumbnail": "https://image.pollinations.ai/prompt/spacex%20rocket%20launch%20dark%20neon%20exhaust%20plume%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=523176",
+    "thumbKey": "prod_AI-30642",
+    "thumbCloudPath": "https://image.pollinations.ai/prompt/spacex%20rocket%20launch%20dark%20neon%20exhaust%20plume%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=523176",
+    "thumbDefault": "https://image.pollinations.ai/prompt/spacex%20rocket%20launch%20dark%20neon%20exhaust%20plume%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=523176",
+    "priceRmb": 249,
+    "priceUsd": "39.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "轨道载荷竞对差速",
+        "sub": "Falcon 9 对比 Starship 低轨运力性价比",
+        "kpi": "$3,200/kg",
+        "label": "三倍密度优势",
+        "progress": 82
+      },
+      {
+        "title": "一级回收成本陷阱",
+        "sub": "翻修 vs 新造 成本倒挂风险揭示",
+        "kpi": "31% 翻修率",
+        "label": "折旧黑洞",
+        "progress": 67
+      },
+      {
+        "title": "发射窗口期现金流表",
+        "sub": "AST 频率掣肘 月度收款折线模拟",
+        "kpi": "$48M Q3",
+        "label": "窗口拥堵",
+        "progress": 73
+      },
+      {
+        "title": "轨道工厂闭环毛利",
+        "sub": "微重力实验载荷边际毛利推算",
+        "kpi": "68% GM",
+        "label": "高溢价走廊",
+        "progress": 58
+      },
+      {
+        "title": "逃逸系统风险溢价",
+        "sub": "载人发射保险精算模型对比",
+        "kpi": "+1.2% 保费",
+        "label": "归零焦虑",
+        "progress": 44
+      }
+    ]
+  },
+  {
+    "id": "AI-89009",
+    "title": "Shopee海运利润绞肉机",
+    "titleEn": "Sea Freight Margin Grinder",
+    "category": "18表 · 数字贸易",
+    "categoryEn": "18 Tabs · Digital Trade",
+    "type": "excel",
+    "thumb": "https://image.pollinations.ai/prompt/global%20logistics%20shipping%20containers%20stacked%20data%20visualization%20night%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=302423",
+    "thumbnail": "https://image.pollinations.ai/prompt/global%20logistics%20shipping%20containers%20stacked%20data%20visualization%20night%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=302423",
+    "thumbKey": "prod_AI-89009",
+    "thumbCloudPath": "https://image.pollinations.ai/prompt/global%20logistics%20shipping%20containers%20stacked%20data%20visualization%20night%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=302423",
+    "thumbDefault": "https://image.pollinations.ai/prompt/global%20logistics%20shipping%20containers%20stacked%20data%20visualization%20night%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=302423",
+    "priceRmb": 199,
+    "priceUsd": "29.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "头程海运费率波动器",
+        "sub": "盐田—雅加达 40HQ 周指数漂移",
+        "kpi": "$5,820/柜",
+        "label": "红海附加费",
+        "progress": 91
+      },
+      {
+        "title": "每SKU边际贡献核算",
+        "sub": "含退货腐蚀后的单元经济模型",
+        "kpi": "$7.43净利",
+        "label": "损失 22%",
+        "progress": 64
+      },
+      {
+        "title": "退货率侵蚀敏感性仪表",
+        "sub": "3% vs 7% 退货对年度利润冲击",
+        "kpi": "-$118K",
+        "label": "侵蚀加速带",
+        "progress": 88
+      },
+      {
+        "title": "海外仓滞销折价日历",
+        "sub": "90 天库存年龄折扣阶梯计算",
+        "kpi": "52% 折价",
+        "label": "呆货燃尽",
+        "progress": 47
+      },
+      {
+        "title": "推荐链接比价税盾",
+        "sub": "TikTok vs SellerX 佣金叠加净利对冲",
+        "kpi": "2.4% 税盾",
+        "label": "联盟刺客",
+        "progress": 39
+      }
+    ]
+  },
+  {
+    "id": "AI-46921",
+    "title": "高盛级ESG尽职调查白皮书",
+    "titleEn": "Goldman-Scale ESG Due Diligence Report",
+    "category": "28页 · 绿色金融",
+    "categoryEn": "28 P · Green Finance",
+    "type": "word",
+    "thumb": "https://image.pollinations.ai/prompt/emerald%20green%20carbon%20credit%20trading%20floor%20skyscraper%20glass%20reflection%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=553012",
+    "thumbnail": "https://image.pollinations.ai/prompt/emerald%20green%20carbon%20credit%20trading%20floor%20skyscraper%20glass%20reflection%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=553012",
+    "thumbKey": "prod_AI-46921",
+    "thumbCloudPath": "https://image.pollinations.ai/prompt/emerald%20green%20carbon%20credit%20trading%20floor%20skyscraper%20glass%20reflection%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=553012",
+    "thumbDefault": "https://image.pollinations.ai/prompt/emerald%20green%20carbon%20credit%20trading%20floor%20skyscraper%20glass%20reflection%202k%20resolution%20top%20tier%20commercial%20photography%20remixed%20abstract%20dark%20theme%20data%20visualization%20background%208k%20photorealistic%20no%20text%20no%20letters%20no%20watermark?width=1280&height=720&nologo=true&seed=553012",
+    "priceRmb": 299,
+    "priceUsd": "44.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "碳资产估值外部性量化",
+        "sub": "CCER 与 VER 双重渠道联动定价",
+        "kpi": "$86/吨",
+        "label": "合规套利窗口",
+        "progress": 77
+      },
+      {
+        "title": "供应链Scope 3 穿透审计",
+        "sub": "二级供应商绿电协议泄露风险扫描",
+        "kpi": "19% 超额",
+        "label": "范围3漏洞",
+        "progress": 81
+      },
+      {
+        "title": "绿色贴标债务成本对冲",
+        "sub": "ESG挂钩贷款与绿色债票面利差测算",
+        "kpi": "-45bps",
+        "label": "利差红利",
+        "progress": 52
+      },
+      {
+        "title": "生物多样性损害拨备",
+        "sub": "采矿及林业对生态足迹的减值计提模型",
+        "kpi": "$2.9M 拨备",
+        "label": "自然资产减记",
+        "progress": 63
+      },
+      {
+        "title": "董事会气候风险委员会图谱",
+        "sub": "碳绩效与高管薪酬挂钩比例破题",
+        "kpi": "7.5% 股权挂钩",
+        "label": "治理督责",
+        "progress": 45
+      }
+    ]
+  },
+  {
     "id": "AI-12731",
     "title": "星际物流征服者",
     "titleEn": "Orbital Logistics Conqueror",
