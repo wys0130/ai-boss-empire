@@ -199,7 +199,7 @@ window.ApexUserManager = {
             this.userList[this.currentVerifyIdx].verified = true;
             this.saveUsers();
             this.renderUserTable();
-            alert("✅ 恭els！邮箱真实身份核验成功！");
+            alert("✅ 恭喜！邮箱真实身份核验成功！");
             this.closeVerifyModal();
         }
     },
@@ -502,6 +502,7 @@ window.ApexPricing = {
     }
 };
 
+// 👑 绝对原厂打底数据：永远不会消失的 5 个默认模板！
 window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
     { id: "saas", title: "SaaS 增长指标盘点", category: "20 SLIDES · Office PPT演示", thumbKey: "prod_saas", thumbCloudPath: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
@@ -511,18 +512,40 @@ window.DEFAULT_AUDIT_PRODUCTS = [
 ];
 
 window.loadAuditProducts = async function() {
-    let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+    // 取得销毁黑名单
+    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     
-    // 👑 彻底过滤：读取本地缓存时，绝对剔除被标记删除的僵尸！
+    // 👑 修复1：绝对物理保底，不管本地坏没坏，先把 5 个原装货铺上
+    let baseProducts = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
+    
     if (localProducts) {
-        window.AUDIT_PRODUCTS.length = 0; 
-        JSON.parse(localProducts).forEach(p => {
-            if (!blacklist.includes(p.id)) window.AUDIT_PRODUCTS.push(p);
-        });
-    } else {
-        window.AUDIT_PRODUCTS = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
+        try {
+            const parsedLocal = JSON.parse(localProducts);
+            // 将本地缓存里保存的价格、上下架状态覆盖给原装模板
+            baseProducts.forEach(bp => {
+                const found = parsedLocal.find(lp => lp.id === bp.id);
+                if (found) {
+                    bp.priceRmb = found.priceRmb;
+                    bp.priceUsd = found.priceUsd;
+                    bp.isLinked = found.isLinked;
+                    bp.status = found.status;
+                }
+            });
+            
+            // 将本地缓存里的 AI 生成产品加载进来（并且严格剔除黑名单里的僵尸）
+            parsedLocal.forEach(lp => {
+                if (lp.id.startsWith('AI-') && !blacklist.includes(lp.id)) {
+                    // 确保不重复添加
+                    if (!baseProducts.find(p => p.id === lp.id)) {
+                        baseProducts.push(lp);
+                    }
+                }
+            });
+        } catch(e) {}
     }
+    
+    window.AUDIT_PRODUCTS = baseProducts;
     window.renderAuditTable();
 
     try {
@@ -536,10 +559,15 @@ window.loadAuditProducts = async function() {
             if (res.ok) aiData = await res.json();
         }
 
-        // 👑 彻底过滤：云端拉取新数据时，绝对拦截在黑名单中的任何数据！
         if (Array.isArray(aiData)) {
+            // 👑 修复2：再次拿最新黑名单，在拉取云端旧数据时物理拦截僵尸复活！
+            const currentBlacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+            
             aiData.forEach(aiItem => {
-                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && !blacklist.includes(aiItem.id)) {
+                // 如果 ID 在销毁黑名单里，天王老子来了也拦住它！
+                if (currentBlacklist.includes(aiItem.id)) return;
+                
+                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id)) {
                     let col = 'text-orange-500 font-bold';
                     if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
                     if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
@@ -555,8 +583,6 @@ window.loadAuditProducts = async function() {
                     });
                 }
             });
-            // 写入本地前，再次彻底过滤一遍以防万一
-            window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
             localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
             window.renderAuditTable(); 
         }
@@ -639,9 +665,8 @@ window.renderAuditTable = function() {
         titleArea.appendChild(btn);
     }
 
-    // 👑 渲染前最后一次过滤，将黑名单里的僵尸死死按住
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
+    window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
 
     window.AUDIT_PRODUCTS.forEach((item, index) => {
         const isDefault = !item.id.startsWith('AI-');
@@ -1203,3 +1228,5 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         alert("❌ 还原异常: " + err.message);
     }
 };
+
+document.addEventListener("DOMContentLoaded", window.initAdminEngine);
