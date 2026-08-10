@@ -182,14 +182,31 @@
     </div>
 
     <script>
+        // 👑 修复：帮你补齐了 15 页默认数据！绝不再让你看到光秃秃的 3 页列表！
+        const defaultAeroTechSlides = [
+            { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
+            { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
+            { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" }
+        ];
+        
+        // 自动用循环把默认演示模板补满 15 页
+        for(let i=4; i<=15; i++) {
+            defaultAeroTechSlides.push({ 
+                id: i, 
+                layoutType: "default", 
+                title: `核心战略模块 ${i}`, 
+                sub: "可视化数据展示架构...", 
+                kpi: `+${10+i*5}%`, 
+                label: "预期增长指标", 
+                progress: 40 + i*3, 
+                tag: `${i < 10 ? '0'+i : i}. MODULE` 
+            });
+        }
+
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
-                slides: [
-                    { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
-                    { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
-                    { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" }
-                ]
+                slides: defaultAeroTechSlides
             }
         };
 
@@ -200,7 +217,6 @@
         let currentLayoutAlign = 'center';
         let currentCardMask = 'normal';
 
-        // 👑 降维打击：绝对无延迟的本地优先路由，彻底抹杀 CDN 脱节问题！
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
@@ -208,25 +224,25 @@
 
             if (!preset && key.startsWith('AI-')) {
                 let targetAiDeck = null;
-
-                // 1. 优先从浏览器本地金库极速读取 (零延迟，即刻生成即刻打开)
+                
                 try {
                     const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-                    targetAiDeck = localDecks.find(d => d.id === key);
+                    // 👑 防僵尸机制：读取本地缓存前，确保过滤掉被加入黑名单(销毁)的僵尸模板
+                    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                    targetAiDeck = localDecks.find(d => d.id === key && !blacklist.includes(d.id));
                 } catch(e) {}
 
-                // 2. 如果本地缓存没命中，再去请求云端 (防丢兜底)
                 if (!targetAiDeck) {
                     try {
                         const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
                         if (res.ok) {
                             const aiDecks = await res.json();
-                            targetAiDeck = aiDecks.find(d => d.id === key);
+                            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                            targetAiDeck = aiDecks.find(d => d.id === key && !blacklist.includes(d.id));
                         }
-                    } catch(e) { console.warn("拉取AI云端数据失败", e); }
+                    } catch(e) {}
                 }
 
-                // 3. 完美映射 AI 独家生成的内部幻灯片结构 (拒绝旧结构套娃)
                 if (targetAiDeck) {
                     const aiSlides = targetAiDeck.slides || [];
                     const slideCount = aiSlides.length > 0 ? aiSlides.length : 5;
@@ -241,7 +257,7 @@
                             const aiSec = aiSlides[i] || {};
                             return {
                                 id: i + 1, 
-                                layoutType: aiSec.layoutType || 'default', // 👑 引入 AI 给出的组件类型
+                                layoutType: aiSec.layoutType || 'default', 
                                 title: aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`, 
                                 sub: aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。", 
                                 kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
@@ -262,7 +278,6 @@
                 }
             }
 
-            // 极限容灾兜底，防止报错白屏
             if (!preset) {
                 currentDeckKey = 'aerotech';
                 preset = DECK_PRESETS['aerotech'];
@@ -314,7 +329,6 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
-        // 👑 积木化画布渲染引擎：根据 AI 下发的 layoutType 动态变异 UI 结构！
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
@@ -396,7 +410,6 @@
                         </div>
                     </div>`;
             } else {
-                // Default fallback
                 innerContent = `
                     <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
                         <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
