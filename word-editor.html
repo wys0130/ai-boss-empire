@@ -15,8 +15,8 @@
   .nav-pill:hover { background: #e2e8f0; color: #0f172a; }
   .nav-pill.active { background: #0f172a; color: #ffffff; border-color: #0f172a; box-shadow: 0 4px 10px -2px rgba(15,23,42,0.3); }
   .a4-paper { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 0.5rem; padding: 3.5rem 4rem; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1), 0 0 1px 1px rgba(0,0,0,0.05); min-height: 600px; }
-  .doc-title { font-size: 1.85rem; font-weight: 800; color: #0f172a; margin-bottom: 1.5rem; border-bottom: 3px solid #0f172a; padding-bottom: 0.75rem; letter-spacing: -0.02em; }
-  .doc-content { font-size: 1rem; color: #334155; line-height: 2; white-space: pre-wrap; font-family: 'Georgia', serif; }
+  .doc-title { font-size: 1.85rem; font-weight: 800; color: #0f172a; margin-bottom: 1.5rem; border-bottom: 3px solid #0f172a; padding-bottom: 0.75rem; letter-spacing: -0.02em; transition: all 0.3s; }
+  .doc-content { font-size: 1rem; color: #334155; line-height: 2; white-space: pre-wrap; font-family: 'Georgia', serif; transition: all 0.3s; }
   .input-field { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 0.6rem 0.85rem; font-size: 0.875rem; transition: all 0.2s; background: #f8fafc; color: #0f172a; }
   .input-field:focus { outline: none; border-color: #6366f1; background: #ffffff; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
   [contenteditable="true"]:hover { outline: 1px dashed #94a3b8; background: rgba(248,250,252,0.8); cursor: text; }
@@ -62,6 +62,7 @@
       
       <div class="a4-paper" id="previewArea">
         <div class="doc-title" contenteditable="true" id="previewTitle" oninput="syncFromPreviewTitle(this.textContent)">正在加载...</div>
+        <!-- 👑 DOM CSS 将根据 layoutType 动态变身 -->
         <div class="doc-content" contenteditable="true" id="previewContent" oninput="syncFromPreviewContent(this.textContent)">请稍候...</div>
       </div>
     </main>
@@ -99,10 +100,10 @@
 </div>
 
 <script>
-// 基础兜底结构，如果没调到 AI 则用这个
+// 基础兜底结构
 let sections = [
-  { title: '封面标题页', content: 'APEXWORK 企业合规管理与评估报告\n\n发布日期：2026 年度\n文档密级：企业机密' },
-  { title: '执行摘要', content: '本审查报告涵盖公司重点核心层面的现有实践及进阶建议。' }
+  { layoutType: 'title-page', title: '封面标题页', content: 'APEXWORK 企业合规管理与评估报告\n\n发布日期：2026 年度\n文档密级：企业机密' },
+  { layoutType: 'text-block', title: '执行摘要', content: '本审查报告涵盖公司重点核心层面的现有实践及进阶建议。' }
 ];
 let currentSection = 0;
 
@@ -117,9 +118,14 @@ function renderSectionNav() {
   sections.forEach((sec, index) => {
     const isActive = index === currentSection ? 'active' : '';
     const cleanTitle = sec.title.replace(/<[^>]+>/g, '');
+    let icon = "📝";
+    if (sec.layoutType === 'quote') icon = "💭";
+    if (sec.layoutType === 'checklist') icon = "✅";
+    if (sec.layoutType === 'title-page') icon = "🏆";
+
     navContainer.innerHTML += `
       <button class="nav-pill w-full ${isActive}" data-index="${index}" onclick="selectSection(${index})">
-        <span class="truncate pr-2">${index + 1}. ${cleanTitle}</span>
+        <span class="truncate pr-2">${icon} ${index + 1}. ${cleanTitle}</span>
         <span class="text-[10px] opacity-60 shrink-0">Sec</span>
       </button>
     `;
@@ -129,10 +135,27 @@ function renderSectionNav() {
 function selectSection(index) {
   currentSection = index;
   renderSectionNav();
-  document.getElementById('sectionTitleInput').value = sections[index].title;
-  document.getElementById('sectionContentInput').value = sections[index].content;
-  document.getElementById('previewTitle').textContent = sections[index].title;
-  document.getElementById('previewContent').textContent = sections[index].content;
+  const sec = sections[index];
+  
+  document.getElementById('sectionTitleInput').value = sec.title;
+  document.getElementById('sectionContentInput').value = sec.content;
+  document.getElementById('previewTitle').textContent = sec.title;
+  document.getElementById('previewContent').textContent = sec.content;
+
+  // 👑 积木化 CSS 装配：根据 layoutType 直接改变 Word 视觉样式
+  const previewContent = document.getElementById('previewContent');
+  const previewTitle = document.getElementById('previewTitle');
+  previewContent.className = 'doc-content'; // reset
+  previewTitle.style.display = 'block';
+
+  if (sec.layoutType === 'title-page' || sec.layoutType === 'cover') {
+      previewTitle.style.display = 'none'; // 封面页隐藏普通小标题
+      previewContent.classList.add('text-center', 'font-black', 'text-3xl', 'mt-16', 'text-slate-900');
+  } else if (sec.layoutType === 'quote') {
+      previewContent.classList.add('border-l-4', 'border-indigo-500', 'pl-5', 'italic', 'text-slate-600', 'bg-slate-50', 'py-4', 'rounded-r-lg');
+  } else if (sec.layoutType === 'checklist') {
+      previewContent.classList.add('font-mono', 'text-sm');
+  }
 }
 
 function updatePreviewFromForm() {
@@ -156,7 +179,7 @@ function syncFromPreviewContent(text) {
   sections[currentSection].content = text;
 }
 
-// DOCX 原生压缩输出
+// DOCX 原生压缩与富排版输出 (适配组件的格式差异)
 function executeDOCXExport() {
   const zip = new JSZip();
   const doc = zip.folder('word');
@@ -173,13 +196,34 @@ function executeDOCXExport() {
   });
 }
 
+// 👑 DOCX XML 构建引擎，支持引用/列表格式转换
 function generateDocumentXML() {
   let body = '';
   sections.forEach((sec) => {
-    body += `<w:p><w:pPr><w:spacing w:before="280" w:after="160"/><w:rPr><w:b/><w:color w:val="0F172A"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="0F172A"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr><w:t>${sec.title}</w:t></w:r></w:p>`;
+    if (sec.layoutType !== 'title-page' && sec.layoutType !== 'cover') {
+        body += `<w:p><w:pPr><w:spacing w:before="280" w:after="160"/><w:rPr><w:b/><w:color w:val="0F172A"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="0F172A"/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr><w:t>${sec.title}</w:t></w:r></w:p>`;
+    }
+    
     const paragraphs = sec.content.split('\n');
     paragraphs.forEach(pText => {
-      body += `<w:p><w:pPr><w:spacing w:line="360" w:lineRule="auto" w:after="120"/><w:rPr><w:color w:val="334155"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="334155"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:t>${pText}</w:t></w:r></w:p>`;
+      let runProps = `<w:color w:val="334155"/><w:sz w:val="22"/><w:szCs w:val="22"/>`;
+      let pProps = `<w:spacing w:line="360" w:lineRule="auto" w:after="120"/>`;
+      
+      // 按 LayoutType 注入不同的 Word XML 样式
+      if (sec.layoutType === 'quote') {
+          runProps += `<w:i/>`; // 斜体
+          pProps += `<w:ind w:left="400"/>`; // 缩进
+      } else if (sec.layoutType === 'title-page' || sec.layoutType === 'cover') {
+          runProps = `<w:b/><w:color w:val="0F172A"/><w:sz w:val="48"/><w:szCs w:val="48"/>`; // 超大加粗
+          pProps = `<w:jc w:val="center"/><w:spacing w:before="400" w:after="400"/>`; // 居中
+      }
+
+      let textToRender = pText;
+      if (sec.layoutType === 'checklist' && textToRender.trim() !== '') {
+          textToRender = '☑ ' + textToRender;
+      }
+
+      body += `<w:p><w:pPr>${pProps}<w:rPr>${runProps}</w:rPr></w:pPr><w:r><w:rPr>${runProps}</w:rPr><w:t>${textToRender}</w:t></w:r></w:p>`;
     });
   });
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}</w:body></w:document>`;
@@ -208,7 +252,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                     const decks = await res.json();
                     targetAiDeck = decks.find(d => d.id === deckId);
                 }
-            } catch (e) { console.warn("加载 AI 云端文档失败", e); }
+            } catch (e) {}
         }
 
         if (targetAiDeck) {
@@ -216,25 +260,25 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('headerTitle').innerText = docName;
             document.getElementById('headerCat').innerText = targetAiDeck.category || '核心业务架构 · 智能合规生成';
             
-            const priceStr = `$${targetAiDeck.priceUsd || '9.99'}`;
+            const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
             document.getElementById('topPriceBtn').innerText = priceStr;
             document.getElementById('mainPriceTxt').innerHTML = `${priceStr} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
             
-            // 👑 销毁死板旧结构，直接把 AI 生成的骨架 1:1 动态灌入 Word 章节
+            // 👑 销毁死板旧结构，直接把 AI 生成的带 layoutType 的骨架 1:1 动态灌入
             const aiSlides = targetAiDeck.slides || [];
             if (aiSlides.length > 0) {
-                sections.length = 0; // 清空死板数据
+                sections.length = 0; 
                 aiSlides.forEach((slide, idx) => {
                     sections.push({
-                        title: slide.title || `核心模块 ${idx + 1}`,
-                        content: `${slide.sub || '详细阐述商业运作机制。'}\n\n关键节点指标: ${slide.label || 'KPI'} = ${slide.kpi || '100%'}`
+                        layoutType: slide.layoutType || 'text-block',
+                        title: slide.title || `模块 ${idx + 1}`,
+                        content: `${slide.sub || '详细阐述商业运作机制。'}\n关键节点指标: ${slide.label || 'KPI'} = ${slide.kpi || '100%'}`
                     });
                 });
             }
         }
     }
     
-    // 初始化并渲染第一页
     selectSection(0);
 });
 </script>
