@@ -50,7 +50,6 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <aside class="lg:col-span-3 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📑 动态生成章节</h2>
-      <!-- 👑 绝对动态渲染，取代死板写死的 HTML 导航 -->
       <nav class="space-y-1.5 max-h-[500px] overflow-y-auto custom-scroll pr-1" id="sectionNav"></nav>
     </aside>
 
@@ -62,7 +61,6 @@
       
       <div class="a4-paper" id="previewArea">
         <div class="doc-title" contenteditable="true" id="previewTitle" oninput="syncFromPreviewTitle(this.textContent)">正在加载...</div>
-        <!-- 👑 DOM CSS 将根据 layoutType 动态变身 -->
         <div class="doc-content" contenteditable="true" id="previewContent" oninput="syncFromPreviewContent(this.textContent)">请稍候...</div>
       </div>
     </main>
@@ -100,10 +98,17 @@
 </div>
 
 <script>
-// 基础兜底结构
+// 👑 修复：原封不动放回你最初的 9 个章节！不要删减任何一条
 let sections = [
-  { layoutType: 'title-page', title: '封面标题页', content: 'APEXWORK 企业合规管理与评估报告\n\n发布日期：2026 年度\n文档密级：企业机密' },
-  { layoutType: 'text-block', title: '执行摘要', content: '本审查报告涵盖公司重点核心层面的现有实践及进阶建议。' }
+  { layoutType: 'title-page', title: '封面标题页', content: 'APEXWORK 企业合规管理与合规评估年度报告\n\n发布日期：2026 年度\n文档密级：企业机密\n标准：欧美企业通用 ATS 合规准则' },
+  { layoutType: 'text-block', title: '执行摘要', content: '本合规性审查报告涵盖公司在财务报告、数据安全与隐私、雇佣平等、以及 ESG 环境治理等重点核心层面的现有实践及进阶建议。全部准则完全遵从 GAAP、GDPR 及 EEO 条例。' },
+  { layoutType: 'text-block', title: '公司背景概况', content: '公司官方实体名称：APEXWORK Inc.\n法定注册所在地：美国特拉华州 (Delaware)\n现存全职正式员工总数：150\n持续运营与审计年份：2020 - 2026' },
+  { layoutType: 'text-block', title: '财务合规性', content: '所有的财务报告均严格依据 GAAP 基本通用准则制定。年度独立审计均由具备权威资质的会计师事务所按时出具，且报告期内无任何重大违规与审计调整说明。' },
+  { layoutType: 'text-block', title: '数据安全与隐私', content: '我们的产品及架构符合欧洲 GDPR 与美国 CCPA 隐私法规。已构建完整的数据保护影响评估（DPIA）流程，全部用户存储及传输数据均经 Ed25519 或等同算法加密。' },
+  { layoutType: 'text-block', title: '雇佣与反歧视', content: '坚持平等就业机会（EEO）法则，并在公司内部全面施行严格的反 workplace 骚扰与反歧视条例。全员年度线上及线下合规培训覆盖率达到 100%。' },
+  { layoutType: 'text-block', title: 'ESG 环境治理', content: '相关生产及行政园区通过 ISO 14001 环境管理体系评估。2026 年度统计总碳排放强度相较往期同比下降 15%，硬件及废弃物材料回收再利用率达 90% 以上。' },
+  { layoutType: 'checklist', title: '风险评估矩阵', content: '综合识别高风险事项 0 项、常规监测中等风险 4 项、一般低级别改进关注点 11 项。针对已有中等关注事项，均明确分派具体负责人及整改解决期限。' },
+  { layoutType: 'text-block', title: '结论与下一步', content: '公司的综合合规运行状况优异，治理结构稳固。我们建议下一步在海外扩展期内加强第三方供应商及渠道的 ESG 与安全抽检。' }
 ];
 let currentSection = 0;
 
@@ -111,7 +116,6 @@ function openCheckoutModal() {
   ApexAuth.openCheckout({ title: "APEXWORK ATS 商业报告 (.DOCX)", onSuccess: () => executeDOCXExport() });
 }
 
-// 👑 动态构建左侧导航栏
 function renderSectionNav() {
   const navContainer = document.getElementById('sectionNav');
   navContainer.innerHTML = '';
@@ -142,14 +146,13 @@ function selectSection(index) {
   document.getElementById('previewTitle').textContent = sec.title;
   document.getElementById('previewContent').textContent = sec.content;
 
-  // 👑 积木化 CSS 装配：根据 layoutType 直接改变 Word 视觉样式
   const previewContent = document.getElementById('previewContent');
   const previewTitle = document.getElementById('previewTitle');
-  previewContent.className = 'doc-content'; // reset
+  previewContent.className = 'doc-content'; 
   previewTitle.style.display = 'block';
 
   if (sec.layoutType === 'title-page' || sec.layoutType === 'cover') {
-      previewTitle.style.display = 'none'; // 封面页隐藏普通小标题
+      previewTitle.style.display = 'none'; 
       previewContent.classList.add('text-center', 'font-black', 'text-3xl', 'mt-16', 'text-slate-900');
   } else if (sec.layoutType === 'quote') {
       previewContent.classList.add('border-l-4', 'border-indigo-500', 'pl-5', 'italic', 'text-slate-600', 'bg-slate-50', 'py-4', 'rounded-r-lg');
@@ -179,7 +182,6 @@ function syncFromPreviewContent(text) {
   sections[currentSection].content = text;
 }
 
-// DOCX 原生压缩与富排版输出 (适配组件的格式差异)
 function executeDOCXExport() {
   const zip = new JSZip();
   const doc = zip.folder('word');
@@ -196,7 +198,6 @@ function executeDOCXExport() {
   });
 }
 
-// 👑 DOCX XML 构建引擎，支持引用/列表格式转换
 function generateDocumentXML() {
   let body = '';
   sections.forEach((sec) => {
@@ -209,13 +210,12 @@ function generateDocumentXML() {
       let runProps = `<w:color w:val="334155"/><w:sz w:val="22"/><w:szCs w:val="22"/>`;
       let pProps = `<w:spacing w:line="360" w:lineRule="auto" w:after="120"/>`;
       
-      // 按 LayoutType 注入不同的 Word XML 样式
       if (sec.layoutType === 'quote') {
-          runProps += `<w:i/>`; // 斜体
-          pProps += `<w:ind w:left="400"/>`; // 缩进
+          runProps += `<w:i/>`; 
+          pProps += `<w:ind w:left="400"/>`; 
       } else if (sec.layoutType === 'title-page' || sec.layoutType === 'cover') {
-          runProps = `<w:b/><w:color w:val="0F172A"/><w:sz w:val="48"/><w:szCs w:val="48"/>`; // 超大加粗
-          pProps = `<w:jc w:val="center"/><w:spacing w:before="400" w:after="400"/>`; // 居中
+          runProps = `<w:b/><w:color w:val="0F172A"/><w:sz w:val="48"/><w:szCs w:val="48"/>`; 
+          pProps = `<w:jc w:val="center"/><w:spacing w:before="400" w:after="400"/>`; 
       }
 
       let textToRender = pText;
@@ -233,7 +233,6 @@ function generateRelsXML() { return `<?xml version="1.0" encoding="UTF-8" standa
 function generateContentTypesXML() { return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`; }
 function generateRootRelsXML() { return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`; }
 
-// 👑 降维打击：绝对无延迟本地路由提取 AI 文档指纹结构
 window.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     const deckId = params.get('deck');
@@ -264,7 +263,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('topPriceBtn').innerText = priceStr;
             document.getElementById('mainPriceTxt').innerHTML = `${priceStr} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
             
-            // 👑 销毁死板旧结构，直接把 AI 生成的带 layoutType 的骨架 1:1 动态灌入
             const aiSlides = targetAiDeck.slides || [];
             if (aiSlides.length > 0) {
                 sections.length = 0; 
