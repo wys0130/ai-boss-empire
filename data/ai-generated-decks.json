@@ -1,19 +1,164 @@
 [
   {
-    "id": "AI-76956",
-    "title": "星辰资本路演蓝图",
-    "name": "星辰资本路演蓝图",
-    "category": "32 SLIDES · 深空科幻",
+    "id": "AI-27443",
+    "title": "量子跃迁增长引擎",
+    "name": "量子跃迁增长引擎",
+    "category": "30 SLIDES · 高级路演",
     "type": "ppt",
-    "thumb": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "thumbnail": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "thumbKey": "prod_AI-76956",
-    "thumbCloudPath": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "thumbDefault": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "priceRmb": 159,
-    "priceUsd": "24.99",
+    "thumb": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "thumbnail": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "thumbKey": "prod_AI-27443",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "thumbDefault": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "priceRmb": 299,
+    "priceUsd": "49.99",
     "colorCls": "text-orange-500 font-bold",
     "isLinked": true,
-    "status": true
+    "status": true,
+    "slides": [
+      {
+        "title": "市场风暴眼",
+        "sub": "万亿级蓝海市场的三大裂缝",
+        "kpi": "¥3.2T",
+        "label": "可寻址市场",
+        "progress": 72
+      },
+      {
+        "title": "破局点矩阵",
+        "sub": "技术壁垒与客户痛点的精准啮合",
+        "kpi": "87%",
+        "label": "痛点覆盖率",
+        "progress": 91
+      },
+      {
+        "title": "增长飞轮原型",
+        "sub": "自传播系数与网络效应的闭环验证",
+        "kpi": "4.7x",
+        "label": "病毒系数K因子",
+        "progress": 64
+      },
+      {
+        "title": "单位经济模型",
+        "sub": "LTV/CAC 与现金焚化炉的赛跑",
+        "kpi": "3.9",
+        "label": "LTV/CAC 比值",
+        "progress": 58
+      },
+      {
+        "title": "资本弹药库",
+        "sub": "三轮融资路径与关键里程碑",
+        "kpi": "$18M",
+        "label": "B轮目标额",
+        "progress": 43
+      }
+    ]
+  },
+  {
+    "id": "AI-31142",
+    "title": "多维战情指挥舱",
+    "name": "多维战情指挥舱",
+    "category": "12 SLIDES · 数据驾驶舱",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "thumbnail": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "thumbKey": "prod_AI-31142",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "thumbDefault": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=90",
+    "priceRmb": 199,
+    "priceUsd": "29.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "营收瀑布拆解",
+        "sub": "从线索到回款的漏斗每一环转化率",
+        "kpi": "¥1.2M",
+        "label": "月度新增ARR",
+        "progress": 76
+      },
+      {
+        "title": "客户健康度热力图",
+        "sub": "NPS、活跃度与续约风险的交叉雷达",
+        "kpi": "31%",
+        "label": "高风险客户占比",
+        "progress": 48
+      },
+      {
+        "title": "渠道ROI狙击镜",
+        "sub": "SEM/SEO/ABM/生态的归因贡献对比",
+        "kpi": "6.8",
+        "label": "平均ROI倍数",
+        "progress": 83
+      },
+      {
+        "title": "现金流火星地图",
+        "sub": "月度烧钱率与跑道长度的预测推演",
+        "kpi": "14.2",
+        "label": "剩余跑道月份",
+        "progress": 35
+      },
+      {
+        "title": "人力效能杠杆",
+        "sub": "人均产出与招聘优先级矩阵",
+        "kpi": "¥86K",
+        "label": "人均季度产出",
+        "progress": 69
+      }
+    ]
+  },
+  {
+    "id": "AI-11204",
+    "title": "极简战略叙事书",
+    "name": "极简战略叙事书",
+    "category": "20 PAGES · 商业计划书",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
+    "thumbnail": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
+    "thumbKey": "prod_AI-11204",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
+    "thumbDefault": "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=90",
+    "priceRmb": 159,
+    "priceUsd": "24.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "问题重定义",
+        "sub": "把伪需求滤除后的真金痛点",
+        "kpi": "92%",
+        "label": "深度访谈验证率",
+        "progress": 88
+      },
+      {
+        "title": "解决方案蓝图",
+        "sub": "MVP到PMF的路径图与假设清单",
+        "kpi": "3周",
+        "label": "原型迭代周期",
+        "progress": 77
+      },
+      {
+        "title": "竞争格局暗流",
+        "sub": "直接对手与替代方案的降维打击",
+        "kpi": "2.3x",
+        "label": "功能覆盖领先度",
+        "progress": 61
+      },
+      {
+        "title": "获客实验工坊",
+        "sub": "七大渠道的冷启动成本与转化数据",
+        "kpi": "¥4.5",
+        "label": "单次获客成本",
+        "progress": 54
+      },
+      {
+        "title": "组织与执行节拍",
+        "sub": "关键岗位图谱与双周冲刺节奏",
+        "kpi": "11人",
+        "label": "核心团队规模",
+        "progress": 39
+      }
+    ]
   }
 ]
