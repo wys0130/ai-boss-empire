@@ -1739,7 +1739,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 终极满血版：DeepSeek 文本大脑 + Pollinations AI 画师双重驱动
+// 👑 终极满血版：DeepSeek 文本大脑 + Pollinations 顶级商业画师 (90分+画质)
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1793,28 +1793,30 @@ window.triggerSwarmAutonomousAction = async function() {
 
             appendLog(`🔨 [主动产品部]: 文本与数据框架搭建完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             await new Promise(r => setTimeout(r, 1000));
-            appendLog(`🎨 [视觉策划部]: 正在呼叫跨国 AI 画师，为新作品实时生成专属 3D 封面...`);
+            appendLog(`🎨 [视觉策划部]: 正在注入顶级商业 3D 渲染提示词，剔除乱码，生成 90 分以上质感封面...`);
 
-            // 👑 核心视觉增强：利用免费开源的 Pollinations AI 直接根据标题生成专属封面
+            // 👑 核心视觉增强：采用 Dribbble/Behance 霸榜级别的 3D Mockup 提示词，并强制要求不含文字(no text)
             const newTemplates = generatedData.map((t) => {
                 const rId = "AI-" + Math.floor(10000 + Math.random()*90000);
                 let col = 'text-orange-500 font-bold';
                 
-                // 动态构建专门喂给 AI 画师的英文提示词 (Prompt)
-                let imagePrompt = `High end professional corporate business presentation background, abstract tech, dark theme, highly detailed, 8k resolution, representing ${t.name}`;
+                // 默认 PPT 的顶级 Prompt
+                let imagePrompt = `Premium 3D mockup of a sleek business presentation slide hovering on a dark minimalist studio background, cinematic lighting, elegant corporate design, Behance trending, Unreal Engine 5 render, 8k resolution, masterpiece, completely empty without any text, no letters, clean graphics`;
 
                 if (t.type && t.type.toLowerCase() === 'excel') {
                     col = 'text-emerald-600 font-bold';
-                    imagePrompt = `Financial dashboard UI concept, data visualization background, spreadsheet elements, dark green neon theme, corporate business, 8k, representing ${t.name}`;
+                    // Excel/数据的顶级 Prompt
+                    imagePrompt = `Premium 3D isometric mockup of a futuristic financial data dashboard UI, glowing neon data charts on dark glass screens, sleek tech environment, professional fintech design, Octane render, masterpiece, completely empty without any text, no letters, clean UI graphics`;
                 }
                 if (t.type && t.type.toLowerCase() === 'word') {
                     col = 'text-indigo-600 font-bold';
-                    imagePrompt = `Legal corporate document layout background, clean minimalist dark blue theme, elegant business paper, 8k resolution, representing ${t.name}`;
+                    // Word/文档的顶级 Prompt
+                    imagePrompt = `Premium 3D mockup of elegant corporate document papers with minimal abstract blue graphics, lying on a sleek matte desk, cinematic studio lighting, top tier professional layout, 8k, masterpiece, completely empty without any text, no letters, clean paper`;
                 }
                 
-                // 拼接免费文生图 API 链接，添加 seed 确保每次生成都不一样
+                // 拼接 API 链接：增加 enhance=true 让底层开启自动润色优化，nologo=true 去除水印
                 const seed = Math.floor(Math.random() * 999999);
-                const aiImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=600&nologo=true&seed=${seed}`;
+                const aiImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=600&nologo=true&enhance=true&seed=${seed}`;
 
                 return {
                     id: rId,
