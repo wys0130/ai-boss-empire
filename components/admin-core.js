@@ -446,6 +446,7 @@ const DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
+// 👑 终极防御：带本地黑名单与强穿透 API 的加载引擎
 async function loadAuditProducts() {
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     if (localProducts) {
@@ -456,34 +457,45 @@ async function loadAuditProducts() {
     }
 
     try {
-        const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
-        if (res.ok) {
-            const aiData = await res.json();
-            if (Array.isArray(aiData)) {
-                aiData.forEach(aiItem => {
-                    if (!AUDIT_PRODUCTS.find(p => p.id === aiItem.id)) {
-                        let col = 'text-orange-500 font-bold';
-                        if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
-                        if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
-                        
-                        AUDIT_PRODUCTS.push({
-                            id: aiItem.id,
-                            title: aiItem.title || aiItem.name,
-                            category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
-                            thumbKey: "prod_" + aiItem.id,
-                            thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
-                            thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-                            priceRmb: aiItem.priceRmb || 69,
-                            priceUsd: "9.99",
-                            colorCls: col,
-                            isLinked: true,
-                            status: true
-                        });
-                    }
-                });
-            }
+        // 尝试读取 GitHub API 绝对真实的数据（无视 CDN 缓存）
+        let aiData = null;
+        const keys = getKeysSafe();
+        if (keys && keys.gh) {
+            const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
+            if (f.content) aiData = JSON.parse(f.content);
+        } else {
+            const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+            if (res.ok) aiData = await res.json();
         }
-    } catch(e) {}
+
+        if (Array.isArray(aiData)) {
+            // 读取本地黑名单（存放刚刚被删掉的死刑 ID）
+            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+            
+            aiData.forEach(aiItem => {
+                // 只有本地没有，且【绝对不在黑名单里】的数据，才允许从云端拉入！
+                if (!AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && !blacklist.includes(aiItem.id)) {
+                    let col = 'text-orange-500 font-bold';
+                    if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
+                    if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
+                    
+                    AUDIT_PRODUCTS.push({
+                        id: aiItem.id,
+                        title: aiItem.title || aiItem.name,
+                        category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
+                        thumbKey: "prod_" + aiItem.id,
+                        thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
+                        thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+                        priceRmb: aiItem.priceRmb || 69,
+                        priceUsd: aiItem.priceUsd || "14.99",
+                        colorCls: col,
+                        isLinked: true,
+                        status: true
+                    });
+                }
+            });
+        }
+    } catch(e) { console.warn("拉取云端模板失败", e); }
     
     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
     renderAuditTable();
@@ -595,9 +607,9 @@ window.toggleAuditStatus = function(index) {
     appendLog(`>> [风控审查] 更改作品 [${AUDIT_PRODUCTS[index].title}] 上架状态 -> ${AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
 };
 
-// 👑 修复版：物理级强制销毁，彻底从 GitHub 云端抹除数据
+// 👑 物理级强制销毁，彻底抹除云端记录并打入黑名单
 window.forceRemoveProduct = async function(index) {
-    if (!confirm(`⚠️ 危险操作！确定要在商城强制下架并销毁 [${AUDIT_PRODUCTS[index].title}] 吗？\n(此操作将物理删除云端数据库记录，刷新也不会复活！)`)) return;
+    if (!confirm(`⚠️ 危险操作！确定要在商城强制下架并销毁 [${AUDIT_PRODUCTS[index].title}] 吗？\n(此操作将彻底物理删除云端记录，并加入本地防御黑名单，绝对无法复活！)`)) return;
     
     const btn = window.event ? window.event.currentTarget : null;
     const originalText = btn ? btn.innerHTML : "强制销毁";
@@ -607,23 +619,28 @@ window.forceRemoveProduct = async function(index) {
         const targetId = AUDIT_PRODUCTS[index].id;
         const title = AUDIT_PRODUCTS[index].title;
         
-        // 1. 斩断本地缓存
+        // 1. 记入死刑黑名单（绝对防御 GitHub Pages 的 CDN 延迟重发）
+        const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+        if (!blacklist.includes(targetId)) blacklist.push(targetId);
+        localStorage.setItem('APEX_DELETED_ZOMBIES', JSON.stringify(blacklist));
+
+        // 2. 斩断本地当前列表缓存
         AUDIT_PRODUCTS.splice(index, 1);
         localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
         renderAuditTable();
         
-        // 2. 物理斩断 GitHub 云端数据
+        // 3. 物理斩断 GitHub 云端源文件数据
         const keys = getKeysSafe();
         if (keys && keys.gh) {
             const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
             if (f.content) {
                 let cloudDecks = JSON.parse(f.content);
-                // 过滤掉被删除的那个 ID
+                // 过滤掉被删除的那个 ID，重新推回云端
                 cloudDecks = cloudDecks.filter(d => d.id !== targetId);
-                await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 删除下架商品: ${title} [skip ci]`, keys.gh);
+                await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 强制销毁下架商品: ${title} [skip ci]`, keys.gh);
             }
         }
-        appendLog(`>> [风控审查] 已彻底销毁作品并同步云端: ${title}`);
+        appendLog(`>> [风控审查] 已彻底销毁作品并加入防复活黑名单: ${title}`);
     } catch(e) {
         alert("❌ 销毁失败，云端同步异常：" + e.message);
         if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
