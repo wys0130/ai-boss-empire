@@ -314,8 +314,45 @@ function executeXLSXExport() {
   alert('✅ 完整带排版的 Excel 建模表下载成功！');
 }
 
-initFinanceData();
-recomputeKPIsAndRender(true);
+// 👑 动态拦截并加载 AI 生成的全新财务模型数据
+window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const deckId = params.get('deck');
+    
+    if (deckId && deckId.startsWith('AI-')) {
+        try {
+            const res = await fetch('data/ai-generated-decks.json?_t=' + Date.now());
+            if (res.ok) {
+                const decks = await res.json();
+                const aiDeck = decks.find(d => d.id === deckId);
+                
+                if (aiDeck) {
+                    // 1. 替换页面大标题与分类
+                    const titleEl = document.querySelector('h1');
+                    const catEl = titleEl.nextElementSibling;
+                    const priceEl = document.querySelector('.text-3xl.font-black');
+                    
+                    if (titleEl) titleEl.innerText = aiDeck.name || aiDeck.title;
+                    if (catEl) catEl.innerText = aiDeck.category || '12 个月现金流滚动预测矩阵 · 智能动态生成';
+                    
+                    // 2. 替换价格区
+                    if (priceEl) priceEl.innerHTML = `$${aiDeck.priceUsd || '14.99'} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
+                    
+                    // 3. 随机打乱初始投资和增长率，让生成的模板数据看起来完全不一样！
+                    document.getElementById('initialInvestment').value = 50000 + Math.floor(Math.random() * 80000);
+                    document.getElementById('growthRate').value = 3 + Math.floor(Math.random() * 12);
+                }
+            }
+        } catch (e) {
+            console.warn("加载 AI 云端模型失败", e);
+        }
+    }
+    
+    // 初始化并渲染
+    initFinanceData();
+    updateROI(); // 确保覆盖随机打乱的参数
+    recomputeKPIsAndRender(true);
+});
 </script>
 </body>
 </html>
