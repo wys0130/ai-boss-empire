@@ -51,23 +51,6 @@
     "status": true
   },
   {
-    "id": "AI-52086",
-    "title": "财智多维驾驶舱",
-    "name": "财智多维驾驶舱",
-    "category": "12 SHEETS · 动态仪表盘",
-    "type": "excel",
-    "thumb": "https://image.pollinations.ai/prompt/Financial%20dashboard%20UI%20concept%2C%20data%20visualization%20background%2C%20spreadsheet%20elements%2C%20dark%20green%20neon%20theme%2C%20corporate%20business%2C%208k%2C%20representing%20%E8%B4%A2%E6%99%BA%E5%A4%9A%E7%BB%B4%E9%A9%BE%E9%A9%B6%E8%88%B1?width=800&height=600&nologo=true&seed=103600",
-    "thumbnail": "https://image.pollinations.ai/prompt/Financial%20dashboard%20UI%20concept%2C%20data%20visualization%20background%2C%20spreadsheet%20elements%2C%20dark%20green%20neon%20theme%2C%20corporate%20business%2C%208k%2C%20representing%20%E8%B4%A2%E6%99%BA%E5%A4%9A%E7%BB%B4%E9%A9%BE%E9%A9%B6%E8%88%B1?width=800&height=600&nologo=true&seed=103600",
-    "thumbKey": "prod_AI-52086",
-    "thumbCloudPath": "https://image.pollinations.ai/prompt/Financial%20dashboard%20UI%20concept%2C%20data%20visualization%20background%2C%20spreadsheet%20elements%2C%20dark%20green%20neon%20theme%2C%20corporate%20business%2C%208k%2C%20representing%20%E8%B4%A2%E6%99%BA%E5%A4%9A%E7%BB%B4%E9%A9%BE%E9%A9%B6%E8%88%B1?width=800&height=600&nologo=true&seed=103600",
-    "thumbDefault": "https://image.pollinations.ai/prompt/Financial%20dashboard%20UI%20concept%2C%20data%20visualization%20background%2C%20spreadsheet%20elements%2C%20dark%20green%20neon%20theme%2C%20corporate%20business%2C%208k%2C%20representing%20%E8%B4%A2%E6%99%BA%E5%A4%9A%E7%BB%B4%E9%A9%BE%E9%A9%B6%E8%88%B1?width=800&height=600&nologo=true&seed=103600",
-    "priceRmb": 89,
-    "priceUsd": "13.99",
-    "colorCls": "text-emerald-600 font-bold",
-    "isLinked": true,
-    "status": true
-  },
-  {
     "id": "AI-55890",
     "title": "极臻商业提案白皮书",
     "name": "极臻商业提案白皮书",
