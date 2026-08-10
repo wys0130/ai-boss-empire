@@ -93,16 +93,32 @@
                 <button onclick="document.execCommand('bold', false, null)" class="tool-btn font-black text-sm w-7" title="加粗 (Ctrl+B)">B</button>
                 <button onclick="document.execCommand('italic', false, null)" class="tool-btn italic font-serif text-sm w-7" title="斜体 (Ctrl+I)">I</button>
                 <button onclick="document.execCommand('underline', false, null)" class="tool-btn underline text-sm w-7" title="下划线 (Ctrl+U)">U</button>
-                <div class="relative flex items-center ml-1">
-                    <span class="absolute text-[10px] text-slate-400 -top-3 left-1">Color</span>
-                    <input type="color" onchange="document.execCommand('foreColor', false, this.value)" class="w-6 h-6 p-0 border-0 bg-transparent rounded cursor-pointer mt-1" title="字体颜色">
+                <!-- 1. 修复：完美生效的颜色拾取器 (Color Picker) -->
+                <div class="flex flex-col items-center justify-center gap-1 mr-4">
+                    <span class="text-[10px] text-slate-400 font-mono">Color</span>
+                    <div class="relative w-6 h-6 rounded overflow-hidden border border-slate-600 hover:border-blue-400 transition shadow-inner">
+                        <!-- 核心修复：直接使用原生 color input，拉伸覆盖父级，并绑定 execCommand -->
+                        <input type="color" oninput="document.execCommand('foreColor', false, this.value)" class="absolute -top-2 -left-2 w-10 h-10 cursor-pointer opacity-0" value="#ffffff" title="更改选中文字颜色">
+                        <!-- 这个 div 用于视觉展示，跟着 input 的值变色 (如果需要双向绑定可以用 JS 控制其背景色) -->
+                        <div class="w-full h-full bg-slate-800 pointer-events-none"></div>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-1 border-r border-slate-700 pr-6">
-                <button onclick="document.execCommand('justifyLeft', false, null)" class="tool-btn text-sm w-7" title="左对齐">⫷</button>
-                <button onclick="document.execCommand('justifyCenter', false, null)" class="tool-btn text-sm w-7" title="居中">⫸⫷</button>
-                <button onclick="document.execCommand('justifyRight', false, null)" class="tool-btn text-sm w-7" title="右对齐">⫸</button>
+            <!-- 2. 修复：人类能看懂的对齐按钮组 (采用通用 SVG 图标) -->
+            <div class="flex items-center gap-1 bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
+                <button onclick="document.execCommand('justifyLeft', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="左对齐">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"></path></svg>
+                </button>
+                <button onclick="document.execCommand('justifyCenter', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="居中对齐">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M4 18h16"></path></svg>
+                </button>
+                <button onclick="document.execCommand('justifyRight', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="右对齐">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M4 18h16"></path></svg>
+                </button>
+                <button onclick="document.execCommand('justifyFull', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="两端对齐">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
             </div>
 
             <!-- 幻灯片布局设计组 -->
