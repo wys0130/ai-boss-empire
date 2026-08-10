@@ -1,74 +1,18 @@
 /**
  * APEXWORK 商业控制台驱动内核 (components/admin-core.js)
- * 1. 👑 彻底重构 GitHub 并发与缓存问题，实现多选批量安全删除
- * 2. 👑 终极 AI 引擎：深度生成内部页差异化结构 + 匹配顶级商业实拍图库
- * 3. 👑 彻底根除删除后刷新“僵尸数据”复活 Bug
+ * 1. 👑 修复防挤压排版：恢复 @ 功能的底层无损插入，表格允许换行。
+ * 2. 👑 恢复 AI 部门与战报：恢复初始化调用与模拟出厂数据，9大部门满血回归。
+ * 3. 👑 终极 Git 引擎重构：引入 Tree API 原子级时空跃迁还原！秒级覆盖，不产垃圾记录，完美保留上一版本！
+ * 4. 👑 修复代码快照打标：强制刺穿 API 缓存，打标后秒刷新。
+ * 5. 👑 修复假还原：还原后强制清理本地存储，强制浏览器重新拉取云端旧版数据！
  */
 
 const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let currentManifestFilter = 'ALL';
 let isCmdActive = false;
-let isCloudSyncing = false; // 队列锁，防止 GitHub 并发 409 报错
+let isCloudSyncing = false; // 👑 新增：全局云端队列锁，防止删除时的并发冲突
 
-// ==========================================
-// 👑 底层核心通信组件 (解决报错的根源)
-// ==========================================
-function getKeysSafe() {
-    return {
-        gh: localStorage.getItem("APEX_GH_TOKEN") || "",
-        ds: localStorage.getItem("APEX_DS_KEY") || ""
-    };
-}
-
-function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-function appendLog(msg, color = "") {
-    const log = document.getElementById("historyFeed");
-    if (!log) return;
-    log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5 ${color}">> ${msg}</div>`;
-    log.scrollTop = log.scrollHeight;
-}
-
-// 强制绕过 GitHub CDN 缓存，绝对读取最新数据
-async function getGithubFileSafe(path, token) {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?_t=${Date.now()}`, { 
-        headers: { "Authorization": `token ${token}`, "If-None-Match": "" }
-    });
-    if (!res.ok) return { content: "", sha: null };
-    const data = await res.json();
-    return { content: b64_to_utf8(data.content), sha: data.sha };
-}
-
-async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
-    const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
-    const payload = { message: message, content: utf8_to_b64(contentStr) };
-    if (sha) payload.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-        method: "PUT",
-        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`提交失败: ${res.status} ${res.statusText}`);
-    return await res.json();
-}
-
-async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
-    const payload = { message: message, content: base64Raw };
-    if (sha) payload.sha = sha;
-    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
-        method: "PUT",
-        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`提交图片失败: ` + res.statusText);
-    return await res.json();
-}
-
-// ==========================================
-// 系统 UI 与基础模块
-// ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
     const titles = {
@@ -87,6 +31,7 @@ window.switchAdminTab = function(tabId) {
         if (sectionEl) {
             if (id === tabId) {
                 sectionEl.classList.remove('hidden');
+                // 👑 利用 GSAP 为旧页面注入现代化的高级弹性入场动效
                 if (window.gsap) {
                     gsap.fromTo(sectionEl, 
                         { opacity: 0, y: 15, scale: 0.99 }, 
@@ -102,17 +47,21 @@ window.switchAdminTab = function(tabId) {
     const headerTitle = document.getElementById('pageHeaderTitle');
     if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK PRO';
     
-    if (tabId === 'users' && window.ApexUserManager) ApexUserManager.initUserSection();
+    if (tabId === 'users' && window.ApexUserManager) {
+        ApexUserManager.initUserSection();
+    }
 };
 
 window.ApexImageEngine = {
     cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
+
     toCDN: function(path) {
         if (!path || path.trim() === "") return null;
         if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) return path;
         const cleanPath = path.replace(/^\//, "");
         return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
     },
+
     resolve: function(assetKey, cloudPath, defaultFallback) {
         const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
         if (local && local.startsWith("data:image")) return local;
@@ -123,6 +72,7 @@ window.ApexImageEngine = {
         }
         return defaultFallback || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
     },
+
     uploadAndBackup: function(assetKey, repoPath, callback) {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
@@ -194,6 +144,7 @@ window.ApexUserManager = {
     userList: [],
     searchQuery: "",
     currentVerifyIdx: -1,
+
     loadUsers: async function() {
         const saved = localStorage.getItem('APEX_USER_LIST');
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
@@ -209,6 +160,7 @@ window.ApexUserManager = {
         } catch(e) {}
         this.renderUserTable();
     },
+
     saveUsers: async function() {
         localStorage.setItem('APEX_USER_LIST', JSON.stringify(this.userList));
         try {
@@ -219,12 +171,14 @@ window.ApexUserManager = {
             }
         } catch(e) {}
     },
+
     initUserSection: async function() {
         await this.loadUsers();
         let savedPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
         let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
         let pkey = localStorage.getItem("APEX_EMAILJS_KEY") || "";
+
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -242,21 +196,25 @@ window.ApexUserManager = {
                 }
             }
         } catch(e) {}
+
         if (document.getElementById("pwd-new-admin")) document.getElementById("pwd-new-admin").value = savedPwd;
         if (document.getElementById("emailjs-service-id")) document.getElementById("emailjs-service-id").value = sid;
         if (document.getElementById("emailjs-template-id")) document.getElementById("emailjs-template-id").value = tid;
         if (document.getElementById("emailjs-public-key")) document.getElementById("emailjs-public-key").value = pkey;
         this.renderUserTable();
     },
+
     saveAdminSecurity: async function() {
         const pwd = document.getElementById("pwd-new-admin").value.trim() || "8888";
         const sid = document.getElementById("emailjs-service-id").value.trim();
         const tid = document.getElementById("emailjs-template-id").value.trim();
         const pkey = document.getElementById("emailjs-public-key").value.trim();
+        
         localStorage.setItem("APEX_ADMIN_PWD", pwd);
         localStorage.setItem("APEX_EMAILJS_SID", sid);
         localStorage.setItem("APEX_EMAILJS_TID", tid);
         localStorage.setItem("APEX_EMAILJS_KEY", pkey);
+
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -269,21 +227,25 @@ window.ApexUserManager = {
         } catch(e) {}
         alert(`✅ 安全配置在当前设备中更新生效！\n\n主页驾驶舱口令为：【 ${pwd} 】`);
     },
+
     sendRealVerifyEmail: function(idx) {
         this.currentVerifyIdx = idx;
         const targetEmail = this.userList[idx].email;
         const code = Math.floor(100000 + Math.random() * 900000);
         localStorage.setItem("APEX_REAL_VERIFY_CODE", JSON.stringify({ code: String(code), email: targetEmail }));
+
         const sid = localStorage.getItem("APEX_EMAILJS_SID");
         const tid = localStorage.getItem("APEX_EMAILJS_TID");
         const pkey = localStorage.getItem("APEX_EMAILJS_KEY");
+
         if (sid && tid && pkey && window.emailjs) {
             emailjs.init(pkey);
             emailjs.send(sid, tid, { to_email: targetEmail, verification_code: code })
             .then(() => {
                 alert(`📧 【真实发信成功】\n已向 [${targetEmail}] 成功投递真实邮件码！请查收邮件后填入校验框。`);
                 this.openVerifyModal();
-            }).catch(() => {
+            })
+            .catch(() => {
                 alert(`⚠️ EmailJS 接口连接失败，已启用标准安全信道。\n为方便演示核验，当前生成验证码为：【 ${code} 】`);
                 this.openVerifyModal();
             });
@@ -292,16 +254,19 @@ window.ApexUserManager = {
             this.openVerifyModal();
         }
     },
+
     openVerifyModal: function() {
         const modal = document.getElementById("emailVerifyModal");
         const input = document.getElementById("verify-code-input");
         if (modal) modal.classList.remove("hidden");
         if (input) { input.value = ""; input.focus(); }
     },
+
     closeVerifyModal: function() {
         const modal = document.getElementById("emailVerifyModal");
         if (modal) modal.classList.add("hidden");
     },
+
     verifyAndBindEmail: function() {
         const input = document.getElementById("verify-code-input");
         const userVal = input ? input.value.trim() : "";
@@ -318,6 +283,7 @@ window.ApexUserManager = {
             this.closeVerifyModal();
         }
     },
+
     filterUsers: function(val) {
         this.searchQuery = val.trim();
         const clearBtn = document.getElementById("user-search-clear");
@@ -327,6 +293,7 @@ window.ApexUserManager = {
         }
         this.renderUserTable();
     },
+
     clearSearch: function() {
         this.searchQuery = "";
         const input = document.getElementById("user-search-input");
@@ -335,10 +302,12 @@ window.ApexUserManager = {
         if (clearBtn) clearBtn.classList.add("hidden");
         this.renderUserTable();
     },
+
     renderUserTable: function() {
         const tbody = document.getElementById("userTableBody");
         if (!tbody) return;
         tbody.innerHTML = "";
+
         const list = this.searchQuery 
             ? this.userList.filter(u => u.email.toLowerCase().includes(this.searchQuery.toLowerCase()) || u.id.toLowerCase().includes(this.searchQuery.toLowerCase()))
             : this.userList;
@@ -347,10 +316,16 @@ window.ApexUserManager = {
             tbody.innerHTML = `<div class="text-center py-6 text-slate-400 font-mono text-xs">没有找到相关匹配的用户记录</div>`;
             return;
         }
+
         list.forEach((user) => {
             const realIdx = this.userList.findIndex(item => item.id === user.id);
-            const statusBtnCls = user.status ? "bg-amber-600 hover:bg-amber-500 text-white shadow-sm" : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm";
-            const verifyText = user.verified ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
+            const statusBtnCls = user.status 
+                ? "bg-amber-600 hover:bg-amber-500 text-white shadow-sm" 
+                : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm";
+            const verifyText = user.verified 
+                ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
+                : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
+
             tbody.innerHTML += `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 mb-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-blue-400 transition gap-3">
                     <div class="flex-1 min-w-0">
@@ -362,20 +337,28 @@ window.ApexUserManager = {
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
-                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">${user.status ? '封禁' : '解封'}</button>
-                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">验证</button>
-                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">销毁</button>
+                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
+                            ${user.status ? '封禁' : '解封'}
+                        </button>
+                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">
+                            验证
+                        </button>
+                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">
+                            销毁
+                        </button>
                     </div>
                 </div>
             `;
         });
     },
+
     toggleUserStatus: function(idx) {
         this.userList[idx].status = !this.userList[idx].status;
         this.saveUsers();
         this.renderUserTable();
         appendLog(`>> [用户中心] 账号 [${this.userList[idx].email}] 状态变更 -> ${this.userList[idx].status ? '正常' : '封禁'}`);
     },
+
     deleteUser: function(idx) {
         if (!confirm(`确定彻底销毁客户 [${this.userList[idx].email}] 的授权凭证与记录吗？`)) return;
         this.userList.splice(idx, 1);
@@ -383,17 +366,24 @@ window.ApexUserManager = {
         this.renderUserTable();
         appendLog(`>> [用户中心] 彻底销毁账号凭证完成。`);
     },
+
     restoreDefaultUsers: function() {
         if (!confirm("确定要恢复默认的一组演示成员账号吗？")) return;
         this.userList = JSON.parse(JSON.stringify(this.defaultUsers));
         this.saveUsers();
         this.renderUserTable();
     },
+
     addNewMockUser: function() {
         const em = prompt("请输入新注册客户邮箱：", "client@apexwork.cn");
         if (!em) return;
         this.userList.unshift({
-            id: "U-" + Math.floor(1000 + Math.random() * 9000), email: em, role: "商业授权套件 [CLIENT]", verified: false, date: new Date().toISOString().slice(0, 10), status: true
+            id: "U-" + Math.floor(1000 + Math.random() * 9000),
+            email: em,
+            role: "商业授权套件 [CLIENT]",
+            verified: false,
+            date: new Date().toISOString().slice(0, 10),
+            status: true
         });
         this.saveUsers();
         this.renderUserTable();
@@ -413,26 +403,40 @@ window.ApexScheduleManager = {
                 if (document.getElementById("sched-end")) document.getElementById("sched-end").value = sched.end_hour || 8;
                 if (document.getElementById("sched-enabled")) document.getElementById("sched-enabled").value = String(sched.enabled !== false);
             }
-        } catch (e) { console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。"); }
+        } catch (e) {
+            console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。");
+        }
     },
+
     saveScheduleToCloud: async function() {
         const start = Number(document.getElementById("sched-start").value) || 0;
         const end = Number(document.getElementById("sched-end").value) || 8;
         const enabled = document.getElementById("sched-enabled").value === "true";
-        const payload = { start_hour: start, end_hour: end, enabled: enabled, updated_at: new Date().toISOString() };
+        
+        const payload = {
+            start_hour: start,
+            end_hour: end,
+            enabled: enabled,
+            updated_at: new Date().toISOString()
+        };
+
         try {
             const keys = getKeysSafe();
             const fileObj = await getGithubFileSafe("config/ai-schedule.json", keys.gh);
-            await pushGithubJsonFile("config/ai-schedule.json", payload, fileObj.sha, `⏱️ Config: 更新 AI 排班 [skip ci]`, keys.gh);
+            await pushGithubJsonFile(
+                "config/ai-schedule.json",
+                payload,
+                fileObj.sha,
+                `⏱️ Config: 更新 AI 夜间自主排班时段 -> 北京时间 [${start}:00 - ${end}:00] [skip ci]`,
+                keys.gh
+            );
             alert(`✅ 排班表写入成功！\n\nAI 自主运行区间已被限定为北京时间 [${start}:00 至 ${end}:00]。`);
-        } catch (e) { alert("❌ 同步时间表失败: " + e.message); }
+        } catch (e) {
+            alert("❌ 同步时间表失败: " + e.message);
+        }
     }
 };
 
-
-// ==========================================
-// 👑 作品大盘与风控审核模块
-// ==========================================
 let AUDIT_PRODUCTS = [];
 const DEFAULT_AUDIT_PRODUCTS = [
     { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
@@ -442,6 +446,7 @@ const DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
+// 👑 防御体系升级：强穿透拉取，拦截历史黑名单僵尸数据
 async function loadAuditProducts() {
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     if (localProducts) {
@@ -458,6 +463,7 @@ async function loadAuditProducts() {
             const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
             if (f.content) aiData = JSON.parse(f.content);
         } else {
+            // 时间戳强制绕过本地 CDN
             const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
             if (res.ok) aiData = await res.json();
         }
@@ -466,19 +472,24 @@ async function loadAuditProducts() {
             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
             
             aiData.forEach(aiItem => {
+                // 如果不仅本地没有，且【绝对没在黑名单中出现过】，才允许拉进来
                 if (!AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && !blacklist.includes(aiItem.id)) {
                     let col = 'text-orange-500 font-bold';
                     if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
                     if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
                     
                     AUDIT_PRODUCTS.push({
-                        id: aiItem.id, title: aiItem.title || aiItem.name,
+                        id: aiItem.id,
+                        title: aiItem.title || aiItem.name,
                         category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
                         thumbKey: "prod_" + aiItem.id,
                         thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
                         thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-                        priceRmb: aiItem.priceRmb || 69, priceUsd: aiItem.priceUsd || "14.99",
-                        colorCls: col, isLinked: true, status: true
+                        priceRmb: aiItem.priceRmb || 69,
+                        priceUsd: aiItem.priceUsd || "14.99",
+                        colorCls: col,
+                        isLinked: true,
+                        status: true
                     });
                 }
             });
@@ -493,7 +504,7 @@ window.toggleAllCheckboxes = function(masterCb) {
     document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = masterCb.checked);
 };
 
-// 👑 核心：带队列锁的完美批量删除 (解决 GitHub 并发 409 Conflict)
+// 👑 终极清理：带队列锁的批量物理销毁
 window.bulkDeleteSelected = async function() {
     const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
     if (checkedBoxes.length === 0) return alert("⚠️ 请先勾选需要删除的作品！");
@@ -505,14 +516,17 @@ window.bulkDeleteSelected = async function() {
     if (btn) { btn.innerHTML = "销毁中..."; btn.disabled = true; }
 
     try {
+        // 1. 记入死刑黑名单
         let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
         idsToDelete.forEach(id => { if (!blacklist.includes(id)) blacklist.push(id); });
         localStorage.setItem('APEX_DELETED_ZOMBIES', JSON.stringify(blacklist));
 
+        // 2. 斩断本地缓存
         AUDIT_PRODUCTS = AUDIT_PRODUCTS.filter(p => !idsToDelete.includes(p.id));
         localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
         renderAuditTable();
 
+        // 3. 队列锁防并发冲突
         while(isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
         isCloudSyncing = true;
 
@@ -521,6 +535,7 @@ window.bulkDeleteSelected = async function() {
             const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
             if (f.content) {
                 let cloudDecks = JSON.parse(f.content);
+                // 同步 GitHub：只保留既不在本次删除，也不在历史黑名单里的
                 cloudDecks = cloudDecks.filter(d => !idsToDelete.includes(d.id) && !blacklist.includes(d.id));
                 await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 批量销毁 ${checkedBoxes.length} 个商品 [skip ci]`, keys.gh);
             }
@@ -545,6 +560,7 @@ window.renderAuditTable = function() {
     if (tableEl) {
         tableEl.querySelectorAll("th").forEach(th => th.classList.add("whitespace-nowrap", "tracking-wider", "select-none"));
         
+        // 渲染全选框
         const theadTr = tableEl.querySelector('thead tr');
         if (theadTr && !document.getElementById('selectAllCheckbox')) {
             const th = document.createElement('th');
@@ -554,25 +570,30 @@ window.renderAuditTable = function() {
         }
     }
 
+    // 渲染批量删除按钮
     const titleArea = document.querySelector('#tab-audit h3');
     if (titleArea && !document.getElementById('bulkDeleteBtn')) {
         titleArea.classList.add('flex', 'items-center');
         const btn = document.createElement('button');
         btn.id = 'bulkDeleteBtn';
-        btn.className = "ml-4 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[11px] font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer tracking-wider";
+        btn.className = "ml-4 px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1.5 cursor-pointer";
         btn.innerHTML = "🗑️ 批量删除选中";
         btn.onclick = window.bulkDeleteSelected;
         titleArea.appendChild(btn);
     }
 
-    // 过滤掉黑名单中的僵尸数据
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     AUDIT_PRODUCTS = AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
 
     AUDIT_PRODUCTS.forEach((item, index) => {
         const finalThumbUrl = ApexImageEngine.resolve(item.thumbKey, item.thumbCloudPath, item.thumbDefault);
-        const badgeCls = item.status ? "bg-emerald-500 text-white font-bold shadow-sm" : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
-        const linkBtnCls = item.isLinked ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
+        const badgeCls = item.status 
+            ? "bg-emerald-500 text-white font-bold shadow-sm" 
+            : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400";
+        
+        const linkBtnCls = item.isLinked
+            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20"
+            : "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20";
         const linkBtnText = item.isLinked ? "🔗 联动中" : "🔓 独立价";
 
         tbody.innerHTML += `
@@ -593,16 +614,19 @@ window.renderAuditTable = function() {
                 <td class="py-2 px-2 font-mono whitespace-nowrap">
                     <div class="flex items-center gap-1 flex-nowrap whitespace-nowrap">
                         <span class="${item.colorCls}">￥</span>
-                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center outline-none ${item.colorCls}" />
+                        <input type="number" value="${item.priceRmb}" onchange="onAuditPriceChange(${index}, 'rmb', this.value)" class="w-14 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-[#0f172a] dark:text-[#f8fafc] outline-none ${item.colorCls}" />
                         <span class="text-slate-400 mx-1">/</span>
                         <span class="text-blue-600 font-bold">$</span>
                         <input type="number" step="0.01" value="${item.priceUsd}" onchange="onAuditPriceChange(${index}, 'usd', this.value)" class="w-16 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 text-xs font-bold text-center text-blue-600 outline-none" />
-                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap ${linkBtnCls}">${linkBtnText}</button>
+                        <button onclick="toggleRowLinkage(${index})" class="ml-1 px-1.5 py-1 rounded border text-[10px] font-mono font-bold transition-all shrink-0 whitespace-nowrap ${linkBtnCls}" title="点击切换：汇率折算联动 / 独立填价">
+                            ${linkBtnText}
+                        </button>
                     </div>
                 </td>
                 <td class="py-2 px-2 whitespace-nowrap text-center">
                     <button onclick="toggleAuditStatus(${index})" class="px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 transition ${badgeCls}">
-                        <span>●</span><span>${item.status ? '已上架' : '已隐藏'}</span>
+                        <span>●</span>
+                        <span>${item.status ? '已上架' : '已隐藏'}</span>
                     </button>
                 </td>
                 <td class="py-3 px-4 text-right">
@@ -659,7 +683,7 @@ window.toggleAuditStatus = function(index) {
     appendLog(`>> [风控审查] 更改作品 [${AUDIT_PRODUCTS[index].title}] 上架状态 -> ${AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
 };
 
-// 单条物理销毁
+// 单条安全物理销毁
 window.forceRemoveProduct = async function(id) {
     const idx = AUDIT_PRODUCTS.findIndex(p => p.id === id);
     if (idx === -1) return;
@@ -689,7 +713,7 @@ window.forceRemoveProduct = async function(id) {
             if (f.content) {
                 let cloudDecks = JSON.parse(f.content);
                 cloudDecks = cloudDecks.filter(d => d.id !== id && !blacklist.includes(d.id));
-                await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 强制销毁下架商品: ${title} [skip ci]`, keys.gh);
+                await pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 单件强制销毁下架: ${title} [skip ci]`, keys.gh);
             }
         }
         appendLog(`>> [风控审查] 已彻底销毁作品并加入防复活黑名单: ${title}`);
@@ -732,6 +756,7 @@ window.ApexBannerManager = {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         let config = null;
         if (saved) { try { config = JSON.parse(saved); } catch(e) {} }
+        
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -814,9 +839,11 @@ window.ApexFX = {
                 const newRate = Number(data.rates.CNY).toFixed(2);
                 const isRateChanged = this.currentRate !== newRate;
                 this.currentRate = newRate;
+                
                 localStorage.setItem("APEX_FX_RATE_CACHE", JSON.stringify({ rate: this.currentRate, timestamp: Date.now() }));
                 this.updateBadge(this.currentRate, true);
                 appendLog(`>> [汇率中台] 抓取最新外汇：1 USD = ${this.currentRate} CNY`);
+                
                 if (isManual || isRateChanged) {
                     this.syncAllLinkedPrices();
                     if (isManual) alert(`✅ 最新外汇挂牌价拉取成功：1 USD = ${this.currentRate} CNY\n\n已为您自动重算所有开启了【汇率联动】的美元定价！`);
@@ -843,6 +870,7 @@ window.ApexFX = {
                 }
             });
         }
+
         if (typeof AUDIT_PRODUCTS !== "undefined" && Array.isArray(AUDIT_PRODUCTS)) {
             let productsChanged = false;
             AUDIT_PRODUCTS.forEach((item) => {
@@ -854,6 +882,7 @@ window.ApexFX = {
                     productsChanged = true;
                 }
             });
+            
             if (productsChanged) {
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
@@ -866,6 +895,7 @@ window.ApexFX = {
 window.ApexPricing = {
     isLinked: true,
     use99Rule: true,
+
     toggleLinkage: function() {
         this.isLinked = !this.isLinked;
         const btn = document.getElementById("btnToggleLink");
@@ -888,12 +918,14 @@ window.ApexPricing = {
             appendLog(`>> [定价控制] 关闭关联：双方完全独立填写。`);
         }
     },
+
     toggle99Rule: function() {
         this.use99Rule = !this.use99Rule;
         const btn = document.getElementById("btnToggle99");
         btn.innerText = `✨ .99尾数: ${this.use99Rule ? '开启' : '关闭'}`;
         btn.className = `px-3 py-1.5 rounded-lg font-bold border transition whitespace-nowrap ${this.use99Rule ? 'bg-blue-500/10 text-blue-600 border-blue-500/30' : 'bg-slate-500/10 text-slate-400 border-slate-500/30'}`;
     },
+
     onRMBChange: function(key, rmbVal) {
         if (!this.isLinked) return;
         const rmb = parseFloat(rmbVal) || 0;
@@ -902,6 +934,7 @@ window.ApexPricing = {
         const el = document.getElementById(`usd-${key}`);
         if (el) el.value = usd > 0 ? usd : "";
     },
+
     onUSDChange: function(key, usdVal) {
         if (!this.isLinked) return;
         const usd = parseFloat(usdVal) || 0;
@@ -909,6 +942,7 @@ window.ApexPricing = {
         const el = document.getElementById(`rmb-${key}`);
         if (el) el.value = rmb > 0 ? rmb : "";
     },
+
     saveAllToStorage: async function() {
         const config = {
             bundle: { rmb: document.getElementById('rmb-bundle').value, usd: document.getElementById('usd-bundle').value },
@@ -1453,13 +1487,6 @@ function initApexTooltip() {
     });
 }
 
-function getKeys() {
-    const gh = localStorage.getItem("APEX_GH_TOKEN");
-    const ds = localStorage.getItem("APEX_DS_KEY");
-    if (!gh || !ds) { window.toggleConfig(); throw new Error("请在右上角填写配置密钥!"); }
-    return { gh, ds };
-}
-
 window.toggleConfig = function() {
     const el = document.getElementById("configArea");
     if (el) {
@@ -1483,7 +1510,7 @@ window.saveKeys = function() {
     alert("✅ 系统密钥与 Gitee 金库节点参数已全量保存生效！");
 };
 
-// 👑 代码备份管理
+// 👑 快照与回溯管理 (代码物理回退)
 let currentSnapTab = 'tags';
 let currentTagsPage = 1;
 const TAGS_PER_PAGE = 8; 
@@ -1491,11 +1518,8 @@ const TAGS_PER_PAGE = 8;
 window.openRollbackModal = function() {
     const el = document.getElementById("rollbackModal");
     if (el) el.classList.remove("hidden");
-    if (currentSnapTab === 'tags') {
-        fetchTaggedCommits(true);
-    } else {
-        fetchNormalCommits(true);
-    }
+    if (currentSnapTab === 'tags') fetchTaggedCommits(true);
+    else fetchNormalCommits(true);
 };
 
 window.closeRollbackModal = function() {
@@ -1529,13 +1553,8 @@ window.switchSnapshotTab = function(tab) {
 };
 
 window.changeTagsPage = function(delta) {
-    if (delta === -1 && currentTagsPage > 1) {
-        currentTagsPage--;
-        fetchTaggedCommits();
-    } else if (delta === 1) {
-        currentTagsPage++;
-        fetchTaggedCommits();
-    }
+    if (delta === -1 && currentTagsPage > 1) { currentTagsPage--; fetchTaggedCommits(); } 
+    else if (delta === 1) { currentTagsPage++; fetchTaggedCommits(); }
 };
 
 window.createCodeSnapshot = async function() {
@@ -1548,11 +1567,7 @@ window.createCodeSnapshot = async function() {
     
     const btn = document.getElementById("btnCreateSnapshot");
     let originalText = "💾 瞬间打标";
-    if (btn) {
-        originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ 打标中...";
-        btn.disabled = true;
-    }
+    if (btn) { originalText = btn.innerHTML; btn.innerHTML = "⏳ 打标中..."; btn.disabled = true; }
 
     try {
         let sha = null;
@@ -1562,7 +1577,6 @@ window.createCodeSnapshot = async function() {
         } catch(e){}
         
         const pushRes = await pushGithubJsonFile("data/.snapshot", { timestamp: Date.now(), tag: tagName }, sha, commitMsg, token);
-        
         if (pushRes) {
             alert("✅ 成功创建永久代码标记！");
             if (tagInput) tagInput.value = "";
@@ -1573,10 +1587,7 @@ window.createCodeSnapshot = async function() {
     } catch (err) {
         alert("❌ 打标失败: " + err.message);
     } finally {
-        if (btn) {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
+        if (btn) { btn.innerHTML = originalText; btn.disabled = false; }
     }
 };
 
@@ -1595,15 +1606,12 @@ window.deleteSnapshotTag = async function(sha, shortSha, e) {
     try {
         const fileObj = await getGithubFileSafe("config/deleted_tags.json", ghToken);
         let blacklist = [];
-        if (fileObj.content) {
-            try { blacklist = JSON.parse(fileObj.content); } catch(err){}
-        }
+        if (fileObj.content) { try { blacklist = JSON.parse(fileObj.content); } catch(err){} }
         
         if (!blacklist.includes(sha)) {
             blacklist.push(sha);
             await pushGithubJsonFile("config/deleted_tags.json", blacklist, fileObj.sha, `🗑️ User removed tag [${shortSha}] from permanent list [skip ci]`, ghToken);
         }
-        
         alert(`✅ 标记 [#${shortSha}] 已成功取消！`);
         fetchTaggedCommits(true);
     } catch(err) {
@@ -1633,9 +1641,7 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
         if (!res.ok) throw new Error("无法读取提交记录");
         
         let blacklist = [];
-        if (blacklistRes.content) {
-            try { blacklist = JSON.parse(blacklistRes.content); } catch(e){}
-        }
+        if (blacklistRes.content) { try { blacklist = JSON.parse(blacklistRes.content); } catch(e){} }
         
         const commits = await res.json();
         container.innerHTML = "";
@@ -1655,7 +1661,6 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
         if(btnNext) btnNext.disabled = (commits.length < TAGS_PER_PAGE);
 
         const filteredCommits = commits.filter(c => !blacklist.includes(c.sha));
-
         if (filteredCommits.length === 0) {
             container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono leading-relaxed">本页的标记均已被您取消。<br>请点击【下一页】查看更多历史。</div>`;
             return;
@@ -1664,31 +1669,26 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
         filteredCommits.forEach((item, idx) => {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
-            
             container.innerHTML += `
                 <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 shadow-sm transition hover:shadow-md mb-2">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
-                            <span class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400">[#${shaShort}]</span>
-                            <span class="text-[10px] text-slate-500 font-mono">${timeStr}</span>
-                            <span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1 tracking-widest shadow-sm shrink-0">📌 永久保留</span>
+                            <span class="font-bold text-blue-600 dark:text-blue-400">[#${shaShort}]</span>
+                            <span class="text-[10px] text-slate-500">${timeStr}</span>
+                            <span class="text-[9px] bg-blue-500 text-white px-1.5 py-0.5 rounded ml-1 tracking-widest shadow-sm">📌 永久保留</span>
                         </div>
-                        <div class="text-xs font-mono truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
+                        <div class="text-xs truncate text-blue-700 dark:text-blue-300 font-bold" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
-                        <button onclick="deleteSnapshotTag('${item.sha}', '${shaShort}', event)" class="px-2.5 py-1.5 border border-rose-200 dark:border-rose-800/50 rounded-lg text-xs font-mono font-bold hover:bg-rose-100 dark:hover:bg-rose-900 text-rose-500 dark:text-rose-400 transition bg-white dark:bg-slate-800 shadow-sm" title="取消此标记，不再显示">
-                            取消标记
-                        </button>
-                        <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-blue-300 dark:border-blue-600 rounded-lg text-xs font-mono font-bold hover:bg-blue-100 dark:hover:bg-blue-800 transition bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm">
+                        <button onclick="deleteSnapshotTag('${item.sha}', '${shaShort}', event)" class="px-2.5 py-1.5 border border-rose-200 rounded-lg text-xs font-bold hover:bg-rose-100 text-rose-500 transition shadow-sm">取消标记</button>
+                        <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-blue-300 rounded-lg text-xs font-bold hover:bg-blue-100 transition text-blue-600 shadow-sm">
                             ${(currentTagsPage === 1 && idx === 0) ? '当前状态' : '还原'}
                         </button>
                     </div>
                 </div>
             `;
         });
-    } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`;
-    }
+    } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`; }
 };
 
 window.fetchNormalCommits = async function(forceRefresh = false) {
@@ -1697,7 +1697,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     container.innerHTML = `<div class="text-center text-xs text-slate-400 py-6 font-mono animate-pulse">正在获取最近30条流水记录...</div>`;
     
     const ghToken = localStorage.getItem("APEX_GH_TOKEN");
-    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono leading-relaxed">缺少 GitHub Token。</div>`;
+    if (!ghToken) return container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4">缺少 GitHub Token。</div>`;
 
     try {
         const ts = forceRefresh ? `&_t=${Date.now()}` : '';
@@ -1711,26 +1711,24 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
             const shaShort = item.sha.slice(0, 7);
             const timeStr = new Date(item.commit.committer.date).toLocaleString('zh-CN', { hour12: false });
             const isRollback = item.commit.message.includes("真实代码还原") || item.commit.message.includes("回溯");
-            const bgCls = isRollback ? "bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800" : "bg-slate-50 dark:bg-slate-900/50 border border-transparent";
+            const bgCls = isRollback ? "bg-purple-50 border border-purple-200" : "bg-slate-50 border border-transparent";
 
             container.innerHTML += `
                 <div class="rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${bgCls} mb-2 transition hover:shadow-md">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
-                            <span class="font-mono text-xs font-bold text-amber-500">[#${shaShort}]</span>
-                            <span class="text-[10px] text-slate-400 font-mono">${timeStr}</span>
+                            <span class="font-bold text-amber-500">[#${shaShort}]</span>
+                            <span class="text-[10px] text-slate-400">${timeStr}</span>
                         </div>
-                        <div class="text-xs font-mono truncate ${isRollback ? 'text-purple-600 dark:text-purple-400 font-bold' : 'text-slate-800 dark:text-slate-300'}" title="${item.commit.message}">${item.commit.message}</div>
+                        <div class="text-xs truncate ${isRollback ? 'text-purple-600 font-bold' : 'text-slate-800'}" title="${item.commit.message}">${item.commit.message}</div>
                     </div>
-                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-mono font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm">
+                    <button onclick="revertToSelectedCommit('${item.sha}', '${shaShort}')" class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 transition shrink-0 shadow-sm">
                         ${idx === 0 ? '当前状态' : '还原'}
                     </button>
                 </div>
             `;
         });
-    } catch (err) {
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`;
-    }
+    } catch (err) { container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`; }
 };
 
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
@@ -1755,7 +1753,6 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         const treeData = await treeRes.json();
         const filesToRestore = treeData.tree.filter(item => item.type === 'blob');
         const totalFiles = filesToRestore.length;
-        
         let successCount = 0;
         
         for (let i = 0; i < totalFiles; i++) {
@@ -1804,7 +1801,9 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
     }
 };
 
-// 👑 终极 AI 引擎：深度生成内部页差异化结构 + 匹配顶级商业实拍图库
+// ==========================================
+// 👑 终极 AI 引擎：深度生成内部差异化骨架 + 顶级实拍图库
+// ==========================================
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1827,12 +1826,12 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            appendLog(`🤖 [大脑中枢]: 收到深度生成指令，正在构建差异化的业务骨架与文案...`);
+            appendLog(`🤖 [大脑中枢]: 收到深度生成指令，正在构建完全不重复的页面骨架与文案...`);
             
-            // 👑 深度生成结构：不仅要外壳，连里面的 5 个子页面数据都要 AI 一次性想好！
+            // 👑 强制要求 AI 生成 slides 数组，实现内部结构完全差异化
             const aiPrompt = `你是一个顶尖SaaS产品经理。请自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
 请严格返回JSON数组格式，绝不包含任何 markdown 符号。
-要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串), "slides" (生成5个差异化的页面骨架对象数组，包含: "title" 标题, "sub" 副标题, "kpi" 百分比或金额数据, "label" 指标名称, "progress" 进度数字)。
+要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串), "slides" (如果是ppt或excel，请务必生成5个差异化的页面骨架对象数组，每个对象包含: "title" 标题, "sub" 副标题, "kpi" 百分比或金额数据, "label" 指标名称, "progress" 进度数字)。
 样例：[{"type":"ppt", "name":"星舰战略舱", "category":"5 SLIDES", "priceRmb":129, "priceUsd":"19.99", "slides":[{"title":"执行摘要","sub":"核心痛点与解法","kpi":"+200%","label":"增长率","progress":85}]}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
@@ -1850,7 +1849,7 @@ window.triggerSwarmAutonomousAction = async function() {
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🎨 [视觉策划部]: 正在从顶级商业图库匹配 95分+ 质感的实景封面...`);
 
-            // 👑 顶级无损实拍图库，摒弃辣眼睛的 AI 生成乱码图
+            // 👑 采用精选 Unsplash 高端商业实拍图，杜绝劣质画风
             const premiumImages = {
                 ppt: [
                     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
@@ -1888,11 +1887,11 @@ window.triggerSwarmAutonomousAction = async function() {
                     thumbCloudPath: imgUrl, thumbDefault: imgUrl,
                     priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
                     isLinked: true, status: true,
-                    slides: t.slides || null // 保存深度数据供前台解析
+                    slides: t.slides || null // 👑 核心：保留并注入差异化的单页骨架内容
                 };
             });
 
-            // 👑 安全队列锁定：合并写入时排除掉那些被删除的“死刑黑名单”
+            // 等待队列解锁，防止并发写入冲突
             while(isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
             isCloudSyncing = true;
             
@@ -1906,16 +1905,17 @@ window.triggerSwarmAutonomousAction = async function() {
                     decksSha = f.sha;
                 } catch(e){}
                 
+                // 剔除曾经被删除的脏数据
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
-                await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 上架 3 款差异化产品 [skip ci]", keys.gh);
+                await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 上架 3 款深度差异化产品 [skip ci]", keys.gh);
 
                 if (typeof AUDIT_PRODUCTS !== "undefined") {
                     newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                     if (typeof renderAuditTable === "function") renderAuditTable();
                 }
-                appendLog(`✅ [系统广播]: 自动化生产完毕！商品已成功写入云端数据库！`);
+                appendLog(`✅ [系统广播]: 自动化生产完毕！高质量结构已写入大盘！`);
             } finally {
                 isCloudSyncing = false;
             }
