@@ -106,14 +106,11 @@
         init: async function() {
             let displayProducts = [];
             
-            // 👑 终极前后台同步引擎：前台直接镜像后台风控大盘的数据源！
             const localAudit = localStorage.getItem('APEX_AUDIT_PRODUCTS');
             
             if (localAudit) {
-                // 如果进过后台，直接 100% 提取后台大盘数据（包含你改过的价格、封图、上下架状态）
                 displayProducts = JSON.parse(localAudit);
             } else {
-                // 兜底逻辑：首次访问时
                 displayProducts = [...this.baseProducts];
                 try {
                     const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
@@ -128,13 +125,13 @@
                 displayProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
             }
 
-            // 👑 过滤掉后台被标记为“下架隐藏”的商品
             displayProducts = displayProducts.filter(p => p.status !== false);
 
             this.render(displayProducts);
         },
         render: function(products) {
-            const ppts = products.filter(p => !p.type || p.type === 'ppt' || (p.category && p.category.toLowerCase().includes('ppt')) || p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech');
+            // 👑 精准修复：移除原本错误的 !p.type，严格按 ID 或 type 字段分类
+            const ppts = products.filter(p => p.type === 'ppt' || (p.category && p.category.toLowerCase().includes('ppt')) || p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech');
             const excels = products.filter(p => p.type === 'excel' || (p.category && p.category.toLowerCase().includes('excel')) || p.id === 'excel-roi');
             const words = products.filter(p => p.type === 'word' || (p.category && p.category.toLowerCase().includes('word')) || p.id === 'word-ats');
 
@@ -156,7 +153,6 @@
             }
             
             items.forEach(p => {
-                // 兼容读取后台的动态封图
                 let finalImg = p.thumbCloudPath || p.thumb || p.thumbnail || p.thumbDefault || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80";
                 if (p.thumbKey) {
                     const localCache = localStorage.getItem("APEX_IMG_CACHE_" + p.thumbKey);
