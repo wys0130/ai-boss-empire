@@ -95,7 +95,6 @@
                 </div>
             </div>
 
-            <!-- 👑 高频 Office 插入组件 -->
             <div class="flex items-center gap-1.5 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50 shadow-inner">
                 <button onclick="document.execCommand('insertHTML', false, '<div contenteditable=\'true\' class=\'p-3 border border-blue-500/50 bg-blue-500/10 rounded min-w-[120px] min-h-[40px] inline-block m-2 shadow text-white\'>双击编辑文本框</div>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-blue-600/20 text-slate-300 hover:text-blue-400 transition group" title="插入排版文本框">
                     <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h8M4 18h16"></path></svg>
@@ -113,10 +112,6 @@
                 <button onclick="document.execCommand('insertHTML', false, '<table class=\'w-full border-collapse border border-slate-600 text-sm my-3\'><tr><th class=\'border border-slate-600 p-2 bg-slate-800 text-white\'>标题1</th><th class=\'border border-slate-600 p-2 bg-slate-800 text-white\'>标题2</th></tr><tr><td class=\'border border-slate-600 p-2 text-white\'>数据A</td><td class=\'border border-slate-600 p-2 text-white\'>数据B</td></tr></table>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-fuchsia-600/20 text-slate-300 hover:text-fuchsia-400 transition group" title="插入数据表格">
                     <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                     <span class="text-[10px] font-bold mt-0.5">插表格</span>
-                </button>
-                <button onclick="alert('数据面板尚未挂载可视化插件')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-rose-600/20 text-slate-300 hover:text-rose-400 transition group" title="插入动态图表">
-                    <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                    <span class="text-[10px] font-bold mt-0.5">插图表</span>
                 </button>
             </div>
 
@@ -189,11 +184,7 @@
     <script>
         const DECK_PRESETS = {
             aerotech: {
-                brand: "AeroTech",
-                titleName: "AeroTech 创投图解版",
-                badge: "15 SLIDES · TECH BLUE",
-                total: 15,
-                defaultBg: "tech",
+                brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
                 slides: [
                     { id: 1, title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
                     { id: 2, title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
@@ -251,7 +242,6 @@
                                 })
                             };
                             
-                            // 更新价格标签
                             const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
                             document.getElementById('priceUsdLabel').innerText = priceStr;
                             document.getElementById('exportBoxPrice').innerText = priceStr;
