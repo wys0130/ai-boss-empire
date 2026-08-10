@@ -95,6 +95,7 @@
                 </div>
             </div>
 
+            <!-- 高频 Office 插入组件 -->
             <div class="flex items-center gap-1.5 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50 shadow-inner">
                 <button onclick="document.execCommand('insertHTML', false, '<div contenteditable=\'true\' class=\'p-3 border border-blue-500/50 bg-blue-500/10 rounded min-w-[120px] min-h-[40px] inline-block m-2 shadow text-white\'>双击编辑文本框</div>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-blue-600/20 text-slate-300 hover:text-blue-400 transition group" title="插入排版文本框">
                     <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h8M4 18h16"></path></svg>
@@ -205,7 +206,7 @@
             "team": "bg-photo-team text-white", "mesh": "bg-style-mesh text-white"
         };
 
-        // 👑 核心修复：读取 AI 深度生成的差异化内容
+        // 👑 核心：动态加载 AI 深度差异化结构，完美渲染专属内页
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
@@ -213,7 +214,7 @@
 
             if (!preset && key.startsWith('AI-')) {
                 try {
-                    const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+                    const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
                     if (res.ok) {
                         const aiDecks = await res.json();
                         const targetAiDeck = aiDecks.find(d => d.id === key);
@@ -232,6 +233,7 @@
                                     const aiSec = aiSlides[i] || {};
                                     return {
                                         id: i + 1, 
+                                        // 注入 AI 生成的独家标题与文案
                                         title: aiSec.title || `${targetAiDeck.name} - 核心模块 ${i+1}`, 
                                         sub: aiSec.sub || "此页面由 AI 智能体自动构建骨架，请双击输入具体商业内容。", 
                                         kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
@@ -344,6 +346,7 @@
                 </div>
             `;
 
+            // GSAP 弹性入场
             if (window.gsap) {
                 gsap.fromTo(canvas, 
                     { opacity: 0, y: 20, scale: 0.98 }, 
