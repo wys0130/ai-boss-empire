@@ -105,35 +105,41 @@
         ],
         init: async function() {
             let displayProducts = [];
-            
             const localAudit = localStorage.getItem('APEX_AUDIT_PRODUCTS');
+            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
             
+            // 🚀 1. 立刻用本地/默认数据渲染，消灭加载白屏延迟，实现秒开！
             if (localAudit) {
                 displayProducts = JSON.parse(localAudit);
             } else {
                 displayProducts = [...this.baseProducts];
+            }
+            
+            let safeProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
+            safeProducts = safeProducts.filter(p => p.status !== false);
+            this.render(safeProducts);
+
+            // ☁️ 2. 如果之前没有从后台提取过数据，再去云端拉取更新
+            if (!localAudit) {
                 try {
                     const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
                     if (res.ok) {
                         const aiData = await res.json();
                         if (Array.isArray(aiData) && aiData.length > 0) {
-                            displayProducts = [...displayProducts, ...aiData];
+                            displayProducts = [...this.baseProducts, ...aiData];
+                            safeProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
+                            safeProducts = safeProducts.filter(p => p.status !== false);
+                            this.render(safeProducts); // 拉取到了新数据再重新渲染一次
                         }
                     }
                 } catch(e) {}
-                const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-                displayProducts = displayProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
             }
-
-            displayProducts = displayProducts.filter(p => p.status !== false);
-
-            this.render(displayProducts);
         },
         render: function(products) {
-            // 👑 精准修复：移除原本错误的 !p.type，严格按 ID 或 type 字段分类
-            const ppts = products.filter(p => p.type === 'ppt' || (p.category && p.category.toLowerCase().includes('ppt')) || p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech');
-            const excels = products.filter(p => p.type === 'excel' || (p.category && p.category.toLowerCase().includes('excel')) || p.id === 'excel-roi');
-            const words = products.filter(p => p.type === 'word' || (p.category && p.category.toLowerCase().includes('word')) || p.id === 'word-ats');
+            // 👑 精准分类逻辑：严格按照 type 或特定原厂 id 划分，杜绝乱入
+            const ppts = products.filter(p => p.type === 'ppt' || (!p.type && (p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech')));
+            const excels = products.filter(p => p.type === 'excel' || (!p.type && p.id === 'excel-roi'));
+            const words = products.filter(p => p.type === 'word' || (!p.type && p.id === 'word-ats'));
 
             this.renderGrid('mall-ppt-grid', ppts, 'orange', 'editor.html');
             this.renderGrid('mall-excel-grid', excels, 'emerald', 'excel-editor.html');
@@ -162,13 +168,15 @@
                 const rmb = p.priceRmb || pricing.ppt.rmb;
                 const usd = p.priceUsd || pricing.ppt.usd || 9.99;
                 const titleZh = p.title || p.name;
-                const titleEn = p.titleEn || titleZh;
+                
+                // 👑 自动兜底英文翻译机制：如果 AI 没生成英文标题，就套用商务格式
+                const titleEn = p.titleEn || (p.id.startsWith('AI-') ? 'Premium ' + (p.type ? p.type.toUpperCase() : 'PRO') + ' Template' : titleZh);
                 
                 let catZh = '精选模板';
                 if (p.category) {
                     catZh = p.category.includes('·') ? p.category.split('·')[1].trim() : p.category;
                 }
-                const catEn = p.categoryEn || 'Premium Model';
+                const catEn = p.categoryEn || (p.id.startsWith('AI-') ? 'AI Generated Model' : 'Premium Model');
 
                 const textCol = themeColor === 'blue' ? 'text-blue-600' : (themeColor === 'emerald' ? 'text-emerald-600' : (themeColor === 'orange' ? 'text-orange-500' : 'text-indigo-600'));
                 const badgeGrad = themeColor === 'blue' ? 'from-blue-500 to-indigo-500' : (themeColor === 'emerald' ? 'from-emerald-500 to-teal-500' : (themeColor === 'orange' ? 'from-orange-500 to-red-500' : 'from-indigo-500 to-purple-500'));
