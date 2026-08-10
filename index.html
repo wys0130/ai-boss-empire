@@ -104,10 +104,11 @@
             { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
         ],
         init: async function() {
-            let displayProducts = [...this.baseProducts];
+            // 👑 防僵尸：坚决先以原厂 5 个为主，不去读可能损坏的 localStorage 数组
+            let displayProducts = JSON.parse(JSON.stringify(this.baseProducts));
             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
             
-            // 👑 强力接驳云端 AI 数据，物理拦截黑名单
+            // 强力接驳云端 AI 数据，物理拦截黑名单
             try {
                 const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
                 if (res.ok) {
@@ -117,25 +118,28 @@
                             if (aiItem.id && aiItem.id.startsWith('AI-') && !blacklist.includes(aiItem.id)) {
                                 aiItem.titleEn = aiItem.titleEn || ('Premium ' + (aiItem.type ? aiItem.type.toUpperCase() : 'PRO') + ' Template');
                                 aiItem.categoryEn = aiItem.categoryEn || 'AI Generated Model';
-                                displayProducts.push(aiItem);
+                                if (!displayProducts.find(p => p.id === aiItem.id)) {
+                                    displayProducts.push(aiItem);
+                                }
                             }
                         });
                     }
                 }
-            } catch(e) { console.log("Fetch AI decks failed", e); }
+            } catch(e) {}
 
-            // 👑 覆盖在后台设置的本地价格和状态
-            const localAudit = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-            displayProducts.forEach(p => {
-                const lp = localAudit.find(l => l.id === p.id);
-                if (lp) {
-                    p.priceRmb = lp.priceRmb;
-                    p.priceUsd = lp.priceUsd;
-                    p.status = lp.status; 
-                }
-            });
+            // 覆盖在后台设置的本地价格和状态
+            try {
+                const localAudit = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+                displayProducts.forEach(p => {
+                    const lp = localAudit.find(l => l.id === p.id);
+                    if (lp) {
+                        if (lp.priceRmb !== undefined) p.priceRmb = lp.priceRmb;
+                        if (lp.priceUsd !== undefined) p.priceUsd = lp.priceUsd;
+                        if (lp.status !== undefined) p.status = lp.status; 
+                    }
+                });
+            } catch(e) {}
 
-            // 过滤掉被隐藏的商品
             const safeProducts = displayProducts.filter(p => p.status !== false);
             this.render(safeProducts);
         },
