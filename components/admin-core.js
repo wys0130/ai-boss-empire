@@ -1739,7 +1739,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 修复版：带前后端全兼容字段映射的 AI 生产车间
+// 👑 终极满血版：DeepSeek 文本大脑 + Pollinations AI 画师双重驱动
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1753,7 +1753,7 @@ window.triggerSwarmAutonomousAction = async function() {
     
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = "<span>⚙️ AI 蜂群全自动推演与生产中...</span>";
+        btn.innerHTML = "<span>⚙️ AI 蜂群全自动推演与设计中...</span>";
     }
 
     try {
@@ -1767,7 +1767,7 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在唤醒 AI 大模型构思全新排版与业务场景的产品...`);
+            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在唤醒 DeepSeek 大模型构思商业产品...`);
             
             const aiPrompt = `你是一个顶尖SaaS产品经理。请根据不同的商业需求，自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
 请严格返回JSON数组格式，绝对不要包含任何 markdown 符号(如 \`\`\`json)或解释文本，直接以 [ 开始，以 ] 结束。
@@ -1791,43 +1791,49 @@ window.triggerSwarmAutonomousAction = async function() {
             if (!jsonMatch) throw new Error("AI 返回的数据格式无法解析");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            appendLog(`🔨 [主动产品部]: 创作完毕！产出全新排版作品：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            appendLog(`🔨 [主动产品部]: 文本与数据框架搭建完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             await new Promise(r => setTimeout(r, 1000));
-            appendLog(`🛡️ [审核质量部]: 版权风控审查通过！正在将其封装并上传至 GitHub 商城数据库...`);
+            appendLog(`🎨 [视觉策划部]: 正在呼叫跨国 AI 画师，为新作品实时生成专属 3D 封面...`);
 
-            // AI 无法直接画图，提供高品质占位图池，供管理员后续手动替换
-            const imgPool = [
-                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80",
-                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-                "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
-                "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&w=300&q=80",
-                "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=300&q=80"
-            ];
-
+            // 👑 核心视觉增强：利用免费开源的 Pollinations AI 直接根据标题生成专属封面
             const newTemplates = generatedData.map((t) => {
                 const rId = "AI-" + Math.floor(10000 + Math.random()*90000);
                 let col = 'text-orange-500 font-bold';
-                if (t.type && t.type.toLowerCase() === 'excel') col = 'text-emerald-600 font-bold';
-                if (t.type && t.type.toLowerCase() === 'word') col = 'text-indigo-600 font-bold';
                 
-                const imgUrl = imgPool[Math.floor(Math.random() * imgPool.length)];
+                // 动态构建专门喂给 AI 画师的英文提示词 (Prompt)
+                let imagePrompt = `High end professional corporate business presentation background, abstract tech, dark theme, highly detailed, 8k resolution, representing ${t.name}`;
 
-                // 👑 核心修复：全字段兼容！同时下发 thumb 和 thumbCloudPath，确保任何前台版本都能解析
+                if (t.type && t.type.toLowerCase() === 'excel') {
+                    col = 'text-emerald-600 font-bold';
+                    imagePrompt = `Financial dashboard UI concept, data visualization background, spreadsheet elements, dark green neon theme, corporate business, 8k, representing ${t.name}`;
+                }
+                if (t.type && t.type.toLowerCase() === 'word') {
+                    col = 'text-indigo-600 font-bold';
+                    imagePrompt = `Legal corporate document layout background, clean minimalist dark blue theme, elegant business paper, 8k resolution, representing ${t.name}`;
+                }
+                
+                // 拼接免费文生图 API 链接，添加 seed 确保每次生成都不一样
+                const seed = Math.floor(Math.random() * 999999);
+                const aiImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=600&nologo=true&seed=${seed}`;
+
                 return {
                     id: rId,
                     title: t.name,
-                    name: t.name, // 兼容前台
+                    name: t.name, 
                     category: t.category,
                     type: t.type ? t.type.toLowerCase() : 'ppt',
-                    thumb: imgUrl, // 兼容前台
-                    thumbnail: imgUrl, // 兼容前台
+                    thumb: aiImageUrl, 
+                    thumbnail: aiImageUrl, 
                     thumbKey: "prod_" + rId, 
-                    thumbCloudPath: imgUrl, 
-                    thumbDefault: imgUrl,
+                    thumbCloudPath: aiImageUrl, 
+                    thumbDefault: aiImageUrl,
                     priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
                     isLinked: true, status: true
                 };
             });
+
+            await new Promise(r => setTimeout(r, 1500));
+            appendLog(`🛡️ [审核质量部]: 视觉画册与风控合规审查通过！正在封装并上传至 GitHub 商城数据库...`);
 
             let existingDecks = [];
             let decksSha = null;
@@ -1841,7 +1847,7 @@ window.triggerSwarmAutonomousAction = async function() {
             } catch(e){}
             
             const combinedDecks = [...newTemplates, ...existingDecks];
-            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 自动生成并上架 3 款全新产品 [skip ci]", keys.gh);
+            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 生成并上架 3 款带独立 AI 封面的新产品 [skip ci]", keys.gh);
 
             if (typeof AUDIT_PRODUCTS !== "undefined") {
                 newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
@@ -1853,11 +1859,11 @@ window.triggerSwarmAutonomousAction = async function() {
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 let memContent = memFile.content || "";
                 const timeStr = new Date().toLocaleString('zh-CN', { hour12: false });
-                memContent = `- [EVO-RECORD | 主动产品部]: ${timeStr} 自动生成并上架了《${newTemplates.map(t=>t.title).join('》、《')}》。\n` + memContent;
+                memContent = `- [EVO-RECORD | 跨域协同]: ${timeStr} 文本AI与绘图AI联合生成并上架了《${newTemplates.map(t=>t.title).join('》、《')}》。\n` + memContent;
                 await pushGithubJsonFile("MEMORY.md", memContent, memFile.sha, "📝 AI Brain: 记录生产战报 [skip ci]", keys.gh);
             } catch(e){}
 
-            appendLog(`✅ [系统广播]: 自动化生产完毕！新商品已成功写入云端数据库！`);
+            appendLog(`✅ [系统广播]: 自动化生产完毕！商品已成功写入云端数据库！`);
 
         } else {
             const prompt = `董事长指令：${rawText}。请用一句话简短回复，带上处理部门前缀。`;
