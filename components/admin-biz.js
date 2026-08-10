@@ -1,6 +1,6 @@
-// ==========================================
-// APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
-// ==========================================
+/**
+ * APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
+ */
 
 window.ApexImageEngine = {
     cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
@@ -172,7 +172,7 @@ window.ApexUserManager = {
             emailjs.init(pkey);
             emailjs.send(sid, tid, { to_email: targetEmail, verification_code: code })
             .then(() => { alert(`📧 【真实发信成功】\n已向 [${targetEmail}] 成功投递真实邮件码！请查收。`); this.openVerifyModal(); })
-            .catch(() => { alert(`⚠️ EmailJS 接口连接失败，已启用标准安全信道。\n为方便演示，生成验证码为：【 ${code} 】`); this.openVerifyModal(); });
+            .catch(() => { alert(`⚠️ EmailJS 接口连接失败，已启用标准安全信道。\n为方便演示核验，当前生成验证码为：【 ${code} 】`); this.openVerifyModal(); });
         } else {
             alert(`📧 【发信网关已触发】\n当前系统尚未填入 EmailJS 接口参数，已启用安全校验链路！\n\n本次验证码为：【 ${code} 】`);
             this.openVerifyModal();
@@ -244,9 +244,9 @@ window.ApexUserManager = {
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
-                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">${user.status ? '封禁' : '解封'}</button>
-                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">验证</button>
-                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">销毁</button>
+                        <button onclick="window.ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">${user.status ? '封禁' : '解封'}</button>
+                        <button onclick="window.ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">验证</button>
+                        <button onclick="window.ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">销毁</button>
                     </div>
                 </div>
             `;
@@ -769,4 +769,122 @@ window.toggleAuditStatus = function(index) {
     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
     window.renderAuditTable();
     window.appendLog(`>> [风控审查] 更改作品 [${window.AUDIT_PRODUCTS[index].title}] 上架状态 -> ${window.AUDIT_PRODUCTS[index].status ? '已上架' : '下架隐藏'}`);
+};
+
+window.DEFAULT_MANIFEST_TASKS = [
+    { id: "TASK-101", title: "配置海外主力 Lemon Squeezy 结账网关", notes: "用极简代码嵌入 Checkout", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
+    { id: "TASK-102", title: "国内临时过渡方案：引流至『爱发电』免签约", notes: "检测中国 IP 时购买按钮自动变爱发电跳转", stage: "STAGE_1_MVP_GLOBAL", department: "施工工程部", status: "DONE" },
+    { id: "TASK-201", title: "国内正规军升级：广州个体户执照与对公参数", notes: "办个体户无需实际租用办公楼", stage: "STAGE_2_CN_UPGRADE", department: "董事长", status: "IN_PROGRESS" },
+    { id: "TASK-203", title: "智能判断多模态设计组，建立每日自动生成模版流水线", notes: "AI 每日印钞：研发多样式 PPT/Excel 模版", stage: "STAGE_2_CN_UPGRADE", department: "主动产品部", status: "TODO" }
+];
+
+window.loadTasksManifest = async function() {
+    const listEl = document.getElementById('manifestList');
+    if (!listEl) return;
+    try {
+        const localCache = localStorage.getItem("APEX_TASKS_CACHE");
+        if (localCache) {
+            window.rawManifestTasks = JSON.parse(localCache);
+            window.renderManifestTasks();
+            return;
+        }
+        const keys = window.getKeysSafe();
+        if (keys && keys.gh) {
+            const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            if (fileObj.content) {
+                const manifest = JSON.parse(fileObj.content);
+                window.rawManifestTasks = (manifest.tasks && manifest.tasks.length > 0) ? manifest.tasks : JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+                window.renderManifestTasks();
+                return;
+            }
+        }
+        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+        window.renderManifestTasks();
+    } catch (err) {
+        window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+        window.renderManifestTasks();
+    }
+};
+
+window.resetManifestToDefault = async function() {
+    if (!confirm("确定将所有阶段工单重置为初始待办进度 (TODO) 吗？")) return;
+    window.rawManifestTasks = JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
+    localStorage.setItem("APEX_TASKS_CACHE", JSON.stringify(window.rawManifestTasks));
+    window.renderManifestTasks();
+    window.appendLog(">> [进度书] 已将工单重置为初始待办进度！", "text-emerald-500");
+    try {
+        const keys = window.getKeysSafe();
+        if (keys.gh) {
+            const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            const manifest = { summary: { completed: 2, todo: 2, total_tasks: 4 }, tasks: window.rawManifestTasks, updated_at: new Date().toISOString().slice(0, 10) };
+            await window.pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, "🔄 Reset tasks to realistic default [skip ci]", keys.gh);
+            alert("✅ 云端 GitHub 仓库及页面工单已全部重置！");
+            return;
+        }
+    } catch(e) {}
+    alert("✅ 本地工单已完成重置！");
+};
+
+window.filterManifest = function(stageKey) {
+    window.currentManifestFilter = stageKey;
+    document.querySelectorAll('.manifest-tab').forEach(btn => btn.className = "manifest-tab px-3 py-1 rounded-lg text-slate-400 hover:text-slate-600");
+    const targetBtn = window.event?.target;
+    if (targetBtn) targetBtn.className = "manifest-tab px-3 py-1 rounded-lg bg-blue-600 text-white font-bold";
+    window.renderManifestTasks();
+};
+
+window.renderManifestTasks = function() {
+    const listEl = document.getElementById('manifestList');
+    if (!listEl) return;
+    listEl.innerHTML = "";
+    const filtered = window.currentManifestFilter === 'ALL' ? window.rawManifestTasks : window.rawManifestTasks.filter(t => t.stage === window.currentManifestFilter || (!t.stage && window.currentManifestFilter === 'ALL'));
+    if (filtered.length === 0) { listEl.innerHTML = `<div class="text-center text-xs text-slate-500 py-4 col-span-full font-mono">该阶段无任务</div>`; return; }
+
+    filtered.forEach(task => {
+        const isDone = task.status === 'DONE';
+        const isInProg = task.status === 'IN_PROGRESS';
+        let dotCls = isDone ? "bg-emerald-500" : (isInProg ? "bg-amber-400 animate-pulse" : "bg-slate-400");
+        let statusText = isDone ? "已达成" : (isInProg ? "执行中" : "待落实");
+        let btnCls = isDone ? "bg-slate-700 hover:bg-slate-600 text-slate-200" : "bg-blue-600 hover:bg-blue-500 text-white shadow-sm";
+        
+        listEl.innerHTML += `
+            <div class="saas-card rounded-xl p-4 flex flex-col justify-between transition hover:border-blue-500 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                <div>
+                    <div class="flex items-center justify-between text-[10px] font-mono mb-1.5 text-slate-500 dark:text-slate-400">
+                        <span class="font-bold text-blue-600 dark:text-blue-500">[${task.id}] · ${task.department.split('&')[0].trim()}</span>
+                        <span class="flex items-center gap-1 font-bold"><i class="w-1.5 h-1.5 rounded-full ${dotCls} inline-block"></i>${statusText}</span>
+                    </div>
+                    <span class="text-xs font-bold truncate mb-1 block text-slate-900 dark:text-slate-100">${task.title}</span>
+                    <span class="text-[11px] text-slate-500 font-mono truncate block">${task.notes || '暂无说明'}</span>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end text-xs font-mono">
+                    <button onclick="window.toggleTaskStatus('${task.id}')" class="px-4 py-1.5 rounded-lg font-bold transition ${btnCls}">${isDone ? "↩ 撤销" : "✓ 达成"}</button>
+                </div>
+            </div>
+        `;
+    });
+};
+
+window.toggleTaskStatus = async function(taskId) {
+    const task = window.rawManifestTasks.find(t => t.id === taskId);
+    if (!task) return;
+    task.status = task.status === 'DONE' ? 'TODO' : 'DONE';
+    localStorage.setItem("APEX_TASKS_CACHE", JSON.stringify(window.rawManifestTasks));
+    window.appendLog(`✏️ 变更工单状态 -> [${taskId}] ${task.status}`);
+    window.renderManifestTasks();
+    try {
+        const keys = window.getKeysSafe();
+        if(keys.gh) {
+            const fileObj = await window.getGithubFileSafe("TASKS_MANIFEST.json", keys.gh);
+            const manifest = JSON.parse(fileObj.content);
+            const targetInManifest = manifest.tasks.find(t => t.id === taskId);
+            if (targetInManifest) {
+                targetInManifest.status = task.status;
+                manifest.updated_at = new Date().toISOString().slice(0, 10);
+                await window.pushGithubJsonFile("TASKS_MANIFEST.json", manifest, fileObj.sha, `🎯 Toggle Task [${taskId}] -> ${task.status} [skip ci]`, keys.gh);
+                window.appendLog(`✅ 工单进度写入成功！`);
+                window.loadTasksManifest();
+            }
+        }
+    } catch (e) { window.appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500"); }
 };
