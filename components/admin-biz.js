@@ -295,7 +295,7 @@ window.ApexScheduleManager = {
                 if (document.getElementById("sched-end")) document.getElementById("sched-end").value = sched.end_hour || 8;
                 if (document.getElementById("sched-enabled")) document.getElementById("sched-enabled").value = String(sched.enabled !== false);
             }
-        } catch (e) { console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。"); }
+        } catch (e) {}
     },
     saveScheduleToCloud: async function() {
         const start = Number(document.getElementById("sched-start").value) || 0;
@@ -510,15 +510,14 @@ window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
-// 👑 绝对防爆的数据加载核心
+// 👑 终极防爆：只信原厂代码 + 云端数据，拒绝读取有毒的本地数组！
 window.loadAuditProducts = async function() {
-    // 第一道闸门：获取黑名单
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     
-    // 第二道防线：永远以原厂 5 大件作为底座，绝不被本地脏数据覆盖掉默认项！
+    // 1. 绝对强制装载 5 大原厂件，永不消失
     let finalProducts = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
 
-    // 第三步：去云端拉取 AI 新生成的模板
+    // 2. 拉取云端 AI 数据
     let cloudData = [];
     try {
         const keys = window.getKeysSafe();
@@ -529,12 +528,12 @@ window.loadAuditProducts = async function() {
             const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
             if (res.ok) cloudData = await res.json();
         }
-    } catch(e) { console.warn("拉取云端AI模板失败", e); }
+    } catch(e) {}
 
-    // 第四步：合并 AI 模板（在此处物理拦截任何在黑名单里的僵尸）
+    // 3. 严格合并云端 AI 数据，并进行物理级防僵尸拦截
     if (Array.isArray(cloudData)) {
         cloudData.forEach(item => {
-            // 只有是 AI 模板，且【绝对不在】黑名单里，才允许进入大盘！
+            // 如果这个 ID 存在于黑名单中，当场击杀，绝不进入大盘！
             if (item.id && item.id.startsWith('AI-') && !blacklist.includes(item.id)) {
                 if (!finalProducts.find(p => p.id === item.id)) {
                     let col = 'text-orange-500 font-bold';
@@ -553,19 +552,21 @@ window.loadAuditProducts = async function() {
         });
     }
 
-    // 第五步：读取本地的价格、上下架修改状态，覆盖上去
-    const localOverrides = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-    finalProducts.forEach(p => {
-        const lp = localOverrides.find(l => l.id === p.id);
-        if (lp) {
-            if(lp.priceRmb !== undefined) p.priceRmb = lp.priceRmb;
-            if(lp.priceUsd !== undefined) p.priceUsd = lp.priceUsd;
-            if(lp.isLinked !== undefined) p.isLinked = lp.isLinked;
-            if(lp.status !== undefined) p.status = lp.status;
-        }
-    });
+    // 4. 恢复用户手动改过的价格和状态 (只提取这四个字段，不碰其它结构)
+    try {
+        const localOverrides = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+        finalProducts.forEach(p => {
+            const override = localOverrides.find(o => o.id === p.id);
+            if (override) {
+                if (override.priceRmb !== undefined) p.priceRmb = override.priceRmb;
+                if (override.priceUsd !== undefined) p.priceUsd = override.priceUsd;
+                if (override.isLinked !== undefined) p.isLinked = override.isLinked;
+                if (override.status !== undefined) p.status = override.status;
+            }
+        });
+    } catch(e) {}
 
-    // 最终写入大盘并渲染
+    // 5. 将洗净的纯洁数据写入全局变量，强制渲染
     window.AUDIT_PRODUCTS = finalProducts;
     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
     window.renderAuditTable();
