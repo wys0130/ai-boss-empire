@@ -50,6 +50,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <aside class="lg:col-span-3 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📑 动态生成章节</h2>
+      <!-- 👑 绝对动态渲染，取代死板写死的 HTML 导航 -->
       <nav class="space-y-1.5 max-h-[500px] overflow-y-auto custom-scroll pr-1" id="sectionNav"></nav>
     </aside>
 
@@ -61,6 +62,7 @@
       
       <div class="a4-paper" id="previewArea">
         <div class="doc-title" contenteditable="true" id="previewTitle" oninput="syncFromPreviewTitle(this.textContent)">正在加载...</div>
+        <!-- 👑 DOM CSS 将根据 layoutType 动态变身 -->
         <div class="doc-content" contenteditable="true" id="previewContent" oninput="syncFromPreviewContent(this.textContent)">请稍候...</div>
       </div>
     </main>
@@ -98,7 +100,7 @@
 </div>
 
 <script>
-// 👑 修复：原封不动放回你最初的 9 个章节！不要删减任何一条
+// 👑 绝不再漏掉您的内容！原版 9 个强专业章节全字恢复！
 let sections = [
   { layoutType: 'title-page', title: '封面标题页', content: 'APEXWORK 企业合规管理与合规评估年度报告\n\n发布日期：2026 年度\n文档密级：企业机密\n标准：欧美企业通用 ATS 合规准则' },
   { layoutType: 'text-block', title: '执行摘要', content: '本合规性审查报告涵盖公司在财务报告、数据安全与隐私、雇佣平等、以及 ESG 环境治理等重点核心层面的现有实践及进阶建议。全部准则完全遵从 GAAP、GDPR 及 EEO 条例。' },
@@ -241,7 +243,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         let targetAiDeck = null;
         try {
             const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-            targetAiDeck = localDecks.find(d => d.id === deckId);
+            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+            targetAiDeck = localDecks.find(d => d.id === deckId && !blacklist.includes(d.id));
         } catch(e) {}
 
         if (!targetAiDeck) {
@@ -249,7 +252,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
                 if (res.ok) {
                     const decks = await res.json();
-                    targetAiDeck = decks.find(d => d.id === deckId);
+                    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                    targetAiDeck = decks.find(d => d.id === deckId && !blacklist.includes(d.id));
                 }
             } catch (e) {}
         }
