@@ -9,7 +9,66 @@ const REPO = "wys0130/ai-boss-empire";
 let activeFilterDept = "";
 let currentManifestFilter = 'ALL';
 let isCmdActive = false;
+let isCloudSyncing = false; // 队列锁，防止 GitHub 并发 409 报错
 
+// ==========================================
+// 👑 底层核心通信组件 (解决报错的根源)
+// ==========================================
+function getKeysSafe() {
+    return {
+        gh: localStorage.getItem("APEX_GH_TOKEN") || "",
+        ds: localStorage.getItem("APEX_DS_KEY") || ""
+    };
+}
+
+function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
+
+function appendLog(msg, color = "") {
+    const log = document.getElementById("historyFeed");
+    if (!log) return;
+    log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5 ${color}">> ${msg}</div>`;
+    log.scrollTop = log.scrollHeight;
+}
+
+// 强制绕过 GitHub CDN 缓存，绝对读取最新数据
+async function getGithubFileSafe(path, token) {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?_t=${Date.now()}`, { 
+        headers: { "Authorization": `token ${token}`, "If-None-Match": "" }
+    });
+    if (!res.ok) return { content: "", sha: null };
+    const data = await res.json();
+    return { content: b64_to_utf8(data.content), sha: data.sha };
+}
+
+async function pushGithubJsonFile(path, jsonObj, sha, message, token) {
+    const contentStr = typeof jsonObj === 'string' ? jsonObj : JSON.stringify(jsonObj, null, 2);
+    const payload = { message: message, content: utf8_to_b64(contentStr) };
+    if (sha) payload.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+        method: "PUT",
+        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`提交失败: ${res.status} ${res.statusText}`);
+    return await res.json();
+}
+
+async function pushGithubBinaryFile(path, base64Raw, sha, message, token) {
+    const payload = { message: message, content: base64Raw };
+    if (sha) payload.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+        method: "PUT",
+        headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json", "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`提交图片失败: ` + res.statusText);
+    return await res.json();
+}
+
+// ==========================================
+// 系统 UI 与基础模块
+// ==========================================
 window.switchAdminTab = function(tabId) {
     const tabs = ['audit', 'config', 'overview', 'swarm', 'users'];
     const titles = {
@@ -43,21 +102,17 @@ window.switchAdminTab = function(tabId) {
     const headerTitle = document.getElementById('pageHeaderTitle');
     if (headerTitle) headerTitle.innerText = titles[tabId] || '业务控制台 / APEXWORK PRO';
     
-    if (tabId === 'users' && window.ApexUserManager) {
-        ApexUserManager.initUserSection();
-    }
+    if (tabId === 'users' && window.ApexUserManager) ApexUserManager.initUserSection();
 };
 
 window.ApexImageEngine = {
     cdn: { owner: "wys0130", repo: "ai-boss-empire", branch: "main" },
-
     toCDN: function(path) {
         if (!path || path.trim() === "") return null;
         if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:image")) return path;
         const cleanPath = path.replace(/^\//, "");
         return `https://cdn.jsdelivr.net/gh/${this.cdn.owner}/${this.cdn.repo}@${this.cdn.branch}/${cleanPath}`;
     },
-
     resolve: function(assetKey, cloudPath, defaultFallback) {
         const local = localStorage.getItem("APEX_IMG_CACHE_" + assetKey);
         if (local && local.startsWith("data:image")) return local;
@@ -68,7 +123,6 @@ window.ApexImageEngine = {
         }
         return defaultFallback || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
     },
-
     uploadAndBackup: function(assetKey, repoPath, callback) {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
@@ -140,7 +194,6 @@ window.ApexUserManager = {
     userList: [],
     searchQuery: "",
     currentVerifyIdx: -1,
-
     loadUsers: async function() {
         const saved = localStorage.getItem('APEX_USER_LIST');
         this.userList = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(this.defaultUsers));
@@ -156,7 +209,6 @@ window.ApexUserManager = {
         } catch(e) {}
         this.renderUserTable();
     },
-
     saveUsers: async function() {
         localStorage.setItem('APEX_USER_LIST', JSON.stringify(this.userList));
         try {
@@ -167,14 +219,12 @@ window.ApexUserManager = {
             }
         } catch(e) {}
     },
-
     initUserSection: async function() {
         await this.loadUsers();
         let savedPwd = localStorage.getItem("APEX_ADMIN_PWD") || "8888";
         let sid = localStorage.getItem("APEX_EMAILJS_SID") || "";
         let tid = localStorage.getItem("APEX_EMAILJS_TID") || "";
         let pkey = localStorage.getItem("APEX_EMAILJS_KEY") || "";
-
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -192,25 +242,21 @@ window.ApexUserManager = {
                 }
             }
         } catch(e) {}
-
         if (document.getElementById("pwd-new-admin")) document.getElementById("pwd-new-admin").value = savedPwd;
         if (document.getElementById("emailjs-service-id")) document.getElementById("emailjs-service-id").value = sid;
         if (document.getElementById("emailjs-template-id")) document.getElementById("emailjs-template-id").value = tid;
         if (document.getElementById("emailjs-public-key")) document.getElementById("emailjs-public-key").value = pkey;
         this.renderUserTable();
     },
-
     saveAdminSecurity: async function() {
         const pwd = document.getElementById("pwd-new-admin").value.trim() || "8888";
         const sid = document.getElementById("emailjs-service-id").value.trim();
         const tid = document.getElementById("emailjs-template-id").value.trim();
         const pkey = document.getElementById("emailjs-public-key").value.trim();
-        
         localStorage.setItem("APEX_ADMIN_PWD", pwd);
         localStorage.setItem("APEX_EMAILJS_SID", sid);
         localStorage.setItem("APEX_EMAILJS_TID", tid);
         localStorage.setItem("APEX_EMAILJS_KEY", pkey);
-
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -223,25 +269,21 @@ window.ApexUserManager = {
         } catch(e) {}
         alert(`✅ 安全配置在当前设备中更新生效！\n\n主页驾驶舱口令为：【 ${pwd} 】`);
     },
-
     sendRealVerifyEmail: function(idx) {
         this.currentVerifyIdx = idx;
         const targetEmail = this.userList[idx].email;
         const code = Math.floor(100000 + Math.random() * 900000);
         localStorage.setItem("APEX_REAL_VERIFY_CODE", JSON.stringify({ code: String(code), email: targetEmail }));
-
         const sid = localStorage.getItem("APEX_EMAILJS_SID");
         const tid = localStorage.getItem("APEX_EMAILJS_TID");
         const pkey = localStorage.getItem("APEX_EMAILJS_KEY");
-
         if (sid && tid && pkey && window.emailjs) {
             emailjs.init(pkey);
             emailjs.send(sid, tid, { to_email: targetEmail, verification_code: code })
             .then(() => {
                 alert(`📧 【真实发信成功】\n已向 [${targetEmail}] 成功投递真实邮件码！请查收邮件后填入校验框。`);
                 this.openVerifyModal();
-            })
-            .catch(() => {
+            }).catch(() => {
                 alert(`⚠️ EmailJS 接口连接失败，已启用标准安全信道。\n为方便演示核验，当前生成验证码为：【 ${code} 】`);
                 this.openVerifyModal();
             });
@@ -250,19 +292,16 @@ window.ApexUserManager = {
             this.openVerifyModal();
         }
     },
-
     openVerifyModal: function() {
         const modal = document.getElementById("emailVerifyModal");
         const input = document.getElementById("verify-code-input");
         if (modal) modal.classList.remove("hidden");
         if (input) { input.value = ""; input.focus(); }
     },
-
     closeVerifyModal: function() {
         const modal = document.getElementById("emailVerifyModal");
         if (modal) modal.classList.add("hidden");
     },
-
     verifyAndBindEmail: function() {
         const input = document.getElementById("verify-code-input");
         const userVal = input ? input.value.trim() : "";
@@ -279,7 +318,6 @@ window.ApexUserManager = {
             this.closeVerifyModal();
         }
     },
-
     filterUsers: function(val) {
         this.searchQuery = val.trim();
         const clearBtn = document.getElementById("user-search-clear");
@@ -289,7 +327,6 @@ window.ApexUserManager = {
         }
         this.renderUserTable();
     },
-
     clearSearch: function() {
         this.searchQuery = "";
         const input = document.getElementById("user-search-input");
@@ -298,12 +335,10 @@ window.ApexUserManager = {
         if (clearBtn) clearBtn.classList.add("hidden");
         this.renderUserTable();
     },
-
     renderUserTable: function() {
         const tbody = document.getElementById("userTableBody");
         if (!tbody) return;
         tbody.innerHTML = "";
-
         const list = this.searchQuery 
             ? this.userList.filter(u => u.email.toLowerCase().includes(this.searchQuery.toLowerCase()) || u.id.toLowerCase().includes(this.searchQuery.toLowerCase()))
             : this.userList;
@@ -312,16 +347,10 @@ window.ApexUserManager = {
             tbody.innerHTML = `<div class="text-center py-6 text-slate-400 font-mono text-xs">没有找到相关匹配的用户记录</div>`;
             return;
         }
-
         list.forEach((user) => {
             const realIdx = this.userList.findIndex(item => item.id === user.id);
-            const statusBtnCls = user.status 
-                ? "bg-amber-600 hover:bg-amber-500 text-white shadow-sm" 
-                : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm";
-            const verifyText = user.verified 
-                ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' 
-                : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
-
+            const statusBtnCls = user.status ? "bg-amber-600 hover:bg-amber-500 text-white shadow-sm" : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm";
+            const verifyText = user.verified ? '<span class="text-emerald-500 font-bold">✓ 邮箱已认证</span>' : '<span class="text-amber-500 font-bold">⚠ 待验证</span>';
             tbody.innerHTML += `
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 mb-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg hover:border-blue-400 transition gap-3">
                     <div class="flex-1 min-w-0">
@@ -333,28 +362,20 @@ window.ApexUserManager = {
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
-                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">
-                            ${user.status ? '封禁' : '解封'}
-                        </button>
-                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">
-                            验证
-                        </button>
-                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">
-                            销毁
-                        </button>
+                        <button onclick="ApexUserManager.toggleUserStatus(${realIdx})" class="px-3 py-1.5 rounded text-[11px] font-bold transition ${statusBtnCls}">${user.status ? '封禁' : '解封'}</button>
+                        <button onclick="ApexUserManager.sendRealVerifyEmail(${realIdx})" class="px-3 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition shadow-sm">验证</button>
+                        <button onclick="ApexUserManager.deleteUser(${realIdx})" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold transition shadow-sm">销毁</button>
                     </div>
                 </div>
             `;
         });
     },
-
     toggleUserStatus: function(idx) {
         this.userList[idx].status = !this.userList[idx].status;
         this.saveUsers();
         this.renderUserTable();
         appendLog(`>> [用户中心] 账号 [${this.userList[idx].email}] 状态变更 -> ${this.userList[idx].status ? '正常' : '封禁'}`);
     },
-
     deleteUser: function(idx) {
         if (!confirm(`确定彻底销毁客户 [${this.userList[idx].email}] 的授权凭证与记录吗？`)) return;
         this.userList.splice(idx, 1);
@@ -362,24 +383,17 @@ window.ApexUserManager = {
         this.renderUserTable();
         appendLog(`>> [用户中心] 彻底销毁账号凭证完成。`);
     },
-
     restoreDefaultUsers: function() {
         if (!confirm("确定要恢复默认的一组演示成员账号吗？")) return;
         this.userList = JSON.parse(JSON.stringify(this.defaultUsers));
         this.saveUsers();
         this.renderUserTable();
     },
-
     addNewMockUser: function() {
         const em = prompt("请输入新注册客户邮箱：", "client@apexwork.cn");
         if (!em) return;
         this.userList.unshift({
-            id: "U-" + Math.floor(1000 + Math.random() * 9000),
-            email: em,
-            role: "商业授权套件 [CLIENT]",
-            verified: false,
-            date: new Date().toISOString().slice(0, 10),
-            status: true
+            id: "U-" + Math.floor(1000 + Math.random() * 9000), email: em, role: "商业授权套件 [CLIENT]", verified: false, date: new Date().toISOString().slice(0, 10), status: true
         });
         this.saveUsers();
         this.renderUserTable();
@@ -399,40 +413,26 @@ window.ApexScheduleManager = {
                 if (document.getElementById("sched-end")) document.getElementById("sched-end").value = sched.end_hour || 8;
                 if (document.getElementById("sched-enabled")) document.getElementById("sched-enabled").value = String(sched.enabled !== false);
             }
-        } catch (e) {
-            console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。");
-        }
+        } catch (e) { console.log("云端尚无自定义时间表，沿用默认 0-8 点配置。"); }
     },
-
     saveScheduleToCloud: async function() {
         const start = Number(document.getElementById("sched-start").value) || 0;
         const end = Number(document.getElementById("sched-end").value) || 8;
         const enabled = document.getElementById("sched-enabled").value === "true";
-        
-        const payload = {
-            start_hour: start,
-            end_hour: end,
-            enabled: enabled,
-            updated_at: new Date().toISOString()
-        };
-
+        const payload = { start_hour: start, end_hour: end, enabled: enabled, updated_at: new Date().toISOString() };
         try {
             const keys = getKeysSafe();
             const fileObj = await getGithubFileSafe("config/ai-schedule.json", keys.gh);
-            await pushGithubJsonFile(
-                "config/ai-schedule.json",
-                payload,
-                fileObj.sha,
-                `⏱️ Config: 更新 AI 夜间自主排班时段 -> 北京时间 [${start}:00 - ${end}:00] [skip ci]`,
-                keys.gh
-            );
+            await pushGithubJsonFile("config/ai-schedule.json", payload, fileObj.sha, `⏱️ Config: 更新 AI 排班 [skip ci]`, keys.gh);
             alert(`✅ 排班表写入成功！\n\nAI 自主运行区间已被限定为北京时间 [${start}:00 至 ${end}:00]。`);
-        } catch (e) {
-            alert("❌ 同步时间表失败: " + e.message);
-        }
+        } catch (e) { alert("❌ 同步时间表失败: " + e.message); }
     }
 };
 
+
+// ==========================================
+// 👑 作品大盘与风控审核模块
+// ==========================================
 let AUDIT_PRODUCTS = [];
 const DEFAULT_AUDIT_PRODUCTS = [
     { id: "aerotech", title: "AeroTech 创投规划书", category: "15 SLIDES · Office PPT演示", thumbKey: "prod_aerotech", thumbCloudPath: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-orange-500 font-bold", isLinked: true, status: true },
@@ -442,7 +442,6 @@ const DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
-// 👑 终极防御：带本地黑名单、强穿透 CDN 的加载引擎
 async function loadAuditProducts() {
     const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
     if (localProducts) {
@@ -473,17 +472,13 @@ async function loadAuditProducts() {
                     if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
                     
                     AUDIT_PRODUCTS.push({
-                        id: aiItem.id,
-                        title: aiItem.title || aiItem.name,
+                        id: aiItem.id, title: aiItem.title || aiItem.name,
                         category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
                         thumbKey: "prod_" + aiItem.id,
                         thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
                         thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-                        priceRmb: aiItem.priceRmb || 69,
-                        priceUsd: aiItem.priceUsd || "14.99",
-                        colorCls: col,
-                        isLinked: true,
-                        status: true
+                        priceRmb: aiItem.priceRmb || 69, priceUsd: aiItem.priceUsd || "14.99",
+                        colorCls: col, isLinked: true, status: true
                     });
                 }
             });
@@ -494,52 +489,11 @@ async function loadAuditProducts() {
     renderAuditTable();
 }
 
-window.uploadProductThumb = function(index) {
-    const item = AUDIT_PRODUCTS[index];
-    ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
-        localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
-        renderAuditTable();
-        appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
-    });
-};
-
-window.toggleRowLinkage = function(index) {
-    AUDIT_PRODUCTS[index].isLinked = !AUDIT_PRODUCTS[index].isLinked;
-    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
-    renderAuditTable();
-    appendLog(`>> [风控审查] 作品 [${AUDIT_PRODUCTS[index].title}] 定价模式 -> ${AUDIT_PRODUCTS[index].isLinked ? '汇率联动' : '行内独立定价'}`);
-};
-
-window.onAuditPriceChange = function(index, field, val) {
-    const num = parseFloat(val) || 0;
-    if (field === 'rmb') {
-        AUDIT_PRODUCTS[index].priceRmb = num;
-        if (AUDIT_PRODUCTS[index].isLinked) {
-            let usd = num / ApexFX.currentRate;
-            usd = (ApexPricing && ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
-            AUDIT_PRODUCTS[index].priceUsd = usd > 0 ? usd : "0.00";
-        }
-    } else if (field === 'usd') {
-        AUDIT_PRODUCTS[index].priceUsd = num;
-        if (AUDIT_PRODUCTS[index].isLinked) {
-            const rmb = Math.round(num * ApexFX.currentRate);
-            AUDIT_PRODUCTS[index].priceRmb = rmb > 0 ? rmb : 0;
-        }
-    }
-    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
-    renderAuditTable();
-};
-
-// ==========================================
-// 👑 带多选批量删除的风控列表引擎
-// ==========================================
-let isCloudSyncing = false;
-
 window.toggleAllCheckboxes = function(masterCb) {
     document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = masterCb.checked);
 };
 
-// 👑 多选批量删除 (带有防并发锁与黑名单防复活)
+// 👑 核心：带队列锁的完美批量删除 (解决 GitHub 并发 409 Conflict)
 window.bulkDeleteSelected = async function() {
     const checkedBoxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
     if (checkedBoxes.length === 0) return alert("⚠️ 请先勾选需要删除的作品！");
@@ -611,6 +565,7 @@ window.renderAuditTable = function() {
         titleArea.appendChild(btn);
     }
 
+    // 过滤掉黑名单中的僵尸数据
     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     AUDIT_PRODUCTS = AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
 
@@ -659,6 +614,42 @@ window.renderAuditTable = function() {
             </tr>
         `;
     });
+};
+
+window.uploadProductThumb = function(index) {
+    const item = AUDIT_PRODUCTS[index];
+    ApexImageEngine.uploadAndBackup(item.thumbKey, item.thumbCloudPath, () => {
+        localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+        renderAuditTable();
+        appendLog(`>> [缩略图] [${item.title}] WebP 转换并绑定完成`);
+    });
+};
+
+window.toggleRowLinkage = function(index) {
+    AUDIT_PRODUCTS[index].isLinked = !AUDIT_PRODUCTS[index].isLinked;
+    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+    renderAuditTable();
+    appendLog(`>> [风控审查] 作品 [${AUDIT_PRODUCTS[index].title}] 定价模式 -> ${AUDIT_PRODUCTS[index].isLinked ? '汇率联动' : '行内独立定价'}`);
+};
+
+window.onAuditPriceChange = function(index, field, val) {
+    const num = parseFloat(val) || 0;
+    if (field === 'rmb') {
+        AUDIT_PRODUCTS[index].priceRmb = num;
+        if (AUDIT_PRODUCTS[index].isLinked) {
+            let usd = num / ApexFX.currentRate;
+            usd = (ApexPricing && ApexPricing.use99Rule && num > 0) ? (Math.floor(usd) + 0.99) : Number(usd.toFixed(2));
+            AUDIT_PRODUCTS[index].priceUsd = usd > 0 ? usd : "0.00";
+        }
+    } else if (field === 'usd') {
+        AUDIT_PRODUCTS[index].priceUsd = num;
+        if (AUDIT_PRODUCTS[index].isLinked) {
+            const rmb = Math.round(num * ApexFX.currentRate);
+            AUDIT_PRODUCTS[index].priceRmb = rmb > 0 ? rmb : 0;
+        }
+    }
+    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+    renderAuditTable();
 };
 
 window.toggleAuditStatus = function(index) {
@@ -728,7 +719,6 @@ window.ApexBannerManager = {
             appendLog(`>> [视觉渐变] 已为第 ${idx + 1} 幕横幅快速应用配色方案 -> ${gradientStr}`);
         }
     },
-
     uploadBannerImg: function(idx) {
         const assetKey = "banner_slide_" + idx;
         const repoPath = `assets/banners/slide-${idx}.webp`;
@@ -738,14 +728,10 @@ window.ApexBannerManager = {
             appendLog(`>> [轮播图云备份] 幻灯片 #${idx + 1} 绑定实体路径 -> ${finalCloudPath}`);
         });
     },
-
     loadBannerConfig: async function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         let config = null;
-        if (saved) {
-            try { config = JSON.parse(saved); } catch(e) {}
-        }
-        
+        if (saved) { try { config = JSON.parse(saved); } catch(e) {} }
         try {
             const keys = getKeysSafe();
             if (keys && keys.gh) {
@@ -773,7 +759,6 @@ window.ApexBannerManager = {
             if (document.getElementById('banner-img-1')) document.getElementById('banner-img-1').value = config[1].bgImg || "";
         }
     },
-
     saveBannerConfig: async function() {
         const config = [
             {
@@ -805,7 +790,6 @@ window.ApexBannerManager = {
 
 window.ApexFX = {
     currentRate: 7.18,
-    
     initWeeklyRate: async function() {
         const cache = JSON.parse(localStorage.getItem("APEX_FX_RATE_CACHE") || "{}");
         const now = Date.now();
@@ -816,12 +800,10 @@ window.ApexFX = {
         }
         await this.forceRefreshRate();
     },
-
     manualRefresh: async function() {
         if (!confirm("🔄 确定要手动向央行节点拉取最新汇率吗？\n\n(拉取成功后，系统将自动重算全站所有已开启【汇率联动】的美元定价)")) return;
         await this.forceRefreshRate(true);
     },
-
     forceRefreshRate: async function(isManual = false) {
         const badge = document.getElementById("fxRateBadge");
         if (badge) badge.innerText = "向央行查汇中...";
@@ -832,11 +814,9 @@ window.ApexFX = {
                 const newRate = Number(data.rates.CNY).toFixed(2);
                 const isRateChanged = this.currentRate !== newRate;
                 this.currentRate = newRate;
-                
                 localStorage.setItem("APEX_FX_RATE_CACHE", JSON.stringify({ rate: this.currentRate, timestamp: Date.now() }));
                 this.updateBadge(this.currentRate, true);
                 appendLog(`>> [汇率中台] 抓取最新外汇：1 USD = ${this.currentRate} CNY`);
-                
                 if (isManual || isRateChanged) {
                     this.syncAllLinkedPrices();
                     if (isManual) alert(`✅ 最新外汇挂牌价拉取成功：1 USD = ${this.currentRate} CNY\n\n已为您自动重算所有开启了【汇率联动】的美元定价！`);
@@ -849,12 +829,10 @@ window.ApexFX = {
         }
         this.updateBadge(this.currentRate, false);
     },
-
     updateBadge: function(rate, isFresh) {
         const badge = document.getElementById("fxRateBadge");
         if (badge) badge.innerText = `1 : ${rate} ${isFresh ? '(最新)' : ''}`;
     },
-
     syncAllLinkedPrices: function() {
         if (window.ApexPricing && window.ApexPricing.isLinked) {
             const keys = ["bundle", "ppt", "excel", "word"];
@@ -865,7 +843,6 @@ window.ApexFX = {
                 }
             });
         }
-
         if (typeof AUDIT_PRODUCTS !== "undefined" && Array.isArray(AUDIT_PRODUCTS)) {
             let productsChanged = false;
             AUDIT_PRODUCTS.forEach((item) => {
@@ -877,13 +854,11 @@ window.ApexFX = {
                     productsChanged = true;
                 }
             });
-            
             if (productsChanged) {
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
             }
         }
-        
         appendLog(`>> [汇率中台] 全站已开启联动的美元定价，已按 1:${this.currentRate} 重新核算完毕。`);
     }
 };
@@ -891,7 +866,6 @@ window.ApexFX = {
 window.ApexPricing = {
     isLinked: true,
     use99Rule: true,
-
     toggleLinkage: function() {
         this.isLinked = !this.isLinked;
         const btn = document.getElementById("btnToggleLink");
@@ -914,14 +888,12 @@ window.ApexPricing = {
             appendLog(`>> [定价控制] 关闭关联：双方完全独立填写。`);
         }
     },
-
     toggle99Rule: function() {
         this.use99Rule = !this.use99Rule;
         const btn = document.getElementById("btnToggle99");
         btn.innerText = `✨ .99尾数: ${this.use99Rule ? '开启' : '关闭'}`;
         btn.className = `px-3 py-1.5 rounded-lg font-bold border transition whitespace-nowrap ${this.use99Rule ? 'bg-blue-500/10 text-blue-600 border-blue-500/30' : 'bg-slate-500/10 text-slate-400 border-slate-500/30'}`;
     },
-
     onRMBChange: function(key, rmbVal) {
         if (!this.isLinked) return;
         const rmb = parseFloat(rmbVal) || 0;
@@ -930,7 +902,6 @@ window.ApexPricing = {
         const el = document.getElementById(`usd-${key}`);
         if (el) el.value = usd > 0 ? usd : "";
     },
-
     onUSDChange: function(key, usdVal) {
         if (!this.isLinked) return;
         const usd = parseFloat(usdVal) || 0;
@@ -938,7 +909,6 @@ window.ApexPricing = {
         const el = document.getElementById(`rmb-${key}`);
         if (el) el.value = rmb > 0 ? rmb : "";
     },
-
     saveAllToStorage: async function() {
         const config = {
             bundle: { rmb: document.getElementById('rmb-bundle').value, usd: document.getElementById('usd-bundle').value },
@@ -1023,13 +993,6 @@ async function loadTasksManifest() {
         rawManifestTasks = JSON.parse(JSON.stringify(DEFAULT_MANIFEST_TASKS));
         renderManifestTasks();
     }
-}
-
-function getKeysSafe() {
-    return {
-        gh: localStorage.getItem("APEX_GH_TOKEN") || "",
-        ds: localStorage.getItem("APEX_DS_KEY") || ""
-    };
 }
 
 window.resetManifestToDefault = async function() {
@@ -1520,16 +1483,7 @@ window.saveKeys = function() {
     alert("✅ 系统密钥与 Gitee 金库节点参数已全量保存生效！");
 };
 
-function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
-function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
-
-function appendLog(msg, color = "") {
-    const log = document.getElementById("historyFeed");
-    if (!log) return;
-    log.innerHTML += `<div class="text-[11px] font-mono text-slate-500 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 py-1.5 ${color}">> ${msg}</div>`;
-    log.scrollTop = log.scrollHeight;
-}
-
+// 👑 代码备份管理
 let currentSnapTab = 'tags';
 let currentTagsPage = 1;
 const TAGS_PER_PAGE = 8; 
@@ -1875,7 +1829,7 @@ window.triggerSwarmAutonomousAction = async function() {
 
             appendLog(`🤖 [大脑中枢]: 收到深度生成指令，正在构建差异化的业务骨架与文案...`);
             
-            // 要求 AI 深度生成 slides 内部数据！
+            // 👑 深度生成结构：不仅要外壳，连里面的 5 个子页面数据都要 AI 一次性想好！
             const aiPrompt = `你是一个顶尖SaaS产品经理。请自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
 请严格返回JSON数组格式，绝不包含任何 markdown 符号。
 要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串), "slides" (生成5个差异化的页面骨架对象数组，包含: "title" 标题, "sub" 副标题, "kpi" 百分比或金额数据, "label" 指标名称, "progress" 进度数字)。
@@ -1896,7 +1850,7 @@ window.triggerSwarmAutonomousAction = async function() {
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🎨 [视觉策划部]: 正在从顶级商业图库匹配 95分+ 质感的实景封面...`);
 
-            // 彻底解决图库重复：大幅扩充 Unsplash 顶流无缝商业授权图片
+            // 👑 顶级无损实拍图库，摒弃辣眼睛的 AI 生成乱码图
             const premiumImages = {
                 ppt: [
                     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
@@ -1934,11 +1888,11 @@ window.triggerSwarmAutonomousAction = async function() {
                     thumbCloudPath: imgUrl, thumbDefault: imgUrl,
                     priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
                     isLinked: true, status: true,
-                    slides: t.slides || null // 保存深度数据
+                    slides: t.slides || null // 保存深度数据供前台解析
                 };
             });
 
-            // 安全队列写入机制
+            // 👑 安全队列锁定：合并写入时排除掉那些被删除的“死刑黑名单”
             while(isCloudSyncing) { await new Promise(r => setTimeout(r, 500)); }
             isCloudSyncing = true;
             
@@ -1952,7 +1906,6 @@ window.triggerSwarmAutonomousAction = async function() {
                     decksSha = f.sha;
                 } catch(e){}
                 
-                // 剔除黑名单的僵尸数据，合并新数据
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
                 await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 上架 3 款差异化产品 [skip ci]", keys.gh);
