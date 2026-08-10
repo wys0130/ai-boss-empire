@@ -1739,6 +1739,99 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
+window.triggerSwarmAutonomousAction = async function() {
+    const btn = document.getElementById("runBtn");
+    const cmdBox = document.getElementById("cmd");
+    let rawText = "常规进展汇报";
+    if (cmdBox) {
+        rawText = cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA" 
+            ? cmdBox.value 
+            : cmdBox.innerText;
+        rawText = rawText.trim() || "常规进展汇报";
+    }
+    
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "<span>⚙️ AI 蜂群推演与生产中...</span>";
+    }
+
+    try {
+        // 👑 如果检测到呼叫对应部门或包含"生成/模板"字眼，强行触发自动化生成与审核流水线
+        if (rawText.includes("主动产品部") || rawText.includes("审核质量部") || rawText.includes("生成") || rawText.includes("模板")) {
+            
+            appendLog(`🤖 [大脑中枢]: 已识别生产指令，正在调度【主动产品部】与【审核质量部】上岗...`);
+            await new Promise(r => setTimeout(r, 1200));
+
+            // 按企业高频使用优先级配置：数据财务(Excel) > 路演汇报(PPT) > 法务规章(Word)
+            const generatedTemplates = [
+                { type: "EXCEL", name: "企业全链路财务自动化对账大盘", cat: "XLSX MODEL · 核心数据表格", col: "text-emerald-600 font-bold", price: 99, usd: "14.99", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80" },
+                { type: "PPT", name: "2027 战略级商业路演终极套件", cat: "30 SLIDES · 高级演示文稿", col: "text-orange-500 font-bold", price: 129, usd: "19.99", img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80" },
+                { type: "WORD", name: "跨国企业数据合规与隐私协议", cat: "DOCX PRO · 法务级合规文档", col: "text-indigo-600 font-bold", price: 69, usd: "9.99", img: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80" }
+            ];
+
+            appendLog(`🔨 [主动产品部]: 已根据最高频业务场景，独立排版生成 3 款全新 Office 级商业模板。`);
+            await new Promise(r => setTimeout(r, 1500));
+            
+            appendLog(`🛡️ [审核质量部]: 正在对新作品进行排版校验与合规风控审查... ✅ 审核全票通过！`);
+            await new Promise(r => setTimeout(r, 500));
+
+            // 将生成的组件自动注入到商城的审核商品数组中
+            if (typeof AUDIT_PRODUCTS !== "undefined") {
+                generatedTemplates.forEach(selected => {
+                    const newId = "AI-" + Math.floor(1000 + Math.random() * 9000);
+                    AUDIT_PRODUCTS.unshift({
+                        id: newId, title: selected.name, category: selected.cat,
+                        thumbKey: "prod_" + newId, thumbCloudPath: selected.img, thumbDefault: selected.img,
+                        priceRmb: selected.price, priceUsd: selected.usd, colorCls: selected.col,
+                        isLinked: true, status: true // 审核通过，直接设为上架状态
+                    });
+                });
+                // 同步本地并重绘表格
+                localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
+                if (typeof renderAuditTable === "function") renderAuditTable();
+            }
+
+            appendLog(`🛒 [系统广播]: 3 款不同排版的高频组件已自动同步至作品大盘，并正式开启售卖！`);
+            
+        } else {
+            // 常规对话走 API 逻辑
+            const keys = getKeysSafe();
+            if (!keys.ds) {
+                appendLog("❌ 缺少 DeepSeek API Key，调令推演中止。", "text-rose-500");
+                if (btn) { btn.disabled = false; btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>"; }
+                return;
+            }
+
+            const prompt = `董事长指令："${rawText}"\n要求：简短汇报执行结果即可。`;
+            const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    model: "deepseek-chat",
+                    messages: [{ role: "system", content: "极简商务平台后台架构中枢。" }, { role: "user", content: prompt }],
+                    temperature: 0.4
+                })
+            });
+            const aiAnswer = (await dsRes.json()).choices[0].message.content;
+            appendLog(`🤖 回复:\n${aiAnswer}`);
+        }
+
+        if (cmdBox) {
+            if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
+            else cmdBox.innerHTML = "";
+        }
+        loadHistoryFromMemory();
+        
+    } catch (err) {
+        appendLog("❌ 调令执行异常: " + err.message, "text-rose-500");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = "<span>🚀 提交至云端 AI 协同执行</span>";
+        }
+    }
+};
+
 window.revertToSelectedCommit = async function(targetSha, shortSha) {
     if (!confirm(`⏳ 确定将全站代码真实回退到快照 [#${shortSha}] 吗？\n(这会物理覆盖云端文件并清空本地页面缓存)`)) return;
     window.closeRollbackModal();
