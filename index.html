@@ -104,55 +104,44 @@
             { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
         ],
         init: async function() {
-            let displayProducts = [];
-            const localAudit = localStorage.getItem('APEX_AUDIT_PRODUCTS');
+            // 👑 防僵尸：坚决先以原厂 5 个为主，不去读可能损坏的 localStorage 数组
+            let displayProducts = JSON.parse(JSON.stringify(this.baseProducts));
             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
             
-            // 👑 修复 1：秒开渲染，如果有缓存直接读取，不被 await 阻塞
-            if (localAudit) {
-                const parsed = JSON.parse(localAudit);
-                // 👑 修复 2：缝合英文翻译，找回丢失的 titleEn 和 categoryEn
-                displayProducts = parsed.map(p => {
-                    const baseP = this.baseProducts.find(b => b.id === p.id);
-                    if (baseP) {
-                        p.titleEn = baseP.titleEn;
-                        p.categoryEn = baseP.categoryEn;
-                    } else if (!p.titleEn && p.id.startsWith('AI-')) {
-                        // AI 生成商品的英文兜底
-                        p.titleEn = 'Premium ' + (p.type ? p.type.toUpperCase() : 'PRO') + ' Template';
-                        p.categoryEn = 'AI Generated Model';
-                    }
-                    return p;
-                });
-            } else {
-                displayProducts = [...this.baseProducts];
-            }
-
-            let safeProducts = displayProducts.filter(p => p.status !== false && (!p.id.startsWith('AI-') || !blacklist.includes(p.id)));
-            this.render(safeProducts); // 立刻渲染，实现0延迟
-
-            // 👑 修复 3：如果没有本地缓存数据，才去异步云端静默拉取，并在完成后无感刷新
-            if (!localAudit) {
-                try {
-                    const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
-                    if (res.ok) {
-                        const aiData = await res.json();
-                        if (Array.isArray(aiData) && aiData.length > 0) {
-                            displayProducts = [...this.baseProducts, ...aiData];
-                            safeProducts = displayProducts.filter(p => p.status !== false && (!p.id.startsWith('AI-') || !blacklist.includes(p.id)));
-                            
-                            // 同样为 AI 生成商品添加英文兜底
-                            safeProducts.forEach(p => {
-                                if (p.id.startsWith('AI-') && !p.titleEn) {
-                                    p.titleEn = 'Premium ' + (p.type ? p.type.toUpperCase() : 'PRO') + ' Template';
-                                    p.categoryEn = 'AI Generated Model';
+            // 强力接驳云端 AI 数据，物理拦截黑名单
+            try {
+                const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
+                if (res.ok) {
+                    const aiData = await res.json();
+                    if (Array.isArray(aiData)) {
+                        aiData.forEach(aiItem => {
+                            if (aiItem.id && aiItem.id.startsWith('AI-') && !blacklist.includes(aiItem.id)) {
+                                aiItem.titleEn = aiItem.titleEn || ('Premium ' + (aiItem.type ? aiItem.type.toUpperCase() : 'PRO') + ' Template');
+                                aiItem.categoryEn = aiItem.categoryEn || 'AI Generated Model';
+                                if (!displayProducts.find(p => p.id === aiItem.id)) {
+                                    displayProducts.push(aiItem);
                                 }
-                            });
-                            this.render(safeProducts);
-                        }
+                            }
+                        });
                     }
-                } catch(e) {}
-            }
+                }
+            } catch(e) {}
+
+            // 覆盖在后台设置的本地价格和状态
+            try {
+                const localAudit = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+                displayProducts.forEach(p => {
+                    const lp = localAudit.find(l => l.id === p.id);
+                    if (lp) {
+                        if (lp.priceRmb !== undefined) p.priceRmb = lp.priceRmb;
+                        if (lp.priceUsd !== undefined) p.priceUsd = lp.priceUsd;
+                        if (lp.status !== undefined) p.status = lp.status; 
+                    }
+                });
+            } catch(e) {}
+
+            const safeProducts = displayProducts.filter(p => p.status !== false);
+            this.render(safeProducts);
         },
         render: function(products) {
             const ppts = products.filter(p => p.type === 'ppt' || (!p.type && (p.id === 'aerotech' || p.id === 'saas' || p.id === 'fintech')));
