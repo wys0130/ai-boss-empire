@@ -225,7 +225,44 @@ function generateRootRelsXML() {
   </Relationships>`;
 }
 
-selectSection(0);
+// 👑 动态拦截并加载 AI 生成的全新 Word 文档结构
+window.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const deckId = params.get('deck');
+    
+    if (deckId && deckId.startsWith('AI-')) {
+        try {
+            const res = await fetch('data/ai-generated-decks.json?_t=' + Date.now());
+            if (res.ok) {
+                const decks = await res.json();
+                const aiDeck = decks.find(d => d.id === deckId);
+                
+                if (aiDeck) {
+                    const docName = aiDeck.name || aiDeck.title;
+                    const titleEl = document.querySelector('h1');
+                    const catEl = titleEl.nextElementSibling;
+                    const priceEl = document.querySelector('.text-3xl.font-black');
+                    
+                    // 1. 替换页面大标题与分类
+                    if (titleEl) titleEl.innerText = docName;
+                    if (catEl) catEl.innerText = aiDeck.category || '九大核心章节标准架构 · 智能合规生成';
+                    
+                    // 2. 替换价格区
+                    if (priceEl) priceEl.innerHTML = `$${aiDeck.priceUsd || '9.99'} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
+                    
+                    // 3. 动态重写前两章的文本，把 AI 取的新名字无缝融进去！
+                    sections[0].content = `${docName}\n\n发布日期：2026 年度\n文档密级：企业机密\n标准：欧美企业通用合规准则`;
+                    sections[1].content = `本文档（${docName}）涵盖公司在相关领域的核心规范、财务报告及数据隐私的实践建议。全部准则完全遵从 GAAP、GDPR 及 EEO 条例。`;
+                }
+            }
+        } catch (e) {
+            console.warn("加载 AI 云端文档失败", e);
+        }
+    }
+    
+    // 初始化并渲染
+    selectSection(0);
+});
 </script>
 </body>
 </html>
