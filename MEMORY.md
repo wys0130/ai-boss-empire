@@ -1,3 +1,4 @@
+- [EVO-RECORD | 主动产品部]: 2026/8/10 12:53:45 自动生成并上架了《星舰融资蓝图：全球扩张战略路演》、《超级增长驾驶舱：SaaS现金流与LTV/CAC透视表》、《企业并购尽职调查终极清单与风险控制手册》。
 # [SYSTEM CONSTITUTION & LOCKING RULES | 核心防退化宪法]
 
 ## 1. 区域锁定与增量开发原则 (Incremental & Locked Mode)
