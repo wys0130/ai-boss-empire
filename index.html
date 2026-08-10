@@ -117,9 +117,9 @@
                 }
             } catch(e) {}
             
-            // 👑 前后台完美同步补丁：让前台主动屏蔽被后台杀掉的“黑名单僵尸商品”！
+            // 👑 前台拦截器：过滤被黑名单干掉的 AI 商品，但是必须保证原生 5 件套绝对显示！
             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-            allProducts = allProducts.filter(p => !blacklist.includes(p.id));
+            allProducts = allProducts.filter(p => !p.id.startsWith('AI-') || !blacklist.includes(p.id));
 
             this.render(allProducts);
         },
