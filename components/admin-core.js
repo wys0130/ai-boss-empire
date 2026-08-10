@@ -1739,7 +1739,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 模块 1：真正的 AI 生产车间 (替换 admin-core.js 最底部的整个 window.triggerSwarmAutonomousAction 函数)
+// 👑 修复版：带数组类型保护的 AI 生产车间
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1760,7 +1760,6 @@ window.triggerSwarmAutonomousAction = async function() {
         const keys = getKeysSafe();
         if (!keys.ds || !keys.gh) throw new Error("缺少 DeepSeek API Key 或 GitHub Token");
         
-        // 👑 拦截关键字，调用真正的 AI 大模型生成产品
         if (rawText.includes("主动产品部") || rawText.includes("审核质量部") || rawText.includes("生成") || rawText.includes("模板")) {
             
             if (cmdBox) {
@@ -1768,17 +1767,12 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在唤醒 DeepSeek AI 大模型构思全新产品...`);
+            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在唤醒 AI 大模型构思全新排版与业务场景的产品...`);
             
-            // 🚀 调用 AI 真实生成 JSON 数据，每次绝对不重样！
-            const aiPrompt = `你是一个顶尖SaaS产品经理。请自动生成3个完全不同的全新商业模板作品（必须包含1个PPT, 1个Excel, 1个Word）。
-请严格返回JSON数组格式，绝不要包含任何 markdown 符号或多余的解释文本，直接以 [ 开始，以 ] 结束。
-格式样例：
-[
-  {"type": "ppt", "name": "这里写高大上的模板名称", "category": "30 SLIDES · 高级路演", "priceRmb": 129, "priceUsd": "19.99"},
-  {"type": "excel", "name": "...", "category": "XLSX MODEL · 数据中台", "priceRmb": 99, "priceUsd": "14.99"},
-  {"type": "word", "name": "...", "category": "DOCX PRO · 合规协议", "priceRmb": 69, "priceUsd": "9.99"}
-]`;
+            const aiPrompt = `你是一个顶尖SaaS产品经理。请根据不同的商业需求，自动生成3个完全不同的全新商业模板作品（1个PPT, 1个Excel, 1个Word）。
+请严格返回JSON数组格式，绝对不要包含任何 markdown 符号(如 \`\`\`json)或解释文本，直接以 [ 开始，以 ] 结束。
+要求字段："type" (ppt/excel/word), "name" (大气的模板名称), "category" (如 30 SLIDES · 高级路演), "priceRmb" (数字), "priceUsd" (字符串)。
+样例：[{"type": "ppt", "name": "硅谷级商业计划书", "category": "25 SLIDES · 极简黑", "priceRmb": 129, "priceUsd": "19.99"}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST",
@@ -1786,23 +1780,21 @@ window.triggerSwarmAutonomousAction = async function() {
                 body: JSON.stringify({ 
                     model: "deepseek-chat", 
                     messages: [{ role: "user", content: aiPrompt }], 
-                    temperature: 0.8 // 提高随机性，保证排版名称全都不一样
+                    temperature: 0.8 
                 })
             });
             
             if (!dsRes.ok) throw new Error("AI 接口调用失败");
             const aiAnswer = (await dsRes.json()).choices[0].message.content;
             
-            // 提取并解析 JSON
             const jsonMatch = aiAnswer.match(/\[[\s\S]*\]/);
             if (!jsonMatch) throw new Error("AI 返回的数据格式无法解析");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            appendLog(`🔨 [主动产品部]: 创作完毕！产出全新作品：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            appendLog(`🔨 [主动产品部]: 创作完毕！产出全新排版作品：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🛡️ [审核质量部]: 版权风控审查通过！正在将其封装并上传至 GitHub 商城数据库...`);
 
-            // 随机图库素材池，保证图片每次看起来都不一样
             const imgPool = [
                 "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80",
                 "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
@@ -1814,11 +1806,11 @@ window.triggerSwarmAutonomousAction = async function() {
             const newTemplates = generatedData.map((t) => {
                 const rId = "AI-" + Math.floor(10000 + Math.random()*90000);
                 let col = 'text-orange-500 font-bold';
-                if (t.type.toLowerCase() === 'excel') col = 'text-emerald-600 font-bold';
-                if (t.type.toLowerCase() === 'word') col = 'text-indigo-600 font-bold';
+                if (t.type && t.type.toLowerCase() === 'excel') col = 'text-emerald-600 font-bold';
+                if (t.type && t.type.toLowerCase() === 'word') col = 'text-indigo-600 font-bold';
                 
                 return {
-                    id: rId, title: t.name, category: t.category,
+                    id: rId, title: t.name, category: t.category, type: t.type ? t.type.toLowerCase() : 'ppt',
                     thumbKey: "prod_" + rId, 
                     thumbCloudPath: imgPool[Math.floor(Math.random() * imgPool.length)], 
                     thumbDefault: imgPool[Math.floor(Math.random() * imgPool.length)],
@@ -1827,26 +1819,27 @@ window.triggerSwarmAutonomousAction = async function() {
                 };
             });
 
-            // 👑 真实写入 GitHub 数据库
+            // 👑 核心修复：强制确保 existingDecks 一定是数组，防止报错
             let existingDecks = [];
             let decksSha = null;
             try {
                 const f = await getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
-                if (f.content) existingDecks = JSON.parse(f.content);
+                if (f.content) {
+                    const parsed = JSON.parse(f.content);
+                    if (Array.isArray(parsed)) existingDecks = parsed;
+                }
                 decksSha = f.sha;
             } catch(e){}
             
             const combinedDecks = [...newTemplates, ...existingDecks];
             await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 自动生成并上架 3 款全新产品 [skip ci]", keys.gh);
 
-            // 👑 同步更新后台表格 UI
             if (typeof AUDIT_PRODUCTS !== "undefined") {
                 newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
             }
 
-            // 记录到 MEMORY 战报
             try {
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 let memContent = memFile.content || "";
@@ -1855,10 +1848,9 @@ window.triggerSwarmAutonomousAction = async function() {
                 await pushGithubJsonFile("MEMORY.md", memContent, memFile.sha, "📝 AI Brain: 记录生产战报 [skip ci]", keys.gh);
             } catch(e){}
 
-            appendLog(`✅ [系统广播]: 自动化生产完毕！商品已推入数据库。（注：前台商城读取云端需等待 GitHub Pages 编译，约1-2分钟后即可显示）`);
+            appendLog(`✅ [系统广播]: 自动化生产完毕！新商品已成功写入云端数据库！`);
 
         } else {
-            // 常规对话逻辑
             const prompt = `董事长指令：${rawText}。请用一句话简短回复，带上处理部门前缀。`;
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST",
@@ -1873,8 +1865,6 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
         }
-        
-        // ⛔️ 注意！这里绝对去掉了之前的 loadHistoryFromMemory(); 日志绝不会再被冲刷消失！
         
     } catch (err) {
         appendLog(`❌ 执行异常: ${err.message}`, "text-rose-500");
