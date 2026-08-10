@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V18 Office-Ribbon Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="components/vip-download-guard.js"></script>
     <script src="components/zero-auth.js"></script>
     <style>
@@ -181,68 +182,68 @@
     </div>
 
     <script>
-        // 👑 必须补齐：将原厂三个模板的 15/20/12 页数据全部硬编码进数组，绝不白屏！
+        // 👑 彻底修复：满血恢复三大原厂模板的所有页面数据！点哪开哪，绝不强退！
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
                 slides: [
-                    { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
-                    { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
-                    { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" },
-                    { id: 4, layoutType: "timeline", title: "产品演进路线图", sub: "季度里程碑与核心功能发布计划", kpi: "Q4", label: "旗舰版上线时间", progress: 65, tag: "04. ROADMAP" },
-                    { id: 5, layoutType: "funnel", title: "市场转化漏斗模型", sub: "从曝光到成交的全链路追踪", kpi: "12.5%", label: "末端转化率", progress: 88, tag: "05. FUNNEL" },
-                    { id: 6, layoutType: "default", title: "全球市场规模扩张", sub: "北美与亚太区市场渗透分析", kpi: "$4.2B", label: "可触达市场规模", progress: 75, tag: "06. MARKET" },
-                    { id: 7, layoutType: "default", title: "精准受众定位画像", sub: "聚焦B端高净值决策人群", kpi: "85%", label: "目标客户匹配度", progress: 92, tag: "07. AUDIENCE" },
-                    { id: 8, layoutType: "default", title: "核心产品技术壁垒", sub: "自研 AI 算法与数据中台", kpi: "0.2s", label: "系统响应延迟", progress: 99, tag: "08. TECH" },
-                    { id: 9, layoutType: "comparison", title: "竞品优劣势矩阵对比", sub: "我们在成本控制与效率上的绝对领先", kpi: "-30%", label: "综合运营成本下降", progress: 80, tag: "09. COMPETITOR" },
-                    { id: 10, layoutType: "kpi-grid", title: "多元化商业变现矩阵", sub: "SaaS 订阅与增值服务双引擎", kpi: "$12M", label: "预期年度经常性收入", progress: 60, tag: "10. REVENUE" },
-                    { id: 11, layoutType: "default", title: "GTM 市场进入策略", sub: "全渠道内容营销与闭环增长", kpi: "500K", label: "初期目标用户触达", progress: 45, tag: "11. GTM" },
-                    { id: 12, layoutType: "funnel", title: "三年期财务增长预测", sub: "保守与激进双模动态模型", kpi: "+150%", label: "复合年均增长率", progress: 55, tag: "12. FINANCE" },
-                    { id: 13, layoutType: "default", title: "核心创始与管理团队", sub: "具备顶尖大厂与连续创业基因", kpi: "10+", label: "平均行业深耕年限", progress: 100, tag: "13. TEAM" },
-                    { id: 14, layoutType: "default", title: "A 轮融资金额与用途", sub: "主要用于研发扩容与海外市场开拓", kpi: "$5M", label: "计划融资金额", progress: 30, tag: "14. ASK" },
-                    { id: 15, layoutType: "cover", title: "感谢聆听与提问环节", sub: "APEXWORK 期待与您共创未来", kpi: "100%", label: "准备就绪", progress: 100, tag: "15. Q&A" }
+                    { id: 1, title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
+                    { id: 2, title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
+                    { id: 3, title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" },
+                    { id: 4, title: "产品演进路线图", sub: "季度里程碑与核心功能发布计划", kpi: "Q4", label: "旗舰版上线时间", progress: 65, tag: "04. ROADMAP" },
+                    { id: 5, title: "市场转化漏斗模型", sub: "从曝光到成交的全链路追踪", kpi: "12.5%", label: "末端转化率", progress: 88, tag: "05. FUNNEL" },
+                    { id: 6, title: "全球市场规模扩张", sub: "北美与亚太区市场渗透分析", kpi: "$4.2B", label: "可触达市场规模", progress: 75, tag: "06. MARKET" },
+                    { id: 7, title: "精准受众定位画像", sub: "聚焦B端高净值决策人群", kpi: "85%", label: "目标客户匹配度", progress: 92, tag: "07. AUDIENCE" },
+                    { id: 8, title: "核心产品技术壁垒", sub: "自研 AI 算法与数据中台", kpi: "0.2s", label: "系统响应延迟", progress: 99, tag: "08. TECH" },
+                    { id: 9, title: "竞品优劣势矩阵对比", sub: "我们在成本控制与效率上的绝对领先", kpi: "-30%", label: "综合运营成本下降", progress: 80, tag: "09. COMPETITOR" },
+                    { id: 10, title: "多元化商业变现矩阵", sub: "SaaS 订阅与增值服务双引擎", kpi: "$12M", label: "预期年度经常性收入", progress: 60, tag: "10. REVENUE" },
+                    { id: 11, title: "GTM 市场进入策略", sub: "全渠道内容营销与闭环增长", kpi: "500K", label: "初期目标用户触达", progress: 45, tag: "11. GTM" },
+                    { id: 12, title: "三年期财务增长预测", sub: "保守与激进双模动态模型", kpi: "+150%", label: "复合年均增长率", progress: 55, tag: "12. FINANCE" },
+                    { id: 13, title: "核心创始与管理团队", sub: "具备顶尖大厂与连续创业基因", kpi: "10+", label: "平均行业深耕年限", progress: 100, tag: "13. TEAM" },
+                    { id: 14, title: "A 轮融资金额与用途", sub: "主要用于研发扩容与海外市场开拓", kpi: "$5M", label: "计划融资金额", progress: 30, tag: "14. ASK" },
+                    { id: 15, title: "感谢聆听与提问环节", sub: "APEXWORK 期待与您共创未来", kpi: "100%", label: "准备就绪", progress: 100, tag: "15. Q&A" }
                 ]
             },
             saas: {
                 brand: "SaaS", titleName: "SaaS 增长指标盘点", badge: "20 SLIDES · DATA VIZ", total: 20, defaultBg: "finance",
                 slides: [
-                    { id: 1, layoutType: "cover", title: "SaaS 增长全景数据看板", sub: "LTV/CAC与流失率多维监控", kpi: "$1.2M", label: "当前月度经常性收入(MRR)", progress: 92, tag: "01. METRICS" },
-                    { id: 2, layoutType: "kpi-grid", title: "获客成本(CAC)断崖式下降", sub: "全自研AI投放系统介入后的成效", kpi: "-68%", label: "CAC 同比降低", progress: 100, tag: "02. CAC" },
-                    { id: 3, layoutType: "funnel", title: "PLG 产品驱动增长漏斗", sub: "从免费试用到企业版增购的转化旅程", kpi: "28%", label: "PQL 到付费转化", progress: 85, tag: "03. PLG" },
-                    { id: 4, layoutType: "comparison", title: "客户流失率(Churn)拦截对比", sub: "健康度监控系统的提前预警效果", kpi: "<1.2%", label: "月度净流失率", progress: 95, tag: "04. CHURN" },
-                    { id: 5, layoutType: "timeline", title: "大客户(Enterprise)拓展路线", sub: "自上而下的行业标杆打法", kpi: "15 家", label: "财富500强签约数", progress: 60, tag: "05. ENTERPRISE" },
-                    { id: 6, layoutType: "default", title: "活跃用户时长趋势", sub: "产品高粘性的护城河", kpi: "4.5h", label: "日均在线时长", progress: 80, tag: "06. DAU" },
-                    { id: 7, layoutType: "default", title: "API 接口调用吞吐量", sub: "底层算力承载商业扩容", kpi: "10B+", label: "日均 API 吞吐", progress: 99, tag: "07. API" },
-                    { id: 8, layoutType: "kpi-grid", title: "研发与营销支出配比", sub: "健康的 SaaS 现金流结构", kpi: "40%", label: "研发投入占比", progress: 85, tag: "08. SPEND" },
-                    { id: 9, layoutType: "default", title: "核心产品护城河构建", sub: "不仅仅是工具，更是生态", kpi: "300+", label: "三方插件集成数", progress: 70, tag: "09. MOAT" },
-                    { id: 10, layoutType: "funnel", title: "国际化扩张版图", sub: "合规出海与多语种覆盖", kpi: "25+", label: "已支持国家与地区", progress: 50, tag: "10. GLOBAL" },
-                    { id: 11, layoutType: "comparison", title: "自研大模型成本核算", sub: "摆脱第三方 API 调用的高昂抽成", kpi: "-80%", label: "Token 成本下降", progress: 100, tag: "11. AI COST" },
-                    { id: 12, layoutType: "default", title: "信息安全与合规认证", sub: "金融级别的隔离架构", kpi: "SOC 2", label: "核心认证标准", progress: 100, tag: "12. COMPLIANCE" },
-                    { id: 13, layoutType: "timeline", title: "新季度增长飞轮预测", sub: "基于网络效应的用户裂变", kpi: "1.8", label: "K-Factor 裂变系数", progress: 75, tag: "13. GROWTH" },
-                    { id: 14, layoutType: "default", title: "客户成功团队 SLA", sub: "超预期的企业级工单响应", kpi: "<5m", label: "平均首次响应时间", progress: 95, tag: "14. CS" },
-                    { id: 15, layoutType: "kpi-grid", title: "净收入留存率 (NDR)", sub: "反映真实的产品增购健康度", kpi: "135%", label: "最新 NDR 指标", progress: 88, tag: "15. NDR" },
-                    { id: 16, layoutType: "default", title: "市场定价与订阅层级", sub: "精准切割中小微与超大型企业", kpi: "3 档", label: "核心订阅梯度", progress: 100, tag: "16. PRICING" },
-                    { id: 17, layoutType: "comparison", title: "竞品迁移成本分析", sub: "一键无损导入数据的战略价值", kpi: "1s", label: "极速迁移体验", progress: 90, tag: "17. MIGRATION" },
-                    { id: 18, layoutType: "default", title: "核心管理层持股结构", sub: "利益深度绑定的战斗梯队", kpi: "65%", label: "团队绝对控股", progress: 100, tag: "18. CAP TABLE" },
-                    { id: 19, layoutType: "default", title: "B 轮融资核心诉求", sub: "资本杠杆撬动寡头地位", kpi: "$20M", label: "本轮目标融资金额", progress: 40, tag: "19. ASK" },
-                    { id: 20, layoutType: "cover", title: "感谢聆听，共赴星辰", sub: "APEXWORK SAAS 期待您的加持", kpi: "100%", label: "演示结束", progress: 100, tag: "20. END" }
+                    { id: 1, title: "SaaS 增长全景数据看板", sub: "LTV/CAC与流失率多维监控", kpi: "$1.2M", label: "当前月度经常性收入(MRR)", progress: 92, tag: "01. METRICS" },
+                    { id: 2, title: "获客成本(CAC)断崖式下降", sub: "全自研AI投放系统介入后的成效", kpi: "-68%", label: "CAC 同比降低", progress: 100, tag: "02. CAC" },
+                    { id: 3, title: "PLG 产品驱动增长漏斗", sub: "从免费试用到企业版增购的转化旅程", kpi: "28%", label: "PQL 到付费转化", progress: 85, tag: "03. PLG" },
+                    { id: 4, title: "客户流失率(Churn)拦截对比", sub: "健康度监控系统的提前预警效果", kpi: "<1.2%", label: "月度净流失率", progress: 95, tag: "04. CHURN" },
+                    { id: 5, title: "大客户(Enterprise)拓展路线", sub: "自上而下的行业标杆打法", kpi: "15 家", label: "财富500强签约数", progress: 60, tag: "05. ENTERPRISE" },
+                    { id: 6, title: "活跃用户时长趋势", sub: "产品高粘性的护城河", kpi: "4.5h", label: "日均在线时长", progress: 80, tag: "06. DAU" },
+                    { id: 7, title: "API 接口调用吞吐量", sub: "底层算力承载商业扩容", kpi: "10B+", label: "日均 API 吞吐", progress: 99, tag: "07. API" },
+                    { id: 8, title: "研发与营销支出配比", sub: "健康的 SaaS 现金流结构", kpi: "40%", label: "研发投入占比", progress: 85, tag: "08. SPEND" },
+                    { id: 9, title: "核心产品护城河构建", sub: "不仅仅是工具，更是生态", kpi: "300+", label: "三方插件集成数", progress: 70, tag: "09. MOAT" },
+                    { id: 10, title: "国际化扩张版图", sub: "合规出海与多语种覆盖", kpi: "25+", label: "已支持国家与地区", progress: 50, tag: "10. GLOBAL" },
+                    { id: 11, title: "自研大模型成本核算", sub: "摆脱第三方 API 调用的高昂抽成", kpi: "-80%", label: "Token 成本下降", progress: 100, tag: "11. AI COST" },
+                    { id: 12, title: "信息安全与合规认证", sub: "金融级别的隔离架构", kpi: "SOC 2", label: "核心认证标准", progress: 100, tag: "12. COMPLIANCE" },
+                    { id: 13, title: "新季度增长飞轮预测", sub: "基于网络效应的用户裂变", kpi: "1.8", label: "K-Factor 裂变系数", progress: 75, tag: "13. GROWTH" },
+                    { id: 14, title: "客户成功团队 SLA", sub: "超预期的企业级工单响应", kpi: "<5m", label: "平均首次响应时间", progress: 95, tag: "14. CS" },
+                    { id: 15, title: "净收入留存率 (NDR)", sub: "反映真实的产品增购健康度", kpi: "135%", label: "最新 NDR 指标", progress: 88, tag: "15. NDR" },
+                    { id: 16, title: "市场定价与订阅层级", sub: "精准切割中小微与超大型企业", kpi: "3 档", label: "核心订阅梯度", progress: 100, tag: "16. PRICING" },
+                    { id: 17, title: "竞品迁移成本分析", sub: "一键无损导入数据的战略价值", kpi: "1s", label: "极速迁移体验", progress: 90, tag: "17. MIGRATION" },
+                    { id: 18, title: "核心管理层持股结构", sub: "利益深度绑定的战斗梯队", kpi: "65%", label: "团队绝对控股", progress: 100, tag: "18. CAP TABLE" },
+                    { id: 19, title: "B 轮融资核心诉求", sub: "资本杠杆撬动寡头地位", kpi: "$20M", label: "本轮目标融资金额", progress: 40, tag: "19. ASK" },
+                    { id: 20, title: "感谢聆听，共赴星辰", sub: "APEXWORK SAAS 期待您的加持", kpi: "100%", label: "演示结束", progress: 100, tag: "20. END" }
                 ]
             },
             fintech: {
                 brand: "FinTech", titleName: "FinTech A 轮融资方案", badge: "12 SLIDES · FINANCE", total: 12, defaultBg: "team",
                 slides: [
-                    { id: 1, layoutType: "cover", title: "FinTech 颠覆式创新", sub: "重塑跨境支付结算网络", kpi: "2.5M", label: "日均交易笔数", progress: 88, tag: "01. VISION" },
-                    { id: 2, layoutType: "kpi-grid", title: "痛点：传统清算的摩擦", sub: "高昂的手续费与 T+3 到账延迟", kpi: "3.5%", label: "行业平均抽成", progress: 20, tag: "02. PAIN" },
-                    { id: 3, layoutType: "comparison", title: "解法：区块链底层清算", sub: "去中心化账本带来的降维打击", kpi: "T+0", label: "极致结算速度", progress: 100, tag: "03. SOLUTION" },
-                    { id: 4, layoutType: "default", title: "智能合约审计与合规", sub: "全球顶级法务机构出具的白皮书", kpi: "100%", label: "合规通过率", progress: 100, tag: "04. LEGAL" },
-                    { id: 5, layoutType: "funnel", title: "商户接驳转化漏斗", sub: "从 API 调试到真实跑单的极简体验", kpi: "80%", label: "SDK 接入转化率", progress: 85, tag: "05. SDK" },
-                    { id: 6, layoutType: "timeline", title: "清算牌照获取时间轴", sub: "香港、新加坡与欧美的持牌进度", kpi: "3 张", label: "核心 MSO 牌照", progress: 60, tag: "06. LICENSE" },
-                    { id: 7, layoutType: "default", title: "流动性资金池储备", sub: "应对极端并发的备付金机制", kpi: "$50M", label: "常备流动性资金", progress: 95, tag: "07. LIQUIDITY" },
-                    { id: 8, layoutType: "comparison", title: "反洗钱(AML) AI 引擎", sub: "机器学习侦测异常资金流转", kpi: "99.9%", label: "拦截准确率", progress: 90, tag: "08. AML" },
-                    { id: 9, layoutType: "default", title: "B端客户生态图谱", sub: "电商、航旅与数字娱乐的深度绑定", kpi: "120+", label: "深度合作平台", progress: 75, tag: "09. ECOSYSTEM" },
-                    { id: 10, layoutType: "kpi-grid", title: "三年期营收爆发预测", sub: "交易规模扩大带来的网络效应", kpi: "500%", label: "预计营收增幅", progress: 65, tag: "10. REVENUE" },
-                    { id: 11, layoutType: "default", title: "核心创始团队背景", sub: "来自高盛与 PayPal 的金融老兵", kpi: "15年", label: "人均金融深耕", progress: 100, tag: "11. TEAM" },
-                    { id: 12, layoutType: "cover", title: "A 轮募资与未来展望", sub: "诚邀顶尖资方，共建金融新基建", kpi: "$15M", label: "本轮融资金额", progress: 30, tag: "12. ASK" }
+                    { id: 1, title: "FinTech 颠覆式创新", sub: "重塑跨境支付结算网络", kpi: "2.5M", label: "日均交易笔数", progress: 88, tag: "01. VISION" },
+                    { id: 2, title: "痛点：传统清算的摩擦", sub: "高昂的手续费与 T+3 到账延迟", kpi: "3.5%", label: "行业平均抽成", progress: 20, tag: "02. PAIN" },
+                    { id: 3, title: "解法：区块链底层清算", sub: "去中心化账本带来的降维打击", kpi: "T+0", label: "极致结算速度", progress: 100, tag: "03. SOLUTION" },
+                    { id: 4, title: "智能合约审计与合规", sub: "全球顶级法务机构出具的白皮书", kpi: "100%", label: "合规通过率", progress: 100, tag: "04. LEGAL" },
+                    { id: 5, title: "商户接驳转化漏斗", sub: "从 API 调试到真实跑单的极简体验", kpi: "80%", label: "SDK 接入转化率", progress: 85, tag: "05. SDK" },
+                    { id: 6, title: "清算牌照获取时间轴", sub: "香港、新加坡与欧美的持牌进度", kpi: "3 张", label: "核心 MSO 牌照", progress: 60, tag: "06. LICENSE" },
+                    { id: 7, title: "流动性资金池储备", sub: "应对极端并发的备付金机制", kpi: "$50M", label: "常备流动性资金", progress: 95, tag: "07. LIQUIDITY" },
+                    { id: 8, title: "反洗钱(AML) AI 引擎", sub: "机器学习侦测异常资金流转", kpi: "99.9%", label: "拦截准确率", progress: 90, tag: "08. AML" },
+                    { id: 9, title: "B端客户生态图谱", sub: "电商、航旅与数字娱乐的深度绑定", kpi: "120+", label: "深度合作平台", progress: 75, tag: "09. ECOSYSTEM" },
+                    { id: 10, title: "三年期营收爆发预测", sub: "交易规模扩大带来的网络效应", kpi: "500%", label: "预计营收增幅", progress: 65, tag: "10. REVENUE" },
+                    { id: 11, title: "核心创始团队背景", sub: "来自高盛与 PayPal 的金融老兵", kpi: "15年", label: "人均金融深耕", progress: 100, tag: "11. TEAM" },
+                    { id: 12, title: "A 轮募资与未来展望", sub: "诚邀顶尖资方，共建金融新基建", kpi: "$15M", label: "本轮融资金额", progress: 30, tag: "12. ASK" }
                 ]
             }
         };
@@ -254,6 +255,11 @@
         let currentLayoutAlign = 'center';
         let currentCardMask = 'normal';
 
+        const bgStyles = {
+            "tech": "bg-photo-tech text-white", "finance": "bg-photo-finance text-white",
+            "team": "bg-photo-team text-white", "mesh": "bg-style-mesh text-white"
+        };
+
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
@@ -261,6 +267,7 @@
 
             if (!preset && key.startsWith('AI-')) {
                 let targetAiDeck = null;
+
                 try {
                     const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
                     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
@@ -292,7 +299,6 @@
                             const aiSec = aiSlides[i] || {};
                             return {
                                 id: i + 1, 
-                                layoutType: aiSec.layoutType || 'default', 
                                 title: aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`, 
                                 sub: aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。", 
                                 kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
@@ -313,7 +319,7 @@
                 }
             }
 
-            // 极限容灾兜底
+            // 👑 终极容灾：不管什么乱七八糟的情况，要是找不到配置，老老实实回退到 aerotech！
             if (!preset) {
                 currentDeckKey = 'aerotech';
                 preset = DECK_PRESETS['aerotech'];
@@ -352,7 +358,7 @@
             slidesData.forEach((item, idx) => {
                 const activeCls = idx === currentSlideIdx ? "border-blue-500 bg-slate-800 shadow-md ring-1 ring-blue-500" : "border-slate-800 bg-slate-900/60 hover:bg-slate-800/40";
                 
-                // 👑 极限防报错：强行转换为字符串再处理！
+                // 👑 防崩溃保护套：强行转换为字符串再 replace，绝不报错中断！
                 const pureTitle = String(item.title || "加载中").replace(/<[^>]+>/g, '');
                 const pureKpi = String(item.kpi || "0%").replace(/<[^>]+>/g, '');
                 
@@ -369,14 +375,13 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
-        // 👑 彻底剔除引起白屏报错的动画与透明字类名，只保留最原生、最粗暴的 HTML 注入
+        // 👑 彻底剔除引起白屏报错的 GSAP 动画，纯原生 HTML 硬核直出！
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
             
-            // 极限防崩溃兜底
             if (!item) {
-                canvas.innerHTML = '<div class="text-white text-2xl m-auto bg-rose-500 px-4 py-2 rounded">⚠️ 数据结构缺失，请刷新重试。</div>';
+                canvas.innerHTML = '<div class="text-white text-2xl m-auto">⚠️ 数据结构缺失，请刷新重试。</div>';
                 return;
             }
 
@@ -384,114 +389,37 @@
             const alignCls = currentLayoutAlign === 'center' ? "text-center items-center" : "text-left items-start";
             const maskCls = currentCardMask === 'normal' ? "bg-slate-900/80" : "bg-slate-950/95";
 
-            canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between relative overflow-hidden ${bgCls} my-auto`;
+            canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-none relative overflow-hidden ${bgCls} my-auto`;
             
-            const layout = item.layoutType || 'default';
-            const sTitle = item.title || '标题加载中';
-            const sSub = item.sub || '副标题加载中';
-            const sLabel = item.label || '核心指标';
-            const sKpi = item.kpi || '100%';
-            const sTag = item.tag || 'MODULE';
-            const sProg = item.progress || 50;
-
-            let innerContent = '';
-
-            const topHeader = `
+            canvas.innerHTML = `
                 <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10 w-full relative">
                     <span class="text-xs font-bold font-mono tracking-widest text-slate-300">APEXWORK · DECK</span>
-                    <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${sTag}</span>
-                </div>`;
+                    <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag || 'MODULE'}</span>
+                </div>
 
-            if (layout === 'cover' || layout === 'title-page') {
-                innerContent = `
-                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col text-center items-center w-full mx-auto relative">
-                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-5xl md:text-6xl font-black tracking-tight leading-tight mb-6 drop-shadow-lg w-full outline-none text-white">${sTitle}</div>
-                        <div class="w-24 h-1.5 bg-blue-500 mb-6 rounded-full"></div>
-                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-lg text-slate-200 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${sSub}</div>
-                    </div>`;
-            } else if (layout === 'kpi-grid') {
-                innerContent = `
-                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center relative">
-                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 mb-8 outline-none">${sSub}</div>
-                        <div class="grid grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
-                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
-                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">${sLabel}</div>
-                                <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-5xl font-black font-mono text-emerald-400 outline-none">${sKpi}</div>
-                            </div>
-                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
-                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">年度增幅 B</div>
-                                <div contenteditable="true" class="text-5xl font-black font-mono text-blue-400 outline-none">+124K</div>
-                            </div>
-                        </div>
-                    </div>`;
-            } else if (layout === 'timeline' || layout === 'funnel') {
-                innerContent = `
-                    <div class="z-10 w-full mt-4 flex flex-col h-full relative">
-                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 mb-6 outline-none">${sSub}</div>
-                        <div class="flex-1 flex flex-col justify-center gap-6 w-full max-w-2xl mx-auto">
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 text-right font-mono font-bold text-blue-400 text-xl">01</div>
-                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-blue-500 w-full rounded-full shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div></div>
-                                <div class="w-48 text-sm font-bold text-white">${sLabel}</div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 text-right font-mono font-bold text-emerald-400 text-xl">02</div>
-                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-emerald-500 w-3/4 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.6)]"></div></div>
-                                <div class="w-48 text-sm font-bold text-white">中段激活阶段</div>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="w-16 text-right font-mono font-bold text-amber-400 text-xl">03</div>
-                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-amber-500 w-1/2 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.6)]"></div></div>
-                                <div class="w-48 text-sm font-bold text-white">末端营收转化</div>
-                            </div>
-                        </div>
-                    </div>`;
-            } else if (layout === 'comparison') {
-                innerContent = `
-                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center relative">
-                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-8 text-center outline-none text-white">${sTitle}</div>
-                        <div class="grid grid-cols-2 gap-8 w-full max-w-3xl mx-auto">
-                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-8 shadow-lg text-center">
-                                <div class="text-xl font-bold text-slate-300 mb-6 border-b border-white/10 pb-3">传统模式痛点</div>
-                                <div class="text-base text-slate-400 space-y-4"><p>✖ 成本高昂难控</p><p>✖ 人工效率低下</p><p>✖ 数据存在黑盒</p></div>
-                            </div>
-                            <div class="${maskCls} backdrop-blur-md border border-blue-500/40 rounded-xl p-8 shadow-[0_0_30px_rgba(59,130,246,0.15)] text-center relative overflow-hidden">
-                                <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] px-3 py-1 font-bold rounded-bl-lg tracking-widest">APEX OURS</div>
-                                <div class="text-xl font-bold text-blue-400 mb-6 border-b border-blue-500/20 pb-3">${sLabel}</div>
-                                <div class="text-base text-slate-200 space-y-4"><p>✔ 极致自动化降本</p><p>✔ AI 工作流加速</p><p>✔ 全局透明可追溯</p></div>
-                            </div>
-                        </div>
-                    </div>`;
-            } else {
-                innerContent = `
-                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto relative">
-                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
-                            class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none text-white">${sTitle}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
-                            class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${sSub}</div>
+                <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto relative">
+                    <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
+                        class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none text-white">${item.title || '加载中'}</div>
+                    <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
+                        class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${item.sub || '加载中'}</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center w-full relative">
+                    <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label || '核心指标'}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${item.kpi || '0%'}</div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center w-full relative">
-                        <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${sLabel}</div>
-                            <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${sKpi}</div>
+                    <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
+                        <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
+                            <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
+                            <span class="text-blue-400 font-bold">${item.progress || 50}%</span>
                         </div>
-                        <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
-                            <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
-                                <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
-                                <span class="text-blue-400 font-bold">${sProg}%</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-                                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${sProg}%"></div>
-                            </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                            <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full" style="width: ${item.progress || 50}%"></div>
                         </div>
-                    </div>`;
-            }
-
-            // 直接暴力插入 DOM，无需任何动画库干预
-            canvas.style.opacity = '1';
-            canvas.innerHTML = topHeader + innerContent;
+                    </div>
+                </div>
+            `;
         }
 
         function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
@@ -516,7 +444,6 @@
             renderMainSlide();
         }
         
-        // 👑 强转字符串防崩溃
         function syncFormInputs() {
             document.getElementById("bindKpi").value = String(slidesData[currentSlideIdx].kpi || '').replace(/<[^>]+>/g, '');
             document.getElementById("bindLabel").value = String(slidesData[currentSlideIdx].label || '').replace(/<[^>]+>/g, '');
