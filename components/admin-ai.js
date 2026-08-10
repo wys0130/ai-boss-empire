@@ -1,6 +1,6 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：2K商业基底二次魔改 -> 视觉与侵权90分强审 -> 自动WebP压缩 -> 指纹级结构去重
+ * 👑 终极架构：2K商业基底二次魔改 -> 视觉与侵权90分强审 -> 自动WebP压缩 -> 指纹级结构去重与阶梯定价
  */
 
 window.deptConfig = [
@@ -75,20 +75,21 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            window.appendLog(`🤖 [大脑中枢]: 收到商业推演指令，正在启动产品经理思维，推演【指纹级】差异化业务场景...`);
+            window.appendLog(`🤖 [大脑中枢]: 收到商业推演指令，启动【积木式组件装配】与【动态阶梯定价】规则...`);
             
-            // 👑 极限 Prompt 重构：强迫 AI 站在产品经理与销冠视角，构思完全不同的商业场景，绝对避免结构同质化！
+            // 👑 极限 Prompt 重构：加入 layoutType 组件差异化，并强制随机页数（5-20页）触发阶梯定价！
             const aiPrompt = `你是一个深谙消费者心理学和 SaaS 高转化率的国际顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
-【核心铁律：指纹级差异化结构】：
-1. 受众与场景必须完全割裂：不要再用废话般的“商业计划书”。我要极度细分的真实场景！比如：“马斯克系商业航天路演”、“东南亚跨境电商选品利润模型”、“高盛级别的 ESG 碳中和尽调报告”。
-2. 内部结构（slides）必须像指纹一样独一无二：
-   - 航天路演 PPT 的 slides 必须包含“轨道载荷运力对比”、“火箭回收成本测算”。
-   - 跨境电商 Excel 的 slides 必须包含“头程海运物流费率测算”、“退货率侵蚀模型”。
-   - 绝不允许出现雷同的“公司简介”、“团队介绍”、“市场分析”等万金油结构，每次生成必须提供 5-8 个完全独特的专业模块。
+【核心铁律：指纹级差异化结构与组件装配】：
+1. 受众与场景必须完全割裂：极度细分的真实场景！比如：“马斯克系商业航天路演”、“东南亚跨境电商选品利润模型”、“高盛级别的 ESG 碳中和尽调报告”。
+2. 内部结构（slides）必须像指纹一样独一无二，通过不同组件装配：
+   - PPT 可选组件 (layoutType): "cover" (封面), "kpi-grid" (数据网格), "timeline" (时间轴), "funnel" (漏斗模型), "comparison" (双栏对比).
+   - Excel 可选组件 (layoutType): "matrix-12m" (12月矩阵), "roi-calc" (回报测算器), "cost-breakdown" (成本拆解饼图).
+   - Word 可选组件 (layoutType): "title-page" (封面), "text-block" (标准段落), "checklist" (合规检查表), "quote" (高管引言).
+   - 每次生成必须随机提供 5 到 20 个完全独特的组件模块，系统将根据你生成的模块数量自动执行阶梯定价，绝不套娃！
 3. 双语出海：返回 titleEn 和 categoryEn 字段。
 4. 视觉魔改提示词 (themeKeyword)：提取一个极具冲击力的纯英文商业实景词汇（如 "spacex rocket launch dark neon" 或 "global logistics shipping containers data visualization"），供我的魔改引擎去渲染不侵权的 2K 封面。
-请严格返回JSON数组格式，绝不包含任何 markdown 符号。
-样例：[{"type":"ppt", "name":"星舰战略舱", "titleEn":"Starship Strategy Deck", "category":"25页 · 深空科幻", "categoryEn":"25 P · Sci-Fi", "priceRmb":199, "priceUsd":"29.99", "themeKeyword":"deep space neon tech", "slides":[{"title":"运力模型","sub":"低轨载荷成本分析","kpi":"$500/kg","label":"边际成本递减","progress":95}]}]`;
+请严格返回JSON数组格式，绝不包含任何 markdown 符号。不需要你提供价格，前端引擎会自动按页数/组件数定价。
+样例：[{"type":"ppt", "name":"星舰战略舱", "titleEn":"Starship Strategy Deck", "category":"深空科幻", "categoryEn":"Sci-Fi", "themeKeyword":"deep space neon tech", "slides":[{"layoutType":"cover", "title":"运力模型","sub":"低轨载荷成本分析","kpi":"$500/kg","label":"边际成本递减","progress":95}]}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
@@ -101,7 +102,7 @@ window.triggerSwarmAutonomousAction = async function() {
             if (!jsonMatch) throw new Error("AI 数据格式异常");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            window.appendLog(`🔨 [主动产品部]: 指纹级差异化业务骨架生成完毕！拒绝同质化套娃。产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            window.appendLog(`🔨 [主动产品部]: 指纹级差异化积木骨架生成完毕！拒绝同质化套娃。产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             
             // 👑 逐个进行商业级图像魔改与法务风控审查
             const newTemplates = [];
@@ -111,16 +112,32 @@ window.triggerSwarmAutonomousAction = async function() {
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
                 // 等待魔改引擎产出通过 >90 分审核的高清无侵权封面 WebP
-                const finalImg = await processRemixAndScoring(t.themeKeyword || "high end abstract corporate data");
+                let finalImg = await processRemixAndScoring(t.themeKeyword || "high end abstract corporate data");
+                if (!finalImg || finalImg.trim() === "") {
+                    // 彻底兜底：防止 API 异常导致裂图
+                    finalImg = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
+                }
+
+                // 👑 阶梯定价物理拦截阀门：根据 AI 生成的组件数量自动定档
+                const slideCount = t.slides ? t.slides.length : 8;
+                const isPremium = slideCount >= 10; 
+                const finalRmb = isPremium ? 139 : 69;
+                const finalUsd = isPremium ? "19.99" : "9.99";
+                
+                // 动态单位后缀
+                const unitZh = typeStr === 'ppt' ? '页' : (typeStr === 'excel' ? '表' : '章');
+                const unitEn = typeStr === 'ppt' ? 'P' : 'UNITS';
+                const catStr = `${slideCount}${unitZh} · ${t.category}`;
+                const catEnStr = `${slideCount} ${unitEn} · ${t.categoryEn}`;
 
                 newTemplates.push({
                     id: rId, title: t.name, titleEn: t.titleEn, 
-                    category: t.category, categoryEn: t.categoryEn, type: typeStr,
+                    category: catStr, categoryEn: catEnStr, type: typeStr,
                     thumb: finalImg, thumbnail: finalImg, thumbKey: "prod_" + rId, 
                     thumbCloudPath: finalImg, thumbDefault: finalImg,
-                    priceRmb: t.priceRmb || 129, priceUsd: t.priceUsd || "19.99", colorCls: col,
+                    priceRmb: finalRmb, priceUsd: finalUsd, colorCls: col,
                     isLinked: true, status: true,
-                    slides: t.slides || null // 保存极具行业深度的指纹级内部结构，引爆用户购买欲
+                    slides: t.slides || null // 保存带有 layoutType 组件类型的指纹内部结构
                 });
             }
 
@@ -147,7 +164,7 @@ window.triggerSwarmAutonomousAction = async function() {
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
                     window.renderAuditTable();
                 }
-                window.appendLog(`✅ [系统广播]: 上架完毕！指纹级去重结构已录入大盘，前台即刻生效！`);
+                window.appendLog(`✅ [系统广播]: 阶梯定价装配完毕！指纹级去重结构已录入大盘，前台即刻生效！`);
             } finally {
                 window.isCloudSyncing = false;
             }
