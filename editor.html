@@ -181,6 +181,7 @@
     </div>
 
     <script>
+        // 👑 必须补齐：将原厂三个模板的 15/20/12 页数据全部硬编码进数组，绝不白屏！
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
@@ -201,6 +202,48 @@
                     { id: 14, layoutType: "default", title: "A 轮融资金额与用途", sub: "主要用于研发扩容与海外市场开拓", kpi: "$5M", label: "计划融资金额", progress: 30, tag: "14. ASK" },
                     { id: 15, layoutType: "cover", title: "感谢聆听与提问环节", sub: "APEXWORK 期待与您共创未来", kpi: "100%", label: "准备就绪", progress: 100, tag: "15. Q&A" }
                 ]
+            },
+            saas: {
+                brand: "SaaS", titleName: "SaaS 增长指标盘点", badge: "20 SLIDES · DATA VIZ", total: 20, defaultBg: "finance",
+                slides: [
+                    { id: 1, layoutType: "cover", title: "SaaS 增长全景数据看板", sub: "LTV/CAC与流失率多维监控", kpi: "$1.2M", label: "当前月度经常性收入(MRR)", progress: 92, tag: "01. METRICS" },
+                    { id: 2, layoutType: "kpi-grid", title: "获客成本(CAC)断崖式下降", sub: "全自研AI投放系统介入后的成效", kpi: "-68%", label: "CAC 同比降低", progress: 100, tag: "02. CAC" },
+                    { id: 3, layoutType: "funnel", title: "PLG 产品驱动增长漏斗", sub: "从免费试用到企业版增购的转化旅程", kpi: "28%", label: "PQL 到付费转化", progress: 85, tag: "03. PLG" },
+                    { id: 4, layoutType: "comparison", title: "客户流失率(Churn)拦截对比", sub: "健康度监控系统的提前预警效果", kpi: "<1.2%", label: "月度净流失率", progress: 95, tag: "04. CHURN" },
+                    { id: 5, layoutType: "timeline", title: "大客户(Enterprise)拓展路线", sub: "自上而下的行业标杆打法", kpi: "15 家", label: "财富500强签约数", progress: 60, tag: "05. ENTERPRISE" },
+                    { id: 6, layoutType: "default", title: "活跃用户时长趋势", sub: "产品高粘性的护城河", kpi: "4.5h", label: "日均在线时长", progress: 80, tag: "06. DAU" },
+                    { id: 7, layoutType: "default", title: "API 接口调用吞吐量", sub: "底层算力承载商业扩容", kpi: "10B+", label: "日均 API 吞吐", progress: 99, tag: "07. API" },
+                    { id: 8, layoutType: "kpi-grid", title: "研发与营销支出配比", sub: "健康的 SaaS 现金流结构", kpi: "40%", label: "研发投入占比", progress: 85, tag: "08. SPEND" },
+                    { id: 9, layoutType: "default", title: "核心产品护城河构建", sub: "不仅仅是工具，更是生态", kpi: "300+", label: "三方插件集成数", progress: 70, tag: "09. MOAT" },
+                    { id: 10, layoutType: "funnel", title: "国际化扩张版图", sub: "合规出海与多语种覆盖", kpi: "25+", label: "已支持国家与地区", progress: 50, tag: "10. GLOBAL" },
+                    { id: 11, layoutType: "comparison", title: "自研大模型成本核算", sub: "摆脱第三方 API 调用的高昂抽成", kpi: "-80%", label: "Token 成本下降", progress: 100, tag: "11. AI COST" },
+                    { id: 12, layoutType: "default", title: "信息安全与合规认证", sub: "金融级别的隔离架构", kpi: "SOC 2", label: "核心认证标准", progress: 100, tag: "12. COMPLIANCE" },
+                    { id: 13, layoutType: "timeline", title: "新季度增长飞轮预测", sub: "基于网络效应的用户裂变", kpi: "1.8", label: "K-Factor 裂变系数", progress: 75, tag: "13. GROWTH" },
+                    { id: 14, layoutType: "default", title: "客户成功团队 SLA", sub: "超预期的企业级工单响应", kpi: "<5m", label: "平均首次响应时间", progress: 95, tag: "14. CS" },
+                    { id: 15, layoutType: "kpi-grid", title: "净收入留存率 (NDR)", sub: "反映真实的产品增购健康度", kpi: "135%", label: "最新 NDR 指标", progress: 88, tag: "15. NDR" },
+                    { id: 16, layoutType: "default", title: "市场定价与订阅层级", sub: "精准切割中小微与超大型企业", kpi: "3 档", label: "核心订阅梯度", progress: 100, tag: "16. PRICING" },
+                    { id: 17, layoutType: "comparison", title: "竞品迁移成本分析", sub: "一键无损导入数据的战略价值", kpi: "1s", label: "极速迁移体验", progress: 90, tag: "17. MIGRATION" },
+                    { id: 18, layoutType: "default", title: "核心管理层持股结构", sub: "利益深度绑定的战斗梯队", kpi: "65%", label: "团队绝对控股", progress: 100, tag: "18. CAP TABLE" },
+                    { id: 19, layoutType: "default", title: "B 轮融资核心诉求", sub: "资本杠杆撬动寡头地位", kpi: "$20M", label: "本轮目标融资金额", progress: 40, tag: "19. ASK" },
+                    { id: 20, layoutType: "cover", title: "感谢聆听，共赴星辰", sub: "APEXWORK SAAS 期待您的加持", kpi: "100%", label: "演示结束", progress: 100, tag: "20. END" }
+                ]
+            },
+            fintech: {
+                brand: "FinTech", titleName: "FinTech A 轮融资方案", badge: "12 SLIDES · FINANCE", total: 12, defaultBg: "team",
+                slides: [
+                    { id: 1, layoutType: "cover", title: "FinTech 颠覆式创新", sub: "重塑跨境支付结算网络", kpi: "2.5M", label: "日均交易笔数", progress: 88, tag: "01. VISION" },
+                    { id: 2, layoutType: "kpi-grid", title: "痛点：传统清算的摩擦", sub: "高昂的手续费与 T+3 到账延迟", kpi: "3.5%", label: "行业平均抽成", progress: 20, tag: "02. PAIN" },
+                    { id: 3, layoutType: "comparison", title: "解法：区块链底层清算", sub: "去中心化账本带来的降维打击", kpi: "T+0", label: "极致结算速度", progress: 100, tag: "03. SOLUTION" },
+                    { id: 4, layoutType: "default", title: "智能合约审计与合规", sub: "全球顶级法务机构出具的白皮书", kpi: "100%", label: "合规通过率", progress: 100, tag: "04. LEGAL" },
+                    { id: 5, layoutType: "funnel", title: "商户接驳转化漏斗", sub: "从 API 调试到真实跑单的极简体验", kpi: "80%", label: "SDK 接入转化率", progress: 85, tag: "05. SDK" },
+                    { id: 6, layoutType: "timeline", title: "清算牌照获取时间轴", sub: "香港、新加坡与欧美的持牌进度", kpi: "3 张", label: "核心 MSO 牌照", progress: 60, tag: "06. LICENSE" },
+                    { id: 7, layoutType: "default", title: "流动性资金池储备", sub: "应对极端并发的备付金机制", kpi: "$50M", label: "常备流动性资金", progress: 95, tag: "07. LIQUIDITY" },
+                    { id: 8, layoutType: "comparison", title: "反洗钱(AML) AI 引擎", sub: "机器学习侦测异常资金流转", kpi: "99.9%", label: "拦截准确率", progress: 90, tag: "08. AML" },
+                    { id: 9, layoutType: "default", title: "B端客户生态图谱", sub: "电商、航旅与数字娱乐的深度绑定", kpi: "120+", label: "深度合作平台", progress: 75, tag: "09. ECOSYSTEM" },
+                    { id: 10, layoutType: "kpi-grid", title: "三年期营收爆发预测", sub: "交易规模扩大带来的网络效应", kpi: "500%", label: "预计营收增幅", progress: 65, tag: "10. REVENUE" },
+                    { id: 11, layoutType: "default", title: "核心创始团队背景", sub: "来自高盛与 PayPal 的金融老兵", kpi: "15年", label: "人均金融深耕", progress: 100, tag: "11. TEAM" },
+                    { id: 12, layoutType: "cover", title: "A 轮募资与未来展望", sub: "诚邀顶尖资方，共建金融新基建", kpi: "$15M", label: "本轮融资金额", progress: 30, tag: "12. ASK" }
+                ]
             }
         };
 
@@ -218,7 +261,6 @@
 
             if (!preset && key.startsWith('AI-')) {
                 let targetAiDeck = null;
-
                 try {
                     const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
                     const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
@@ -233,7 +275,7 @@
                             const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
                             targetAiDeck = aiDecks.find(d => d.id === key && !blacklist.includes(d.id));
                         }
-                    } catch(e) { console.warn("拉取AI云端数据失败", e); }
+                    } catch(e) {}
                 }
 
                 if (targetAiDeck) {
@@ -327,7 +369,7 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
-        // 👑 彻底剔除引起白屏报错的复杂动画，强行注入保证 100% 渲染
+        // 👑 彻底剔除引起白屏报错的动画与透明字类名，只保留最原生、最粗暴的 HTML 注入
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
@@ -447,7 +489,7 @@
                     </div>`;
             }
 
-            // 👑 绝不用延迟！纯原生强写 HTML，确保文字 100% 出现
+            // 直接暴力插入 DOM，无需任何动画库干预
             canvas.style.opacity = '1';
             canvas.innerHTML = topHeader + innerContent;
         }
@@ -474,7 +516,7 @@
             renderMainSlide();
         }
         
-        // 👑 修复：强转字符串防崩溃
+        // 👑 强转字符串防崩溃
         function syncFormInputs() {
             document.getElementById("bindKpi").value = String(slidesData[currentSlideIdx].kpi || '').replace(/<[^>]+>/g, '');
             document.getElementById("bindLabel").value = String(slidesData[currentSlideIdx].label || '').replace(/<[^>]+>/g, '');
