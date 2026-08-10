@@ -2,7 +2,6 @@
  * APEXWORK 模块 2：业务风控、产品大盘与所有控制面板 (admin-biz.js)
  */
 
-// 👑 修复报错：补全仓库地址变量，杜绝拉取记录时变白板
 const REPO = "wys0130/ai-boss-empire";
 
 window.ApexImageEngine = {
@@ -511,52 +510,65 @@ window.DEFAULT_AUDIT_PRODUCTS = [
     { id: "word-ats", title: "欧美 ATS 智能排版合规报告", category: "DOCX STANDARD · Office WORD文档", thumbKey: "prod_word", thumbCloudPath: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", thumbDefault: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69, priceUsd: "9.99", colorCls: "text-indigo-600 font-bold", isLinked: true, status: true }
 ];
 
+// 👑 物理铁底：绝对过滤僵尸，永远保底 5 大原厂件
 window.loadAuditProducts = async function() {
-    let blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-    const localProducts = localStorage.getItem('APEX_AUDIT_PRODUCTS');
+    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
     
-    // 👑 修复延迟加载：只要有本地缓存或默认数据，第一时间秒开渲染！
-    if (localProducts) {
-        window.AUDIT_PRODUCTS.length = 0; 
-        JSON.parse(localProducts).forEach(p => window.AUDIT_PRODUCTS.push(p));
-    } else {
-        window.AUDIT_PRODUCTS = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
-    }
-    window.renderAuditTable();
+    // 1. 绝对强制装载 5 大原厂件，永不消失
+    let finalProducts = JSON.parse(JSON.stringify(window.DEFAULT_AUDIT_PRODUCTS));
 
+    // 2. 拉取云端 AI 数据
+    let cloudData = [];
     try {
-        let aiData = null;
         const keys = window.getKeysSafe();
         if (keys && keys.gh) {
             const f = await window.getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
-            if (f.content) aiData = JSON.parse(f.content);
+            if (f.content) cloudData = JSON.parse(f.content);
         } else {
             const res = await fetch('data/ai-generated-decks.json?nocache=' + Date.now());
-            if (res.ok) aiData = await res.json();
+            if (res.ok) cloudData = await res.json();
         }
+    } catch(e) {}
 
-        if (Array.isArray(aiData)) {
-            aiData.forEach(aiItem => {
-                if (!window.AUDIT_PRODUCTS.find(p => p.id === aiItem.id) && (!aiItem.id.startsWith('AI-') || !blacklist.includes(aiItem.id))) {
+    // 3. 严格合并云端 AI 数据，并进行物理级防僵尸拦截
+    if (Array.isArray(cloudData)) {
+        cloudData.forEach(item => {
+            if (item.id && item.id.startsWith('AI-') && !blacklist.includes(item.id)) {
+                if (!finalProducts.find(p => p.id === item.id)) {
                     let col = 'text-orange-500 font-bold';
-                    if (aiItem.type === 'excel') col = 'text-emerald-600 font-bold';
-                    if (aiItem.type === 'word') col = 'text-indigo-600 font-bold';
+                    if (item.type === 'excel') col = 'text-emerald-600 font-bold';
+                    if (item.type === 'word') col = 'text-indigo-600 font-bold';
                     
-                    window.AUDIT_PRODUCTS.push({
-                        id: aiItem.id, title: aiItem.title || aiItem.name,
-                        category: aiItem.category || `AI 生成 · ${aiItem.type ? aiItem.type.toUpperCase() : 'PPT'}`,
-                        thumbKey: "prod_" + aiItem.id,
-                        thumbCloudPath: aiItem.thumb || aiItem.thumbnail || "",
-                        thumbDefault: aiItem.thumb || aiItem.thumbnail || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
-                        priceRmb: aiItem.priceRmb || 69, priceUsd: aiItem.priceUsd || "14.99",
-                        colorCls: col, isLinked: true, status: true
-                    });
+                    item.colorCls = col;
+                    item.isLinked = true;
+                    if(typeof item.status === 'undefined') item.status = true;
+                    if(!item.thumbDefault) item.thumbDefault = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80";
+                    if(!item.thumbKey) item.thumbKey = "prod_" + item.id;
+                    
+                    finalProducts.push(item);
                 }
-            });
-            localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
-            window.renderAuditTable(); // 数据拉取完毕后二次渲染更新
-        }
-    } catch(e) { console.warn("拉取云端模板失败", e); }
+            }
+        });
+    }
+
+    // 4. 恢复本地的价格和状态
+    try {
+        const localOverrides = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+        finalProducts.forEach(p => {
+            const override = localOverrides.find(o => o.id === p.id);
+            if (override) {
+                if (override.priceRmb !== undefined) p.priceRmb = override.priceRmb;
+                if (override.priceUsd !== undefined) p.priceUsd = override.priceUsd;
+                if (override.isLinked !== undefined) p.isLinked = override.isLinked;
+                if (override.status !== undefined) p.status = override.status;
+            }
+        });
+    } catch(e) {}
+
+    // 5. 写入大盘
+    window.AUDIT_PRODUCTS = finalProducts;
+    localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
+    window.renderAuditTable();
 };
 
 window.toggleAllCheckboxes = function(masterCb) {
@@ -763,7 +775,7 @@ window.forceRemoveProduct = async function(id) {
             const f = await window.getGithubFileSafe("data/ai-generated-decks.json", keys.gh);
             if (f.content) {
                 let cloudDecks = JSON.parse(f.content);
-                cloudDecks = cloudDecks.filter(d => d.id !== id && !blacklist.includes(d.id));
+                cloudDecks = cloudDecks.filter(d => !idsToDelete.includes(d.id) && !blacklist.includes(d.id));
                 await window.pushGithubJsonFile("data/ai-generated-decks.json", cloudDecks, f.sha, `🗑️ 单件强制销毁下架: ${title} [skip ci]`, keys.gh);
             }
         }
@@ -787,7 +799,6 @@ window.loadTasksManifest = async function() {
     const listEl = document.getElementById('manifestList');
     if (!listEl) return;
     
-    // 🚀 修复延迟加载：先渲染本地已有缓存，实现秒开！
     const localCache = localStorage.getItem("APEX_TASKS_CACHE");
     if (localCache) {
         window.rawManifestTasks = JSON.parse(localCache);
@@ -803,12 +814,10 @@ window.loadTasksManifest = async function() {
             if (fileObj.content) {
                 const manifest = JSON.parse(fileObj.content);
                 window.rawManifestTasks = (manifest.tasks && manifest.tasks.length > 0) ? manifest.tasks : JSON.parse(JSON.stringify(window.DEFAULT_MANIFEST_TASKS));
-                window.renderManifestTasks(); // 拿到新数据后再渲染一次
+                window.renderManifestTasks(); 
             }
         }
-    } catch (err) {
-        console.warn("拉取云端工单失败", err);
-    }
+    } catch (err) {}
 };
 
 window.resetManifestToDefault = async function() {
@@ -898,7 +907,7 @@ window.toggleTaskStatus = async function(taskId) {
                 window.loadTasksManifest();
             }
         }
-    } catch (e) { window.appendLog(`⚠️ 进度已保存在设备中 (同步云端请配置密钥)`, "text-amber-500"); }
+    } catch (e) {}
 };
 
 window.openRollbackModal = function() {
@@ -1014,9 +1023,7 @@ window.fetchTaggedCommits = async function(forceRefresh = false) {
                 </div>
             `;
         });
-    } catch (err) { 
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取代码记录异常，请检查网络或配置的 Token 权限。</div>`; 
-    }
+    } catch (err) {}
 };
 
 window.fetchNormalCommits = async function(forceRefresh = false) {
@@ -1061,9 +1068,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
                 </div>
             `;
         });
-    } catch (err) { 
-        container.innerHTML = `<div class="text-center text-xs text-rose-500 py-4 font-mono">拉取异常，请检查网络。</div>`; 
-    }
+    } catch (err) {}
 };
 
 window.createCodeSnapshot = async function() {
@@ -1199,3 +1204,5 @@ window.revertToSelectedCommit = async function(targetSha, shortSha) {
         alert("❌ 还原异常: " + err.message);
     }
 };
+
+document.addEventListener("DOMContentLoaded", window.initAdminEngine);
