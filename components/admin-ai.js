@@ -1,6 +1,5 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：2K商业基底二次魔改 -> 视觉与侵权90分强审 -> 自动WebP压缩 -> 指纹级结构去重
  */
 
 window.deptConfig = [
@@ -23,12 +22,9 @@ async function processRemixAndScoring(themeKeyword) {
     while(score < 90 && attempt < 4) {
         attempt++;
         window.appendLog(`🎨 [视觉魔改引擎] 锁定 2K 顶级商业实拍图基底，进行第 ${attempt} 轮深度 AI 二次重绘剥离版权...`);
-        
         await new Promise(r => setTimeout(r, 900)); 
-        
         score = 80 + Math.random() * 19; 
         window.appendLog(`⚖️ [法务与美学双重审查] 查重库检索中... 无侵权风险及视觉冲击力测算: 得分 ${score.toFixed(1)}`);
-        
         if(score >= 90) {
             window.appendLog(`✅ [审查通过] 视觉突破 90 分，0 侵权风险！正在自动转换为 WebP 极限压缩格式并锁定...`, "text-emerald-500");
             const safeKeyword = encodeURIComponent(`${themeKeyword} 2k resolution top tier commercial photography remixed abstract dark theme data visualization background 8k photorealistic no text no letters no watermark`);
@@ -38,12 +34,10 @@ async function processRemixAndScoring(themeKeyword) {
             window.appendLog(`⚠️ [驳回销毁] 画面得分 ${score.toFixed(1)}，存在同质化或版权争议，严禁上架，执行彻底销毁重做！`, "text-rose-500");
         }
     }
-    
     if(!finalImg) {
         window.appendLog(`⚠️ [调度异常] 极致魔改超限，为保证体验，已启用极客级备用 0 侵权暗黑科技 WebP 基底图。`, "text-amber-500");
         finalImg = `https://image.pollinations.ai/prompt/premium%20business%20dark%20abstract%20cyberpunk%20background%20no%20text?width=1280&height=720&nologo=true&seed=${Math.floor(Math.random()*999999)}`;
     }
-    
     return finalImg;
 }
 
@@ -63,12 +57,10 @@ window.triggerSwarmAutonomousAction = async function() {
         if (!keys.ds || !keys.gh) throw new Error("缺少 DeepSeek 或 GitHub 密钥");
         
         if (rawText.includes("主动产品部") || rawText.includes("审核质量部") || rawText.includes("生成") || rawText.includes("模板")) {
-            
             if (cmdBox) {
                 if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
                 else cmdBox.innerHTML = "";
             }
-
             window.appendLog(`🤖 [大脑中枢]: 收到商业推演指令，启动【积木式组件装配】与【动态阶梯定价】规则...`);
             
             const aiPrompt = `你是一个深谙消费者心理学和 SaaS 高转化率的国际顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
@@ -104,9 +96,7 @@ window.triggerSwarmAutonomousAction = async function() {
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
                 let finalImg = await processRemixAndScoring(t.themeKeyword || "high end abstract corporate data");
-                if (!finalImg || finalImg.trim() === "") {
-                    finalImg = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
-                }
+                if (!finalImg || finalImg.trim() === "") { finalImg = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80"; }
 
                 const slideCount = t.slides ? t.slides.length : 8;
                 const isPremium = slideCount >= 10; 
@@ -144,7 +134,7 @@ window.triggerSwarmAutonomousAction = async function() {
                 
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
-                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架无侵权高转化商业产品 [skip ci]", keys.gh);
+                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架多组件装配商业产品 [skip ci]", keys.gh);
 
                 if (typeof window.AUDIT_PRODUCTS !== "undefined" && typeof window.renderAuditTable === "function") {
                     newTemplates.forEach(t => window.AUDIT_PRODUCTS.unshift(t));
@@ -155,7 +145,6 @@ window.triggerSwarmAutonomousAction = async function() {
             } finally {
                 window.isCloudSyncing = false;
             }
-
         } else {
             const prompt = `董事长指令：${rawText}。以专业、干练的高管语气简短回复，带部门前缀，严禁废话。`;
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
@@ -331,22 +320,6 @@ window.loadHistoryFromMemory = async function() {
             return;
         }
     } catch (err) {}
-    
-    const mockLogs = [
-        "🤖 [大脑中枢]: 系统启动并注入全局异常捕获钩子。",
-        "👁️ [视觉策划部]: 轮播图资源尺寸及 WebP 转化效验完成。状态：🟢 健康",
-        "🛠️ [施工工程部]: 商业金库架构双端读写 (GitHub/Gitee) 已连通。",
-        "✅ [系统]: AI 智能体准备就绪，待命执行调令。"
-    ];
-    if (countBadge) countBadge.innerText = "4条";
-    feed.innerHTML = mockLogs.map((log, i) => `
-        <div class="border rounded-xl p-2.5 saas-input bg-slate-50 dark:bg-slate-900/50 mb-2">
-            <div class="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1 border-b border-slate-200 dark:border-slate-800 pb-1">
-                <span>⏱️ 今天 ${i+1}:00</span><span>#${4 - i}</span>
-            </div>
-            <div class="text-xs font-mono text-slate-800 dark:text-slate-300 leading-relaxed">${log}</div>
-        </div>
-    `).join('');
 };
 
 window.clearHistoryLog = function() {
@@ -393,7 +366,6 @@ window.initAdminEngine = function() {
     const cmdBox = document.getElementById("cmd");
     if (cmdBox) {
         cmdBox.addEventListener("focus", () => { window.isCmdActive = true; });
-
         const checkMention = function() {
             if (!cmdBox) return;
             const sel = window.getSelection();
@@ -401,7 +373,6 @@ window.initAdminEngine = function() {
                 if(typeof window.hideMentionDropdown === "function") window.hideMentionDropdown();
                 return;
             }
-
             const node = sel.focusNode;
             if (node && node.nodeType === Node.TEXT_NODE && cmdBox.contains(node)) {
                 const text = node.textContent.substring(0, sel.focusOffset).replace(/\u00A0/g, " ");
@@ -440,21 +411,5 @@ window.initAdminEngine = function() {
     }
 };
 
-// 👑 终极防僵尸复活拦截器：无视 CDN 延迟，强制物理过滤
-setTimeout(() => {
-    const origLoad = window.loadAuditProducts;
-    if (origLoad && !window._hijackedLoad) {
-        window._hijackedLoad = true;
-        window.loadAuditProducts = async function() {
-            await origLoad();
-            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-            if (window.AUDIT_PRODUCTS) {
-                window.AUDIT_PRODUCTS = window.AUDIT_PRODUCTS.filter(p => !blacklist.includes(p.id));
-                if (window.renderAuditTable) window.renderAuditTable();
-            }
-        };
-        window.loadAuditProducts();
-    }
-}, 300);
-
+// 👑 这里我已经彻底去掉了会引发冲突覆盖的 setTimeout 脏代码，直接纯净挂载启动！
 document.addEventListener("DOMContentLoaded", window.initAdminEngine);
