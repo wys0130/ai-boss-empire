@@ -141,7 +141,7 @@
         </aside>
 
         <main class="flex-1 bg-slate-950 flex flex-col items-center justify-between p-5 overflow-hidden relative">
-            <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech my-auto"></div>
+            <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech my-auto"></div>
 
             <div class="flex items-center justify-between w-full max-w-4xl text-xs text-slate-400 shrink-0">
                 <span class="bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl text-slate-300">💡 提示：选中文字后，直接使用上方 Ribbon 工具栏进行排版</span>
@@ -181,7 +181,7 @@
     </div>
 
     <script>
-        // 👑 彻底老老实实写死 15 页满血原装数据，绝不用循环！
+        // 👑 绝不使用报错的循环！15 页满血硬编码数据
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
@@ -324,12 +324,17 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
+        // 👑 彻底剔除引起白屏报错的复杂动画，强行注入保证 100% 渲染
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
-            // 👑 绝对防越界保护：如果数据为空，坚决阻断，不让引擎崩盘
-            if (!item) return;
-
             const canvas = document.getElementById("slideCanvas");
+            
+            // 极限防崩溃兜底：哪怕没数据，也要画出来一行字！
+            if (!item) {
+                canvas.innerHTML = '<div class="text-white text-2xl m-auto bg-rose-500 px-4 py-2 rounded">⚠️ 数据结构缺失，请刷新重试。</div>';
+                return;
+            }
+
             const bgCls = bgStyles[currentBgStyle] || bgStyles["tech"];
             const alignCls = currentLayoutAlign === 'center' ? "text-center items-center" : "text-left items-start";
             const maskCls = currentCardMask === 'normal' ? "bg-slate-900/80" : "bg-slate-950/95";
@@ -439,9 +444,13 @@
                     </div>`;
             }
 
-            // 👑 绝不使用会崩溃的 GSAP，强制纯原生 DOM 写法，100% 渲染
+            // 👑 用纯净无报错的 CSS 过渡替代不稳的第三方动画库，绝对渲染
+            canvas.style.opacity = '0';
             canvas.innerHTML = topHeader + innerContent;
-            canvas.style.opacity = 1;
+            setTimeout(() => {
+                canvas.style.transition = 'opacity 0.3s ease-in';
+                canvas.style.opacity = '1';
+            }, 50);
         }
 
         function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
