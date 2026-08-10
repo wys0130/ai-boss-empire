@@ -116,6 +116,11 @@
                     }
                 }
             } catch(e) {}
+            
+            // 👑 前后台完美同步补丁：让前台主动屏蔽被后台杀掉的“黑名单僵尸商品”！
+            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+            allProducts = allProducts.filter(p => !blacklist.includes(p.id));
+
             this.render(allProducts);
         },
         render: function(products) {
