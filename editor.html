@@ -186,9 +186,9 @@
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
                 slides: [
-                    { id: 1, title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
-                    { id: 2, title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
-                    { id: 3, title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" }
+                    { id: 1, layoutType: "cover", title: "AeroTech 2026 创投战略", sub: "破除传统低效长句，全视觉高精呈现", kpi: "+340%", label: "年度营收同比飙升", progress: 85, tag: "01. COVER" },
+                    { id: 2, layoutType: "comparison", title: "高管工作流管理升级", sub: "生产力跨步进化，革新传统文书效率", kpi: "98.4%", label: "流程自动化率", progress: 98, tag: "02. GOALS" },
+                    { id: 3, layoutType: "kpi-grid", title: "传统痛点：高维护与错乱", sub: "旧软件排版混乱、商业授权极其昂贵", kpi: "-45%", label: "无效维护开销缩减", progress: 70, tag: "03. PAIN" }
                 ]
             }
         };
@@ -241,6 +241,7 @@
                             const aiSec = aiSlides[i] || {};
                             return {
                                 id: i + 1, 
+                                layoutType: aiSec.layoutType || 'default', // 👑 引入 AI 给出的组件类型
                                 title: aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`, 
                                 sub: aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。", 
                                 kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
@@ -313,6 +314,7 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
+        // 👑 积木化画布渲染引擎：根据 AI 下发的 layoutType 动态变异 UI 结构！
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
@@ -322,35 +324,104 @@
 
             canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden ${bgCls} my-auto`;
             
-            canvas.innerHTML = `
-                <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10">
+            const layout = item.layoutType || 'default';
+            let innerContent = '';
+
+            const topHeader = `
+                <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10 w-full">
                     <span class="text-xs font-bold font-mono tracking-widest text-slate-300">APEXWORK · DECK</span>
                     <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${item.tag}</span>
-                </div>
+                </div>`;
 
-                <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
-                    <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
-                        class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none">${item.title}</div>
-                    <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
-                        class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${item.sub}</div>
-                </div>
+            if (layout === 'cover' || layout === 'title-page') {
+                innerContent = `
+                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col text-center items-center w-full mx-auto">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-5xl md:text-6xl font-black tracking-tight leading-tight mb-6 drop-shadow-lg w-full outline-none text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">${item.title}</div>
+                        <div class="w-24 h-1.5 bg-blue-500 mb-6 rounded-full"></div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-lg text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${item.sub || item.label}</div>
+                    </div>`;
+            } else if (layout === 'kpi-grid') {
+                innerContent = `
+                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none">${item.title}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-400 mb-8 outline-none">${item.sub}</div>
+                        <div class="grid grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">${item.label || '核心指标 A'}</div>
+                                <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-5xl font-black font-mono text-emerald-400 outline-none">${item.kpi}</div>
+                            </div>
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">年度增幅 B</div>
+                                <div contenteditable="true" class="text-5xl font-black font-mono text-blue-400 outline-none">+124K</div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else if (layout === 'timeline' || layout === 'funnel') {
+                innerContent = `
+                    <div class="z-10 w-full mt-4 flex flex-col h-full">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none">${item.title}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-400 mb-6 outline-none">${item.sub}</div>
+                        <div class="flex-1 flex flex-col justify-center gap-6 w-full max-w-2xl mx-auto">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-blue-400 text-xl">01</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-blue-500 w-full rounded-full shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold">${item.label || '漏斗顶端：获客阶段'}</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-emerald-400 text-xl">02</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-emerald-500 w-3/4 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold">漏斗中段：激活阶段</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-amber-400 text-xl">03</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-amber-500 w-1/2 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold">漏斗末端：转化营收</div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else if (layout === 'comparison') {
+                innerContent = `
+                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-8 text-center outline-none">${item.title}</div>
+                        <div class="grid grid-cols-2 gap-8 w-full max-w-3xl mx-auto">
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-8 shadow-lg text-center">
+                                <div class="text-xl font-bold text-slate-300 mb-6 border-b border-white/10 pb-3">传统模式痛点</div>
+                                <div class="text-base text-slate-400 space-y-4"><p>✖ 成本高昂难控</p><p>✖ 人工效率低下</p><p>✖ 数据存在黑盒</p></div>
+                            </div>
+                            <div class="${maskCls} backdrop-blur-md border border-blue-500/40 rounded-xl p-8 shadow-[0_0_30px_rgba(59,130,246,0.15)] text-center relative overflow-hidden">
+                                <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] px-3 py-1 font-bold rounded-bl-lg tracking-widest">APEX OURS</div>
+                                <div class="text-xl font-bold text-blue-400 mb-6 border-b border-blue-500/20 pb-3">${item.label || '创新解法'}</div>
+                                <div class="text-base text-slate-200 space-y-4"><p>✔ 极致自动化降本</p><p>✔ AI 工作流加速</p><p>✔ 全局透明可追溯</p></div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                // Default fallback
+                innerContent = `
+                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
+                            class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none">${item.title}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" 
+                            class="text-sm text-slate-300 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${item.sub}</div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center w-full">
+                        <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
+                            <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${item.kpi}</div>
+                        </div>
+                        <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
+                            <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
+                                <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
+                                <span class="text-blue-400 font-bold">${item.progress}%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${item.progress}%"></div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
 
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5 border-t border-white/10 z-10 items-center">
-                    <div class="md:col-span-5 ${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-3 shadow-lg">
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">${item.label}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-2xl font-black font-mono text-emerald-400 drop-shadow-sm outline-none">${item.kpi}</div>
-                    </div>
-                    <div class="md:col-span-7 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex flex-col justify-center">
-                        <div class="flex justify-between items-center text-[11px] font-mono mb-1.5">
-                            <span class="text-slate-300 font-bold">● TARGET COMPLETED</span>
-                            <span class="text-blue-400 font-bold">${item.progress}%</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-                            <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${item.progress}%"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            canvas.innerHTML = topHeader + innerContent;
 
             if (window.gsap) {
                 gsap.fromTo(canvas, 
