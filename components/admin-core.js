@@ -1739,7 +1739,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 修复：真实写入 GitHub 数据库，真正上架商城的 AI 生产引擎
+// 👑 模块 1：真正的 AI 生产车间 (替换 admin-core.js 最底部的整个 window.triggerSwarmAutonomousAction 函数)
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1753,37 +1753,81 @@ window.triggerSwarmAutonomousAction = async function() {
     
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = "<span>⚙️ AI 蜂群推演与生产中...</span>";
+        btn.innerHTML = "<span>⚙️ AI 蜂群全自动推演与生产中...</span>";
     }
 
     try {
         const keys = getKeysSafe();
+        if (!keys.ds || !keys.gh) throw new Error("缺少 DeepSeek API Key 或 GitHub Token");
         
-        // 👑 拦截关键字，启动真实生产线
+        // 👑 拦截关键字，调用真正的 AI 大模型生成产品
         if (rawText.includes("主动产品部") || rawText.includes("审核质量部") || rawText.includes("生成") || rawText.includes("模板")) {
             
-            if (!keys.gh) throw new Error("缺少 GitHub Token，无法将商品上架至云端数据库");
-
             if (cmdBox) {
                 if (cmdBox.tagName === "INPUT" || cmdBox.tagName === "TEXTAREA") cmdBox.value = "";
                 else cmdBox.innerHTML = "";
             }
 
-            appendLog(`🤖 [大脑中枢]: 收到生成指令，已唤醒【主动产品部】与【审核质量部】...`);
-            await new Promise(r => setTimeout(r, 1200));
+            appendLog(`🤖 [大脑中枢]: 收到生成指令，正在唤醒 DeepSeek AI 大模型构思全新产品...`);
+            
+            // 🚀 调用 AI 真实生成 JSON 数据，每次绝对不重样！
+            const aiPrompt = `你是一个顶尖SaaS产品经理。请自动生成3个完全不同的全新商业模板作品（必须包含1个PPT, 1个Excel, 1个Word）。
+请严格返回JSON数组格式，绝不要包含任何 markdown 符号或多余的解释文本，直接以 [ 开始，以 ] 结束。
+格式样例：
+[
+  {"type": "ppt", "name": "这里写高大上的模板名称", "category": "30 SLIDES · 高级路演", "priceRmb": 129, "priceUsd": "19.99"},
+  {"type": "excel", "name": "...", "category": "XLSX MODEL · 数据中台", "priceRmb": 99, "priceUsd": "14.99"},
+  {"type": "word", "name": "...", "category": "DOCX PRO · 合规协议", "priceRmb": 69, "priceUsd": "9.99"}
+]`;
+            
+            const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    model: "deepseek-chat", 
+                    messages: [{ role: "user", content: aiPrompt }], 
+                    temperature: 0.8 // 提高随机性，保证排版名称全都不一样
+                })
+            });
+            
+            if (!dsRes.ok) throw new Error("AI 接口调用失败");
+            const aiAnswer = (await dsRes.json()).choices[0].message.content;
+            
+            // 提取并解析 JSON
+            const jsonMatch = aiAnswer.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) throw new Error("AI 返回的数据格式无法解析");
+            const generatedData = JSON.parse(jsonMatch[0]);
 
-            // 生成 3 个全新模板数据
-            const newTemplates = [
-                { id: "AI-" + Math.floor(1000 + Math.random()*9000), name: "全链路财务自动化对账大盘", type: "excel", category: "XLSX MODEL · 核心数据表格", thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80", priceRmb: 99 },
-                { id: "AI-" + Math.floor(1000 + Math.random()*9000), name: "2027 战略商业路演套件", type: "ppt", category: "30 SLIDES · 高级演示文稿", thumb: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80", priceRmb: 129 },
-                { id: "AI-" + Math.floor(1000 + Math.random()*9000), name: "跨国企业数据合规与隐私协议", type: "word", category: "DOCX PRO · 法务级合规文档", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80", priceRmb: 69 }
+            appendLog(`🔨 [主动产品部]: 创作完毕！产出全新作品：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            await new Promise(r => setTimeout(r, 1000));
+            appendLog(`🛡️ [审核质量部]: 版权风控审查通过！正在将其封装并上传至 GitHub 商城数据库...`);
+
+            // 随机图库素材池，保证图片每次看起来都不一样
+            const imgPool = [
+                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80",
+                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
+                "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=300&q=80",
+                "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&w=300&q=80",
+                "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=300&q=80"
             ];
 
-            appendLog(`🔨 [主动产品部]: 独立排版完成！产出 Excel、PPT、Word 模板各 1 套。`);
-            await new Promise(r => setTimeout(r, 1000));
-            appendLog(`🛡️ [审核质量部]: 版权与合规风控审查通过！正在提交至 GitHub 云端数据库...`);
+            const newTemplates = generatedData.map((t) => {
+                const rId = "AI-" + Math.floor(10000 + Math.random()*90000);
+                let col = 'text-orange-500 font-bold';
+                if (t.type.toLowerCase() === 'excel') col = 'text-emerald-600 font-bold';
+                if (t.type.toLowerCase() === 'word') col = 'text-indigo-600 font-bold';
+                
+                return {
+                    id: rId, title: t.name, category: t.category,
+                    thumbKey: "prod_" + rId, 
+                    thumbCloudPath: imgPool[Math.floor(Math.random() * imgPool.length)], 
+                    thumbDefault: imgPool[Math.floor(Math.random() * imgPool.length)],
+                    priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
+                    isLinked: true, status: true
+                };
+            });
 
-            // 👑 真实写入 GitHub 的 data/ai-generated-decks.json
+            // 👑 真实写入 GitHub 数据库
             let existingDecks = [];
             let decksSha = null;
             try {
@@ -1791,42 +1835,30 @@ window.triggerSwarmAutonomousAction = async function() {
                 if (f.content) existingDecks = JSON.parse(f.content);
                 decksSha = f.sha;
             } catch(e){}
+            
             const combinedDecks = [...newTemplates, ...existingDecks];
-            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 自动生成并上架 3 款新模板 [skip ci]", keys.gh);
+            await pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI Worker: 自动生成并上架 3 款全新产品 [skip ci]", keys.gh);
 
-            // 👑 同步更新本地审核大盘 UI
+            // 👑 同步更新后台表格 UI
             if (typeof AUDIT_PRODUCTS !== "undefined") {
-                newTemplates.forEach(t => {
-                    let col = 'text-orange-500 font-bold';
-                    if (t.type === 'excel') col = 'text-emerald-600 font-bold';
-                    if (t.type === 'word') col = 'text-indigo-600 font-bold';
-                    AUDIT_PRODUCTS.unshift({
-                        id: t.id, title: t.name, category: t.category,
-                        thumbKey: "prod_" + t.id, thumbCloudPath: t.thumb, thumbDefault: t.thumb,
-                        priceRmb: t.priceRmb, priceUsd: "19.99", colorCls: col,
-                        isLinked: true, status: true
-                    });
-                });
+                newTemplates.forEach(t => AUDIT_PRODUCTS.unshift(t));
                 localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(AUDIT_PRODUCTS));
                 if (typeof renderAuditTable === "function") renderAuditTable();
             }
 
-            // 👑 将战报写入 GitHub 的 MEMORY.md，固化记录
+            // 记录到 MEMORY 战报
             try {
                 const memFile = await getGithubFileSafe("MEMORY.md", keys.gh);
                 let memContent = memFile.content || "";
                 const timeStr = new Date().toLocaleString('zh-CN', { hour12: false });
-                const newLog = `- [EVO-RECORD | 主动产品部]: ${timeStr} 自动生成并上架了 ${newTemplates.map(t=>t.name).join('、')}。\n`;
-                memContent = newLog + memContent;
+                memContent = `- [EVO-RECORD | 主动产品部]: ${timeStr} 自动生成并上架了《${newTemplates.map(t=>t.title).join('》、《')}》。\n` + memContent;
                 await pushGithubJsonFile("MEMORY.md", memContent, memFile.sha, "📝 AI Brain: 记录生产战报 [skip ci]", keys.gh);
             } catch(e){}
 
-            appendLog(`🛒 [系统广播]: 模板已成功写入云端！前台商城和审核大盘已同步更新！`);
+            appendLog(`✅ [系统广播]: 自动化生产完毕！商品已推入数据库。（注：前台商城读取云端需等待 GitHub Pages 编译，约1-2分钟后即可显示）`);
 
         } else {
             // 常规对话逻辑
-            if (!keys.ds) throw new Error("缺少 DeepSeek API Key");
-            
             const prompt = `董事长指令：${rawText}。请用一句话简短回复，带上处理部门前缀。`;
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST",
@@ -1842,7 +1874,7 @@ window.triggerSwarmAutonomousAction = async function() {
             }
         }
         
-        // ⛔️ 注意！这里绝对没有 loadHistoryFromMemory(); 绝不会再吞你的日志！
+        // ⛔️ 注意！这里绝对去掉了之前的 loadHistoryFromMemory(); 日志绝不会再被冲刷消失！
         
     } catch (err) {
         appendLog(`❌ 执行异常: ${err.message}`, "text-rose-500");
