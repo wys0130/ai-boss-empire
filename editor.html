@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V18 Office-Ribbon Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 👑 新增：引入 GSAP 顶级动效库，优化陈旧 UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
     <!-- 先加载独立风控中台，再加载收银验证模块 -->
     <script src="components/vip-download-guard.js"></script>
     <script src="components/zero-auth.js"></script>
@@ -105,24 +109,38 @@
                 </div>
             </div>
 
-            <!-- 2. 修复：人类能看懂的对齐按钮组 (采用通用 SVG 图标) -->
-            <div class="flex items-center gap-1 bg-slate-900/50 p-1 rounded-lg border border-slate-700/50">
-                <button onclick="document.execCommand('justifyLeft', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="左对齐">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h16"></path></svg>
+            <!-- 👑 模块 3：Office 高频插入组件 Ribbon 工具栏 -->
+            <div class="flex items-center gap-1.5 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50 shadow-inner">
+                <!-- 优先级 1: 文本框 -->
+                <button onclick="document.execCommand('insertHTML', false, '<div contenteditable=\'true\' class=\'p-3 border border-blue-500/50 bg-blue-500/10 rounded min-w-[120px] min-h-[40px] inline-block m-2 shadow text-white\'>双击编辑文本框</div>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-blue-600/20 text-slate-300 hover:text-blue-400 transition group" title="插入排版文本框">
+                    <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h8M4 18h16"></path></svg>
+                    <span class="text-[10px] font-bold mt-0.5">文本框</span>
                 </button>
-                <button onclick="document.execCommand('justifyCenter', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="居中对齐">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M4 18h16"></path></svg>
+                <!-- 优先级 2: 图片 -->
+                <button onclick="const url=prompt('请输入高清图片URL:'); if(url) document.execCommand('insertImage', false, url);" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-emerald-600/20 text-slate-300 hover:text-emerald-400 transition group" title="插入网络图片">
+                    <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span class="text-[10px] font-bold mt-0.5">插图片</span>
                 </button>
-                <button onclick="document.execCommand('justifyRight', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="右对齐">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M4 18h16"></path></svg>
+                <div class="w-px h-8 bg-slate-700 mx-1"></div>
+                <!-- 优先级 3: 形状 -->
+                <button onclick="document.execCommand('insertHTML', false, '<div class=\'w-24 h-24 bg-blue-500 rounded-lg inline-block m-2 shadow-lg\'></div>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-amber-600/20 text-slate-300 hover:text-amber-400 transition group" title="插入基础形状">
+                    <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <span class="text-[10px] font-bold mt-0.5">插形状</span>
                 </button>
-                <button onclick="document.execCommand('justifyFull', false, null)" class="px-2 py-1.5 text-slate-400 hover:text-white hover:bg-blue-600 rounded transition" title="两端对齐">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <!-- 优先级 4: 表格 -->
+                <button onclick="document.execCommand('insertHTML', false, '<table class=\'w-full border-collapse border border-slate-600 text-sm my-3\'><tr><th class=\'border border-slate-600 p-2 bg-slate-800 text-white\'>标题1</th><th class=\'border border-slate-600 p-2 bg-slate-800 text-white\'>标题2</th></tr><tr><td class=\'border border-slate-600 p-2 text-white\'>数据A</td><td class=\'border border-slate-600 p-2 text-white\'>数据B</td></tr></table>')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-fuchsia-600/20 text-slate-300 hover:text-fuchsia-400 transition group" title="插入数据表格">
+                    <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    <span class="text-[10px] font-bold mt-0.5">插表格</span>
+                </button>
+                <!-- 优先级 5: 图表 -->
+                <button onclick="alert('数据面板尚未挂载可视化插件')" class="flex flex-col items-center justify-center w-14 h-12 rounded hover:bg-rose-600/20 text-slate-300 hover:text-rose-400 transition group" title="插入动态图表">
+                    <svg class="w-5 h-5 mb-0.5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    <span class="text-[10px] font-bold mt-0.5">插图表</span>
                 </button>
             </div>
 
             <!-- 幻灯片布局设计组 -->
-            <div class="flex items-center gap-2 border-r border-slate-700 pr-6">
+            <div class="flex items-center gap-2 border-l border-slate-700 pl-6">
                 <span class="text-[10px] text-slate-500 font-bold">主题底图:</span>
                 <button onclick="changeBackground('tech')" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded border border-blue-500/40 text-[11px] transition">科技</button>
                 <button onclick="changeBackground('finance')" class="px-2.5 py-1 bg-amber-600/30 hover:bg-amber-600 text-amber-200 rounded border border-amber-500/40 text-[11px] transition">金融</button>
@@ -130,7 +148,7 @@
                 <button onclick="changeBackground('mesh')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded border border-emerald-500/40 text-[11px] transition">极简</button>
             </div>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 border-l border-slate-700 pl-6">
                 <span class="text-[10px] text-slate-500 font-bold">WPS 组件:</span>
                 <button onclick="toggleVisualChart()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">📊 图表动画</button>
                 <button onclick="toggleLayoutAlign()" class="hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded transition border border-slate-700 text-[11px]">📐 布局切换</button>
@@ -387,6 +405,14 @@
                     </div>
                 </div>
             `;
+
+            // 👑 触发 GSAP 丝滑入场动画，告别陈旧 UI
+            if (window.gsap) {
+                gsap.fromTo(canvas, 
+                    { opacity: 0, y: 20, scale: 0.98 }, 
+                    { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "power3.out" }
+                );
+            }
         }
 
         function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
