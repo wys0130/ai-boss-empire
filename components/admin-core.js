@@ -1739,7 +1739,7 @@ window.fetchNormalCommits = async function(forceRefresh = false) {
     }
 };
 
-// 👑 修复版：带数组类型保护的 AI 生产车间
+// 👑 修复版：带前后端全兼容字段映射的 AI 生产车间
 window.triggerSwarmAutonomousAction = async function() {
     const btn = document.getElementById("runBtn");
     const cmdBox = document.getElementById("cmd");
@@ -1795,6 +1795,7 @@ window.triggerSwarmAutonomousAction = async function() {
             await new Promise(r => setTimeout(r, 1000));
             appendLog(`🛡️ [审核质量部]: 版权风控审查通过！正在将其封装并上传至 GitHub 商城数据库...`);
 
+            // AI 无法直接画图，提供高品质占位图池，供管理员后续手动替换
             const imgPool = [
                 "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=300&q=80",
                 "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=300&q=80",
@@ -1809,17 +1810,25 @@ window.triggerSwarmAutonomousAction = async function() {
                 if (t.type && t.type.toLowerCase() === 'excel') col = 'text-emerald-600 font-bold';
                 if (t.type && t.type.toLowerCase() === 'word') col = 'text-indigo-600 font-bold';
                 
+                const imgUrl = imgPool[Math.floor(Math.random() * imgPool.length)];
+
+                // 👑 核心修复：全字段兼容！同时下发 thumb 和 thumbCloudPath，确保任何前台版本都能解析
                 return {
-                    id: rId, title: t.name, category: t.category, type: t.type ? t.type.toLowerCase() : 'ppt',
+                    id: rId,
+                    title: t.name,
+                    name: t.name, // 兼容前台
+                    category: t.category,
+                    type: t.type ? t.type.toLowerCase() : 'ppt',
+                    thumb: imgUrl, // 兼容前台
+                    thumbnail: imgUrl, // 兼容前台
                     thumbKey: "prod_" + rId, 
-                    thumbCloudPath: imgPool[Math.floor(Math.random() * imgPool.length)], 
-                    thumbDefault: imgPool[Math.floor(Math.random() * imgPool.length)],
+                    thumbCloudPath: imgUrl, 
+                    thumbDefault: imgUrl,
                     priceRmb: t.priceRmb || 99, priceUsd: t.priceUsd || "14.99", colorCls: col,
                     isLinked: true, status: true
                 };
             });
 
-            // 👑 核心修复：强制确保 existingDecks 一定是数组，防止报错
             let existingDecks = [];
             let decksSha = null;
             try {
