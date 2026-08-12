@@ -1,1 +1,266 @@
-[]
+[
+  {
+    "id": "AI-82487",
+    "title": "Web3代币经济学路演：从冷启动到飞轮",
+    "titleEn": "Tokenomics Pitch: Cold Start to Flywheel",
+    "category": "11页 · Web3/代币经济",
+    "categoryEn": "11 P · Token Engineering",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80",
+    "thumbKey": "prod_AI-82487",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "协议自有流动性指数：从0到1的飞轮启动",
+        "kpi": "TVL$ 48M",
+        "label": "目标协议锁仓量"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "核心代币分配仪表盘",
+        "kpi": "40% / 25% / 20% / 15%",
+        "label": "社区 / 团队 / 国库 / 私募"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "TGE前6个月关键里程碑",
+        "kpi": "M3测试网 / M5审计 / M6 TGE",
+        "label": "验证节点数突破 12k"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "质押者→治理者→建设者转化漏斗",
+        "kpi": "29%",
+        "label": "质押转治理率"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "线性释放 vs. 动态衰减释放对比",
+        "kpi": "2.3x",
+        "label": "长期持有者留存倍数"
+      },
+      {
+        "layoutType": "default",
+        "title": "回购销毁机制下的通缩模型推演",
+        "kpi": "-7%",
+        "label": "年化净通缩率"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "国库多元资产健康度雷达",
+        "kpi": "3.1x",
+        "label": "稳定币覆盖18个月运营"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "流动性迁移路径：CEX到DEX到跨链",
+        "kpi": "D30 / D90 / D180",
+        "label": "DEX占比70%"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "锁仓解锁事件对价格波动影响情景",
+        "kpi": "±18%",
+        "label": "最大回撤压力测试"
+      },
+      {
+        "layoutType": "default",
+        "title": "治理代币持有人行为画像聚类",
+        "kpi": "64%",
+        "label": "长期持有型（>1yr）"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "开发者Grant 申请到主网上线漏斗",
+        "kpi": "23%",
+        "label": "存活转化率"
+      }
+    ]
+  },
+  {
+    "id": "AI-28166",
+    "title": "东南亚跨境电商选品利润模型：Shopee/Lazada/TikTok 三栖",
+    "titleEn": "SEA Cross-border Product Margin",
+    "category": "11表 · 跨境电商",
+    "categoryEn": "11 UNITS · Cross-border E-commerce",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "thumbKey": "prod_AI-28166",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "多SKU动态利润计算器（含汇率/关税/物流险）",
+        "kpi": "41.7%",
+        "label": "加权净利率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "从浏览到加购到付款的转化漏斗（分国家）",
+        "kpi": "2.8%",
+        "label": "印尼站转化率"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月市场规模×竞争热度矩阵（选品定位）",
+        "kpi": "B+ / A-",
+        "label": "评分组合：健康/竞争"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "单件商品全链路成本拆解：头程/尾程/仓储/退货",
+        "kpi": "$1.89",
+        "label": "单件综合履约成本"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "三种促销策略（闪购/直播/优惠券）ROI对比",
+        "kpi": "183%",
+        "label": "直播渠道ROI"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "选品淘汰漏斗：初筛300→精筛60→上架15",
+        "kpi": "5%",
+        "label": "存活率"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "季节性需求矩阵：斋月/黑五/9.9大促热力",
+        "kpi": "88",
+        "label": "斋月热力指数"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "跨境物流三方案（空派/海派/海外仓）敏感分析",
+        "kpi": "$3.20",
+        "label": "海派单均成本"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "广告自动规则（ACOS阈值随时调整）",
+        "kpi": "12.5%",
+        "label": "目标ACOS"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "竞品价格弹性矩阵（敏感/不敏感品类）",
+        "kpi": "-15%",
+        "label": "价格敏感度系数"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "退货率与残值回收表（按客单价分桶）",
+        "kpi": "3.2%",
+        "label": "平均退货残值率"
+      }
+    ]
+  },
+  {
+    "id": "AI-20017",
+    "title": "高盛级别ESG尽调白皮书：供应链碳足迹与治理风险",
+    "titleEn": "ESG Due Diligence Whitepaper",
+    "category": "12章 · ESG/尽调",
+    "categoryEn": "12 UNITS · ESG Intelligence",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+    "thumbKey": "prod_AI-20017",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "目标标的 ESG 综合评级：B+（行业前25%）",
+        "kpi": "B+",
+        "label": "MSCI等级"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "环境合规重点核查清单（范围1/2/3）",
+        "kpi": "18项",
+        "label": "通过/待整改"
+      },
+      {
+        "layoutType": "quote",
+        "title": "独立审计师关于范围3数据质量的意见",
+        "kpi": "中等置信",
+        "label": "供应链数据覆盖度"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "水风险与物理气候暴露评估摘要",
+        "kpi": "高风险",
+        "label": "东南亚生产基地"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "董事会多元性及薪酬ESG挂钩检查",
+        "kpi": "3/5",
+        "label": "女性董事比例"
+      },
+      {
+        "layoutType": "quote",
+        "title": "管理层访谈实录：碳减排承诺的可信度交叉验证",
+        "kpi": "SBTi",
+        "label": "已提交承诺"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "行业基准对标：同赛道ESG披露缺口分析",
+        "kpi": "27%",
+        "label": "披露缺口比例"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "合规风险清单：冲突矿产/劳工权益/反贪腐",
+        "kpi": "1项",
+        "label": "重大整改项"
+      },
+      {
+        "layoutType": "quote",
+        "title": "内部通风报信机制的有效性评估",
+        "kpi": "4.2",
+        "label": "员工信任评分（5分制）"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "碳补偿项目质量与额外性分析",
+        "kpi": "34%",
+        "label": "高质量补偿占比"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "未来12个月ESG行动路线图（优先级排序）",
+        "kpi": "9项",
+        "label": "短期优先措施"
+      },
+      {
+        "layoutType": "quote",
+        "title": "律师事务所关于新规合规性的最终备忘录",
+        "kpi": "CSRD",
+        "label": "欧盟合规预期"
+      }
+    ]
+  }
+]
