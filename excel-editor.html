@@ -53,11 +53,15 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <aside class="lg:col-span-2 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📅 分析模块控制台</h2>
-      <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer"></div>
+      <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer">
+        <!-- JS 动态渲染 -->
+      </div>
     </aside>
 
     <main class="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
-      <div id="dynamicMainArea"></div>
+      <div id="dynamicMainArea">
+        <!-- 核心矩阵渲染区 (动态变异) -->
+      </div>
 
       <div class="mt-8 pt-6 border-t border-slate-100">
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📊 商业决策 KPI 卡片矩阵</h3>
@@ -114,7 +118,7 @@ let financeData = [];
 let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
 let isAiMode = false;
 let sheetsData = [];
-let aiBottomKpis = [];
+let aiBottomKpis = []; 
 
 let rowRevName = '营业总收入 (Revenue)';
 let rowCostName = '成本与支出 (Costs)';
@@ -199,7 +203,7 @@ function recomputeKPIsAndRender(rebuildDom = true) {
           const safeValue = String(kpi?.value || '0').replace(/<[^>]+>/g, '');
           kpiContainer.innerHTML += `
             <div class="kpi-card border-l-4 border-l-${colors[idx%4]}-500">
-              <p class="text-xs text-slate-500 font-medium">${safeLabel}</p>
+              <p class="text-xs text-slate-500 font-medium truncate" title="${safeLabel}">${safeLabel}</p>
               <p class="text-2xl font-black text-slate-900 font-mono mt-1">${safeValue}</p>
             </div>
           `;
@@ -242,6 +246,9 @@ function renderDynamicMainArea(rebuildHtml = true) {
   const yearProfit = yearRev - yearCost;
 
   let htmlContent = '';
+  
+  // 👑 修复文字撑破容器框：加入弹性响应的 font-size
+  const kpiSize = kpiTxt.length > 10 ? 'text-2xl leading-tight whitespace-normal break-words' : 'text-6xl';
 
   if (layout === 'roi-calc') {
       htmlContent = `
@@ -255,7 +262,7 @@ function renderDynamicMainArea(rebuildHtml = true) {
         <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-8 mb-4">
             <div class="text-center mb-8 border-b border-indigo-200 pb-6">
                 <div class="text-sm font-bold text-slate-600 uppercase tracking-widest mb-2">${labelTxt}</div>
-                <div class="text-6xl font-black font-mono text-indigo-600 drop-shadow-sm">${kpiTxt}</div>
+                <div class="${kpiSize} font-black font-mono text-indigo-600 drop-shadow-sm">${kpiTxt}</div>
             </div>
             <div class="flex justify-between items-center px-4">
                 <div>
@@ -292,7 +299,7 @@ function renderDynamicMainArea(rebuildHtml = true) {
             <div class="flex items-center gap-4 bg-emerald-50 p-6 rounded-xl border border-emerald-200 shadow-md transform scale-[1.02]">
                 <div class="w-12 text-center font-black text-emerald-600 text-sm">转化</div>
                 <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full" style="width: ${(yearProfit/yearRev*100).toFixed(0)}%"></div></div>
-                <div class="w-24 text-right font-mono font-black text-emerald-600 text-lg">${kpiTxt}</div>
+                <div class="w-24 text-right font-mono font-black text-emerald-600 text-lg whitespace-normal break-words">${kpiTxt}</div>
             </div>
         </div>
       `;
@@ -388,101 +395,102 @@ function executeXLSXExport() {
   alert('✅ 完整带排版的 Excel 建模表下载成功！');
 }
 
-// 👑 异步请求黑盒彻底修复：保证异步拉取结束后，必定执行一次带渲染的强力更新！
-async function loadDeckByRouter() {
-    const params = new URLSearchParams(window.location.search);
-    const deckId = params.get('deck');
-    const navContainer = document.getElementById('monthNavContainer');
-    
-    if (deckId && deckId.startsWith('AI-')) {
-        isAiMode = true;
-        let targetAiDeck = null;
-        try {
-            const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
-            const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-            targetAiDeck = localDecks.find(d => d.id === deckId && !blacklist.includes(d.id));
-        } catch(e) {}
-
-        if (!targetAiDeck) {
+window.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const deckId = params.get('deck');
+        const navContainer = document.getElementById('monthNavContainer');
+        
+        if (deckId && deckId.startsWith('AI-')) {
+            isAiMode = true;
+            let targetAiDeck = null;
             try {
-                const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
-                if (res.ok) {
-                    const decks = await res.json();
-                    const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
-                    targetAiDeck = decks.find(d => d.id === deckId && !blacklist.includes(d.id));
-                }
-            } catch (e) {}
-        }
+                const localDecks = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
+                const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                targetAiDeck = localDecks.find(d => d.id === deckId && !blacklist.includes(d.id));
+            } catch(e) {}
 
-        if (targetAiDeck) {
-            const docName = String(targetAiDeck.name || targetAiDeck.title).replace(/<[^>]+>/g, '');
-            document.getElementById('headerTitle').innerText = docName;
-            document.getElementById('headerCat').innerText = targetAiDeck.category || '核心业务架构 · 智能生成';
-            
-            const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
-            document.getElementById('topPriceBtn').innerText = priceStr;
-            document.getElementById('mainPriceTxt').innerHTML = `${priceStr} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
-            
-            aiBottomKpis = targetAiDeck.bottomKpis;
-            if (!aiBottomKpis || !Array.isArray(aiBottomKpis) || aiBottomKpis.length < 4) {
-                if (docName.includes('电商') || docName.includes('海运') || docName.includes('物流')) {
-                    aiBottomKpis = [
-                        {label: "单客获客成本(CAC)", value: "$" + (Math.random()*50).toFixed(1)},
-                        {label: "退货及折损率", value: (Math.random()*5).toFixed(1) + "%"},
-                        {label: "物流履约准时率", value: (90 + Math.random()*9).toFixed(1) + "%"},
-                        {label: "LTV/CAC 效能比", value: (2 + Math.random()*3).toFixed(1) + "x"}
-                    ];
-                } else if (docName.includes('无人机') || docName.includes('农业') || docName.includes('制造')) {
-                    aiBottomKpis = [
-                        {label: "单机架均摊成本", value: "$" + (Math.random()*1000).toFixed(0)},
-                        {label: "电池循环寿命折损", value: (Math.random()*15).toFixed(1) + "%"},
-                        {label: "单设备日均作业", value: (100 + Math.random()*500).toFixed(0) + " 亩"},
-                        {label: "设备综合效率(OEE)", value: (85 + Math.random()*14).toFixed(1) + "%"}
-                    ];
-                } else {
-                    aiBottomKpis = [
-                        {label: "月度经常性收入", value: "$" + (Math.random()*100).toFixed(1) + "M"},
-                        {label: "平台净流失率", value: (Math.random()*2).toFixed(2) + "%"},
-                        {label: "企业年度客单价", value: "$" + (10 + Math.random()*50).toFixed(1) + "K"},
-                        {label: "模型运算容错率", value: "99.9%"}
-                    ];
-                }
+            if (!targetAiDeck) {
+                try {
+                    const res = await fetch(`data/ai-generated-decks.json?_t=${Date.now()}`);
+                    if (res.ok) {
+                        const decks = await res.json();
+                        const blacklist = JSON.parse(localStorage.getItem('APEX_DELETED_ZOMBIES') || '[]');
+                        targetAiDeck = decks.find(d => d.id === deckId && !blacklist.includes(d.id));
+                    }
+                } catch (e) {}
             }
 
-            sheetsData = targetAiDeck.slides || [];
-            if (sheetsData.length > 0) {
-                navContainer.innerHTML = '';
-                sheetsData.forEach((sheet, idx) => {
-                    const btnTitle = String(sheet.title ? sheet.title : `分析模块 ${idx+1}`).replace(/<[^>]+>/g, '');
-                    navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${btnTitle}</button>`;
-                });
+            if (targetAiDeck) {
+                const docName = String(targetAiDeck.name || targetAiDeck.title).replace(/<[^>]+>/g, '');
+                document.getElementById('headerTitle').innerText = docName;
+                document.getElementById('headerCat').innerText = targetAiDeck.category || '核心业务架构 · 智能生成';
                 
-                if (sheetsData.length >= 2) {
-                    rowRevName = String(sheetsData[0].title || '核心主营收入').replace(/<[^>]+>/g, '');
-                    rowCostName = String(sheetsData[1].title || '刚性支出与损耗').replace(/<[^>]+>/g, '');
-                    document.getElementById('roiTitle').innerText = String(sheetsData[0].label || '投资回报率').replace(/<[^>]+>/g, '');
+                const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
+                document.getElementById('topPriceBtn').innerText = priceStr;
+                document.getElementById('mainPriceTxt').innerHTML = `${priceStr} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
+                
+                aiBottomKpis = targetAiDeck.bottomKpis;
+                if (!aiBottomKpis || !Array.isArray(aiBottomKpis) || aiBottomKpis.length < 4) {
+                    if (docName.includes('电商') || docName.includes('海运') || docName.includes('物流')) {
+                        aiBottomKpis = [
+                            {label: "单客获客成本(CAC)", value: "$" + (Math.random()*50).toFixed(1)},
+                            {label: "退货及折损率", value: (Math.random()*5).toFixed(1) + "%"},
+                            {label: "物流履约准时率", value: (90 + Math.random()*9).toFixed(1) + "%"},
+                            {label: "LTV/CAC 效能比", value: (2 + Math.random()*3).toFixed(1) + "x"}
+                        ];
+                    } else if (docName.includes('无人机') || docName.includes('农业') || docName.includes('制造')) {
+                        aiBottomKpis = [
+                            {label: "单机架均摊成本", value: "$" + (Math.random()*1000).toFixed(0)},
+                            {label: "电池循环寿命折损", value: (Math.random()*15).toFixed(1) + "%"},
+                            {label: "单设备日均作业", value: (100 + Math.random()*500).toFixed(0) + " 亩"},
+                            {label: "设备综合效率(OEE)", value: (85 + Math.random()*14).toFixed(1) + "%"}
+                        ];
+                    } else {
+                        aiBottomKpis = [
+                            {label: "月度经常性收入", value: "$" + (Math.random()*100).toFixed(1) + "M"},
+                            {label: "平台净流失率", value: (Math.random()*2).toFixed(2) + "%"},
+                            {label: "企业年度客单价", value: "$" + (10 + Math.random()*50).toFixed(1) + "K"},
+                            {label: "模型运算容错率", value: "99.9%"}
+                        ];
+                    }
                 }
+
+                sheetsData = targetAiDeck.slides || [];
+                if (sheetsData.length > 0) {
+                    navContainer.innerHTML = '';
+                    sheetsData.forEach((sheet, idx) => {
+                        const btnTitle = String(sheet.title ? sheet.title : `分析模块 ${idx+1}`).replace(/<[^>]+>/g, '');
+                        navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${btnTitle}</button>`;
+                    });
+                    
+                    if (sheetsData.length >= 2) {
+                        rowRevName = String(sheetsData[0].title || '核心主营收入').replace(/<[^>]+>/g, '');
+                        rowCostName = String(sheetsData[1].title || '刚性支出与损耗').replace(/<[^>]+>/g, '');
+                        document.getElementById('roiTitle').innerText = String(sheetsData[0].label || '投资回报率').replace(/<[^>]+>/g, '');
+                    }
+                }
+
+                document.getElementById('initialInvestment').value = 50000 + Math.floor(Math.random() * 80000);
+                document.getElementById('growthRate').value = 3 + Math.floor(Math.random() * 12);
             }
-
-            document.getElementById('initialInvestment').value = 50000 + Math.floor(Math.random() * 80000);
-            document.getElementById('growthRate').value = 3 + Math.floor(Math.random() * 12);
+        } else {
+            navContainer.innerHTML = '';
+            months.forEach((m, idx) => {
+                navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${m}</button>`;
+            });
         }
-    } else {
-        navContainer.innerHTML = '';
-        months.forEach((m, idx) => {
-            navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${m}</button>`;
-        });
+    } catch (e) {
+        console.error("Initialization error:", e);
+    } finally {
+        // 👑 绝对防白屏装甲：无论前面拉取数据发生什么，一定会在页面全部安定后，强制触发一次“0索引”渲染，100%保证有内容上屏！
+        initFinanceData();
+        updateROI(); 
+        setTimeout(() => {
+            selectMonth(0);
+        }, 100);
     }
-    
-    initFinanceData();
-    updateROI(); 
-    // 👑 彻底修复白屏竞态条件：在异步数据拉取并装配完全部结构后，强行执行一次点击第一页事件，100%强制上屏！
-    selectMonth(0);
-}
-
-window.onload = async () => {
-    await loadDeckByRouter();
-};
+});
 </script>
 </body>
 </html>
