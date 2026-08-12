@@ -1,6 +1,6 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：全站查重防图雷同 + 模板级排版乱序矩阵 (真·结构差异化)
+ * 👑 终极架构：全站级物理查重防雷同 + 动态盐值保底 + 纯净部门卡片渲染
  */
 
 window.deptConfig = [
@@ -169,7 +169,6 @@ window.triggerSwarmAutonomousAction = async function() {
             const targetIndustries = shuffled.slice(0, 3);
             const timestampSeed = Date.now();
             
-            // 👑 死亡通牒 Prompt：绝不准重复八股文，强行指定完全不同的组件出牌顺序！
             const aiPrompt = `你是一个深谙SaaS高转化率的顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
 【核心铁律：绝对结构异化机制 (Seed: ${timestampSeed})】：
 1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。禁止生成重复的标题和内容！
@@ -211,9 +210,8 @@ window.triggerSwarmAutonomousAction = async function() {
                 const unitZh = typeStr === 'ppt' ? '页' : (typeStr === 'excel' ? '模块' : '章');
                 const unitEn = typeStr === 'ppt' ? 'P' : 'UNITS';
 
-                // 👑 模板级乱序矩阵：如果大模型偷懒没给布局类型，前端强制分配一个完全打乱的专属组件池！
                 let availableLayouts = [...LAYOUT_POOLS[typeStr]].filter(l => l !== 'cover' && l !== 'title-page' && l !== 'roi-calc');
-                availableLayouts = availableLayouts.sort(() => 0.5 - Math.random()); // 针对当前模板独家洗牌
+                availableLayouts = availableLayouts.sort(() => 0.5 - Math.random()); 
 
                 const processedSlides = Array.from(t.slides || []).map((slide, index) => {
                     let assignedLayout = slide.layoutType;
@@ -221,7 +219,6 @@ window.triggerSwarmAutonomousAction = async function() {
                     if (index === 0) {
                         assignedLayout = typeStr === 'ppt' ? 'cover' : (typeStr === 'word' ? 'title-page' : 'roi-calc');
                     } else {
-                        // 强制变异：如果 AI 给的类型不支持，或者 AI 根本没给，直接从专属乱序池里取！
                         if (!assignedLayout || assignedLayout === 'default' || !LAYOUT_POOLS[typeStr].includes(assignedLayout)) {
                             assignedLayout = availableLayouts[(index - 1) % availableLayouts.length];
                         }
@@ -460,13 +457,7 @@ window.renderDeptButtons = function() {
     if (!container) return;
     container.innerHTML = "";
     
-    const resetBtn = document.createElement("button");
-    resetBtn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-slate-500 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-700`;
-    resetBtn.innerHTML = `<div class="text-xs font-bold truncate">✨ 恢复全景 (取消过滤)</div>`;
-    resetBtn.onmousedown = (e) => e.preventDefault();
-    resetBtn.onclick = () => window.resetDeptFilter();
-    container.appendChild(resetBtn);
-
+    // ⚠️ 保证只在 renderDeptButtons 里构建唯一的部门卡片列表，彻底剔除那颗多余的毒瘤！
     window.deptConfig.forEach(dept => {
         const btn = document.createElement("button");
         btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
