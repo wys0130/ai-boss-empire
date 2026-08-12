@@ -1,5 +1,158 @@
 [
   {
+    "id": "AI-14059",
+    "title": "DTC品牌出海增长作战室",
+    "titleEn": "DTC Cross-Border Growth War Room",
+    "category": "5页 · 出海跨境独立站DTC",
+    "categoryEn": "5 P · Cross-Border DTC",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-14059",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "DTC品牌全球化：从流量收割到LTV复利飞轮",
+        "sub": "独立站 × TikTok Shop × 线下快闪 三域联动策略",
+        "kpi": "GMV $8.4M",
+        "label": "全年可归因增长"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "单客经济健康度仪表盘",
+        "sub": "剔除广告水分后的真实用户资产质量",
+        "kpi": "LTV/CAC 4.2x",
+        "label": "3个核心资产指标"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "新品冷启动生死线：0-60天加速爬坡路径",
+        "sub": "从VOC验证到红人分销裂变的标准化SOP",
+        "kpi": "AOV $118",
+        "label": "客单提升曲线"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "EDM + SMS 双触达复购唤醒漏斗",
+        "sub": "弃购挽回与沉睡激活的自动化战役架构",
+        "kpi": "Recovery Rate 26%",
+        "label": "弃单挽回率"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "DTC vs. 平台店 全链路利润率压强测试",
+        "sub": "剔除平台佣金后独立站的隐性流量成本对比",
+        "kpi": "贡献毛利差 +19%",
+        "label": "独立站溢价空间"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-91541",
+    "title": "新能源汽配供应链现金流沙盘",
+    "titleEn": "EV Supply Chain Cashflow Cockpit",
+    "category": "3模块 · 新能源汽车供应链",
+    "categoryEn": "3 UNITS · NEV Supply Chain",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-91541",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "高压线束总成成本拆解与TLP目标成本回归",
+        "kpi": "TLP优化 14.6%",
+        "label": "单位target landed profit"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "关键芯片双源供给合规漏斗",
+        "kpi": "供应商风险降级率 67%",
+        "label": "从A2级到A1级转换"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "电芯价格联动与碳酸锂期货套保矩阵",
+        "kpi": "毛差锁定 $2.3M",
+        "label": "12个月滚动对冲覆盖"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "单机架均摊成本",
+        "value": "$0.87/pc"
+      },
+      {
+        "label": "电芯库存周转天数",
+        "value": "11.4d"
+      },
+      {
+        "label": "VMI仓位灵活率",
+        "value": "82%"
+      },
+      {
+        "label": "交付履约准时率",
+        "value": "98.7%"
+      }
+    ]
+  },
+  {
+    "id": "AI-59292",
+    "title": "农业无人机作业标准作业手册",
+    "titleEn": "Agri-Drone Operations Playbook",
+    "category": "4章 · 农业无人机自动化作业",
+    "categoryEn": "4 UNITS · Agri-Drone Automation",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-59292",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "农业无人机全程自动化作业效能基准",
+        "content": ""
+      },
+      {
+        "layoutType": "checklist",
+        "title": "植保无人机作业前强制检查清单（含故障代码预判）",
+        "content": "1. RTK基站信号置信度≥95%且差分龄期<3s，否则强制禁止起飞\n2. 药箱液位传感器与流量计双模校准，误差>±2.5%时触发预警\n3. 四旋翼电机温度均方差≤4.2°C，防止高温失磁导致抗风性能衰减\n4. 变量喷洒处方图（NDVI索引）与实时风速风向联动预判漂移矢量\n5. 避障雷达与视觉融合系统在10Hz频率下的仿真障碍物识别率≥99.2%\n6. 应急返航电量阈值设为剩余续航的22%，且强制触发降落缓冲区域识别"
+      },
+      {
+        "layoutType": "quote",
+        "title": "领域专家战略洞察",
+        "content": "在万亩级作业场景下，单机自主作业的连续性比峰值吞吐量更重要，我们通过地面站热切换将断点续飞率提升至99.6%，最终将单亩施药成本压降28%。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "多机协同调度与飞防服务商业闭环的深度耦合分析",
+        "content": "在农忙窗口期（华北小麦全蚀病爆发季，仅7天有效防治期），单机日作业面积受限于充电冷却与药液补给循环，理论极限为320亩/日。但通过引入分布式换电站与热插拔药箱方案，实测可将单机日均作业效率提升至470亩，同时将换电等待时间从18分钟压降至4分30秒。在商业模型层面，飞防服务的核心盈利杠杆并非单亩作业价格，而是‘机组冗余冗余率×燃油替代系数×规模化调度损耗率’三者的乘积优化。若同时部署30架T60级无人机，采用超视距BVLOS编队模式，可将整片农田的作业窗口压缩至2.2天，每公顷净利润提升至43.7元。然而，必须警惕降级风险：当RTK地面站丢失超过7分钟时，自动返航策略将引发超过12%的无效油耗，因此需将备用基站部署密度提升至每5000亩一座，并采用具备AI边缘推理能力的V1000控制器以实现前端实时路径重规划，从而确保作业交付的准时与可持续盈利。"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
     "id": "AI-16341",
     "title": "数字孪生驱动制造跃迁战略",
     "titleEn": "DT-Driven Smart Manufacturing",
