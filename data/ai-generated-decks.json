@@ -1,1 +1,155 @@
-[]
+[
+  {
+    "id": "AI-16341",
+    "title": "数字孪生驱动制造跃迁战略",
+    "titleEn": "DT-Driven Smart Manufacturing",
+    "category": "5页 · 智能制造",
+    "categoryEn": "5 P · Manufacturing",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-16341",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "从物理工厂到虚拟镜像：数字孪生重塑产能边界",
+        "sub": "面向2026年灯塔工厂的实时决策中枢架构",
+        "kpi": "OEE 92%",
+        "label": "设备综合效率目标"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "孪生体健康度全景仪表盘",
+        "sub": "七大维度实时对标物理产线",
+        "kpi": "MTTR 38min|预测准确率 96%|能耗强度 -21%|良率爬坡 4.2%",
+        "label": "关键绩效锚点"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "数字孪生成熟度演进路线",
+        "sub": "从静态镜像到自主进化",
+        "kpi": "L4 自主孪生 2027Q3",
+        "label": "阶段里程碑"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "产线异常根因定位漏斗",
+        "sub": "传感器噪声→特征提取→因果推断→闭环修正",
+        "kpi": "根因定位时效 4.7s",
+        "label": "定位准确率 91%"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "传统MES vs 主动孪生体",
+        "sub": "响应式记录 vs 预判式干预",
+        "kpi": "决策延迟 -78%",
+        "label": "单位产能成本降幅"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-31678",
+    "title": "智慧冷链仓储网络财务驾驶舱",
+    "titleEn": "Cold-Chain Network ROI",
+    "category": "3模块 · 智能冷链",
+    "categoryEn": "3 UNITS · ColdChain",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-31678",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "多温区仓网盈亏平衡模拟",
+        "kpi": "13.7个月",
+        "label": "投资回收期(含能耗优化)"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "订单履约链路损耗分析",
+        "kpi": "0.9%",
+        "label": "全链损耗率(含断链风险)"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "区域仓容利用与能耗耦合矩阵",
+        "kpi": "83%",
+        "label": "坪效+冷机联动效率"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "单托冷库月均摊成本",
+        "value": "$84.5"
+      },
+      {
+        "label": "履约准时率(OTIF)",
+        "value": "97.2%"
+      },
+      {
+        "label": "库存周转天数压降",
+        "value": "-6.3d"
+      },
+      {
+        "label": "温控异常闭环率",
+        "value": "99.8%"
+      }
+    ]
+  },
+  {
+    "id": "AI-19574",
+    "title": "医疗大健康SaaS合规增长作战手册",
+    "titleEn": "Med-SaaS Compliance & Growth",
+    "category": "4章 · 医疗大健康",
+    "categoryEn": "4 UNITS · MedHealth",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-19574",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "医疗SaaS：从合规基座到临床价值变现",
+        "content": "本手册面向医疗健康SaaS产品负责人，聚焦HIPAA/GDPR与国内等保三级双重合规压力下的商业化路径。通过将FHIR标准与院内集成引擎解耦，构建基于Hadoop生态的数据湖仓一体架构，实现真实世界证据(RWE)的实时抽取与质量门控。在DRG/DIP支付改革背景下，我们以临床决策支持(CDSS)模块为核心，结合自然语言处理(NLP)对非结构化病程记录进行实体对齐，形成可解释的诊疗路径偏差预警。同时，通过建立患者360°唯一索引，实现跨院区随访数据的多模态融合，从而支撑临床科研与药企RWS项目的高效入组。最终，以“模块化订阅+按量计费”双引擎，提升客户生命周期价值(LTV)与科室渗透率。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "季度合规运营检查清单",
+        "content": "1. 完成HIPAA安全规则之加密与完整性控制复审\n2. 验证FHIR R4资源定义与院内CDA文档映射准确率≥97%\n3. 审计数据访问日志中的异常模式(如午夜批量提取)\n4. 更新DPIA(数据保护影响评估)并同步至DPO\n5. 执行DRG/DIP分组器模拟测试，确保权重调整同步\n6. 校准AI辅助诊断模型的临床敏感度与特异性阈值\n7. 复核供应商子处理器名单并更新数据处理协议\n8. 针对患者隐私偏好管理模块开展用户验收测试"
+      },
+      {
+        "layoutType": "quote",
+        "title": "首席医疗官战略金句",
+        "content": "真正让医院买单的，不是又一个SaaS界面，而是那个能降低每千次医嘱的用药错误率、能够在医生问诊的黄金30秒内提供可溯源的循证依据，并最终把真实世界数据转化为高质量临床研究资产的决策引擎。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "深度洞察：基于临床路径的SaaS增购模型",
+        "content": "传统的医疗SaaS以HIS或EMR基础模块为入口，但我们观察到从2024年起，头部三甲医院对“专科专病科研随访”与“院内药事管理智能体”的付费意愿呈现三位数增长。这种转变的核心逻辑在于，医院管理者开始将软件投入看作对医保支付盈利率与科研产出效率的调节杠杆。我们建议产品同学聚焦“围术期风险预测”“慢病全程管理”与“影像结构化报告”三个高粘性场景，并将客户成功团队下沉到科室运营助理角色。与此同时，针对不同等级医疗机构的预算弹性建立分梯度定价：核心三件套(CDSS+随访+数据沙箱)提供年度订阅，而针对GCP药物临床试验的遥测与电子源数据核验服务，则按患者入组人次计费。此外，通过与第三方检验检查前置付费打通，可以在不增加医院现金流负担的情况下，让SaaS价值直接附着于单次医疗服务事务，从而大幅提升续费谈判中的话语权与净收入留存率(NRR)。"
+      }
+    ],
+    "bottomKpis": null
+  }
+]
