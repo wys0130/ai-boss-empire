@@ -1,1 +1,156 @@
-[]
+[
+  {
+    "id": "AI-67498",
+    "title": "低轨商业航天发射经济性测算台",
+    "titleEn": "LEO Launch Cost Optimizer",
+    "category": "3模块 · 商业航天",
+    "categoryEn": "3 UNITS · SpaceTech",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-67498",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "一箭多星发射边际成本分摊引擎",
+        "kpi": "32%",
+        "label": "比冲优化后载荷比提升"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "运载火箭垂直回收漏斗转化",
+        "kpi": "11次",
+        "label": "单枚火箭累计复飞次数"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "低轨星座组网资金消耗率热力矩阵",
+        "kpi": "3.2亿美元",
+        "label": "Q3星座部署累计资本开支"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "单星入轨均摊成本",
+        "value": "$0.8M"
+      },
+      {
+        "label": "公斤有效载荷运力价格",
+        "value": "$4,200/kg"
+      },
+      {
+        "label": "整箭回收复用率",
+        "value": "87%"
+      },
+      {
+        "label": "发射窗口履约准时率",
+        "value": "96.5%"
+      }
+    ]
+  },
+  {
+    "id": "AI-77728",
+    "title": "出海跨境独立站DTC品牌增长作战图",
+    "titleEn": "DTC Brand Scaling Blueprint",
+    "category": "4页 · 跨境电商",
+    "categoryEn": "4 P · E-commerce",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-77728",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "独立站DTC私域流量裂变与复购飞轮",
+        "sub": "基于Google Analytics 4 与 Klaviyo 全链路漏斗归因",
+        "kpi": "ROAS 5.8x",
+        "label": "广告支出回报率"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "单客经济模型与LTV/CAC动态监控",
+        "sub": "高客单价产品线嵌套订阅制分层定价",
+        "kpi": "1:4.7",
+        "label": "客户生命周期价值/获客成本比"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "TikTok Shop与独立站双轨履约时效图谱",
+        "sub": "从素材生产-广告投放-海外仓发货全周期调度",
+        "kpi": "4.2天",
+        "label": "北美地区平均端到端履约时长"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "EDM + SMS + Messenger 全触点唤醒漏斗",
+        "sub": "针对弃购人群与沉默老客的定向回流机制",
+        "kpi": "42%",
+        "label": "触达后7日内复购率"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-64729",
+    "title": "医疗大健康SaaS合规与临床循证白皮书",
+    "titleEn": "MedTech SaaS Compliance Playbook",
+    "category": "4章 · 医疗科技",
+    "categoryEn": "4 UNITS · HealthTech",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-64729",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "基于循证医学的智能诊断SaaS多层防护机制",
+        "content": "本白皮书深度剖析医疗SaaS在HIPAA/GDPR双合规框架下的数据血缘追踪与加密策略，重点阐述如何通过FHIR R4标准接口实现EMR/EHR系统无缝集成，同时利用NLP驱动的临床决策支持系统（CDSS）降低误诊率。我们提出一种双置信区间校准模型，将AI辅助筛查的敏感性维持在97.2%以上，并针对影像组学特征构建可解释性报告，从而满足FDA SaMD预认证要求。通过多中心RCT研究验证，该SaaS体系可减少30%重复检验率，并显著提升医院资源调度效率。",
+        "kpi": "97.2%",
+        "label": "AI辅助诊断敏感性"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "医疗机构采购SaaS的九层风控合规核查清单",
+        "content": "1. SOC2 Type II 审计报告是否覆盖所有核心模块？\n2. 数据驻留与容灾备份是否兼容当地医疗数据主权法规？\n3. 是否支持基于SMART on FHIR的第三方应用沙箱隔离？\n4. 临床决策引擎是否具备CE认证或FDA 510(K)豁免？\n5. 用户权限是否具备RBAC + ABAC双维度控制？\n6. 医疗影像传输是否采用DICOM over HTTPS/WSS加密隧道？\n7. 审计日志是否满足可追溯到具体操作者的不可篡改要求？\n8. AI模型版本更新是否提供可回滚的灰度发布策略？\n9. 是否提供HL7 v2.x至FHIR的完整在线转换和数据映射工具？",
+        "kpi": "9项",
+        "label": "全通过率"
+      },
+      {
+        "layoutType": "quote",
+        "title": "首席医务官对于真实世界数据(RWD)的验证声明",
+        "content": "在跨院区部署中，我们注意到该SaaS平台的预测性入院风险模型与院内实际出院转归数据呈现高度温伯格契合度。通过倾向评分匹配法控制混杂变量后，其对于30天非计划再入院率的AUC值稳定在0.89以上。这提示基于结构化电子病历与自然语言处理生成的健康社会学特征，能有效补充传统临床指标盲区。对于院内感染监测模块而言，其基准线浮动阈值设定能够敏锐捕捉到ICU环境中微生态失衡信号。本院已将此系统纳入质量改进核心流程，且建议同行关注其药剂不良反应联动预警机制的灵敏度。",
+        "kpi": "0.89",
+        "label": "再入院预测AUC值"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "多中心临床决策支持系统的运营韧性分析",
+        "content": "该医疗SaaS系统在日均处理10万级结构化临床文档时维持着99.99%的可用性，其弹性伸缩架构基于Kubernetes容器编排并采用跨可用区部署策略。系统内置的断网续传与消息队列回放机制，保障了急诊抢救室极端网络波动下医嘱转录不丢失。在临床决策响应层面，延迟P95控制在190毫秒内，足以支撑实时药物相互作用筛查与过敏警示弹窗。此外，系统针对罕见病特征向量库的持续学习能力，借助主动学习框架使模型在样本量较小的场景下依然可维持85%的阳性预测值。",
+        "kpi": "85%",
+        "label": "罕见病阳性预测值"
+      }
+    ],
+    "bottomKpis": null
+  }
+]
