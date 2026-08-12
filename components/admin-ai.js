@@ -1,6 +1,6 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：发前强制物理校验 + 内容防雷同矩阵 + 图片去重缓存池 + 过滤器复位按键
+ * 👑 终极架构：强迫 AI 产出独家底层指标 (bottomKpis) 与 丰富正文 (content)
  */
 
 window.deptConfig = [
@@ -15,41 +15,34 @@ window.deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
-// 👑 扩容至 20+ 张顶级 2K 无版权商业实拍图库
 const HD_IMAGE_VAULT = {
     web3: [
         "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     ecommerce: [
         "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1472851294608-062f1c4dca84?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1472851294608-062f1c4dca84?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     finance: [
         "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     tech: [
         "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     corporate: [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp"
     ]
 };
 
-// 👑 图片防碰撞缓存池：确保同一批次内抽出的封面图绝不雷同
 window.usedImageCache = window.usedImageCache || new Set();
 
 const LAYOUT_POOLS = {
@@ -58,7 +51,6 @@ const LAYOUT_POOLS = {
     word: ["text-block", "checklist", "quote", "text-block"] 
 };
 
-// 👑 绝对装甲：发前强制校验有无图，无图重做 + 图片查重！
 async function processRemixAndScoring(themeKeyword, category) {
     let finalImg = "";
     let score = 0;
@@ -76,16 +68,14 @@ async function processRemixAndScoring(themeKeyword, category) {
         attempt++;
         window.appendLog(`🎨 [视觉策划部] 第 ${attempt} 次尝试提取封面，启动图片防撞库与物理校验...`);
         
-        // 过滤掉已经使用过的图片
         let availableImgs = targetPool.filter(img => !window.usedImageCache.has(img));
         if (availableImgs.length === 0) {
-            window.usedImageCache.clear(); // 如果当前分类图库耗尽，自动重置池子
+            window.usedImageCache.clear();
             availableImgs = targetPool;
         }
         
         let candidateImg = availableImgs[Math.floor(Math.random() * availableImgs.length)];
         
-        // 在内存中真实加载图片，如果不通直接算失败
         isValidImage = await new Promise((resolve) => {
             const img = new Image();
             const timer = setTimeout(() => { img.src = ""; resolve(false); }, 5000);
@@ -98,17 +88,12 @@ async function processRemixAndScoring(themeKeyword, category) {
             score = 92 + Math.random() * 6; 
             window.appendLog(`✅ [系统广播] 图像物理校验满分！0侵权 0雷同，锁定商用封面。`, "text-emerald-500");
             finalImg = candidateImg;
-            window.usedImageCache.add(finalImg); // 将该图加入已使用缓存，防止下一张图雷同
+            window.usedImageCache.add(finalImg);
             break;
-        } else {
-            window.appendLog(`⚠️ [QA 拦截] 探测到图像损坏或网络白屏，执行销毁重做！`, "text-rose-500");
         }
     }
     
-    if(!finalImg) {
-        finalImg = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp";
-    }
-    
+    if(!finalImg) finalImg = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp";
     return finalImg;
 }
 
@@ -134,25 +119,26 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【防内容雷同矩阵】与【差异化组件装配】...`);
+            window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【内容防雷同矩阵】与【全局底层变量替换】...`);
             
-            // 👑 强行打乱行业词库，杜绝大模型偷懒输出同样的行业
-            const industries = ["医疗大健康SaaS", "新能源汽车供应链", "AI人工智能在线教育平台", "智能制造与数字孪生", "农业无人机自动化作业", "元宇宙沉浸式社交", "全球碳中和碳排放交易", "高端宠物消费经济", "银发族智慧康养", "航空航天商业成本测算", "海洋物流智能调度", "智慧城市政务大脑"];
+            const industries = ["医疗大健康SaaS", "新能源汽车供应链", "AI教育智能硬件", "智能制造与数字孪生", "农业无人机自动化作业", "出海跨境独立站DTC", "全球碳排放交易中心", "高端宠物医疗保险", "低轨商业航天测算", "智能冷链仓储网络"];
             const shuffled = industries.sort(() => 0.5 - Math.random());
             const targetIndustries = shuffled.slice(0, 3);
-            const timestampSeed = Date.now(); // 注入时间戳种子，绝对防 AI 缓存结果
+            const timestampSeed = Date.now();
             
+            // 👑 终极 Prompt：强迫大模型输出 bottomKpis (Excel专用) 和 content (Word专用)，并禁止任何雷同敷衍词汇！
             const aiPrompt = `你是一个深谙SaaS高转化率的顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
-【核心铁律：绝对差异化与防雷同机制 (Seed: ${timestampSeed})】：
-1. 场景必须极度随机且细分！禁止生成“Web3”、“跨境电商”、“高盛ESG”等任何常见重复例子。请为你生成的3个作品分别强制使用以下三个垂直领域：【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。
-2. 模板的名称 (name) 必须极具行业特色，绝不能雷同。
-3. 先写文案，再选组件 (layoutType)：你必须根据文案语义，为每个 slide 提供 "layoutType" 字段，决定前端界面的渲染排版！
-   - PPT 必选: "cover", "kpi-grid", "timeline", "funnel", "comparison", "default".
-   - Excel 必选: "roi-calc", "funnel", "matrix-12m", "cost-breakdown".
-   - Word 必选: "title-page", "checklist", "quote", "text-block".
-4. 数量要求：每次生成随机提供 5 到 15 个模块，系统将根据模块数量执行阶梯定价。
-请严格返回JSON数组格式，绝不包含任何 markdown 符号。不需要提供价格。
-样例：[{"type":"excel", "name":"海洋物流智能引擎", "titleEn":"Ocean Logistics ROI", "category":"海洋运输", "categoryEn":"Logistics", "themeKeyword":"ocean shipping container", "slides":[{"layoutType":"roi-calc", "title":"ROI自动计算器", "kpi":"34%", "label":"预期ROI"}]}]`;
+【核心铁律：绝对差异化内容机制 (Seed: ${timestampSeed})】：
+1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。
+2. Excel 模板 (type: "excel")：
+   - 必须额外包含 "bottomKpis" 数组！这是一个包含4个对象的数组，用于替换底部的4个决策卡片，格式为 [{"label": "独特指标1", "value": "数据"}, ...]。【绝对禁止】使用“毛利率”、“净利率”等普通词汇，必须是行业黑话（如：LTV/CAC比率、单机架均摊成本、履约准时率等）。
+   - slides 数组中的 title 必须是专业的“业务分析模块”名称，【绝对禁止】出现“1月预测”、“2月预测”这种废话！
+3. Word 模板 (type: "word")：
+   - slides 数组中必须包含 "content" 字段！且 "content" 必须是一段不少于 50 字的、充满行业术语的深度分析长文！【绝对禁止】输出类似“详细阐述商业运作机制”这种敷衍的短句！如果是 checklist 类型，请用换行符分割。
+4. PPT 模板 (type: "ppt")：包含 title, sub, kpi, label 字段。
+5. 所有模板的 slides 必须包含 "layoutType" 字段以决定排版（PPT: "cover", "kpi-grid", "timeline", "funnel", "comparison"; Excel: "roi-calc", "funnel", "matrix-12m"; Word: "title-page", "checklist", "quote", "text-block"）。
+请严格返回 JSON 数组格式，绝不包含任何 markdown 符号。
+样例：[{"type":"excel", "name":"医疗SaaS财务中枢", "titleEn":"Med-SaaS ROI", "category":"大健康", "categoryEn":"Health", "themeKeyword":"medical AI", "bottomKpis":[{"label":"单院获客成本","value":"$1.2K"},{"label":"客户终身价值","value":"$50K"},{"label":"月度经常性收入","value":"$2M"},{"label":"流失率","value":"<1%"}], "slides":[{"layoutType":"roi-calc", "title":"AI问诊转化漏斗", "kpi":"34%", "label":"预期诊断率"}]}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
@@ -165,9 +151,8 @@ window.triggerSwarmAutonomousAction = async function() {
             if (!jsonMatch) throw new Error("AI 数据格式异常");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            window.appendLog(`🔨 [主动产品部]: 内容与业务逻辑生成完毕！绝对防雷同。产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            window.appendLog(`🔨 [主动产品部]: 富文本内容与 KPI 底层矩阵生成完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             
-            // 清理上一轮的图像缓存
             window.usedImageCache.clear();
             const newTemplates = [];
             
@@ -176,7 +161,6 @@ window.triggerSwarmAutonomousAction = async function() {
                 const typeStr = t.type ? t.type.toLowerCase() : 'ppt';
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
-                // 执行防裂图与去重图片检索
                 const finalImg = await processRemixAndScoring(t.themeKeyword || "corporate data", t.category || "tech");
 
                 const slideCount = t.slides ? t.slides.length : 8;
@@ -184,29 +168,14 @@ window.triggerSwarmAutonomousAction = async function() {
                 const finalRmb = isPremium ? 139 : 69;
                 const finalUsd = isPremium ? "19.99" : "9.99";
                 
-                const unitZh = typeStr === 'ppt' ? '页' : (typeStr === 'excel' ? '表' : '章');
+                const unitZh = typeStr === 'ppt' ? '页' : (typeStr === 'excel' ? '模块' : '章');
                 const unitEn = typeStr === 'ppt' ? 'P' : 'UNITS';
 
-                // 强制内容级映射组件（如果大模型没给）
                 const processedSlides = Array.from(t.slides || []).map((slide, index) => {
                     let assignedLayout = slide.layoutType;
-                    
                     if (!assignedLayout || assignedLayout === 'default') {
-                        const txt = String(slide.title + " " + slide.sub + " " + slide.label).toLowerCase();
-                        
-                        if (index === 0) {
-                            assignedLayout = typeStr === 'ppt' ? 'cover' : (typeStr === 'word' ? 'title-page' : 'roi-calc');
-                        } else {
-                            if (txt.includes('对比') || txt.includes('vs') || txt.includes('痛点') || txt.includes('优势')) assignedLayout = 'comparison';
-                            else if (txt.includes('阶段') || txt.includes('流程') || txt.includes('步骤') || txt.includes('里程碑')) assignedLayout = 'timeline';
-                            else if (txt.includes('漏斗') || txt.includes('转化') || txt.includes('流失')) assignedLayout = 'funnel';
-                            else if (txt.includes('指标') || txt.includes('率') || txt.includes('kpi')) assignedLayout = 'kpi-grid';
-                            else if (txt.includes('规范') || txt.includes('检查') || txt.includes('清单')) assignedLayout = 'checklist';
-                            else {
-                                const validPool = LAYOUT_POOLS[typeStr];
-                                assignedLayout = validPool[index % validPool.length];
-                            }
-                        }
+                        if (index === 0) assignedLayout = typeStr === 'ppt' ? 'cover' : (typeStr === 'word' ? 'title-page' : 'roi-calc');
+                        else assignedLayout = LAYOUT_POOLS[typeStr][index % LAYOUT_POOLS[typeStr].length];
                     }
                     return { ...slide, layoutType: assignedLayout };
                 });
@@ -219,7 +188,8 @@ window.triggerSwarmAutonomousAction = async function() {
                     thumbCloudPath: finalImg, thumbDefault: finalImg,
                     priceRmb: finalRmb, priceUsd: finalUsd, colorCls: col,
                     isLinked: true, status: true,
-                    slides: processedSlides 
+                    slides: processedSlides,
+                    bottomKpis: t.bottomKpis || null // 👑 注入 Excel 专属底层大盘数据
                 });
             }
 
@@ -238,14 +208,14 @@ window.triggerSwarmAutonomousAction = async function() {
                 
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
-                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架语义驱动且防雷同的产品 [skip ci]", keys.gh);
+                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架全内容差异化的深度产品 [skip ci]", keys.gh);
 
                 if (typeof window.AUDIT_PRODUCTS !== "undefined" && typeof window.renderAuditTable === "function") {
                     newTemplates.forEach(t => window.AUDIT_PRODUCTS.unshift(t));
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
                     window.renderAuditTable();
                 }
-                window.appendLog(`✅ [系统广播]: 内容防雷同及图片防撞库处理完毕！商品已成功录入大盘。`);
+                window.appendLog(`✅ [系统广播]: 核心数据与深度文案替换完毕！已成功录入大盘。`);
             } finally {
                 window.isCloudSyncing = false;
             }
@@ -335,9 +305,7 @@ window.selectMentionDept = function(deptName) {
     tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
     tokenSpan.contentEditable = "false"; 
     tokenSpan.setAttribute("data-dept", deptName);
-    
     tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
-    
     range.insertNode(tokenSpan);
     const spaceNode = document.createTextNode("\u00A0"); 
     tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
@@ -364,9 +332,7 @@ window.inspectDept = function(deptName, btnEl) {
         tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
         tokenSpan.contentEditable = "false";
         tokenSpan.setAttribute("data-dept", deptName);
-        
         tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
-        
         const sel = window.getSelection();
         if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
             const range = sel.getRangeAt(0);
@@ -444,7 +410,6 @@ window.renderDeptButtons = function() {
     if (!container) return;
     container.innerHTML = "";
     
-    // 👑 解决问题4：增加一键取消高亮/重置过滤的按钮
     const resetBtn = document.createElement("button");
     resetBtn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-slate-500 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-700`;
     resetBtn.innerHTML = `<div class="text-xs font-bold truncate">✨ 恢复全景 (取消过滤)</div>`;
