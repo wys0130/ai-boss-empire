@@ -15,9 +15,10 @@
   .nav-pill:hover { background: #e2e8f0; color: #0f172a; }
   .nav-pill.active { background: #0f172a; color: #ffffff; border-color: #0f172a; box-shadow: 0 4px 10px -2px rgba(15,23,42,0.3); }
   .a4-paper { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 0.5rem; padding: 3.5rem 4rem; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1), 0 0 1px 1px rgba(0,0,0,0.05); min-height: 600px; }
-  /* 👑 重构标题与正文样式，绝对不再互相污染 */
-  .doc-title { font-size: 1.85rem; font-weight: 800; color: #0f172a; margin-bottom: 1.5rem; border-bottom: 3px solid #0f172a; padding-bottom: 0.75rem; letter-spacing: -0.02em; transition: all 0.3s; }
+  /* 👑 彻底分离！封面标题字大，正文字小 */
+  .doc-title { font-size: 2.25rem; font-weight: 900; color: #0f172a; margin-bottom: 1.5rem; border-bottom: 3px solid #0f172a; padding-bottom: 1rem; letter-spacing: -0.02em; transition: all 0.3s; }
   .doc-content { font-size: 1rem; color: #334155; line-height: 2; white-space: pre-wrap; font-family: 'Georgia', serif; transition: all 0.3s; }
+  
   .input-field { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 0.6rem 0.85rem; font-size: 0.875rem; transition: all 0.2s; background: #f8fafc; color: #0f172a; }
   .input-field:focus { outline: none; border-color: #6366f1; background: #ffffff; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
   [contenteditable="true"]:hover { outline: 1px dashed #94a3b8; background: rgba(248,250,252,0.8); cursor: text; }
@@ -61,8 +62,8 @@
       </div>
       
       <div class="a4-paper" id="previewArea">
-        <!-- 动态多态文本容器 -->
         <div class="doc-title" contenteditable="true" id="previewTitle" oninput="syncFromPreviewTitle(this.textContent)">正在加载...</div>
+        <!-- 👑 动态多态文本容器 -->
         <div class="doc-content" contenteditable="true" id="previewContent" oninput="syncFromPreviewContent(this.textContent)">请稍候...</div>
       </div>
     </main>
@@ -142,28 +143,25 @@ function selectSection(index) {
   renderSectionNav();
   const sec = sections[index];
   
-  // 防崩溃保护
   const safeTitle = String(sec.title || "加载中").replace(/<[^>]+>/g, '');
-  const safeContent = String(sec.content || "报告段落正在加载，若无内容请补充。").replace(/<[^>]+>/g, '');
+  const safeContent = String(sec.content || "报告正文正在生成中...").replace(/<[^>]+>/g, '');
 
   document.getElementById('sectionTitleInput').value = safeTitle;
   document.getElementById('sectionContentInput').value = safeContent;
   document.getElementById('previewTitle').textContent = safeTitle;
   document.getElementById('previewContent').textContent = safeContent;
 
-  // 👑 彻底修复样式重叠导致的“又大又粗”BUG
   const previewContent = document.getElementById('previewContent');
   const previewTitle = document.getElementById('previewTitle');
   
-  // 每次切换时先归零，洗掉上个 tab 残留的 Tailwind 类名
   previewContent.className = 'doc-content outline-none'; 
   previewTitle.className = 'doc-title outline-none';
   previewTitle.style.display = 'block';
 
+  // 👑 严格控制 CSS：大模型生成的任何正文绝对不准变成黑色粗体！
   if (sec.layoutType === 'title-page' || sec.layoutType === 'cover') {
-      // 如果是封面：把 Title 放大，但是 Content (正文) 绝对保持正常大小，绝不重叠变大！
-      previewTitle.classList.add('text-center', 'text-4xl', 'mt-12', 'mb-6', 'border-0');
-      previewContent.classList.add('text-center', 'text-lg', 'text-slate-600', 'max-w-2xl', 'mx-auto');
+      previewTitle.style.display = 'none'; 
+      previewContent.classList.add('text-center', 'font-black', 'text-4xl', 'mt-20', 'text-slate-900', 'leading-snug');
   } else if (sec.layoutType === 'quote') {
       previewContent.classList.add('border-l-4', 'border-indigo-500', 'pl-6', 'italic', 'text-slate-600', 'bg-slate-50', 'py-6', 'rounded-r-xl', 'text-lg');
   } else if (sec.layoutType === 'checklist') {
@@ -291,8 +289,8 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (aiSlides.length > 0) {
                 sections.length = 0; 
                 aiSlides.forEach((slide, idx) => {
-                    // 彻底干掉脑残的默认 fallback 文字，强行提取 content 字段！
-                    const safeContent = String(slide.content || slide.sub || `核心论点正在生成中。此模块为 ${slide.title || '模块'} 的专业解析文档。`).replace(/<[^>]+>/g, '');
+                    // 👑 彻底剔除之前在代码中写死的“详细阐述商业运作机制”等兜底废话！
+                    const safeContent = String(slide.content || `请补充业务明细内容。`).replace(/<[^>]+>/g, '');
                     
                     sections.push({
                         layoutType: slide.layoutType || 'text-block',
