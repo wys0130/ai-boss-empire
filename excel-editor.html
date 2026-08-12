@@ -54,34 +54,24 @@
     <aside class="lg:col-span-2 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📅 分析模块控制台</h2>
       <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer">
-        <!-- JS 动态渲染 -->
+        <!-- JS 动态渲染，严禁出现 1月、2月 等废话 -->
       </div>
     </aside>
 
     <main class="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
       <div id="dynamicMainArea">
-        <!-- 👑 核心矩阵渲染区 (将根据 AI layoutType 发生变异) -->
+        <!-- 核心矩阵渲染区 (动态变异) -->
       </div>
 
       <div class="mt-8 pt-6 border-t border-slate-100">
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📊 商业决策 KPI 卡片矩阵</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div class="kpi-card border-l-4 border-l-emerald-500">
-            <p class="text-xs text-slate-500 font-medium">毛利率 (Gross)</p>
-            <p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpiGrossMargin">--</p>
-          </div>
-          <div class="kpi-card border-l-4 border-l-blue-500">
-            <p class="text-xs text-slate-500 font-medium">净利率 (Net)</p>
-            <p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpiNetMargin">--</p>
-          </div>
-          <div class="kpi-card border-l-4 border-l-indigo-500">
-            <p class="text-xs text-slate-500 font-medium" id="roiTitle">创投 ROI</p>
-            <p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpiROI">--</p>
-          </div>
-          <div class="kpi-card border-l-4 border-l-amber-500">
-            <p class="text-xs text-slate-500 font-medium">回本周期</p>
-            <p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpiPayback">--</p>
-          </div>
+        <!-- 👑 动态 KPI 容器：将被 AI 的 bottomKpis 彻底覆盖！ -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="dynamicKpiCards">
+            <!-- 默认结构保留，防网络失败 -->
+            <div class="kpi-card border-l-4 border-l-emerald-500"><p class="text-xs text-slate-500 font-medium">毛利率 (Gross)</p><p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpi1">--</p></div>
+            <div class="kpi-card border-l-4 border-l-blue-500"><p class="text-xs text-slate-500 font-medium">净利率 (Net)</p><p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpi2">--</p></div>
+            <div class="kpi-card border-l-4 border-l-indigo-500"><p class="text-xs text-slate-500 font-medium">创投 ROI</p><p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpi3">--</p></div>
+            <div class="kpi-card border-l-4 border-l-amber-500"><p class="text-xs text-slate-500 font-medium">回本周期</p><p class="text-2xl font-black text-slate-900 font-mono mt-1" id="kpi4">--</p></div>
         </div>
       </div>
     </main>
@@ -135,6 +125,7 @@ let financeData = [];
 let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
 let isAiMode = false;
 let sheetsData = [];
+let aiBottomKpis = null; // 👑 存储 AI 传回来的四个独立核心指标
 
 let rowRevName = '营业总收入 (Revenue)';
 let rowCostName = '成本与支出 (Costs)';
@@ -193,20 +184,37 @@ function recomputeKPIsAndRender(rebuildDom = true) {
   const totalProfit = yearRev - yearCost;
 
   const investment = parseFloat(document.getElementById('initialInvestment').value) || 50000;
-  const grossMargin = yearRev > 0 ? ((yearRev - yearCost) / yearRev * 100) : 0;
-  const netMargin = yearRev > 0 ? (totalProfit / yearRev * 100) : 0;
-  const roi = investment > 0 ? (totalProfit / investment * 100) : 0;
-  const payback = totalProfit > 0 ? (investment / (totalProfit / 12)) : 99;
+  
+  // 👑 绝对差异化：如果 AI 给了独家底层指标，直接强制覆盖死板计算公式！
+  if (isAiMode && aiBottomKpis && aiBottomKpis.length === 4) {
+      const colors = ['emerald', 'blue', 'indigo', 'amber'];
+      const kpiContainer = document.getElementById('dynamicKpiCards');
+      kpiContainer.innerHTML = '';
+      
+      aiBottomKpis.forEach((kpi, idx) => {
+          kpiContainer.innerHTML += `
+            <div class="kpi-card border-l-4 border-l-${colors[idx]}-500">
+              <p class="text-xs text-slate-500 font-medium">${String(kpi.label).replace(/<[^>]+>/g, '')}</p>
+              <p class="text-2xl font-black text-slate-900 font-mono mt-1">${String(kpi.value).replace(/<[^>]+>/g, '')}</p>
+            </div>
+          `;
+      });
+  } else {
+      // 老旧的默认计算
+      const grossMargin = yearRev > 0 ? ((yearRev - yearCost) / yearRev * 100) : 0;
+      const netMargin = yearRev > 0 ? (totalProfit / yearRev * 100) : 0;
+      const roi = investment > 0 ? (totalProfit / investment * 100) : 0;
+      const payback = totalProfit > 0 ? (investment / (totalProfit / 12)) : 99;
 
-  document.getElementById('kpiGrossMargin').textContent = grossMargin.toFixed(1) + '%';
-  document.getElementById('kpiNetMargin').textContent = netMargin.toFixed(1) + '%';
-  document.getElementById('kpiROI').textContent = roi.toFixed(1) + '%';
-  document.getElementById('kpiPayback').textContent = payback.toFixed(1) + ' 月';
+      const e1 = document.getElementById('kpi1'); if (e1) e1.textContent = grossMargin.toFixed(1) + '%';
+      const e2 = document.getElementById('kpi2'); if (e2) e2.textContent = netMargin.toFixed(1) + '%';
+      const e3 = document.getElementById('kpi3'); if (e3) e3.textContent = roi.toFixed(1) + '%';
+      const e4 = document.getElementById('kpi4'); if (e4) e4.textContent = payback.toFixed(1) + ' 月';
+  }
 
   renderDynamicMainArea(rebuildDom);
 }
 
-// 👑 积木化装配渲染引擎：根据 AI 的 LayoutType 渲染出不同的财务模型 UI 结构！
 function renderDynamicMainArea(rebuildHtml = true) {
   const mainArea = document.getElementById('dynamicMainArea');
   
@@ -240,7 +248,6 @@ function renderDynamicMainArea(rebuildHtml = true) {
 
   let htmlContent = '';
 
-  // 👑 判断组件类型，渲染截然不同的页面
   if (layout === 'roi-calc') {
       htmlContent = `
         <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
@@ -295,7 +302,6 @@ function renderDynamicMainArea(rebuildHtml = true) {
         </div>
       `;
   } else {
-      // 默认的 12 月收支矩阵 (matrix-12m)
       htmlContent = `
         <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
           <div>
@@ -415,17 +421,20 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (targetAiDeck) {
             const docName = String(targetAiDeck.name || targetAiDeck.title).replace(/<[^>]+>/g, '');
             document.getElementById('headerTitle').innerText = docName;
-            document.getElementById('headerCat').innerText = targetAiDeck.category || '核心业务架构 · 智能合规生成';
+            document.getElementById('headerCat').innerText = targetAiDeck.category || '核心业务架构 · 智能生成';
             
             const priceStr = `$${targetAiDeck.priceUsd || '19.99'}`;
             document.getElementById('topPriceBtn').innerText = priceStr;
             document.getElementById('mainPriceTxt').innerHTML = `${priceStr} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
             
+            // 👑 接收大脑传递过来的深度底层数据
+            aiBottomKpis = targetAiDeck.bottomKpis || null;
+
             sheetsData = targetAiDeck.slides || [];
             if (sheetsData.length > 0) {
                 navContainer.innerHTML = '';
                 sheetsData.forEach((sheet, idx) => {
-                    const btnTitle = String(sheet.title ? sheet.title : `模块 ${idx+1}`).replace(/<[^>]+>/g, '');
+                    const btnTitle = String(sheet.title ? sheet.title : `分析模块 ${idx+1}`).replace(/<[^>]+>/g, '');
                     navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${btnTitle}</button>`;
                 });
                 
