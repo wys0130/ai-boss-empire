@@ -1,5 +1,307 @@
 [
   {
+    "id": "AI-87122",
+    "title": "Web3代币经济学路演",
+    "titleEn": "Tokenomics Roadshow",
+    "category": "6页 · Web3",
+    "categoryEn": "6 P · DeFi",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+    "thumbKey": "prod_AI-87122",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "代币经济学通证设计路演",
+        "subtitle": "从流动性池到治理权重——协议冷启动与飞轮加速",
+        "kpi": "TVL 2.4B",
+        "label": "目标锁定"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "协议经济核心指标仪表盘",
+        "kpis": [
+          {
+            "value": "$184M",
+            "label": "首日TVL"
+          },
+          {
+            "value": "3.7x",
+            "label": "资金效率倍数"
+          },
+          {
+            "value": "28天",
+            "label": "回本周期"
+          },
+          {
+            "value": "0.42%",
+            "label": "日均燃烧率"
+          }
+        ]
+      },
+      {
+        "layoutType": "timeline",
+        "title": "代币释放与生态激励时间轴",
+        "milestones": [
+          {
+            "phase": "TGE",
+            "date": "2024 Q3",
+            "desc": "初始流动性+LBP"
+          },
+          {
+            "phase": "Staking",
+            "date": "2024 Q4",
+            "desc": "veToken模型上线"
+          },
+          {
+            "phase": "Treasury",
+            "date": "2025 Q1",
+            "desc": "协议收入回购销毁"
+          },
+          {
+            "phase": "Governance",
+            "date": "2025 Q2",
+            "desc": "多链DAO分权"
+          }
+        ]
+      },
+      {
+        "layoutType": "funnel",
+        "title": "用户获取到深度锁仓转化漏斗",
+        "stages": [
+          "浏览协议",
+          "存款试用",
+          "体验收益",
+          "锁定veToken",
+          "治理参与"
+        ],
+        "conversion": [
+          "100%",
+          "64%",
+          "41%",
+          "22%",
+          "9%"
+        ]
+      },
+      {
+        "layoutType": "comparison",
+        "title": "vs 传统DeFi代币模型",
+        "leftTitle": "本方案",
+        "leftPoints": [
+          "动态供应烧毁",
+          "激励与锁仓耦合",
+          "真实收益锚定"
+        ],
+        "rightTitle": "传统模型",
+        "rightPoints": [
+          "固定总量",
+          "单纯质押奖励",
+          "仅靠交易手续费"
+        ]
+      },
+      {
+        "layoutType": "default",
+        "title": "风险缓释与极端行情压力测试",
+        "text": "在-70%价格冲击下，协议仍保持0.88偿付率，且通过流动性债券池维持深度。",
+        "highlight": "偿付率 ≥ 90%",
+        "note": "基于历史最大回撤模拟"
+      }
+    ]
+  },
+  {
+    "id": "AI-68543",
+    "title": "东南亚跨境电商选品利润模型",
+    "titleEn": "SEA DTC Selection Model",
+    "category": "5表 · 跨境电商",
+    "categoryEn": "5 UNITS · DTC",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "thumbKey": "prod_AI-68543",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "SKU级ROI自动计算器",
+        "inputs": [
+          "采购成本",
+          "头程运费",
+          "平台佣金",
+          "广告ACOS",
+          "退货率"
+        ],
+        "output": "单品净利率",
+        "kpi": "38.7%",
+        "label": "平均净利率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "选品候选—测款—爆品率漏斗",
+        "stages": [
+          "初步候选SKU",
+          "小单测款",
+          "数据达标",
+          "成爆品"
+        ],
+        "conversion": [
+          "120个",
+          "32个",
+          "11个",
+          "4个"
+        ],
+        "note": "东南亚目标国：印尼/泰国/菲律宾"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月滚动利润热力矩阵",
+        "rows": [
+          "Category A: 家居",
+          "Category B: 3C配件",
+          "Category C: 美妆",
+          "Category D: 服饰"
+        ],
+        "months": [
+          "M1",
+          "M2",
+          "M3",
+          "M4",
+          "M5",
+          "M6",
+          "M7",
+          "M8",
+          "M9",
+          "M10",
+          "M11",
+          "M12"
+        ],
+        "heat": [
+          22,
+          34,
+          41,
+          38,
+          45,
+          52,
+          48,
+          39,
+          33,
+          28,
+          25,
+          30
+        ]
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "单件全链路成本拆解",
+        "items": {
+          "采购": 32,
+          "头程": 8,
+          "尾程": 11,
+          "佣金": 9,
+          "广告": 14,
+          "退款损失": 4,
+          "仓储": 2,
+          "其他": 6
+        },
+        "totalCost": 86,
+        "sellingPrice": 139
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "国家维度利润率对比计算器",
+        "inputs": [
+          "印尼关税",
+          "菲律宾VAT",
+          "泰国物流补贴",
+          "马来COD比例"
+        ],
+        "output": "国别净利排行",
+        "kpi": "泰-29%",
+        "label": "最高净利率国"
+      }
+    ]
+  },
+  {
+    "id": "AI-36881",
+    "title": "高盛级别ESG尽调白皮书",
+    "titleEn": "Goldman-Style ESG DD Whitepaper",
+    "category": "5章 · 金融尽调",
+    "categoryEn": "5 UNITS · Investment Banking",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+    "thumbKey": "prod_AI-36881",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "全球供应链ESG尽职调查白皮书",
+        "subtitle": "Scope 3 碳排放审计 + 社会合规矩阵",
+        "version": "V2.4 内部机密"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "核心ESG合规检查清单（65项）",
+        "items": [
+          "E: 科学碳目标SBTi验证",
+          "E: 水风险压力测试",
+          "S: 供应链强迫劳动审计",
+          "S: 社区影响补偿计划",
+          "G: 董事会ESG独立董事",
+          "G: 反腐败反洗钱OCM"
+        ],
+        "compliance_rate": "87%"
+      },
+      {
+        "layoutType": "quote",
+        "title": "管理层陈述重点",
+        "quote": "我们不把ESG视为合规成本，而是视为进入发达市场供应链的入场券。",
+        "author": "首席可持续发展官"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "关键风险评级摘要",
+        "text": "基于31项数据源交叉验证，当前投资标的在E维度得分中等偏上，S维度存在劳工透明度短板，G维度治理结构有待优化，综合风险评级为BB+。",
+        "emphasis": "建议交易前强制要求90天改善期"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "分项差距整改追踪表（Top 10）",
+        "items": [
+          "Scope 3 数据覆盖率提升至95%",
+          "使用再生材料比例≥40%",
+          "第二方审计机构入驻",
+          "劳工人权申诉渠道上线",
+          "ESG绩效与高管薪酬挂钩",
+          "定期披露TCFD报告",
+          "供应商煤电替代计划",
+          "包装塑料削减30%",
+          "绿色物流份额提升",
+          "回收体系闭环"
+        ],
+        "compliance_rate": "64%"
+      }
+    ]
+  },
+  {
     "id": "AI-34256",
     "title": "Web3代币经济学路演",
     "titleEn": "Web3 Tokenomics Roadshow",
