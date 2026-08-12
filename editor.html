@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V18 Office-Ribbon Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="components/vip-download-guard.js"></script>
     <script src="components/zero-auth.js"></script>
     <style>
@@ -15,8 +14,6 @@
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         
-        .ribbon-tab { @apply px-4 py-2 text-xs font-bold text-slate-400 border-b-2 border-transparent cursor-pointer hover:text-white transition-colors; }
-        .ribbon-tab.active { @apply text-blue-400 border-blue-500; }
         .tool-btn { @apply p-1.5 rounded hover:bg-slate-700 text-slate-300 hover:text-white transition-colors; }
         
         [contenteditable="true"]:focus { outline: 2px dashed rgba(59, 130, 246, 0.5); cursor: text; background: rgba(15, 23, 42, 0.4); border-radius: 4px;}
@@ -135,9 +132,9 @@
         </aside>
 
         <main class="flex-1 bg-slate-950 flex flex-col items-center justify-between p-5 overflow-hidden relative">
-            <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-10 flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-photo-tech my-auto"></div>
+            <div id="slideCanvas" class="w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-800 slide-shadow p-10 flex flex-col justify-between transition-none relative overflow-hidden bg-photo-tech my-auto"></div>
 
-            <div class="flex items-center justify-between w-full max-w-4xl text-xs text-slate-400 shrink-0">
+            <div class="flex items-center justify-between w-full max-w-4xl text-xs text-slate-400 shrink-0 mt-4">
                 <span class="bg-slate-900 border border-slate-800 px-3 py-1 rounded-xl text-slate-300">💡 提示：选中文字后，直接使用上方 Ribbon 工具栏进行排版</span>
                 <div class="flex items-center gap-3">
                     <button onclick="prevSlide()" class="px-3 py-1 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg font-bold transition">← 上页</button>
@@ -175,6 +172,7 @@
     </div>
 
     <script>
+        // 👑 满血补齐！为您写死 3 大原厂模板的所有页面数据，点击主页对应模板绝不报错！
         const DECK_PRESETS = {
             aerotech: {
                 brand: "AeroTech", titleName: "AeroTech 创投图解版", badge: "15 SLIDES · TECH BLUE", total: 15, defaultBg: "tech",
@@ -247,6 +245,11 @@
         let currentLayoutAlign = 'center';
         let currentCardMask = 'normal';
 
+        const bgStyles = {
+            "tech": "bg-photo-tech text-white", "finance": "bg-photo-finance text-white",
+            "team": "bg-photo-team text-white", "mesh": "bg-style-mesh text-white"
+        };
+
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
@@ -307,7 +310,7 @@
                 }
             }
 
-            // 极限容灾兜底
+            // 👑 极限容灾：如果你在浏览器点了个找不到的 URL，必须稳稳退回 aerotech，且保证有数据！
             if (!preset) {
                 currentDeckKey = 'aerotech';
                 preset = DECK_PRESETS['aerotech'];
@@ -346,7 +349,7 @@
             slidesData.forEach((item, idx) => {
                 const activeCls = idx === currentSlideIdx ? "border-blue-500 bg-slate-800 shadow-md ring-1 ring-blue-500" : "border-slate-800 bg-slate-900/60 hover:bg-slate-800/40";
                 
-                // 👑 极限防报错：强行转换为字符串再处理！
+                // 👑 防崩溃保护套：强行转换为字符串，去掉可能引发错乱的 HTML 标签
                 const pureTitle = String(item.title || "加载中").replace(/<[^>]+>/g, '');
                 const pureKpi = String(item.kpi || "0%").replace(/<[^>]+>/g, '');
                 
@@ -363,12 +366,11 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
-        // 👑 彻底剔除引起白屏报错的复杂动画，强行注入保证 100% 渲染
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
             
-            // 极限防崩溃兜底
+            // 👑 绝对防白屏装甲：如果数据真没了，直接渲染报错红框，而不是白板死机
             if (!item) {
                 canvas.innerHTML = '<div class="text-white text-2xl m-auto bg-rose-500 px-4 py-2 rounded">⚠️ 数据结构缺失，请刷新重试。</div>';
                 return;
@@ -381,11 +383,13 @@
             canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-none relative overflow-hidden ${bgCls} my-auto`;
             
             const layout = item.layoutType || 'default';
-            const sTitle = item.title || '标题加载中';
-            const sSub = item.sub || '副标题加载中';
-            const sLabel = item.label || '核心指标';
-            const sKpi = item.kpi || '100%';
-            const sTag = item.tag || 'MODULE';
+            
+            // 👑 强制数据类型转换为 String，哪怕 AI 传个 200 过来，也给我稳稳变成 "200" 显示出来！
+            const sTitle = String(item.title || '标题加载中');
+            const sSub = String(item.sub || '副标题加载中');
+            const sLabel = String(item.label || '核心指标');
+            const sKpi = String(item.kpi || '100%');
+            const sTag = String(item.tag || 'MODULE');
             const sProg = item.progress || 50;
 
             let innerContent = '';
@@ -477,13 +481,13 @@
                                 <span class="text-blue-400 font-bold">${sProg}%</span>
                             </div>
                             <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-                                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full transition-all duration-700" style="width: ${sProg}%"></div>
+                                <div class="bg-gradient-to-r from-blue-500 to-emerald-400 h-full rounded-full" style="width: ${sProg}%"></div>
                             </div>
                         </div>
                     </div>`;
             }
 
-            // 直接暴力插入 DOM，无需任何动画库干预，保证文字 100% 显示！
+            // 👑 去除了所有导致延迟、不可见的特效，强制 1 毫秒直接灌入 DOM！
             canvas.style.opacity = '1';
             canvas.innerHTML = topHeader + innerContent;
         }
@@ -511,6 +515,7 @@
         }
         
         function syncFormInputs() {
+            // 👑 表单回显也加上了绝对强制类型转换，防白屏死锁
             document.getElementById("bindKpi").value = String(slidesData[currentSlideIdx].kpi || '').replace(/<[^>]+>/g, '');
             document.getElementById("bindLabel").value = String(slidesData[currentSlideIdx].label || '').replace(/<[^>]+>/g, '');
         }
