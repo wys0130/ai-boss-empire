@@ -53,7 +53,6 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <aside class="lg:col-span-2 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📅 分析模块控制台</h2>
-      <!-- 👑 动态模块展示区 -->
       <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer">
         <!-- JS 动态渲染 -->
       </div>
@@ -61,7 +60,7 @@
 
     <main class="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
       <div id="dynamicMainArea">
-        <!-- 👑 核心矩阵渲染区 -->
+        <!-- 👑 核心矩阵渲染区 (将根据 AI layoutType 发生变异) -->
       </div>
 
       <div class="mt-8 pt-6 border-t border-slate-100">
@@ -207,18 +206,22 @@ function recomputeKPIsAndRender(rebuildDom = true) {
   renderDynamicMainArea(rebuildDom);
 }
 
+// 👑 积木化装配渲染引擎：根据 AI 的 LayoutType 渲染出不同的财务模型 UI 结构！
 function renderDynamicMainArea(rebuildHtml = true) {
   const mainArea = document.getElementById('dynamicMainArea');
   
-  // 核心！当前到底是渲染哪个月/哪个模块？
   let currentSheetTitle = months[currentMonth];
   let layout = 'matrix-12m';
+  let kpiTxt = '100%';
+  let labelTxt = '核心指标';
 
   if (isAiMode && sheetsData.length > 0) {
       const sheet = sheetsData[currentMonth];
       if (sheet) {
-          currentSheetTitle = sheet.title || `模块 ${currentMonth + 1}`;
+          currentSheetTitle = String(sheet.title || `模块 ${currentMonth + 1}`).replace(/<[^>]+>/g, '');
           layout = sheet.layoutType || 'matrix-12m';
+          kpiTxt = String(sheet.kpi || '100%').replace(/<[^>]+>/g, '');
+          labelTxt = String(sheet.label || '核心指标').replace(/<[^>]+>/g, '');
       }
   }
 
@@ -237,6 +240,7 @@ function renderDynamicMainArea(rebuildHtml = true) {
 
   let htmlContent = '';
 
+  // 👑 判断组件类型，渲染截然不同的页面
   if (layout === 'roi-calc') {
       htmlContent = `
         <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
@@ -246,14 +250,20 @@ function renderDynamicMainArea(rebuildHtml = true) {
           </div>
           <span class="text-[10px] bg-slate-900 text-white font-mono px-2.5 py-1 rounded-lg font-bold">ROI CALCULATOR</span>
         </div>
-        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6 mb-4 flex items-center justify-between">
-            <div>
-                <div class="text-sm font-bold text-indigo-800 mb-1">预计总净利润</div>
-                <div class="text-3xl font-black font-mono text-indigo-600">$${yearProfit.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-8 mb-4">
+            <div class="text-center mb-8 border-b border-indigo-200 pb-6">
+                <div class="text-sm font-bold text-slate-600 uppercase tracking-widest mb-2">${labelTxt}</div>
+                <div class="text-6xl font-black font-mono text-indigo-600 drop-shadow-sm">${kpiTxt}</div>
             </div>
-            <div class="text-right">
-                <div class="text-sm font-bold text-slate-600 mb-1">投资回报率 (ROI)</div>
-                <div class="text-3xl font-black font-mono text-emerald-500">${((yearProfit / (parseFloat(document.getElementById('initialInvestment').value) || 50000)) * 100).toFixed(1)}%</div>
+            <div class="flex justify-between items-center px-4">
+                <div>
+                    <div class="text-xs font-bold text-slate-500 mb-1">预计总净利润</div>
+                    <div class="text-2xl font-black font-mono text-slate-800">$${yearProfit.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs font-bold text-slate-500 mb-1">系统综合评分</div>
+                    <div class="text-2xl font-black font-mono text-emerald-500">EXCELLENT</div>
+                </div>
             </div>
         </div>
       `;
@@ -266,25 +276,26 @@ function renderDynamicMainArea(rebuildHtml = true) {
           </div>
           <span class="text-[10px] bg-slate-900 text-white font-mono px-2.5 py-1 rounded-lg font-bold">FUNNEL VIZ</span>
         </div>
-        <div class="space-y-4">
-            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <div class="w-12 text-center font-bold text-slate-400">顶部</div>
-                <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden"><div class="bg-blue-500 h-full w-full"></div></div>
-                <div class="w-24 text-right font-mono font-bold">$${yearRev.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+        <div class="space-y-4 pt-2">
+            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="w-12 text-center font-bold text-slate-400 text-xs">顶部</div>
+                <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden"><div class="bg-blue-500 h-full w-full"></div></div>
+                <div class="w-24 text-right font-mono font-bold text-slate-700">$${yearRev.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
             </div>
-            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <div class="w-12 text-center font-bold text-slate-400">中部</div>
-                <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden"><div class="bg-amber-500 h-full w-3/4"></div></div>
-                <div class="w-24 text-right font-mono font-bold">$${(yearRev*0.75).toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="w-12 text-center font-bold text-slate-400 text-xs">流失</div>
+                <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden"><div class="bg-amber-500 h-full w-3/4"></div></div>
+                <div class="w-24 text-right font-mono font-bold text-slate-700">$${(yearRev*0.75).toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
             </div>
-            <div class="flex items-center gap-4 bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-                <div class="w-12 text-center font-bold text-emerald-600">转化</div>
-                <div class="flex-1 h-3 bg-slate-200 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full" style="width: ${(yearProfit/yearRev*100).toFixed(0)}%"></div></div>
-                <div class="w-24 text-right font-mono font-bold text-emerald-600">$${yearProfit.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+            <div class="flex items-center gap-4 bg-emerald-50 p-6 rounded-xl border border-emerald-200 shadow-md transform scale-[1.02]">
+                <div class="w-12 text-center font-black text-emerald-600 text-sm">转化</div>
+                <div class="flex-1 h-4 bg-slate-200 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full" style="width: ${(yearProfit/yearRev*100).toFixed(0)}%"></div></div>
+                <div class="w-24 text-right font-mono font-black text-emerald-600 text-lg">${kpiTxt}</div>
             </div>
         </div>
       `;
   } else {
+      // 默认的 12 月收支矩阵 (matrix-12m)
       htmlContent = `
         <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
           <div>
@@ -293,7 +304,7 @@ function renderDynamicMainArea(rebuildHtml = true) {
           </div>
           <span class="text-[10px] bg-slate-900 text-white font-mono px-2.5 py-1 rounded-lg font-bold">WYSIWYG MATRIX</span>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
           <table class="w-full text-sm" id="financeTable">
             <thead>
               <tr>
@@ -353,13 +364,13 @@ function executeXLSXExport() {
       sheetsData.forEach((sheet, i) => {
           let data = [];
           if (sheet.layoutType === 'roi-calc' || sheet.layoutType === 'funnel') {
-              data = [[sheet.title], ['关键指标', '数值'], [sheet.label || '核心产出', sheet.kpi || '100%']];
+              data = [[String(sheet.title).replace(/<[^>]+>/g, '')], ['关键指标', '数值'], [String(sheet.label || '核心产出').replace(/<[^>]+>/g, ''), String(sheet.kpi || '100%').replace(/<[^>]+>/g, '')]];
           } else {
               data = [['预测阶段', rowRevName, rowCostName, '净利润 ($)'], ['Module Data', '12000', '8000', '4000']];
           }
           const ws = XLSX.utils.aoa_to_sheet(data);
           ws['!cols'] = [{ wch: 20 }, { wch: 25 }, { wch: 25 }];
-          let sheetName = (sheet.title || `模块 ${i+1}`).substring(0, 30).replace(/[\\/?*\[\]]/g, '');
+          let sheetName = String(sheet.title || `模块 ${i+1}`).substring(0, 30).replace(/[\\/?*\[\]]/g, '').replace(/<[^>]+>/g, '');
           XLSX.utils.book_append_sheet(wb, ws, sheetName);
       });
   } else {
@@ -402,7 +413,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (targetAiDeck) {
-            const docName = targetAiDeck.name || targetAiDeck.title;
+            const docName = String(targetAiDeck.name || targetAiDeck.title).replace(/<[^>]+>/g, '');
             document.getElementById('headerTitle').innerText = docName;
             document.getElementById('headerCat').innerText = targetAiDeck.category || '核心业务架构 · 智能合规生成';
             
@@ -414,15 +425,14 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (sheetsData.length > 0) {
                 navContainer.innerHTML = '';
                 sheetsData.forEach((sheet, idx) => {
-                    // 👑 根据 AI 生成的名字，渲染出带有具体业务属性的按钮！
-                    const btnTitle = sheet.title ? sheet.title.replace(/<[^>]+>/g, '') : `模块 ${idx+1}`;
+                    const btnTitle = String(sheet.title ? sheet.title : `模块 ${idx+1}`).replace(/<[^>]+>/g, '');
                     navContainer.innerHTML += `<button class="nav-pill ${idx === 0 ? 'active' : ''}" onclick="selectMonth(${idx})">${btnTitle}</button>`;
                 });
                 
                 if (sheetsData.length >= 2) {
-                    rowRevName = (sheetsData[0].title || '核心主营收入').replace(/<[^>]+>/g, '');
-                    rowCostName = (sheetsData[1].title || '刚性支出与损耗').replace(/<[^>]+>/g, '');
-                    document.getElementById('roiTitle').innerText = (sheetsData[0].label || '投资回报率').replace(/<[^>]+>/g, '');
+                    rowRevName = String(sheetsData[0].title || '核心主营收入').replace(/<[^>]+>/g, '');
+                    rowCostName = String(sheetsData[1].title || '刚性支出与损耗').replace(/<[^>]+>/g, '');
+                    document.getElementById('roiTitle').innerText = String(sheetsData[0].label || '投资回报率').replace(/<[^>]+>/g, '');
                 }
             }
 
