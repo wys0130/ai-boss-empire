@@ -285,7 +285,10 @@ window.selectMentionDept = function(deptName) {
     tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
     tokenSpan.contentEditable = "false"; 
     tokenSpan.setAttribute("data-dept", deptName);
-    tokenSpan.innerText = `@${deptName}`;
+    
+    // 👑 物理注入删除按钮 X，无视任何选区，点击就自毁
+    tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
+    
     range.insertNode(tokenSpan);
     const spaceNode = document.createTextNode("\u00A0"); 
     tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
@@ -312,7 +315,10 @@ window.inspectDept = function(deptName, btnEl) {
         tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
         tokenSpan.contentEditable = "false";
         tokenSpan.setAttribute("data-dept", deptName);
-        tokenSpan.innerText = `@${deptName}`;
+        
+        // 👑 同步注入删除按钮 X
+        tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
+        
         const sel = window.getSelection();
         if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
             const range = sel.getRangeAt(0);
