@@ -1,5 +1,160 @@
 [
   {
+    "id": "AI-52291",
+    "title": "医疗大健康SaaS增长引擎",
+    "titleEn": "Med-SaaS Growth Engine",
+    "category": "5页 · 大健康",
+    "categoryEn": "5 P · Health",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-52291",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "智疗云：重构医患触点",
+        "sub": "从诊前AI分诊到诊后慢病管理的全链路SaaS闭环",
+        "kpi": "ARR $12M",
+        "label": "季度复合增长率 23%"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "核心增长杠杆",
+        "sub": "聚焦B2B2C模式的临床价值转化",
+        "kpi": "NPS 62",
+        "label": "客户健康度",
+        "kpi2": "Rule-out率 89%",
+        "label2": "AI辅助诊断精准度"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "产品迭代路线图：智能质控先行",
+        "sub": "从单病种管理向全病种数据中台演进",
+        "kpi": "18个月",
+        "label": "从POC到规模化部署"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "转化漏斗：从临床体验到续约",
+        "sub": "每一步都嵌入临床决策支持引擎",
+        "kpi": "60%",
+        "label": "免费版到付费版转化率"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "传统HIS vs 认知型SaaS",
+        "sub": "数据不再是记录，而是认知",
+        "kpi": "3.2x",
+        "label": "医生日均节省时间"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-10821",
+    "title": "全球碳交易智能对冲工作台",
+    "titleEn": "Carbon Trading Desk",
+    "category": "3模块 · 全球碳排放交易中心",
+    "categoryEn": "3 UNITS · Carbon",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-10821",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "碳配额远期定价对冲模型",
+        "kpi": "$4.2M",
+        "label": "月度套保收益增量"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "履约周期内的CET差额矩阵",
+        "kpi": "12.6%",
+        "label": "基准线年化超额收益"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "从验收到抵消的流转漏斗",
+        "kpi": "71%",
+        "label": "碳资产核销率"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "每张碳证均摊清算成本",
+        "value": "$0.08"
+      },
+      {
+        "label": "履约准时率（月度）",
+        "value": "99.2%"
+      },
+      {
+        "label": "碳价波动捕获率",
+        "value": "68%"
+      },
+      {
+        "label": "CCER持仓溢价倍数",
+        "value": "2.4x"
+      }
+    ]
+  },
+  {
+    "id": "AI-93469",
+    "title": "DTC品牌出海作战手册",
+    "titleEn": "DTC Playbook",
+    "category": "4章 · 出海跨境独立站DTC",
+    "categoryEn": "4 UNITS · DTC",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-93469",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "独立站本土化全栈运营手册",
+        "content": "基于五国市场（美/英/德/日/法）的本地化支付、物流与合规策略。聚焦独立站的去平台化流量重构，结合TikTok Shop与Google Shopping的混合投放模型，实现「站内转化率提升 + 站外品牌资产沉淀」的双轮驱动。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "履约与数据合规自检清单",
+        "content": "一、落地页本地化LCP≤2.5s\n二、支付转化率低于3%时启用本地APM\n三、构建COGS+尾程运费动态定价模型\n四、部署GDPR/CCPA cookie-consent弹窗并埋点\n五、设置跨境退换货保险SLA（≤72h）\n六、启用AI多语种客服（覆盖法语/德语）"
+      },
+      {
+        "layoutType": "quote",
+        "title": "ROI突破的关键断言",
+        "content": "独立站不再依赖广告复利，而是通过「子母站矩阵 + UGC内容中台 + 循环订阅模型」将获客成本摊薄至过去的三分之一。真正的高转化率不在首页，而在产品详情页的信任元叙事里。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "从流量到留量的经营深度分析",
+        "content": "当前DTC出海已进入「精耕细作」阶段，单纯依赖Facebook广告ROAS超过2.5的时代已终结。我们建议采用「混合归因模型」：将Google Analytics 4的User-ID与Klarna、Adyen等支付节点打通，识别跨设备的高净值客群。同时，建立「弹性的本地仓配网络」——以美国西部备货为主、欧洲Fulfillment中心（FBA+FBA替代方案）做缓冲，将库存周转天数压缩至38天以内。在此基础上，利用「邮件/短信自动化SOP」对弃购用户进行「动态折扣+库存紧迫感」双重触达，实现从首次成交到复购的生命周期价值（LTV）倍增——将平均客单价从$52提升至$84，同时将流失率（Returning Customer Churn）稳定控制在6%以下。"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
     "id": "AI-67498",
     "title": "低轨商业航天发射经济性测算台",
     "titleEn": "LEO Launch Cost Optimizer",
