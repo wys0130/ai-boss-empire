@@ -1,5 +1,178 @@
 [
   {
+    "id": "AI-96798",
+    "title": "低轨商业航天在轨服务价值网络",
+    "titleEn": "LEO In-Orbit Service Network",
+    "category": "5页 · 商业航天",
+    "categoryEn": "5 P · Space-Tech",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-96798",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "在轨加注：解锁卫星寿命的第2曲线",
+        "kpi": "150%",
+        "label": "卫星残值利用率提升"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "自营星座 vs 第三方在轨服务",
+        "kpi": "3.2x",
+        "label": "单位质量边际收益倍数"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "从测控申请到燃料交割的12层漏斗",
+        "kpi": "38%",
+        "label": "运控系统自动对接率"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "轨道机动经济性网格x4",
+        "kpi": "4.1",
+        "label": "每公斤燃料可挽回的Δv(km/s)"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "2024-2027在轨服务商业化里程碑",
+        "kpi": "9个月",
+        "label": "从意向书到首单交割周期"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-24752",
+    "title": "智能制造数字孪生排产模拟台",
+    "titleEn": "Digital-Twin Scheduling War-room",
+    "category": "5模块 · 智能制造",
+    "categoryEn": "5 UNITS · Smart-Manufacturing",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527724696",
+    "thumbnail": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527724696",
+    "thumbKey": "prod_AI-24752",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527724696",
+    "thumbDefault": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527724696",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "实时数据回流与模型更新周期",
+        "kpi": "250ms",
+        "label": "PLC到孪生体延迟"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "工艺参数候选集筛选漏斗",
+        "kpi": "91%",
+        "label": "仿真通过率收敛值"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "物理产线 vs 孪生影子线",
+        "kpi": "-23%",
+        "label": "单位能耗偏差率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "瓶颈工位预测命中率矩阵",
+        "kpi": "82%",
+        "label": "提前72小时预报准确度"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "闭环：仿真优化结果一键下发PLC",
+        "kpi": "11秒",
+        "label": "全厂区程序迭代部署时间"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "产线虚拟调试节拍",
+        "value": "42秒"
+      },
+      {
+        "label": "数字孪生模型保真度",
+        "value": "97.3%"
+      },
+      {
+        "label": "异常扰动响应耗时",
+        "value": "1.8秒"
+      },
+      {
+        "label": "换型指令同步率",
+        "value": "100%"
+      }
+    ]
+  },
+  {
+    "id": "AI-95905",
+    "title": "新能源汽车供应链碳追溯与韧性指南",
+    "titleEn": "EV Supply-Chain Carbon Traceability",
+    "category": "5章 · 新能源汽配",
+    "categoryEn": "5 UNITS · EV-Chain",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527725818",
+    "thumbnail": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527725818",
+    "thumbKey": "prod_AI-95905",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527725818",
+    "thumbDefault": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786527725818",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "电池护照与矿源一致性合规白皮书",
+        "kpi": "Scope-3",
+        "label": "覆盖碳排放范围"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "二级供应商ESG数据回传10项强制点",
+        "kpi": "10/10",
+        "label": "必须回填字段完整度"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "正极材料供应链碳因子动态核算框架",
+        "kpi": "0.87",
+        "label": "单kWh碳强度可归因系数",
+        "content": "针对三元锂与磷酸铁锂两条主流技术路线，本框架将正极材料生产环节的电力结构、前驱体煅烧工艺以及湿法回收比例作为三大核心变量。通过引入实时电网排放因子与不同矿源地的冶炼能耗基准，可对每千瓦时电芯所隐含的碳排放进行逐日重算。相比传统年度平均碳因子，该动态核算模型能捕捉到因水电丰枯季节变化或煤炭调度导致的月度波动，从而支持采购部门在价格与碳配额之间做出精细权衡。同时，本框架内置了基于区块链存证的物流温控与批次混料记录，确保每一批正极粉体从矿区到电芯厂的物理流动路径均可在审计时快速回溯。该机制尤其适用于出口欧盟的车型，满足新电池法对碳足迹声明中关于不确定性区间的披露要求。"
+      },
+      {
+        "layoutType": "quote",
+        "title": "供应商协同脱碳：不是成本而是准入证",
+        "kpi": "12%",
+        "label": "整车BOM碳强度可削减比例",
+        "content": "头部车企的实践表明，将碳追溯系统与SRM采购平台深度打通后，二级供应商的绿色电力采购比例平均提升了12个百分点。这并非单纯依靠道德劝说，而是通过将碳强度指标嵌入每季度的配额分配算法，主动让低排放供应商获得更高的订单份额。与此同时，剩余的高碳供应商会被要求缴纳基于内部碳价的补偿金，用于投资共享的回收拆解网络。这种将环境成本内部化的做法，使得供应链韧性与脱碳目标形成正向增强回路：越低碳的路径往往伴随更短的物流距离和更稳定的矿源协议，从而在应对地缘政治风险时表现出更强的议价能力。"
+      },
+      {
+        "layoutType": "quote",
+        "title": "2025年Q3-Q4 碳关务申报预演节点",
+        "kpi": "3.2万吨",
+        "label": "预计全年可避免碳关税支出",
+        "content": "基于当前V2G反向充电试点与电池梯次利用产能规划，我们推演了2025年下半年关键里程碑：9月底前完成所有一级供应商的碳数据接口联调；10月中旬开展模拟CBAM申报演练，利用数字孪生沙盘对10条典型路径进行碳泄漏风险测试；11月初与两家回收龙头企业签订废料闭环抵扣协议，使正极材料再生占比达到18%以上。这些动作预计将帮助出口车型在欧盟边境调节机制下减少约3.2万吨二氧化碳当量的申报缺口，折合直接关税节省与合规风险缓释超过800万欧元，同时为2026年电池护照全量合规打下数据基座。"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
     "id": "AI-32077",
     "title": "AI教育智能硬件·神经重塑作战图",
     "titleEn": "NeuroEdge Learning Hardware",
