@@ -53,19 +53,14 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <aside class="lg:col-span-2 bento-card p-5">
       <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📅 分析模块控制台</h2>
-      <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer">
-        <!-- JS 动态渲染 -->
-      </div>
+      <div class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2" id="monthNavContainer"></div>
     </aside>
 
     <main class="lg:col-span-7 bento-card p-6 flex flex-col justify-between">
-      <div id="dynamicMainArea">
-        <!-- 核心矩阵渲染区 -->
-      </div>
+      <div id="dynamicMainArea"></div>
 
       <div class="mt-8 pt-6 border-t border-slate-100">
         <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 font-mono">📊 商业决策 KPI 卡片矩阵</h3>
-        <!-- 👑 彻底剔除写死的 HTML 框架，完全交由 JS 引擎根据业务动态重绘！ -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="dynamicKpiCards"></div>
       </div>
     </main>
@@ -119,7 +114,7 @@ let financeData = [];
 let manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
 let isAiMode = false;
 let sheetsData = [];
-let aiBottomKpis = []; // 动态承载引擎生成的 KPI 矩阵
+let aiBottomKpis = [];
 
 let rowRevName = '营业总收入 (Revenue)';
 let rowCostName = '成本与支出 (Costs)';
@@ -149,7 +144,7 @@ function updateROI() {
     financeData[i] = { revenue, cost, profit: revenue - cost };
   }
   manualOverrides = { q1Rev: null, q1Cost: null, yearRev: null, yearCost: null };
-  recomputeKPIsAndRender();
+  recomputeKPIsAndRender(false);
 }
 
 function updateCellFromTable(field, scope, rawText) {
@@ -169,7 +164,6 @@ function updateCellFromTable(field, scope, rawText) {
   recomputeKPIsAndRender(false);
 }
 
-// 👑 彻底重写底部渲染逻辑，物理断绝报错！
 function recomputeKPIsAndRender(rebuildDom = true) {
   let totalRevenue = 0, totalCost = 0;
   financeData.forEach(m => { totalRevenue += m.revenue; totalCost += m.cost; });
@@ -184,12 +178,10 @@ function recomputeKPIsAndRender(rebuildDom = true) {
   const roi = investment > 0 ? (totalProfit / investment * 100) : 0;
   const payback = totalProfit > 0 ? (investment / (totalProfit / 12)) : 99;
 
-  // 👑 底层 KPI 阵列装配：优先使用强行注入的行业专属指标！
   let displayKpis = [];
   if (isAiMode && aiBottomKpis && aiBottomKpis.length >= 4) {
       displayKpis = aiBottomKpis.slice(0, 4);
   } else {
-      // 原厂兜底
       displayKpis = [
           {label: "毛利率 (Gross)", value: grossMargin.toFixed(1) + '%'},
           {label: "净利率 (Net)", value: netMargin.toFixed(1) + '%'},
@@ -198,7 +190,6 @@ function recomputeKPIsAndRender(rebuildDom = true) {
       ];
   }
 
-  // 安全渲染 DOM，绝不报错白屏
   const kpiContainer = document.getElementById('dynamicKpiCards');
   if (kpiContainer && rebuildDom) {
       kpiContainer.innerHTML = '';
@@ -220,7 +211,7 @@ function recomputeKPIsAndRender(rebuildDom = true) {
 
 function renderDynamicMainArea(rebuildHtml = true) {
   const mainArea = document.getElementById('dynamicMainArea');
-  if(!mainArea) return; // 绝对防崩溃
+  if(!mainArea) return; 
 
   let currentSheetTitle = months[currentMonth];
   let layout = 'matrix-12m';
@@ -397,7 +388,8 @@ function executeXLSXExport() {
   alert('✅ 完整带排版的 Excel 建模表下载成功！');
 }
 
-window.addEventListener('DOMContentLoaded', async () => {
+// 👑 异步请求黑盒彻底修复：保证异步拉取结束后，必定执行一次带渲染的强力更新！
+async function loadDeckByRouter() {
     const params = new URLSearchParams(window.location.search);
     const deckId = params.get('deck');
     const navContainer = document.getElementById('monthNavContainer');
@@ -431,7 +423,6 @@ window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('topPriceBtn').innerText = priceStr;
             document.getElementById('mainPriceTxt').innerHTML = `${priceStr} <span class="text-xs font-normal text-slate-400">/ 一次性</span>`;
             
-            // 👑 强力接管：大模型如果偷懒没给 KPI，前端根据行业智能捏造 4 个，绝不再显示“毛利率”！
             aiBottomKpis = targetAiDeck.bottomKpis;
             if (!aiBottomKpis || !Array.isArray(aiBottomKpis) || aiBottomKpis.length < 4) {
                 if (docName.includes('电商') || docName.includes('海运') || docName.includes('物流')) {
@@ -485,8 +476,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     initFinanceData();
     updateROI(); 
-    recomputeKPIsAndRender(true); // 保证第一页绝对渲染，不白屏！
-});
+    // 👑 彻底修复白屏竞态条件：在异步数据拉取并装配完全部结构后，强行执行一次点击第一页事件，100%强制上屏！
+    selectMonth(0);
+}
+
+window.onload = async () => {
+    await loadDeckByRouter();
+};
 </script>
 </body>
 </html>
