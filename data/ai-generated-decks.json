@@ -1,19 +1,164 @@
 [
   {
-    "id": "AI-76956",
-    "title": "星辰资本路演蓝图",
-    "name": "星辰资本路演蓝图",
-    "category": "32 SLIDES · 深空科幻",
+    "id": "AI-39573",
+    "title": "曜石增长引擎",
+    "name": "曜石增长引擎",
+    "category": "30 SLIDES · 高级路演",
     "type": "ppt",
-    "thumb": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "thumbnail": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "thumbKey": "prod_AI-76956",
-    "thumbCloudPath": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "thumbDefault": "https://image.pollinations.ai/prompt/Premium%203D%20mockup%20of%20a%20sleek%20business%20presentation%20slide%20hovering%20on%20a%20dark%20minimalist%20studio%20background%2C%20cinematic%20lighting%2C%20elegant%20corporate%20design%2C%20Behance%20trending%2C%20Unreal%20Engine%205%20render%2C%208k%20resolution%2C%20masterpiece%2C%20completely%20empty%20without%20any%20text%2C%20no%20letters%2C%20clean%20graphics?width=800&height=600&nologo=true&enhance=true&seed=8987",
-    "priceRmb": 159,
-    "priceUsd": "24.99",
+    "thumb": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+    "thumbnail": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+    "thumbKey": "prod_AI-39573",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+    "thumbDefault": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=90",
+    "priceRmb": 189,
+    "priceUsd": "29.99",
     "colorCls": "text-orange-500 font-bold",
     "isLinked": true,
-    "status": true
+    "status": true,
+    "slides": [
+      {
+        "title": "市场引力场",
+        "sub": "万亿级赛道重构",
+        "kpi": "$2.4T",
+        "label": "可寻址市场",
+        "progress": 92
+      },
+      {
+        "title": "痛点深潜",
+        "sub": "客户流失根因分析",
+        "kpi": "68%",
+        "label": "未解决痛点占比",
+        "progress": 45
+      },
+      {
+        "title": "飞轮模式",
+        "sub": "网络效应闭环",
+        "kpi": "3.2x",
+        "label": "复购乘数",
+        "progress": 78
+      },
+      {
+        "title": "竞争壁垒",
+        "sub": "数据护城河与专利",
+        "kpi": "17",
+        "label": "核心专利数",
+        "progress": 61
+      },
+      {
+        "title": "资本轨迹",
+        "sub": "A轮到C轮融资路线",
+        "kpi": "$85M",
+        "label": "累计融资额",
+        "progress": 88
+      }
+    ]
+  },
+  {
+    "id": "AI-83264",
+    "title": "深蓝财务中枢",
+    "name": "深蓝财务中枢",
+    "category": "12 SHEETS · 智能财测",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1531538512162-262fac7fb818?auto=format&fit=crop&w=800&q=90",
+    "thumbnail": "https://images.unsplash.com/photo-1531538512162-262fac7fb818?auto=format&fit=crop&w=800&q=90",
+    "thumbKey": "prod_AI-83264",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1531538512162-262fac7fb818?auto=format&fit=crop&w=800&q=90",
+    "thumbDefault": "https://images.unsplash.com/photo-1531538512162-262fac7fb818?auto=format&fit=crop&w=800&q=90",
+    "priceRmb": 99,
+    "priceUsd": "14.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "单位经济模型",
+        "sub": "LTV/CAC 动态测算",
+        "kpi": "4.7",
+        "label": "LTV/CAC比值",
+        "progress": 73
+      },
+      {
+        "title": "现金流瀑布",
+        "sub": "月度burn与runway",
+        "kpi": "23",
+        "label": "剩余月数",
+        "progress": 56
+      },
+      {
+        "title": "ARPU热力矩阵",
+        "sub": "产品线×客群价值",
+        "kpi": "$1,240",
+        "label": "加权ARPU",
+        "progress": 81
+      },
+      {
+        "title": "成本结构沙盘",
+        "sub": "COGS与S&M优化",
+        "kpi": "-18%",
+        "label": "毛利率提升",
+        "progress": 64
+      },
+      {
+        "title": "情景压力测试",
+        "sub": "悲观/基准/乐观",
+        "kpi": "12%",
+        "label": "EBIT margin",
+        "progress": 39
+      }
+    ]
+  },
+  {
+    "id": "AI-14305",
+    "title": "极昼战略白皮书",
+    "name": "极昼战略白皮书",
+    "category": "40 PAGES · 深度洞察",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
+    "thumbnail": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
+    "thumbKey": "prod_AI-14305",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
+    "thumbDefault": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
+    "priceRmb": 149,
+    "priceUsd": "22.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "title": "执行摘要",
+        "sub": "五力模型与战略推荐",
+        "kpi": "91",
+        "label": "战略清晰度指数",
+        "progress": 95
+      },
+      {
+        "title": "客户之声",
+        "sub": "深度访谈与NPS拆解",
+        "kpi": "42",
+        "label": "NPS净推荐值",
+        "progress": 67
+      },
+      {
+        "title": "组织效能审计",
+        "sub": "RACI与决策瓶颈",
+        "kpi": "33%",
+        "label": "响应提速比例",
+        "progress": 58
+      },
+      {
+        "title": "技术栈演进",
+        "sub": "从单体到AI-native",
+        "kpi": "7",
+        "label": "关键迁移阶段",
+        "progress": 74
+      },
+      {
+        "title": "行动路线图",
+        "sub": "12个月里程碑与OKR",
+        "kpi": "100%",
+        "label": "目标达成率",
+        "progress": 82
+      }
+    ]
   }
 ]
