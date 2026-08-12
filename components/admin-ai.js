@@ -1,7 +1,14 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：全站级物理查重防雷同 + 动态盐值保底 + 纯净部门卡片渲染
+ * 👑 终极架构：全站级物理核心ID查重防雷同 + 动态盐值保底 + 纯净部门卡片渲染
  */
+
+// 👑 提取图片唯一核心 ID 算法，剥离所有分辨率、格式等参数干扰
+function getBaseImageId(url) {
+    if (!url) return "";
+    const match = url.match(/photo-[a-zA-Z0-9\-]+/);
+    return match ? match[0] : url.split('?')[0];
+}
 
 window.deptConfig = [
     { name: "大脑中枢", cls: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30" },
@@ -90,13 +97,14 @@ async function processRemixAndScoring(themeKeyword, category, globalUsedImages) 
 
     while(!isValidImage && attempt < 5) {
         attempt++;
-        window.appendLog(`🎨 [视觉策划部] 正在执行全站级图片查重与物理连通性校验...`);
+        window.appendLog(`🎨 [视觉策划部] 正在执行全站级核心 ID 防撞库与物理连通性校验...`);
         
-        let availableImgs = targetPool.filter(img => !globalUsedImages.has(img));
+        // 👑 彻底剔除黑名单图片：必须使用 getBaseImageId 进行比对，无视分辨率参数干扰！
+        let availableImgs = targetPool.filter(img => !globalUsedImages.has(getBaseImageId(img)));
         
         if (availableImgs.length === 0) {
             const allImgs = Object.values(HD_IMAGE_VAULT).flat();
-            availableImgs = allImgs.filter(img => !globalUsedImages.has(img));
+            availableImgs = allImgs.filter(img => !globalUsedImages.has(getBaseImageId(img)));
         }
         
         let candidateImg = "";
@@ -115,9 +123,10 @@ async function processRemixAndScoring(themeKeyword, category, globalUsedImages) 
         });
         
         if(isValidImage) {
-            window.appendLog(`✅ [系统广播] 图像全站查重通过，0雷同！锁定商用封面。`, "text-emerald-500");
+            window.appendLog(`✅ [系统广播] 图像全站唯一性查重通过，0雷同！锁定商用封面。`, "text-emerald-500");
             finalImg = candidateImg;
-            globalUsedImages.add(finalImg.split('&uid=')[0]);
+            // 立即将生成图片的核心 ID 锁定到黑名单中
+            globalUsedImages.add(getBaseImageId(finalImg));
             break;
         } else {
             window.appendLog(`⚠️ [QA 拦截] 探测到图像损坏或网络白屏，执行销毁重做！`, "text-rose-500");
@@ -155,12 +164,21 @@ window.triggerSwarmAutonomousAction = async function() {
 
             window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【强制结构打破算法】与【全局查重库读取】...`);
 
+            // 👑 查重核心：不仅拉取大盘，且物理级锁定默认 5 大件的核心图库，绝对防止 AI 抽到跟默认模板雷同的封面！
             const globalUsedImages = new Set();
+            
+            // 强制写入原生 5 大默认模板的底图核心 ID，雷打不动防撞！
+            globalUsedImages.add("photo-1460925895917-afdab827c52f"); // AeroTech
+            globalUsedImages.add("photo-1504384308090-c894fdcc538d"); // SaaS
+            globalUsedImages.add("photo-1551836022-d5d88e9218df"); // FinTech
+            globalUsedImages.add("photo-1543286386-2e659306cd6c"); // Excel ROI
+            globalUsedImages.add("photo-1450133064473-71024230f91b"); // Word ATS
+
             try {
                 const localAudit = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
                 localAudit.forEach(p => {
-                    if (p.thumbCloudPath) globalUsedImages.add(p.thumbCloudPath.split('&uid=')[0]);
-                    if (p.thumb) globalUsedImages.add(p.thumb.split('&uid=')[0]);
+                    if (p.thumbCloudPath) globalUsedImages.add(getBaseImageId(p.thumbCloudPath));
+                    if (p.thumb) globalUsedImages.add(getBaseImageId(p.thumb));
                 });
             } catch(e) {}
             
@@ -255,14 +273,14 @@ window.triggerSwarmAutonomousAction = async function() {
                 
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
-                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架绝对差异化组件矩阵产品 [skip ci]", keys.gh);
+                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架绝对无重复封面且差异化结构的产品 [skip ci]", keys.gh);
 
                 if (typeof window.AUDIT_PRODUCTS !== "undefined" && typeof window.renderAuditTable === "function") {
                     newTemplates.forEach(t => window.AUDIT_PRODUCTS.unshift(t));
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
                     window.renderAuditTable();
                 }
-                window.appendLog(`✅ [系统广播]: 排版强制变异装配完毕！全站查重无雷同，已成功录入大盘。`);
+                window.appendLog(`✅ [系统广播]: 排版强制变异装配完毕！全站查重(含原生模板)无雷同，已成功录入大盘。`);
             } finally {
                 window.isCloudSyncing = false;
             }
@@ -457,7 +475,6 @@ window.renderDeptButtons = function() {
     if (!container) return;
     container.innerHTML = "";
     
-    // ⚠️ 保证只在 renderDeptButtons 里构建唯一的部门卡片列表，彻底剔除那颗多余的毒瘤！
     window.deptConfig.forEach(dept => {
         const btn = document.createElement("button");
         btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
