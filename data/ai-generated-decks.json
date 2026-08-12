@@ -1,1 +1,166 @@
-[]
+[
+  {
+    "id": "AI-58877",
+    "title": "Web3代币经济学路演舱",
+    "titleEn": "Tokenomics Pitch Deck",
+    "category": "6页 · 区块链融资",
+    "categoryEn": "6 P · Blockchain Fundraising",
+    "type": "ppt",
+    "thumb": "https://image.pollinations.ai/prompt/decentralized%20finance%20data%20vortex%20dark%20neon%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=597504",
+    "thumbnail": "https://image.pollinations.ai/prompt/decentralized%20finance%20data%20vortex%20dark%20neon%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=597504",
+    "thumbKey": "prod_AI-58877",
+    "thumbCloudPath": "https://image.pollinations.ai/prompt/decentralized%20finance%20data%20vortex%20dark%20neon%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=597504",
+    "thumbDefault": "https://image.pollinations.ai/prompt/decentralized%20finance%20data%20vortex%20dark%20neon%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=597504",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "引力协议",
+        "sub": "流动性挖矿2.0",
+        "kpi": "$120M TVL",
+        "label": "总锁仓量",
+        "progress": 100
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "代币分配矩阵",
+        "sub": "社区占比 vs 团队归属",
+        "kpi": "40% / 20%",
+        "label": "社区 / 团队",
+        "progress": 85
+      },
+      {
+        "layoutType": "timeline",
+        "title": "释放曲线",
+        "sub": "4年线性归属 + 悬崖期",
+        "kpi": "18个月",
+        "label": "完全释放周期",
+        "progress": 60
+      },
+      {
+        "layoutType": "funnel",
+        "title": "质押转化漏斗",
+        "sub": "从空投到长期质押",
+        "kpi": "68%",
+        "label": "质押留存率",
+        "progress": 45
+      },
+      {
+        "layoutType": "comparison",
+        "title": "vs 传统LBP",
+        "sub": "公平启动对比",
+        "kpi": "3.2x",
+        "label": "资金效率倍数",
+        "progress": 72
+      },
+      {
+        "layoutType": "default",
+        "title": "风险控制面板",
+        "sub": "闪电贷攻击模拟",
+        "kpi": "0.02%",
+        "label": "坏账率",
+        "progress": 90
+      }
+    ]
+  },
+  {
+    "id": "AI-31171",
+    "title": "跨境电商ROI利润漏斗",
+    "titleEn": "Cross-border ROI Funnel",
+    "category": "3表 · DTC运营",
+    "categoryEn": "3 UNITS · DTC Operations",
+    "type": "excel",
+    "thumb": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=228435",
+    "thumbnail": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=228435",
+    "thumbKey": "prod_AI-31171",
+    "thumbCloudPath": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=228435",
+    "thumbDefault": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=228435",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月SKU级利润矩阵",
+        "sub": "按站点×品类×广告组",
+        "kpi": "€2.4M",
+        "label": "年度净利",
+        "progress": 88
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "动态ROI计算器",
+        "sub": "含汇率波动和关税",
+        "kpi": "4.7x",
+        "label": "广告ROAS",
+        "progress": 74
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "隐形费用拆解",
+        "sub": "头程+尾程+弃置费",
+        "kpi": "$0.89",
+        "label": "单均物流成本",
+        "progress": 62
+      }
+    ]
+  },
+  {
+    "id": "AI-84990",
+    "title": "B2B全生命周期客户战情室",
+    "titleEn": "Full-lifecycle Client War Room",
+    "category": "4章 · 企业服务",
+    "categoryEn": "4 UNITS · Enterprise SaaS",
+    "type": "word",
+    "thumb": "https://image.pollinations.ai/prompt/fortune%20500%20board%20meeting%20executive%20blueprint%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=626748",
+    "thumbnail": "https://image.pollinations.ai/prompt/fortune%20500%20board%20meeting%20executive%20blueprint%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=626748",
+    "thumbKey": "prod_AI-84990",
+    "thumbCloudPath": "https://image.pollinations.ai/prompt/fortune%20500%20board%20meeting%20executive%20blueprint%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=626748",
+    "thumbDefault": "https://image.pollinations.ai/prompt/fortune%20500%20board%20meeting%20executive%20blueprint%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=626748",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "北极星客户成功手册",
+        "sub": "从POC到扩张的36个关键动作",
+        "kpi": "98%",
+        "label": "续约率目标",
+        "progress": 95
+      },
+      {
+        "layoutType": "text-block",
+        "title": "决策链人物画像",
+        "sub": "CIO/CFO/业务VP的差异化痛点",
+        "kpi": "3类",
+        "label": "核心角色",
+        "progress": 80
+      },
+      {
+        "layoutType": "checklist",
+        "title": "上线前90天冲刺清单",
+        "sub": "数据迁移/权限矩阵/培训认证",
+        "kpi": "27项",
+        "label": "强制检查点",
+        "progress": 53
+      },
+      {
+        "layoutType": "quote",
+        "title": "风险预警红线",
+        "sub": "当使用率低于20%时的强制干预",
+        "kpi": "72h",
+        "label": "响应时限",
+        "progress": 41
+      }
+    ]
+  }
+]
