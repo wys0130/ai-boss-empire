@@ -1,1 +1,244 @@
-[]
+[
+  {
+    "id": "AI-41661",
+    "title": "Web3代币经济模型设计",
+    "titleEn": "Tokenomics Architecture",
+    "category": "12页 · Web3",
+    "categoryEn": "12 P · Crypto",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=1280&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=1280&q=80",
+    "thumbKey": "prod_AI-41661",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=1280&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=1280&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "NEXUS Protocol - 代币经济2.0",
+        "kpi": "$120M",
+        "label": "目标市值"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "核心经济指标面板",
+        "kpi": "4.7%",
+        "label": "季度通胀率"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "质押参与率",
+        "kpi": "68%",
+        "label": "流通量质押占比"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "代币释放路线图 2024-2027",
+        "kpi": "Q3 2025",
+        "label": "生态激励池启动"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "用户获取转化漏斗",
+        "kpi": "12.8%",
+        "label": "注册至首笔交易转化"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "vs 传统L1代币模型",
+        "kpi": "3.2x",
+        "label": "资本效率倍数"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "验证者节点回报率",
+        "kpi": "19.5%",
+        "label": "年化APY"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "治理投票关键节点",
+        "kpi": "2025.03",
+        "label": "提案#12 通过"
+      },
+      {
+        "layoutType": "default",
+        "title": "风险缓冲池储备",
+        "kpi": "$8.2M",
+        "label": "审计保险金"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "跨链桥资产净流入",
+        "kpi": "41%",
+        "label": "以太坊桥接占比"
+      },
+      {
+        "layoutType": "cover",
+        "title": "战略合作生态扩展",
+        "kpi": "27",
+        "label": "已签约DApp伙伴"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "交易费用 vs 竞品",
+        "kpi": "-56%",
+        "label": "成本优势"
+      }
+    ]
+  },
+  {
+    "id": "AI-16001",
+    "title": "跨境电商ROI引擎",
+    "titleEn": "Cross-border ROI Engine",
+    "category": "10表 · 跨境电商",
+    "categoryEn": "10 UNITS · DTC",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1280&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1280&q=80",
+    "thumbKey": "prod_AI-16001",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1280&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1280&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "单SKU利润计算器",
+        "kpi": "38%",
+        "label": "毛利率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "广告-落地页-支付漏斗",
+        "kpi": "5.2%",
+        "label": "CVR转化率"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月渠道ROI矩阵",
+        "kpi": "4.6",
+        "label": "Google Ads ROAS"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "物流成本分摊器",
+        "kpi": "$1.82",
+        "label": "单件履约成本"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "自然流量转化漏斗",
+        "kpi": "2.1%",
+        "label": "SEO CVR"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "客单价与复购矩阵",
+        "kpi": "$67.40",
+        "label": "AOV"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "清仓折扣盈亏平衡",
+        "kpi": "78%",
+        "label": "保本折扣率"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "各站点月度净利表",
+        "kpi": "$210K",
+        "label": "月均净利"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "再营销漏斗 (Meta)",
+        "kpi": "11.3%",
+        "label": "像素用户转化率"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "新品孵化ROI预测",
+        "kpi": "1.9x",
+        "label": "12个月回报倍数"
+      }
+    ]
+  },
+  {
+    "id": "AI-17376",
+    "title": "高盛级ESG白皮书",
+    "titleEn": "ESG Due Diligence",
+    "category": "10章 · 金融咨询",
+    "categoryEn": "10 UNITS · Investment Banking",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1280&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1280&q=80",
+    "thumbKey": "prod_AI-17376",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1280&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1280&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "2024全球供应链ESG合规白皮书",
+        "content": "本白皮书基于对42个国家和地区、1300家供应商的深度审计，提出ESG风险分层管理框架，涵盖碳边境调节机制(CBAM)、冲突矿产、劳工合规等关键议题。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "供应链ESG快速筛查清单",
+        "content": "1. 碳披露完整度\n2. 水压力风险评估\n3. 供应商审计频率\n4. 申诉机制可用性\n5. 可再生能源占比"
+      },
+      {
+        "layoutType": "quote",
+        "title": "全球ESG投资总监观点",
+        "content": "“未来三年，ESG合规成本将上升40%，但主动转型的企业将获得溢价估值。” — 高盛亚太ESG主管"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "方法论与数据来源",
+        "content": "本次研究采用双重重要性评估模型，结合SASB标准与ISSB准则，对碳排放强度、多样性指数、反腐败治理等34项指标进行量化分析，数据覆盖2020-2023年公开披露与非公开调研。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "脱碳路线图执行清单",
+        "content": "✓ 设定SBTi目标\n✓ 建立内部碳定价\n✓ 供应链绿色贷款接入\n✓ 每季度独立验证\n✓ 利益相关者沟通计划"
+      },
+      {
+        "layoutType": "quote",
+        "title": "首席合规官访谈",
+        "content": "“我们发现，ESG表现最优的供应商，其产品次品率降低18%，交付准时率提高12%。ESG不是成本，是风控。”"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "风险量化与情景分析",
+        "content": "在1.5°C情景下，2030年暴露于碳关税的行业将面临平均22%的成本上升；而通过提前布局可再生能源和闭环回收，可对冲约65%的财务影响。本部分提供分行业、分地域的敏感性矩阵。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "董事会ESG治理最佳实践",
+        "content": "1. 设立ESG委员会\n2. 高管薪酬挂钩指标\n3. 年度可持续审计\n4. 投资者专项沟通\n5. 负面事件应急流程"
+      },
+      {
+        "layoutType": "quote",
+        "title": "绿色债券投资人视角",
+        "content": "“我们只投资于那些将ESG数据嵌入运营系统的公司，而非仅做披露。透明度决定折价率。”"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "结论与行动建议",
+        "content": "建议企业分三阶段推进：2024年完成数据基座建设，2025年建立动态风险预警与供应商淘汰机制，2026年实现全价值链碳中和可追溯。附件包含可下载的审计模板与指标库。"
+      }
+    ]
+  }
+]
