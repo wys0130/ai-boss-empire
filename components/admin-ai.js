@@ -1,6 +1,6 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：强迫 AI 产出独家底层指标 (bottomKpis) 与 丰富正文 (content)
+ * 👑 终极架构：强行注入差异化组件指纹 + 绝对物理级防裂图过滤 + 纯净部门卡片渲染
  */
 
 window.deptConfig = [
@@ -15,31 +15,37 @@ window.deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
+// 顶级 2K 无版权商业实拍图库
 const HD_IMAGE_VAULT = {
     web3: [
         "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     ecommerce: [
         "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1472851294608-062f1c4dca84?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1472851294608-062f1c4dca84?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     finance: [
         "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     tech: [
         "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     corporate: [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp"
     ]
 };
 
@@ -90,10 +96,15 @@ async function processRemixAndScoring(themeKeyword, category) {
             finalImg = candidateImg;
             window.usedImageCache.add(finalImg);
             break;
+        } else {
+            window.appendLog(`⚠️ [QA 拦截] 探测到图像损坏或网络白屏，执行销毁重做！`, "text-rose-500");
         }
     }
     
-    if(!finalImg) finalImg = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp";
+    if(!finalImg) {
+        finalImg = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp";
+    }
+    
     return finalImg;
 }
 
@@ -126,7 +137,6 @@ window.triggerSwarmAutonomousAction = async function() {
             const targetIndustries = shuffled.slice(0, 3);
             const timestampSeed = Date.now();
             
-            // 👑 终极 Prompt：强迫大模型输出 bottomKpis (Excel专用) 和 content (Word专用)，并禁止任何雷同敷衍词汇！
             const aiPrompt = `你是一个深谙SaaS高转化率的顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
 【核心铁律：绝对差异化内容机制 (Seed: ${timestampSeed})】：
 1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。
@@ -189,7 +199,7 @@ window.triggerSwarmAutonomousAction = async function() {
                     priceRmb: finalRmb, priceUsd: finalUsd, colorCls: col,
                     isLinked: true, status: true,
                     slides: processedSlides,
-                    bottomKpis: t.bottomKpis || null // 👑 注入 Excel 专属底层大盘数据
+                    bottomKpis: t.bottomKpis || null 
                 });
             }
 
@@ -305,7 +315,10 @@ window.selectMentionDept = function(deptName) {
     tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
     tokenSpan.contentEditable = "false"; 
     tokenSpan.setAttribute("data-dept", deptName);
+    
+    // 带有物理移除功能的卡片
     tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
+    
     range.insertNode(tokenSpan);
     const spaceNode = document.createTextNode("\u00A0"); 
     tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
@@ -332,7 +345,9 @@ window.inspectDept = function(deptName, btnEl) {
         tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
         tokenSpan.contentEditable = "false";
         tokenSpan.setAttribute("data-dept", deptName);
+        
         tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
+        
         const sel = window.getSelection();
         if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
             const range = sel.getRangeAt(0);
@@ -410,13 +425,8 @@ window.renderDeptButtons = function() {
     if (!container) return;
     container.innerHTML = "";
     
-    const resetBtn = document.createElement("button");
-    resetBtn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-slate-500 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-700`;
-    resetBtn.innerHTML = `<div class="text-xs font-bold truncate">✨ 恢复全景 (取消过滤)</div>`;
-    resetBtn.onmousedown = (e) => e.preventDefault();
-    resetBtn.onclick = () => window.resetDeptFilter();
-    container.appendChild(resetBtn);
-
+    // 👑 已经被彻底剔除，不再这里面生成丑陋的内嵌按钮！
+    
     window.deptConfig.forEach(dept => {
         const btn = document.createElement("button");
         btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
