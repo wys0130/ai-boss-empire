@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApexWork 可视化演示编辑台 (V18 Office-Ribbon Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="components/vip-download-guard.js"></script>
     <script src="components/zero-auth.js"></script>
     <style>
@@ -55,13 +56,6 @@
                     <span id="exportBtnLabel">⚡ 支付 $9.99 导出包</span>
                 </button>
             </div>
-        </div>
-        
-        <div class="flex px-4 bg-slate-900">
-            <div class="ribbon-tab active">开始</div>
-            <div class="ribbon-tab">插入</div>
-            <div class="ribbon-tab">设计</div>
-            <div class="ribbon-tab">动画与切换</div>
         </div>
 
         <div class="bg-slate-800/40 px-6 py-2 flex items-center gap-6 overflow-x-auto custom-scroll">
@@ -253,14 +247,6 @@
         let currentLayoutAlign = 'center';
         let currentCardMask = 'normal';
 
-        const bgStyles = {
-            "tech": "bg-photo-tech text-white", "finance": "bg-photo-finance text-white",
-            "team": "bg-photo-team text-white", "mesh": "bg-style-mesh text-white"
-        };
-
-        // 👑 绝对纯净的组件随机穿插算法 (防套娃装甲)
-        const availableLayouts = ["cover", "kpi-grid", "comparison", "timeline", "funnel", "default"];
-
         async function loadDeckByRouter() {
             const params = new URLSearchParams(window.location.search);
             const key = params.get('deck') || 'aerotech';
@@ -298,26 +284,13 @@
                         defaultBg: targetAiDeck.type === 'excel' ? 'finance' : (targetAiDeck.type === 'word' ? 'mesh' : 'tech'),
                         slides: Array.from({length: slideCount}).map((_, i) => {
                             const aiSec = aiSlides[i] || {};
-                            
-                            // 👑 强制分配不同的排版组件：如果大模型忘了写，前端随机强行分配，绝对不重样！
-                            let assignedLayout = aiSec.layoutType;
-                            if (!assignedLayout || assignedLayout === 'default') {
-                                assignedLayout = availableLayouts[i % availableLayouts.length];
-                            }
-
-                            // 👑 防崩溃保护套：强行转换为字符串再处理！
-                            const safeKpi = String(aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"));
-                            const safeLabel = String(aiSec.label || "核心业务指标");
-                            const safeTitle = String(aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`);
-                            const safeSub = String(aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。");
-
                             return {
                                 id: i + 1, 
-                                layoutType: assignedLayout, 
-                                title: safeTitle, 
-                                sub: safeSub, 
-                                kpi: safeKpi, 
-                                label: safeLabel, 
+                                layoutType: aiSec.layoutType || 'default', 
+                                title: aiSec.title || `${targetAiDeck.title} - 核心模块 ${i+1}`, 
+                                sub: aiSec.sub || "此页面由 AI 智能体自动构建专属骨架，请双击输入具体商业内容。", 
+                                kpi: aiSec.kpi || ("+" + Math.floor(20 + Math.random() * 300) + "%"), 
+                                label: aiSec.label || "核心业务指标", 
                                 progress: aiSec.progress || Math.floor(60 + Math.random() * 40), 
                                 tag: `0${i+1}. ${aiSec.tag || 'MODULE'}` 
                             };
@@ -373,7 +346,7 @@
             slidesData.forEach((item, idx) => {
                 const activeCls = idx === currentSlideIdx ? "border-blue-500 bg-slate-800 shadow-md ring-1 ring-blue-500" : "border-slate-800 bg-slate-900/60 hover:bg-slate-800/40";
                 
-                // 👑 极限防报错：强行转换为字符串再 replace，绝不报错中断！
+                // 👑 极限防报错：强行转换为字符串再处理！
                 const pureTitle = String(item.title || "加载中").replace(/<[^>]+>/g, '');
                 const pureKpi = String(item.kpi || "0%").replace(/<[^>]+>/g, '');
                 
@@ -390,7 +363,7 @@
             document.getElementById("pageCounter").innerText = `${currentSlideIdx+1<10?'0'+(currentSlideIdx+1):currentSlideIdx+1} / ${total}`;
         }
 
-        // 👑 彻底剔除死板的“APEXWORK DECK”头部文字，组件 100% 差异化变异！
+        // 👑 彻底剔除引起白屏报错的复杂动画，强行注入保证 100% 渲染
         function renderMainSlide() {
             const item = slidesData[currentSlideIdx];
             const canvas = document.getElementById("slideCanvas");
@@ -408,83 +381,64 @@
             canvas.className = `w-full max-w-4xl aspect-[16/9] rounded-2xl border border-slate-700/80 slide-shadow p-10 flex flex-col justify-between transition-none relative overflow-hidden ${bgCls} my-auto`;
             
             const layout = item.layoutType || 'default';
-            const sTitle = String(item.title || '标题加载中');
-            const sSub = String(item.sub || '副标题加载中');
-            const sLabel = String(item.label || '核心指标');
-            const sKpi = String(item.kpi || '100%');
-            const sTag = String(item.tag || 'MODULE');
+            const sTitle = item.title || '标题加载中';
+            const sSub = item.sub || '副标题加载中';
+            const sLabel = item.label || '核心指标';
+            const sKpi = item.kpi || '100%';
+            const sTag = item.tag || 'MODULE';
             const sProg = item.progress || 50;
 
             let innerContent = '';
 
-            // 👑 完全重写的真·组件化渲染！每个 layoutType 长得都不一样！
+            const topHeader = `
+                <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10 w-full relative">
+                    <span class="text-xs font-bold font-mono tracking-widest text-slate-300">APEXWORK · DECK</span>
+                    <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${sTag}</span>
+                </div>`;
+
             if (layout === 'cover' || layout === 'title-page') {
                 innerContent = `
-                    <div class="my-auto py-12 z-10 max-w-4xl flex flex-col text-center items-center w-full mx-auto relative">
-                        <div class="text-[11px] font-mono font-bold px-4 py-1 bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30 mb-8 tracking-widest uppercase">${sTag}</div>
-                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-5xl md:text-6xl font-black tracking-tight leading-tight mb-8 drop-shadow-lg w-full outline-none text-white">${sTitle}</div>
-                        <div class="w-32 h-1.5 bg-blue-500 mb-8 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.6)]"></div>
-                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-xl text-slate-200 leading-relaxed font-medium drop-shadow-sm w-full max-w-3xl outline-none">${sSub}</div>
+                    <div class="my-auto py-4 z-10 max-w-3xl flex flex-col text-center items-center w-full mx-auto relative">
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-5xl md:text-6xl font-black tracking-tight leading-tight mb-6 drop-shadow-lg w-full outline-none text-white">${sTitle}</div>
+                        <div class="w-24 h-1.5 bg-blue-500 mb-6 rounded-full"></div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-lg text-slate-200 leading-relaxed font-medium drop-shadow-sm w-full max-w-2xl outline-none">${sSub}</div>
                     </div>`;
             } else if (layout === 'kpi-grid') {
                 innerContent = `
                     <div class="z-10 w-full mt-4 flex flex-col h-full justify-center relative">
-                        <div class="border-l-4 border-emerald-500 pl-4 mb-10">
-                            <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
-                            <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 outline-none">${sSub}</div>
-                        </div>
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 mb-8 outline-none">${sSub}</div>
                         <div class="grid grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
-                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-8 shadow-lg flex flex-col items-center justify-center min-h-[160px]">
-                                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">${sLabel}</div>
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">${sLabel}</div>
                                 <div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-5xl font-black font-mono text-emerald-400 outline-none">${sKpi}</div>
                             </div>
-                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-8 shadow-lg flex flex-col items-center justify-center min-h-[160px]">
-                                <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">目标达成率</div>
-                                <div contenteditable="true" class="text-5xl font-black font-mono text-blue-400 outline-none">${sProg}%</div>
+                            <div class="${maskCls} backdrop-blur-md border border-white/10 rounded-xl p-6 shadow-lg text-center">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">年度增幅 B</div>
+                                <div contenteditable="true" class="text-5xl font-black font-mono text-blue-400 outline-none">+124K</div>
                             </div>
                         </div>
                     </div>`;
-            } else if (layout === 'timeline') {
+            } else if (layout === 'timeline' || layout === 'funnel') {
                 innerContent = `
                     <div class="z-10 w-full mt-4 flex flex-col h-full relative">
-                        <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-4">
-                            <div class="text-[10px] font-bold bg-white/10 px-2 py-1 rounded text-slate-300 font-mono">${sTag}</div>
-                            <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-2xl font-black outline-none text-white flex-1">${sTitle}</div>
-                        </div>
-                        <div class="flex-1 flex flex-col justify-center gap-8 w-full max-w-2xl mx-auto pl-4 border-l-2 border-white/20">
-                            <div class="relative pl-6">
-                                <div class="absolute left-[-29px] top-1 w-4 h-4 bg-blue-500 rounded-full border-4 border-slate-900"></div>
-                                <div class="text-sm font-bold text-blue-400 mb-1 font-mono">${sKpi} (核心节点)</div>
-                                <div class="text-lg font-bold text-white mb-2">${sLabel}</div>
-                                <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-400 outline-none">${sSub}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-2 outline-none text-white">${sTitle}</div>
+                        <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-300 mb-6 outline-none">${sSub}</div>
+                        <div class="flex-1 flex flex-col justify-center gap-6 w-full max-w-2xl mx-auto">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-blue-400 text-xl">01</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-blue-500 w-full rounded-full shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold text-white">${sLabel}</div>
                             </div>
-                            <div class="relative pl-6">
-                                <div class="absolute left-[-29px] top-1 w-4 h-4 bg-emerald-500 rounded-full border-4 border-slate-900"></div>
-                                <div class="text-sm font-bold text-emerald-400 mb-1 font-mono">NEXT PHASE</div>
-                                <div class="text-lg font-bold text-white mb-2">全面业务扩张</div>
-                                <div class="text-sm text-slate-400">持续投入研发与市场营销矩阵，实现规模化增长。</div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-emerald-400 text-xl">02</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-emerald-500 w-3/4 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold text-white">中段激活阶段</div>
                             </div>
-                        </div>
-                    </div>`;
-            } else if (layout === 'funnel') {
-                innerContent = `
-                    <div class="z-10 w-full mt-4 flex flex-col h-full justify-center relative">
-                        <div class="text-center mb-10">
-                            <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" class="text-3xl font-black mb-3 outline-none text-white">${sTitle}</div>
-                            <div contenteditable="true" onblur="updateFromCanvas('sub', this.innerHTML)" class="text-sm text-slate-400 outline-none">${sSub}</div>
-                        </div>
-                        <div class="flex-1 flex flex-col justify-center items-center gap-3 w-full">
-                            <div class="w-full max-w-2xl bg-blue-500/20 border border-blue-500/30 rounded-t-xl p-4 flex justify-between items-center">
-                                <span class="font-bold text-blue-300">1. 市场触达曝光</span>
-                                <span class="font-mono font-bold text-white">100%</span>
-                            </div>
-                            <div class="w-4/5 max-w-xl bg-amber-500/20 border border-amber-500/30 p-4 flex justify-between items-center">
-                                <span class="font-bold text-amber-300">2. 意向客户留存</span>
-                                <span class="font-mono font-bold text-white">${sProg}%</span>
-                            </div>
-                            <div class="w-3/5 max-w-lg bg-emerald-500/20 border border-emerald-500/30 rounded-b-xl p-4 flex justify-between items-center shadow-[0_10px_30px_rgba(16,185,129,0.2)]">
-                                <span class="font-bold text-emerald-400">3. ${sLabel}</span>
-                                <span contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="font-mono font-black text-emerald-400 text-xl outline-none">${sKpi}</span>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 text-right font-mono font-bold text-amber-400 text-xl">03</div>
+                                <div class="h-1 flex-1 bg-white/10 relative rounded-full"><div class="absolute inset-y-0 left-0 bg-amber-500 w-1/2 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.6)]"></div></div>
+                                <div class="w-48 text-sm font-bold text-white">末端营收转化</div>
                             </div>
                         </div>
                     </div>`;
@@ -500,17 +454,12 @@
                             <div class="${maskCls} backdrop-blur-md border border-blue-500/40 rounded-xl p-8 shadow-[0_0_30px_rgba(59,130,246,0.15)] text-center relative overflow-hidden">
                                 <div class="absolute top-0 right-0 bg-blue-500 text-white text-[10px] px-3 py-1 font-bold rounded-bl-lg tracking-widest">APEX OURS</div>
                                 <div class="text-xl font-bold text-blue-400 mb-6 border-b border-blue-500/20 pb-3">${sLabel}</div>
-                                <div class="text-base text-slate-200 space-y-4"><p>✔ 极致自动化降本</p><p>✔ AI 工作流加速</p><div contenteditable="true" onblur="updateFromCanvas('kpi', this.innerHTML)" class="text-emerald-400 font-bold font-mono outline-none pt-2">${sKpi}</div></div>
+                                <div class="text-base text-slate-200 space-y-4"><p>✔ 极致自动化降本</p><p>✔ AI 工作流加速</p><p>✔ 全局透明可追溯</p></div>
                             </div>
                         </div>
                     </div>`;
             } else {
-                // 通用带进度条的图文排版
                 innerContent = `
-                    <div class="flex justify-between items-center border-b border-white/10 pb-3 z-10 w-full relative">
-                        <span class="text-xs font-bold font-mono tracking-widest text-slate-300">APEXWORK · DECK</span>
-                        <span class="text-[11px] font-mono font-bold px-2.5 py-0.5 bg-white/10 backdrop-blur-md rounded text-blue-300 border border-white/10">${sTag}</span>
-                    </div>
                     <div class="my-auto py-4 z-10 max-w-3xl flex flex-col ${alignCls} w-full mx-auto relative">
                         <div contenteditable="true" onblur="updateFromCanvas('title', this.innerHTML)" 
                             class="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3 drop-shadow-md w-full outline-none text-white">${sTitle}</div>
@@ -534,8 +483,9 @@
                     </div>`;
             }
 
-            // 直接暴力插入 DOM，保证 100% 出现文字！
-            canvas.innerHTML = innerContent;
+            // 直接暴力插入 DOM，无需任何动画库干预，保证文字 100% 显示！
+            canvas.style.opacity = '1';
+            canvas.innerHTML = topHeader + innerContent;
         }
 
         function changeBackground(styleKey) { currentBgStyle = styleKey; renderMainSlide(); }
