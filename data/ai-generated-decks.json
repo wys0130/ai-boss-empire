@@ -1,1 +1,298 @@
-[]
+[
+  {
+    "id": "AI-79030",
+    "title": "动力电池梯次利用作战室",
+    "titleEn": "EV Battery Second-Life Command Center",
+    "category": "6页 · 新能源汽车供应链",
+    "categoryEn": "6 P · NEV Supply Chain",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-79030",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "从矿场到回收场：动力电池全生命周期战情室",
+        "kpi": "12.8GWh",
+        "label": "2030年梯次利用市场规模预测"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "供应链断点雷达",
+        "kpi": "98.2%",
+        "label": "电芯追溯覆盖率",
+        "subKpis": [
+          {
+            "value": "3.7天",
+            "label": "电池包周转周期"
+          },
+          {
+            "value": "41%",
+            "label": "镍钴锰回收率"
+          },
+          {
+            "value": "¥1,240",
+            "label": "每kWh再生成本"
+          }
+        ]
+      },
+      {
+        "layoutType": "timeline",
+        "title": "矿端-电池厂-车企-回收站四维联动时间轴",
+        "kpi": "2025Q3",
+        "label": "首个闭环试点启动",
+        "points": [
+          {
+            "date": "2025Q1",
+            "event": "与宁德时代签订定向回收协议"
+          },
+          {
+            "date": "2025Q3",
+            "event": "合肥梯次利用工厂投产"
+          },
+          {
+            "date": "2026Q2",
+            "event": "电网侧储能入市交易"
+          },
+          {
+            "date": "2027Q4",
+            "event": "全链碳足迹护照上线"
+          }
+        ]
+      },
+      {
+        "layoutType": "funnel",
+        "title": "退役电池价值漏斗：从检测到再制造",
+        "kpi": "67%",
+        "label": "实测SOH保留率",
+        "stages": [
+          {
+            "stage": "到港检测",
+            "value": 100
+          },
+          {
+            "stage": "健康分选",
+            "value": 72
+          },
+          {
+            "stage": "重组封装",
+            "value": 58
+          },
+          {
+            "stage": "梯次认证",
+            "value": 47
+          },
+          {
+            "stage": "并网交易",
+            "value": 39
+          }
+        ]
+      },
+      {
+        "layoutType": "comparison",
+        "title": "自建回收 vs 第三方联盟 经济效益对比",
+        "kpi": "+18.6%",
+        "label": "联盟模式净利率优势",
+        "left": {
+          "name": "自建闭环",
+          "cost": "¥2.1亿初期投入",
+          "roi": "21%",
+          "risk": "高资产沉没"
+        },
+        "right": {
+          "name": "联盟协同",
+          "cost": "¥0.8亿平台费",
+          "roi": "39.6%",
+          "risk": "数据安全需协商"
+        }
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "电池护照数据中台架构",
+        "kpi": "500万+",
+        "label": "电芯级数据点日采集量",
+        "content": "基于区块链的不可篡改电池档案，涵盖电芯化学成分、充放电曲线、维修记录、碳排足迹。对接整车CAN总线与回收产线MES，实现分钟级状态同步。"
+      }
+    ]
+  },
+  {
+    "id": "AI-44289",
+    "title": "AI导师获客成本熔断模型",
+    "titleEn": "AI Tutor CAC Circuit Breaker",
+    "category": "4表 · AI人工智能在线教育平台",
+    "categoryEn": "4 UNITS · AI EdTech",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-44289",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "AI试听课转化ROI计算器",
+        "kpi": "2.8x",
+        "label": "AI助教干预后ROI倍数",
+        "fields": [
+          "线索成本",
+          "AI触达次数",
+          "人工跟进时长",
+          "试听完成率",
+          "正课转化率"
+        ]
+      },
+      {
+        "layoutType": "funnel",
+        "title": "智能督学漏斗：注册→续费",
+        "kpi": "76%",
+        "label": "AI预警挽回率",
+        "stages": [
+          {
+            "stage": "注册试听",
+            "value": 10000
+          },
+          {
+            "stage": "AI互动课",
+            "value": 8300
+          },
+          {
+            "stage": "真人1v1",
+            "value": 5900
+          },
+          {
+            "stage": "付费转化",
+            "value": 3100
+          },
+          {
+            "stage": "次月续费",
+            "value": 2356
+          }
+        ]
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月渠道-课程交叉盈利热力矩阵",
+        "kpi": "¥2.3M",
+        "label": "全年毛利峰值月份",
+        "rows": [
+          "抖音信息流",
+          "公众号内容",
+          "私域社群",
+          "B站测评",
+          "学校合作"
+        ],
+        "cols": [
+          "1月",
+          "2月",
+          "3月",
+          "4月",
+          "5月",
+          "6月",
+          "7月",
+          "8月",
+          "9月",
+          "10月",
+          "11月",
+          "12月"
+        ],
+        "highlight": "7-8月暑假集训营渠道叠加效应"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "AI算力 vs 师资薪酬成本结构解构",
+        "kpi": "43%",
+        "label": "AI替代人工工时占比",
+        "items": [
+          {
+            "name": "GPU推理服务器",
+            "cost": "¥86,000/月",
+            "trend": "下降12%"
+          },
+          {
+            "name": "课程内容生产",
+            "cost": "¥120,000/月",
+            "trend": "上升5%"
+          },
+          {
+            "name": "班主任团队",
+            "cost": "¥75,000/月",
+            "trend": "下降30%"
+          },
+          {
+            "name": "AI Agent调用费",
+            "cost": "¥32,000/月",
+            "trend": "波动15%"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "AI-69819",
+    "title": "碳汇资产尽调合规手册",
+    "titleEn": "Carbon Sink Asset Due Diligence Playbook",
+    "category": "4章 · 全球碳中和碳排放交易",
+    "categoryEn": "4 UNITS · Carbon Trading",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-69819",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "国际自愿碳市场（VCM）项目收购前合规与估值尽调清单",
+        "kpi": "18项",
+        "label": "强制核查节点",
+        "subtitle": "适用于林业碳汇、甲烷回收及蓝碳项目的一线投前风控"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "VERRA/GS 双重认证文件交叉核验表",
+        "kpi": "100%",
+        "label": "文件完整性底线",
+        "items": [
+          "项目设计文件PDD与注册PDD版本哈希一致性",
+          "监测报告MRV周期与签发批次匹配度",
+          "利益相关方会议纪要及当地社区无异议函",
+          "土地权属证明及林权流转备案回执",
+          "碳信用登记的I-REC/VERRA唯一序列号",
+          "第三方审定机构资质及利益冲突声明"
+        ]
+      },
+      {
+        "layoutType": "quote",
+        "title": "交易对手风险规避条款",
+        "kpi": "30%",
+        "label": "价格调整缓冲带",
+        "quote": "若买方在交割后12个月内发现项目存在重复计算或环境完整性争议，卖方须以购买价加计15%年化利率回购全部对应碳信用，且不影响买方追偿审计费用及声誉损失。",
+        "author": "首席合规官模板"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "碳信用静态池与动态池估值逻辑",
+        "kpi": "5.2年",
+        "label": "平均信用发放滞后周期",
+        "content": "静态池为已签发待售的信用额度，按近6个月交易所收盘价加权计算；动态池涵盖未来3个计入期的预期产量，折现率需额外考虑政策波动风险溢价200bp。建议采用蒙特卡洛模拟对铂、金、普通三类信用分层定价。"
+      }
+    ]
+  }
+]
