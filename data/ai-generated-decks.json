@@ -1,5 +1,198 @@
 [
   {
+    "id": "AI-32077",
+    "title": "AI教育智能硬件·神经重塑作战图",
+    "titleEn": "NeuroEdge Learning Hardware",
+    "category": "6页 · AI教育智能硬件",
+    "categoryEn": "6 P · EdTech Hardware",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-32077",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "从算力到心力：AI硬件如何重构儿童认知节奏",
+        "kpi": "0→1",
+        "label": "首发市场切入逻辑"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "旧范式(平板+APP) vs 新范式(神经反馈手环+眼镜)",
+        "kpi": "3.2x",
+        "label": "专注时长提升倍数"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "硬件激活 → 周活 → 家长付费 → 续费扩科",
+        "kpi": "58%",
+        "label": "激活后30天付费转化率"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "四象限硬件健康度看板（非财务）",
+        "kpi": "92/84/71/63",
+        "label": "佩戴时长/纠错反馈/家长打开率/课堂联动率"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "9个月硬件迭代与内容生态冷启动里程碑",
+        "kpi": "3代",
+        "label": "传感器精度与算法轻量化跃迁"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "“硬件不是盒子，是孩子大脑的体外突触”",
+        "kpi": "伦理审查",
+        "label": "儿童数据隐私合规前置"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-70259",
+    "title": "农业无人机自动化作业·季候风收益矩阵",
+    "titleEn": "AgriDrone Autonomy Yield Matrix",
+    "category": "5模块 · 农业无人机自动化作业",
+    "categoryEn": "5 UNITS · AgriTech Drones",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-70259",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "人工喷洒 vs 单人机群(20机编队) 作业效率对冲",
+        "kpi": "17:1",
+        "label": "单位人时产能比"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "自动化作业经济性底层四项雷达",
+        "kpi": "见底部",
+        "label": "直接剔除毛利率干扰"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "田块测绘 → 航线规划 → 自动起降 → 变量喷洒 → 数据回传",
+        "kpi": "73%",
+        "label": "全链路无人干预成功率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "播种季/除草季/虫害爆发季/收获前 四阶段调度峰值表",
+        "kpi": "3.2万架次",
+        "label": "单季最大作业架次"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "不同作物(水稻/玉米/棉花/柑橘)的自动化适配度网格",
+        "kpi": "A/A-/B+/B",
+        "label": "作业平坦度×冠层密度系数"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "亩均调度成本",
+        "value": "$0.38"
+      },
+      {
+        "label": "单机日有效作业面积",
+        "value": "840亩"
+      },
+      {
+        "label": "农药减量率",
+        "value": "-31%"
+      },
+      {
+        "label": "故障自愈重启率",
+        "value": "96.4%"
+      }
+    ]
+  },
+  {
+    "id": "AI-92319",
+    "title": "低轨商业航天测算·轨道经济学白皮书",
+    "titleEn": "LEO Orbit Economics Bluepaper",
+    "category": "5章 · 低轨商业航天测算",
+    "categoryEn": "5 UNITS · SpaceTech LEO",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-92319",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "低轨不是跑马圈地，是频谱与星座构型的双重期权定价",
+        "kpi": "—",
+        "label": "基于OPM(轨道实物期权)模型"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "星座部署前必做的17项非财务沙盘推演清单",
+        "kpi": "17项",
+        "label": "含碎片规避/极地寿命衰减/太阳同步相位漂移"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "深度计算论证：为什么单星成本低于25万美元时，星间激光链路才具备盈亏平衡意义？本文基于1200颗卫星的混合倾角星座，结合发射批量化(一箭60星)、地面站稀疏化(仅7座极地站)以及路由算法对流量峰值的影响，推导出每Gbps容量成本与星座规模的四次方反比关系。进一步引入轨道摄动模型，发现当轨道高度从1100km降至800km时，单星燃料寿命缩短41%，但地面终端仰角需求下降28%，从而使得终端相控阵天线成本可下探至$180。同时，本文提出“频谱时隙复用率”作为关键度量，取代传统带宽占用率，以更精准地计算同频干扰下的有效容量损失。最终给出在不同Ka波段分配方案下，星座整体的NPV敏感度边界，并指出在轨维修机器人(而非替换发射)将成为降低长尾维护成本的核心杠杆。",
+        "kpi": "800km",
+        "label": "最优轨道高度敏感度拐点"
+      },
+      {
+        "layoutType": "quote",
+        "title": "“未来低轨霸主不是发射最多卫星的公司，而是能最便宜地放弃一颗卫星的公司。”",
+        "kpi": "弃星成本",
+        "label": "再入销毁与残骸责任险定价"
+      },
+      {
+        "layoutType": "quote",
+        "title": "非财务经济性四维底座（详见底部）",
+        "kpi": "见底部",
+        "label": "制造/频谱/容量/寿命"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "单星制造边际成本",
+        "value": "$210K"
+      },
+      {
+        "label": "每Gbps容量成本",
+        "value": "$1.4M"
+      },
+      {
+        "label": "轨道频段占用费率",
+        "value": "$0.9/Hz/年"
+      },
+      {
+        "label": "在轨寿命置信中位数",
+        "value": "7.3年"
+      }
+    ]
+  },
+  {
     "id": "AI-52291",
     "title": "医疗大健康SaaS增长引擎",
     "titleEn": "Med-SaaS Growth Engine",
