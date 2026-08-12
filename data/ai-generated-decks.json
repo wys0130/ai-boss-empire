@@ -1,24 +1,5 @@
 [
   {
-    "id": "AI-75918",
-    "title": "跨境电商ROI利润漏斗",
-    "titleEn": "Cross-border ROI Funnel Model",
-    "category": "8表 · DTC电商",
-    "categoryEn": "8 UNITS · E-commerce Analytics",
-    "type": "excel",
-    "thumb": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=196394",
-    "thumbnail": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=196394",
-    "thumbKey": "prod_AI-75918",
-    "thumbCloudPath": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=196394",
-    "thumbDefault": "https://image.pollinations.ai/prompt/global%20logistics%20data%20visualization%20dark%20theme%202k%20resolution%20top%20tier%20commercial%20abstract%20dark%20theme%20data%20background%20no%20text%20no%20watermark?width=1280&height=720&nologo=true&seed=196394",
-    "priceRmb": 69,
-    "priceUsd": "9.99",
-    "colorCls": "text-emerald-600 font-bold",
-    "isLinked": true,
-    "status": true,
-    "slides": null
-  },
-  {
     "id": "AI-39573",
     "title": "曜石增长引擎",
     "name": "曜石增长引擎",
@@ -69,60 +50,6 @@
         "kpi": "$85M",
         "label": "累计融资额",
         "progress": 88
-      }
-    ]
-  },
-  {
-    "id": "AI-14305",
-    "title": "极昼战略白皮书",
-    "name": "极昼战略白皮书",
-    "category": "40 PAGES · 深度洞察",
-    "type": "word",
-    "thumb": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
-    "thumbnail": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
-    "thumbKey": "prod_AI-14305",
-    "thumbCloudPath": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
-    "thumbDefault": "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=90",
-    "priceRmb": 149,
-    "priceUsd": "22.99",
-    "colorCls": "text-indigo-600 font-bold",
-    "isLinked": true,
-    "status": true,
-    "slides": [
-      {
-        "title": "执行摘要",
-        "sub": "五力模型与战略推荐",
-        "kpi": "91",
-        "label": "战略清晰度指数",
-        "progress": 95
-      },
-      {
-        "title": "客户之声",
-        "sub": "深度访谈与NPS拆解",
-        "kpi": "42",
-        "label": "NPS净推荐值",
-        "progress": 67
-      },
-      {
-        "title": "组织效能审计",
-        "sub": "RACI与决策瓶颈",
-        "kpi": "33%",
-        "label": "响应提速比例",
-        "progress": 58
-      },
-      {
-        "title": "技术栈演进",
-        "sub": "从单体到AI-native",
-        "kpi": "7",
-        "label": "关键迁移阶段",
-        "progress": 74
-      },
-      {
-        "title": "行动路线图",
-        "sub": "12个月里程碑与OKR",
-        "kpi": "100%",
-        "label": "目标达成率",
-        "progress": 82
       }
     ]
   }
