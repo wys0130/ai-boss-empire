@@ -1,5 +1,158 @@
 [
   {
+    "id": "AI-82994",
+    "title": "新能源供应链韧性作战室",
+    "titleEn": "EV Supply Chain Resilience Deck",
+    "category": "5页 · 新能源汽车供应链",
+    "categoryEn": "5 P · EV Supply Chain",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-82994",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "从矿端到桩端：全链路断点重构",
+        "sub": "聚焦碳酸锂锁价、电芯产能爬坡与V2G反向充电节点的实时风险地图",
+        "kpi": "BOM降本$18.7/辆",
+        "label": "TWh级产能利用率"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "电池黑盒透明度看板",
+        "sub": "电芯一致性CPK、极片涂布缺陷率、模组焊接良率三重穿透",
+        "kpi": "CPK≥1.67",
+        "label": "良率损失率<0.3%"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "矿产-正极-电芯-整车四阶SOP",
+        "sub": "从非洲锂矿到上海超级工厂的35天专线物流，锁定海运与中欧班列冗余",
+        "kpi": "交付周期缩短2.1周",
+        "label": "库存周转率提升至4.2x"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "供应商准入与淘汰漏斗",
+        "sub": "从碳足迹审计、矿源追溯码到PFMEA评审，逐层过滤低效供应商",
+        "kpi": "淘汰率21%",
+        "label": "战略供应商份额提升至68%"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "自研电芯 vs 外采电芯TCO对决",
+        "sub": "对比磷酸铁锂与三元锂在补能效率、维修成本及残值上的全生命周期差异",
+        "kpi": "自研LCO节省$320/辆",
+        "label": "能量密度领先9%"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-48881",
+    "title": "AI教育硬件运营中枢",
+    "titleEn": "AI Edu Hardware ROI Matrix",
+    "category": "3模块 · AI教育智能硬件",
+    "categoryEn": "3 UNITS · AI Education Hardware",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-48881",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "硬件激活与学习时长转化分析",
+        "kpi": "5.3个月",
+        "label": "硬件回本周期"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "AI陪练订阅-续费-增购漏斗",
+        "kpi": "次月留存率74%",
+        "label": "家长付费意愿指数"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "边缘计算算力负载与渗透率矩阵",
+        "kpi": "峰值OPS占用42%",
+        "label": "离线推理完整率99.3%"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "单机架均摊成本",
+        "value": "$0.86/天"
+      },
+      {
+        "label": "LTV/CAC比率",
+        "value": "4.7x"
+      },
+      {
+        "label": "月度流失前预警值",
+        "value": "83.2%"
+      },
+      {
+        "label": "学情数据回传率",
+        "value": "92.5%"
+      }
+    ]
+  },
+  {
+    "id": "AI-26998",
+    "title": "DTC品牌出海独立站合规与增长手册",
+    "titleEn": "DTC Brand Overseas Playbook",
+    "category": "4章 · 出海跨境独立站DTC",
+    "categoryEn": "4 UNITS · Cross-border DTC",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-26998",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "独立站全链路黑手党提案",
+        "content": "覆盖Shopify Plus与自研Headless架构的混合部署策略，强调TikTok Shop与Google Shopping Feed的动态同步，以及通过Klarna与本地BNPL（先享后付）适配欧洲消费者支付习惯，降低弃单率至0.7%。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "出海合规九宫格检查清单",
+        "content": "GDPR下的Cookie追踪重设\n巴西LGPD的本地数据托管\n中东Shariah支付网关预审\n美国各州销售税自动代缴\n欧盟EPR包装回收注册\n东南亚清真认证标签\nDDP关税预付模式切换\n品牌域名防御性注册\n独立站会员积分跨币种结算"
+      },
+      {
+        "layoutType": "quote",
+        "title": "独立站DTC核心洞察",
+        "content": "当品牌将弃单恢复从邮件升级为WhatsApp与Meta Messenger实时AI客服后，客单价低于$27的订单挽回率提升了130%，同时利用Shopify Flow自动触发黑五闪购，使复购客群在6个月内的LTV环比增长22%。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "增量市场与存量用户双轮驱动策略",
+        "content": "针对北美市场采用UGC（用户生成内容）本地化测评视频，结合Klarna分期付款降低客单价阻碍；针对欧洲市场则推动A/B测试动态货币转换器，配合本地物流商Chrono24实现48小时达。最终目标是通过cROAS（广告支出回报率）维度监控每一次Facebook Pixel事件，逐步将付费流量占比收敛至35%，剩余65%依赖私域邮件与SMS自动化生命周期营销，使平均客户获取成本降低至$16.2。"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
     "id": "AI-79816",
     "title": "医疗大健康SaaS增长作战室",
     "titleEn": "MedHealth SaaS Growth Command",
