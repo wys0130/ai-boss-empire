@@ -61,7 +61,7 @@
       
       <div class="a4-paper" id="previewArea">
         <div class="doc-title" contenteditable="true" id="previewTitle" oninput="syncFromPreviewTitle(this.textContent)">正在加载...</div>
-        <!-- 👑 DOM CSS 将根据 layoutType 动态变身 -->
+        <!-- 👑 动态多态文本容器 -->
         <div class="doc-content" contenteditable="true" id="previewContent" oninput="syncFromPreviewContent(this.textContent)">请稍候...</div>
       </div>
     </main>
@@ -99,7 +99,6 @@
 </div>
 
 <script>
-// 基础兜底结构
 let sections = [
   { layoutType: 'title-page', title: '封面标题页', content: 'APEXWORK 企业合规管理与合规评估年度报告\n\n发布日期：2026 年度\n文档密级：企业机密\n标准：欧美企业通用 ATS 合规准则' },
   { layoutType: 'text-block', title: '执行摘要', content: '本合规性审查报告涵盖公司在财务报告、数据安全与隐私、雇佣平等、以及 ESG 环境治理等重点核心层面的现有实践及进阶建议。全部准则完全遵从 GAAP、GDPR 及 EEO 条例。' },
@@ -117,7 +116,6 @@ function openCheckoutModal() {
   ApexAuth.openCheckout({ title: "APEXWORK ATS 商业报告 (.DOCX)", onSuccess: () => executeDOCXExport() });
 }
 
-// 👑 动态构建左侧导航栏
 function renderSectionNav() {
   const navContainer = document.getElementById('sectionNav');
   navContainer.innerHTML = '';
@@ -145,18 +143,17 @@ function selectSection(index) {
   
   // 防崩溃保护
   const safeTitle = String(sec.title || "加载中").replace(/<[^>]+>/g, '');
-  const safeContent = String(sec.content || "内容生成中").replace(/<[^>]+>/g, '');
+  const safeContent = String(sec.content || "报告段落正在加载，若无内容请补充。").replace(/<[^>]+>/g, '');
 
   document.getElementById('sectionTitleInput').value = safeTitle;
   document.getElementById('sectionContentInput').value = safeContent;
   document.getElementById('previewTitle').textContent = safeTitle;
   document.getElementById('previewContent').textContent = safeContent;
 
-  // 👑 积木化 CSS 装配：根据 layoutType 直接改变 Word 视觉样式，告别纯文本！
+  // 👑 富文本组件排版装配
   const previewContent = document.getElementById('previewContent');
   const previewTitle = document.getElementById('previewTitle');
   
-  // 恢复默认类
   previewContent.className = 'doc-content'; 
   previewTitle.style.display = 'block';
 
@@ -167,7 +164,6 @@ function selectSection(index) {
       previewContent.classList.add('border-l-4', 'border-indigo-500', 'pl-6', 'italic', 'text-slate-600', 'bg-slate-50', 'py-6', 'rounded-r-xl', 'text-lg');
   } else if (sec.layoutType === 'checklist') {
       previewContent.classList.add('font-mono', 'text-sm', 'bg-slate-50', 'p-6', 'rounded-xl', 'border', 'border-slate-200');
-      // 动态将换行转为打钩列表
       const listItems = safeContent.split('\n').filter(l => l.trim() !== '').map(l => `<div class="flex items-start gap-3 mb-2"><span class="text-emerald-500 font-bold">☑</span><span class="flex-1">${l}</span></div>`).join('');
       previewContent.innerHTML = listItems;
   }
@@ -179,7 +175,6 @@ function updatePreviewFromForm() {
   sections[currentSection].title = title;
   sections[currentSection].content = content;
   
-  // 如果是 checklist，不要用 textContent，需要重新触发 selectSection 渲染 HTML
   if (sections[currentSection].layoutType === 'checklist') {
       selectSection(currentSection);
   } else {
@@ -200,7 +195,6 @@ function syncFromPreviewContent(text) {
   sections[currentSection].content = text;
 }
 
-// DOCX 原生压缩与富排版输出 (完全适配组件的格式差异)
 function executeDOCXExport() {
   const zip = new JSZip();
   const doc = zip.folder('word');
@@ -217,7 +211,6 @@ function executeDOCXExport() {
   });
 }
 
-// 👑 DOCX XML 构建引擎，支持引用/列表格式动态转换
 function generateDocumentXML() {
   let body = '';
   sections.forEach((sec) => {
@@ -235,13 +228,12 @@ function generateDocumentXML() {
       let runProps = `<w:color w:val="334155"/><w:sz w:val="22"/><w:szCs w:val="22"/>`;
       let pProps = `<w:spacing w:line="360" w:lineRule="auto" w:after="120"/>`;
       
-      // 👑 按 LayoutType 注入不同的 Word XML 样式
       if (sec.layoutType === 'quote') {
-          runProps += `<w:i/>`; // 斜体
-          pProps += `<w:ind w:left="400"/>`; // 首行缩进
+          runProps += `<w:i/>`; 
+          pProps += `<w:ind w:left="400"/>`; 
       } else if (sec.layoutType === 'title-page' || sec.layoutType === 'cover') {
-          runProps = `<w:b/><w:color w:val="0F172A"/><w:sz w:val="48"/><w:szCs w:val="48"/>`; // 超大加粗
-          pProps = `<w:jc w:val="center"/><w:spacing w:before="600" w:after="400"/>`; // 居中且大间距
+          runProps = `<w:b/><w:color w:val="0F172A"/><w:sz w:val="48"/><w:szCs w:val="48"/>`; 
+          pProps = `<w:jc w:val="center"/><w:spacing w:before="600" w:after="400"/>`; 
       }
 
       let textToRender = pText;
@@ -295,10 +287,13 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (aiSlides.length > 0) {
                 sections.length = 0; 
                 aiSlides.forEach((slide, idx) => {
+                    // 👑 彻底干掉脑残的默认 fallback 文字，强行提取 content 字段！
+                    const safeContent = String(slide.content || slide.sub || `核心论点正在生成中。此模块为 ${slide.title || '模块'} 的专业解析文档。`).replace(/<[^>]+>/g, '');
+                    
                     sections.push({
                         layoutType: slide.layoutType || 'text-block',
                         title: String(slide.title || `模块 ${idx + 1}`).replace(/<[^>]+>/g, ''),
-                        content: String(`${slide.sub || '详细阐述商业运作机制。'}\n关键节点指标: ${slide.label || 'KPI'} = ${slide.kpi || '100%'}`).replace(/<[^>]+>/g, '')
+                        content: safeContent
                     });
                 });
             }
