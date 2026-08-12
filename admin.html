@@ -45,9 +45,8 @@
 </head>
 <body class="bg-slate-50 dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 min-h-screen flex items-start selection:bg-blue-500/30">
 
-    <!-- 1. 侧边栏 (Sidebar) 👑 固定在屏幕左侧，内部独立滚动 -->
+    <!-- 1. 侧边栏 (Sidebar) -->
     <aside class="w-64 bg-white dark:bg-[#0f172a] border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 z-40 sticky top-0 h-screen shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-[4px_0_24px_rgba(0,0,0,0.2)] transition-colors duration-300">
-        <!-- 👑 修复：绝对稳健的 LOGO 兜底显示逻辑 -->
         <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800/50 group cursor-pointer shrink-0" onclick="ApexLogoManager.uploadLogo()" title="点击更换企业 LOGO">
             <div class="flex items-center gap-2.5">
                 <img id="adminBrandLogo" src="assets/logo.webp" class="h-7 w-auto object-contain drop-shadow-sm" onerror="this.onerror=null; this.src='https://cdn.jsdelivr.net/gh/wys0130/ai-boss-empire@main/assets/logo.webp'; setTimeout(()=>{if(!this.complete || this.naturalWidth===0){this.style.display='none'; document.getElementById('adminFallbackBadge').classList.remove('hidden');}}, 1500);" />
@@ -300,7 +299,6 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <!-- 左侧战报 -->
                     <div class="lg:col-span-5 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col h-[500px]">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white">系统进化战报</h3>
@@ -312,7 +310,6 @@
                         <div id="historyFeed" class="flex-1 overflow-y-auto custom-scroll space-y-2 pr-2"></div>
                     </div>
 
-                    <!-- 右侧调令台 -->
                     <div class="lg:col-span-7 bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col h-[500px]">
                         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
                             <h3 class="text-sm font-black text-slate-800 dark:text-white flex items-center gap-2">
@@ -325,7 +322,8 @@
                         <div id="deptButtonsContainer" class="flex flex-wrap gap-2 mb-4 shrink-0"></div>
 
                         <div class="flex-1 flex flex-col gap-3 relative">
-                            <div id="cmd" contenteditable="true" spellcheck="false" placeholder="在此输入全局调令，键入 @ 呼出指定协作部门..." class="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-blue-300 dark:border-blue-500/50 rounded-xl p-4 text-sm text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition custom-scroll whitespace-pre-wrap"></div>
+                            <!-- 👑 修复点：原生 HTML 绑定回车事件，无视 JS 执行顺序，100% 必定触发！ -->
+                            <div id="cmd" contenteditable="true" spellcheck="false" placeholder="在此输入全局调令，键入 @ 呼出指定协作部门..." class="flex-1 w-full bg-slate-50 dark:bg-slate-900 border border-blue-300 dark:border-blue-500/50 rounded-xl p-4 text-sm text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/50 transition custom-scroll whitespace-pre-wrap" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); if(typeof window.triggerSwarmAutonomousAction === 'function') window.triggerSwarmAutonomousAction();}"></div>
                             
                             <button id="runBtn" onclick="triggerSwarmAutonomousAction()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shrink-0">
                                 <span>🚀 提交至云端 AI 协同执行</span>
@@ -335,7 +333,6 @@
                 </div>
             </section>
 
-            <!-- 模块 5：用户与权限管理中心 -->
             <section id="tab-users" class="hidden max-w-6xl mx-auto space-y-6">
                 <div class="bg-gradient-to-r from-blue-900 to-slate-900 border border-blue-500/30 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -595,7 +592,6 @@
             }}
         };
         
-        // 👑 砍掉了尾部的 setTimeout 毒瘤！直接点火，绝不二次过滤闪烁！
         document.addEventListener("DOMContentLoaded", window.initAdminEngine);
     </script>
 </body>
