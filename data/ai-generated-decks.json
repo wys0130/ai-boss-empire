@@ -1,1 +1,232 @@
-[]
+[
+  {
+    "id": "AI-26291",
+    "title": "Web3 代币经济模型与增长引擎",
+    "titleEn": "Tokenomics 2.0 Growth Engine",
+    "category": "9页 · Web3 基础设施",
+    "categoryEn": "9 P · Web3 Infra",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1280&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1280&q=80",
+    "thumbKey": "prod_AI-26291",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1280&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=1280&q=80",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "Tokenomics 2.0：从通胀陷阱到飞轮效应",
+        "kpi": "3.8x",
+        "label": "用户留存提升倍数"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "核心经济指标总览",
+        "kpi": "42%",
+        "label": "质押率目标"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "核心经济指标总览",
+        "kpi": "$18M",
+        "label": "协议年收入"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "核心经济指标总览",
+        "kpi": "0.62",
+        "label": "流通/总供应比"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "代币释放时间轴（4年线性递减）",
+        "kpi": "TGE+36M",
+        "label": "全稀释市值拐点"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "从质押到治理的转化漏斗",
+        "kpi": "71%",
+        "label": "质押→投票率"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "通胀模型对比：固定 vs 动态回购",
+        "kpi": "2.1x",
+        "label": "代币价格稳定性优势"
+      },
+      {
+        "layoutType": "default",
+        "title": "Bonding Curve 参数敏感性分析",
+        "kpi": "15%",
+        "label": "滑点上限阈值"
+      },
+      {
+        "layoutType": "default",
+        "title": "社区金库与生态激活动态配置",
+        "kpi": "$5.2M",
+        "label": "季度生态拨款"
+      }
+    ]
+  },
+  {
+    "id": "AI-94136",
+    "title": "跨境电商 ROI 引擎与广告漏斗",
+    "titleEn": "DTC ROI Engine",
+    "category": "11表 · 跨境电商",
+    "categoryEn": "11 UNITS · DTC",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=1280&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=1280&q=80",
+    "thumbKey": "prod_AI-94136",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=1280&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=1280&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "全链路 ROI 自动计算器（含运费与关税）",
+        "kpi": "34%",
+        "label": "预期ROI"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "广告渠道 ROI 对比（Meta vs TikTok vs Google）",
+        "kpi": "2.8x",
+        "label": "Meta ROAS"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "A+B 定价策略利润测算器",
+        "kpi": "19.6%",
+        "label": "净利率提升"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "独立站访问→购买转化漏斗（按设备）",
+        "kpi": "3.2%",
+        "label": "移动端结算率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "弃购挽回Email序列效果漏斗",
+        "kpi": "11.4%",
+        "label": "挽回转化率"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月SKU维度贡献毛利矩阵",
+        "kpi": "$240K",
+        "label": "累计毛利Top SKU"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "12个月国家/地区市场渗透率矩阵",
+        "kpi": "5.7%",
+        "label": "德国市场Q3渗透率"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "旺季备货安全性库存成本测算",
+        "kpi": "$8,400",
+        "label": "单位FBA仓租"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "物流时效与退货率风险矩阵",
+        "kpi": "2.1%",
+        "label": "欧洲退货率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "付费流量→邮件订阅→复购漏斗",
+        "kpi": "22%",
+        "label": "订阅转化率"
+      },
+      {
+        "layoutType": "roi-calc",
+        "title": "CAC/LTV 实时仪表盘",
+        "kpi": "4.3",
+        "label": "LTV/CAC倍数"
+      }
+    ]
+  },
+  {
+    "id": "AI-53131",
+    "title": "高盛级 ESG 白皮书与行动清单",
+    "titleEn": "ESG Institutional Playbook",
+    "category": "10章 · 金融与可持续",
+    "categoryEn": "10 UNITS · ESG Advisory",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80",
+    "thumbnail": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80",
+    "thumbKey": "prod_AI-53131",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80",
+    "thumbDefault": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1280&q=80",
+    "priceRmb": 139,
+    "priceUsd": "19.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "高盛级ESG白皮书：范式转变与资本机遇",
+        "content": "本白皮书面向机构投资者与CFO，深度解析气候风险定价、范围三排放审计及绿色债券发行框架。核心观点：ESG不再是非财务指标，而是企业估值模型中必须内置的现金流折现变量。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "监管前景：CSRD/ISSB 合规路线图",
+        "content": "2025年前，欧盟CSRD将覆盖超过50,000家公司，必须按照双重重要性原则披露温室气体排放与转型计划。ISSB S2准则亦将成为全球默认基线。企业若未提前构建数据审计链，将面临巨额的合规罚款与声誉折价。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "范围一至范围三碳盘查校准清单",
+        "content": "1. 建立设施级能源计量表；2. 采购绿色电力协议（PPA）；3. 供应商（上游95%覆盖率）发放CDP问卷；4. 物流链采用生物燃料或电动卡车；5. 使用GHG Protocol工具核算碳汇（避免重复计算）；6. 第三方审计（ISAE3410）完成鉴证。"
+      },
+      {
+        "layoutType": "quote",
+        "title": "首席可持续官（CSO）高管引言",
+        "content": "ESG转型最危险的不是成本太高，而是动作太慢。当碳价从$50/t升至$130/t时，落后者的资产会在一夜之间变成搁浅资产。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "绿色债券与可持续挂钩贷款的结构设计",
+        "content": "我们建议发行10年期可持续挂钩债券，利率与关键绩效指标（KPIs）绑定：50%权重对标范围一/二减排率（25%以上），30%权重对标女性高管比例≥35%，20%权重对标董事会气候应急预案演练通过率。若达成目标，利率下调15bp，否则上调25bp。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "气候风险压力测试基准场景模板",
+        "content": "采用NGFS三种情景（净零2050、延迟转型、当前政策）动态折现到2040年。对每个实体资产进行地理位置洪水/野火/热浪概率建模，并计算保险缺口。每季度更新一次风险阈值，输出情景化拨备金比例。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "供应链Scope 3数据采集的自动化路径",
+        "content": "利用区块链存证的物流单据与能源标签，结合AI图像识别自动估算第三方制造的碳排放因子。将数据错误率从±30%压缩至±8%以内，并实现实时仪表盘与供应商评分卡联动。"
+      },
+      {
+        "layoutType": "quote",
+        "title": "机构股东代表（CIO视角）引言",
+        "content": "我们将把ESG评级低于行业中位数的公司排除出核心持仓，但会为那些提供可信净零路线图且管理层薪酬与碳强度挂钩的企业提供风险溢价补偿。"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "董事会ESG治理成熟度评估表",
+        "content": "1. ESG议题是否纳入董事会议事日程（每季度≥1次）；2. 是否设立独立ESG委员会；3. 高管绩效指标中ESG占比≥15%；4. 是否披露TCFD报告且完成第三方鉴证；5. 是否拥有内部碳定价机制（≥$40/t）。"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "结论：建设持久ESG竞争力",
+        "content": "企业必须从披露过渡到行动闭环：将气候数据嵌入ERP系统，将ESG绩效纳入CFA估值模型。我们预测，到2026年，ESG优化型企业的估值溢价将达到20%至35%。所有关键行动必须在未来18个月内启动，以获得先发优势。"
+      }
+    ]
+  }
+]
