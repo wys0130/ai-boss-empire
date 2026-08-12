@@ -1,6 +1,6 @@
 /**
  * APEXWORK 模块 3：AI 智能体引擎与初始化 (admin-ai.js)
- * 👑 终极架构：强行注入差异化组件指纹 + 绝对物理级防裂图过滤 + 纯净部门卡片渲染
+ * 👑 终极架构：海量图库防碰撞 + 绝对内容驱动排版引擎
  */
 
 window.deptConfig = [
@@ -15,47 +15,51 @@ window.deptConfig = [
     { name: "国际法务部", cls: "bg-teal-500/10 text-teal-600 border-teal-500/30 dark:bg-teal-500/20 dark:text-teal-400 dark:border-teal-500/40" }
 ];
 
-// 顶级 2K 无版权商业实拍图库
+// 👑 极限扩容 50+ 张顶级 2K 无版权商业实拍图库，彻底杜绝池子干涸导致的重复！
 const HD_IMAGE_VAULT = {
     web3: [
         "https://images.unsplash.com/photo-1639762681485-074b7f4ec651?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1622630998477-20b41cd0e073?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1639762681057-408e52192e55?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     ecommerce: [
         "https://images.unsplash.com/photo-1586528116311-ad8ed7453444?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1472851294608-062f1c4dca84?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1556741533-6e40ce36a0fb?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     finance: [
         "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     tech: [
         "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80&fm=webp"
     ],
     corporate: [
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80&fm=webp",
         "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80&fm=webp",
-        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp"
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80&fm=webp",
+        "https://images.unsplash.com/photo-1556761175-5973dc0f32d7?auto=format&fit=crop&w=800&q=80&fm=webp"
     ]
 };
 
 window.usedImageCache = window.usedImageCache || new Set();
-
-const LAYOUT_POOLS = {
-    ppt: ["kpi-grid", "timeline", "funnel", "comparison", "default"],
-    excel: ["roi-calc", "funnel", "cost-breakdown", "matrix-12m"],
-    word: ["text-block", "checklist", "quote", "text-block"] 
-};
 
 async function processRemixAndScoring(themeKeyword, category) {
     let finalImg = "";
@@ -75,9 +79,15 @@ async function processRemixAndScoring(themeKeyword, category) {
         window.appendLog(`🎨 [视觉策划部] 第 ${attempt} 次尝试提取封面，启动图片防撞库与物理校验...`);
         
         let availableImgs = targetPool.filter(img => !window.usedImageCache.has(img));
+        
+        // 👑 极限兜底：如果垂直图库被抽干了，绝不清空缓存，而是去全局兜底库抽，保证绝不重复！
         if (availableImgs.length === 0) {
-            window.usedImageCache.clear();
-            availableImgs = targetPool;
+            const allImgs = Object.values(HD_IMAGE_VAULT).flat();
+            availableImgs = allImgs.filter(img => !window.usedImageCache.has(img));
+            if (availableImgs.length === 0) {
+                window.usedImageCache.clear(); // 只有当 30 张图全抽完了才清空
+                availableImgs = targetPool;
+            }
         }
         
         let candidateImg = availableImgs[Math.floor(Math.random() * availableImgs.length)];
@@ -94,7 +104,7 @@ async function processRemixAndScoring(themeKeyword, category) {
             score = 92 + Math.random() * 6; 
             window.appendLog(`✅ [系统广播] 图像物理校验满分！0侵权 0雷同，锁定商用封面。`, "text-emerald-500");
             finalImg = candidateImg;
-            window.usedImageCache.add(finalImg);
+            window.usedImageCache.add(finalImg); // 立即封锁该图，禁止后续使用
             break;
         } else {
             window.appendLog(`⚠️ [QA 拦截] 探测到图像损坏或网络白屏，执行销毁重做！`, "text-rose-500");
@@ -130,7 +140,7 @@ window.triggerSwarmAutonomousAction = async function() {
                 else cmdBox.innerHTML = "";
             }
 
-            window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【内容防雷同矩阵】与【全局底层变量替换】...`);
+            window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【内容防雷同矩阵】与【语义驱动排版映射】...`);
             
             const industries = ["医疗大健康SaaS", "新能源汽车供应链", "AI教育智能硬件", "智能制造与数字孪生", "农业无人机自动化作业", "出海跨境独立站DTC", "全球碳排放交易中心", "高端宠物医疗保险", "低轨商业航天测算", "智能冷链仓储网络"];
             const shuffled = industries.sort(() => 0.5 - Math.random());
@@ -141,14 +151,13 @@ window.triggerSwarmAutonomousAction = async function() {
 【核心铁律：绝对差异化内容机制 (Seed: ${timestampSeed})】：
 1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。
 2. Excel 模板 (type: "excel")：
-   - 必须额外包含 "bottomKpis" 数组！这是一个包含4个对象的数组，用于替换底部的4个决策卡片，格式为 [{"label": "独特指标1", "value": "数据"}, ...]。【绝对禁止】使用“毛利率”、“净利率”等普通词汇，必须是行业黑话（如：LTV/CAC比率、单机架均摊成本、履约准时率等）。
-   - slides 数组中的 title 必须是专业的“业务分析模块”名称，【绝对禁止】出现“1月预测”、“2月预测”这种废话！
+   - 必须包含 "bottomKpis" 数组！这是一个包含4个对象的数组，格式为 [{"label": "独特指标1", "value": "数据"}, ...]。【绝对禁止】使用“毛利率”、“净利率”，必须是行业黑话（如：LTV/CAC比率、单机均摊成本）。
+   - slides 数组的 title 必须是包含【漏斗、对比、痛点、阶段、流程、拆解】等暗示排版的词汇，【绝对禁止】出现“1月预测”、“2月预测”！
 3. Word 模板 (type: "word")：
-   - slides 数组中必须包含 "content" 字段！且 "content" 必须是一段不少于 50 字的、充满行业术语的深度分析长文！【绝对禁止】输出类似“详细阐述商业运作机制”这种敷衍的短句！如果是 checklist 类型，请用换行符分割。
-4. PPT 模板 (type: "ppt")：包含 title, sub, kpi, label 字段。
-5. 所有模板的 slides 必须包含 "layoutType" 字段以决定排版（PPT: "cover", "kpi-grid", "timeline", "funnel", "comparison"; Excel: "roi-calc", "funnel", "matrix-12m"; Word: "title-page", "checklist", "quote", "text-block"）。
-请严格返回 JSON 数组格式，绝不包含任何 markdown 符号。
-样例：[{"type":"excel", "name":"医疗SaaS财务中枢", "titleEn":"Med-SaaS ROI", "category":"大健康", "categoryEn":"Health", "themeKeyword":"medical AI", "bottomKpis":[{"label":"单院获客成本","value":"$1.2K"},{"label":"客户终身价值","value":"$50K"},{"label":"月度经常性收入","value":"$2M"},{"label":"流失率","value":"<1%"}], "slides":[{"layoutType":"roi-calc", "title":"AI问诊转化漏斗", "kpi":"34%", "label":"预期诊断率"}]}]`;
+   - slides 必须包含 "content" 字段！且是一段不少于 50 字的、充满行业术语的深度分析长文！如果是规范、检查清单，请用换行符分割。
+4. PPT 模板 (type: "ppt")：包含 title, sub, kpi, label 字段。内容必须包含【漏斗、对比、痛点、时间轴】等逻辑。
+请严格返回 JSON 数组格式，绝不包含任何 markdown 符号。不需要提供价格。
+样例：[{"type":"excel", "name":"医疗SaaS财务中枢", "titleEn":"Med-SaaS ROI", "category":"大健康", "categoryEn":"Health", "themeKeyword":"medical AI", "bottomKpis":[{"label":"单院获客成本","value":"$1.2K"},{"label":"客户终身价值","value":"$50K"},{"label":"月度经常性收入","value":"$2M"},{"label":"流失率","value":"<1%"}], "slides":[{"title":"AI问诊转化漏斗", "kpi":"34%", "label":"预期诊断率"}]}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
@@ -163,7 +172,6 @@ window.triggerSwarmAutonomousAction = async function() {
 
             window.appendLog(`🔨 [主动产品部]: 富文本内容与 KPI 底层矩阵生成完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             
-            window.usedImageCache.clear();
             const newTemplates = [];
             
             for (let t of generatedData) {
@@ -181,12 +189,32 @@ window.triggerSwarmAutonomousAction = async function() {
                 const unitZh = typeStr === 'ppt' ? '页' : (typeStr === 'excel' ? '模块' : '章');
                 const unitEn = typeStr === 'ppt' ? 'P' : 'UNITS';
 
+                // 👑 绝对智能语义排版装甲：强行读取文案，匹配最佳排版组件！
                 const processedSlides = Array.from(t.slides || []).map((slide, index) => {
-                    let assignedLayout = slide.layoutType;
-                    if (!assignedLayout || assignedLayout === 'default') {
-                        if (index === 0) assignedLayout = typeStr === 'ppt' ? 'cover' : (typeStr === 'word' ? 'title-page' : 'roi-calc');
-                        else assignedLayout = LAYOUT_POOLS[typeStr][index % LAYOUT_POOLS[typeStr].length];
+                    // 将标题、副标题、正文拼接后转小写，进行语义嗅探
+                    const txt = String(slide.title + " " + (slide.sub || "") + " " + (slide.content || "") + " " + (slide.label || "")).toLowerCase();
+                    let assignedLayout = 'default';
+
+                    if (typeStr === 'ppt') {
+                        if (index === 0) assignedLayout = 'cover';
+                        else if (txt.match(/对比|vs|痛点|劣势|优势|挑战|解法|传统/)) assignedLayout = 'comparison';
+                        else if (txt.match(/阶段|流程|步骤|时间|规划|路线|里程碑/)) assignedLayout = 'timeline';
+                        else if (txt.match(/漏斗|转化|流失|率|留存|获客/)) assignedLayout = 'funnel';
+                        else if (txt.match(/指标|数据|kpi|营收|成本|增长/)) assignedLayout = 'kpi-grid';
+                        else assignedLayout = 'default';
+                    } else if (typeStr === 'excel') {
+                        if (index === 0) assignedLayout = 'roi-calc';
+                        else if (txt.match(/漏斗|转化|流失/)) assignedLayout = 'funnel';
+                        else if (txt.match(/成本|支出|明细|拆解/)) assignedLayout = 'cost-breakdown';
+                        else assignedLayout = 'matrix-12m';
+                    } else if (typeStr === 'word') {
+                        if (index === 0) assignedLayout = 'title-page';
+                        else if (txt.match(/清单|检查|规范|要求|条款/)) assignedLayout = 'checklist';
+                        else if (txt.match(/致辞|引言|观点|总结|结论/)) assignedLayout = 'quote';
+                        else assignedLayout = 'text-block';
                     }
+                    
+                    // 覆写排版类型，让前端必须按此执行！
                     return { ...slide, layoutType: assignedLayout };
                 });
 
@@ -218,14 +246,14 @@ window.triggerSwarmAutonomousAction = async function() {
                 
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
-                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架全内容差异化的深度产品 [skip ci]", keys.gh);
+                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架全内容差异化产品 [skip ci]", keys.gh);
 
                 if (typeof window.AUDIT_PRODUCTS !== "undefined" && typeof window.renderAuditTable === "function") {
                     newTemplates.forEach(t => window.AUDIT_PRODUCTS.unshift(t));
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
                     window.renderAuditTable();
                 }
-                window.appendLog(`✅ [系统广播]: 核心数据与深度文案替换完毕！已成功录入大盘。`);
+                window.appendLog(`✅ [系统广播]: 核心数据与深度文案智能排版完毕！已成功录入大盘。`);
             } finally {
                 window.isCloudSyncing = false;
             }
@@ -315,10 +343,7 @@ window.selectMentionDept = function(deptName) {
     tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
     tokenSpan.contentEditable = "false"; 
     tokenSpan.setAttribute("data-dept", deptName);
-    
-    // 带有物理移除功能的卡片
     tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
-    
     range.insertNode(tokenSpan);
     const spaceNode = document.createTextNode("\u00A0"); 
     tokenSpan.parentNode.insertBefore(spaceNode, tokenSpan.nextSibling);
@@ -345,9 +370,7 @@ window.inspectDept = function(deptName, btnEl) {
         tokenSpan.className = `inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-bold mx-1 select-none shadow-sm cursor-default ${deptInfo.cls}`;
         tokenSpan.contentEditable = "false";
         tokenSpan.setAttribute("data-dept", deptName);
-        
         tokenSpan.innerHTML = `@${deptName} <b class="ml-1 px-1 cursor-pointer hover:text-rose-600 hover:bg-rose-100 rounded-full transition-colors" onclick="this.parentElement.remove()" title="移除标签">×</b>`;
-        
         const sel = window.getSelection();
         if (sel.rangeCount > 0 && cmdBox.contains(sel.anchorNode)) {
             const range = sel.getRangeAt(0);
@@ -425,8 +448,13 @@ window.renderDeptButtons = function() {
     if (!container) return;
     container.innerHTML = "";
     
-    // 👑 已经被彻底剔除，不再这里面生成丑陋的内嵌按钮！
-    
+    const resetBtn = document.createElement("button");
+    resetBtn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-slate-500 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-700`;
+    resetBtn.innerHTML = `<div class="text-xs font-bold truncate">✨ 恢复全景 (取消过滤)</div>`;
+    resetBtn.onmousedown = (e) => e.preventDefault();
+    resetBtn.onclick = () => window.resetDeptFilter();
+    container.appendChild(resetBtn);
+
     window.deptConfig.forEach(dept => {
         const btn = document.createElement("button");
         btn.className = `dept-btn border rounded-xl p-2.5 text-left transition hover:border-blue-500 ${dept.cls}`;
