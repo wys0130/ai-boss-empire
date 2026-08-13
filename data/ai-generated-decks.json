@@ -1,5 +1,198 @@
 [
   {
+    "id": "AI-86541",
+    "title": "AI教育智能硬件决策沙盘",
+    "titleEn": "EduBrains Hardware ROI Simulator",
+    "category": "5页 · AI教育",
+    "categoryEn": "5 P · EdTech",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-86541",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "当算力遇见黑板：下一代学习终端的利润重构",
+        "kpi": "67%",
+        "label": "课堂参与度提升"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "传统平板 vs 情感计算学习机：决策链断裂点",
+        "kpi": "3.2x",
+        "label": "续费率差异"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "硬件订阅制下的四象限生存法则",
+        "kpi": "41%",
+        "label": "首月激活率",
+        "subKpis": [
+          {
+            "label": "单机月活成本",
+            "value": "$0.8"
+          },
+          {
+            "label": "家长端NPS",
+            "value": "52"
+          },
+          {
+            "label": "课程复购间隔",
+            "value": "18天"
+          }
+        ]
+      },
+      {
+        "layoutType": "timeline",
+        "title": "从试点校到区域渗透：90天硬件投放节奏",
+        "kpi": "8周",
+        "label": "达到日活峰值"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "硬件激活→AI诊断→家长付费转化链",
+        "kpi": "29%",
+        "label": "付费转化率（区域样本）"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-12147",
+    "title": "农业无人机自动化作业效能总盘",
+    "titleEn": "AgriDronomics Ops Matrix",
+    "category": "5模块 · 智慧农业",
+    "categoryEn": "5 UNITS · AgriTech",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786604613547",
+    "thumbnail": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786604613547",
+    "thumbKey": "prod_AI-12147",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786604613547",
+    "thumbDefault": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=1786604613547",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "人工喷洒 vs 无人机群自主编队：单位小时产出对比",
+        "kpi": "5.6x",
+        "label": "作业效率倍数"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "农田网格化停机坪的数学最优解",
+        "kpi": "12km²",
+        "label": "单基站管控半径"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "恶劣天气下的故障降级矩阵",
+        "kpi": "2.1%",
+        "label": "任务中断率",
+        "subKpis": [
+          {
+            "label": "风速>8级预案切换",
+            "value": "0.3min"
+          },
+          {
+            "label": "视觉定位偏移",
+            "value": "±4.2cm"
+          },
+          {
+            "label": "充电站利用率",
+            "value": "73%"
+          }
+        ]
+      },
+      {
+        "layoutType": "funnel",
+        "title": "地块扫描→施药决策→效果回传的数据闭环",
+        "kpi": "91%",
+        "label": "决策采纳率"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "春耕季10周资源调度甘特图",
+        "kpi": "第5周",
+        "label": "机群扩容拐点"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "亩均调度延迟",
+        "value": "0.7hr"
+      },
+      {
+        "label": "单架次覆盖面积",
+        "value": "214亩"
+      },
+      {
+        "label": "电池热替换成功率",
+        "value": "98.2%"
+      },
+      {
+        "label": "农药节流指数",
+        "value": "31%"
+      }
+    ]
+  },
+  {
+    "id": "AI-67548",
+    "title": "智能冷链仓储网络重构白皮书",
+    "titleEn": "ColdChain AI Blueprint",
+    "category": "4章 · 物流科技",
+    "categoryEn": "4 UNITS · LogiTech",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-67548",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "从被动保鲜到主动免疫：智能冷链仓储的神经单元架构",
+        "kpi": "0.4℃",
+        "label": "温度波动收敛值"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "冷库选址的12项隐形否决清单（含电力冗余/地下水脉/无人机禁飞区）",
+        "kpi": "7项",
+        "label": "常被忽略项"
+      },
+      {
+        "layoutType": "quote",
+        "title": "冷链的终极成本不是电费，而是每一分钟不可追溯的静默区间。",
+        "kpi": "100%",
+        "label": "需要全链路可视化的节点比例"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "深度分析：基于数字孪生与边缘推理的库内微气候预测模型",
+        "content": "传统冷链仓储依赖集中式温控与人工巡检，但在多温区混载、频繁开关库门以及季节性外温突变的三重压力下，恒温设定往往只能保证平均值安全，无法应对局部热点或冷桥效应。本方案引入每20立方米布设一颗的低功耗温湿度传感粒子，结合库内AGV路径的实时摩擦热数据，构建出分辨率达1.5米的三维热力场。同时，边缘计算网关将预测模型压缩至0.8M大小，使每个冷库机柜可独立运行30分钟的未来状态推演，无需回传云端。实测显示，在-18℃冷冻区与0℃冷藏区之间的缓冲带，温度失控事件下降76%，而因压缩机能耗导致的碳排量减少22%。关键创新在于将冷库的制冷周期从\"恒定功率\"改为\"脉冲式预冷\"，配合库门开闭感应器，提前6秒触发局部强冷喷流，从而将单次开门带来的温度回弹峰值抑制在0.5℃以内。这一架构使货品保质期平均延长2.3天，同时将货损率从行业平均的4.8%压缩至1.1%。更深远的价值在于，系统自动生成每批次货物的\"热履历\"，当发现某托盘的历史温度曲线偏离预设包络时，会触发自动移库指令并重排后续订单的拣选顺序，从源头阻断劣变扩散。最终，该网络使冷库空置率下降18%，周转率提升至每月4.7次，投资回收期缩短至14个月。",
+        "kpi": "2.3天",
+        "label": "货品保质期延长"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
     "id": "AI-47245",
     "title": "医疗大健康SaaS·数字疗法引擎",
     "titleEn": "Digital Therapeutics Command Deck",
