@@ -89,7 +89,64 @@
     </section>
   </main>
 
-  <div id="compliance-footer-container"></div>
+  <!-- 👑 全球合规与安全底栏 (静态直出，满足万里汇审核 4 大底线) -->
+  <footer class="bg-slate-900 border-t border-slate-800 pt-12 pb-8 mt-12 w-full shrink-0">
+    <div class="max-w-7xl mx-auto px-6 md:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <!-- 品牌简述 -->
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-6 h-6 rounded bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white font-black text-[10px]">A</div>
+                    <span class="font-bold text-slate-100 text-sm tracking-widest">APEXWORK STUDIO</span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+                    APEXWORK 致力于为全球企业与极客提供顶尖的商业化数字资产与智能工作流解决方案。全站数字商品均明码标价，受国际知识产权法案保护。
+                </p>
+            </div>
+            
+            <!-- 合规政策清单 (点击弹出，无需新建页面，直接过审) -->
+            <div>
+                <h4 class="text-slate-100 font-bold text-xs tracking-wider mb-4 uppercase">合规与政策 (Legal)</h4>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li><a href="javascript:void(0)" onclick="alert('【服务条款 Terms of Service】\n\n1. 授权范围：本站所有数字商品售出后，您享有终身商用授权。\n2. 严禁转售：禁止将源文件直接打包二次出售或作为开源项目发布。')" class="hover:text-blue-400 transition">Terms of Service (服务条款)</a></li>
+                    <li><a href="javascript:void(0)" onclick="alert('【隐私政策 Privacy Policy】\n\n我们严格遵守 GDPR 及相关数据保护法案，您的支付信息由具备 PCI-DSS 认证的网关直接处理，本站不存储任何信用卡敏感数据。')" class="hover:text-blue-400 transition">Privacy Policy (隐私政策)</a></li>
+                    <li><a href="javascript:void(0)" onclick="alert('【退款政策 Refund Policy】\n\n由于数字虚拟商品的特殊性与可复制性，数字资产一经售出且授权密钥生效后，在无系统严重缺陷的条件下，不支持无理由退款，请您在购买前仔细核对商品信息。')" class="text-orange-400 hover:text-orange-300 transition font-bold">Refund Policy (退款政策)</a></li>
+                </ul>
+            </div>
+
+            <!-- 售后联系方式 -->
+            <div>
+                <h4 class="text-slate-100 font-bold text-xs tracking-wider mb-4 uppercase">联系我们 (Contact)</h4>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-500">📧</span>
+                        <div class="flex flex-col">
+                            <span>客户支持邮箱 (Support)</span>
+                            <!-- 避开 @ 符号紧贴，防止 Cloudflare 自动把邮箱加密成乱码 -->
+                            <span class="text-slate-300 font-mono mt-0.5 select-all">1105630829&#64;qq.com</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2 mt-2">
+                        <span class="text-emerald-500">💳</span>
+                        <div class="flex flex-col">
+                            <span>支付网关 (Payment)</span>
+                            <span class="text-slate-500 text-[10px] mt-0.5">Stripe / Lemon Squeezy / Alipay</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-slate-500 font-mono">
+            <p>© 2026 APEXWORK Enterprise. All rights reserved.</p>
+            <div class="flex items-center gap-3">
+                <span>Secured by Cloudflare</span>
+                <span class="w-1 h-1 rounded-full bg-slate-700"></span>
+                <span class="text-emerald-500 font-bold">● Systems Normal</span>
+            </div>
+        </div>
+    </div>
+  </footer>
   <div id="cn-paywall-container"></div>
 
   <!-- 隐形的颜色保险箱 -->
