@@ -83,7 +83,7 @@ const LAYOUT_POOLS = {
     word: ["text-block", "checklist", "quote", "text-block"] 
 };
 
-async function processRemixAndScoring(themeKeyword, category, globalUsedImages) {
+async function processRemixAndScoring(themeKeyword, category, globalUsedImages, productTitle = "Corporate") {
     let finalImg = "";
     let attempt = 0;
     let isValidImage = false;
@@ -99,7 +99,7 @@ async function processRemixAndScoring(themeKeyword, category, globalUsedImages) 
         attempt++;
         window.appendLog(`🎨 [视觉策划部] 正在执行全站级核心 ID 防撞库与物理连通性校验...`);
         
-        // 👑 彻底剔除黑名单图片：必须使用 getBaseImageId 进行比对，无视分辨率参数干扰！
+        // 彻底剔除黑名单图片：必须使用 getBaseImageId 进行比对
         let availableImgs = targetPool.filter(img => !globalUsedImages.has(getBaseImageId(img)));
         
         if (availableImgs.length === 0) {
@@ -111,7 +111,9 @@ async function processRemixAndScoring(themeKeyword, category, globalUsedImages) 
         if (availableImgs.length > 0) {
             candidateImg = availableImgs[Math.floor(Math.random() * availableImgs.length)];
         } else {
-            candidateImg = targetPool[Math.floor(Math.random() * targetPool.length)] + "&uid=" + Date.now() + Math.random().toString().slice(2, 6);
+            // 👑 核心修复1：图库彻底耗尽时，绝不使用重复底图！强制调用 AI 画师根据标题实时作画，绝对独一无二！
+            const aiPrompt = encodeURIComponent(`High-end commercial photography, minimalistic, corporate, ${productTitle}, 8k resolution, photorealistic`);
+            candidateImg = `https://image.pollinations.ai/prompt/${aiPrompt}?width=800&height=600&nologo=true`;
         }
         
         isValidImage = await new Promise((resolve) => {
@@ -134,7 +136,9 @@ async function processRemixAndScoring(themeKeyword, category, globalUsedImages) 
     }
     
     if(!finalImg) {
-        finalImg = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80&fm=webp&uid=" + Date.now();
+        // 兜底防白屏方案也必须保证每次不同
+        const safePrompt = encodeURIComponent(`Business corporate technology abstract background ${Date.now()}`);
+        finalImg = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=600&nologo=true`;
     }
     
     return finalImg;
@@ -164,15 +168,14 @@ window.triggerSwarmAutonomousAction = async function() {
 
             window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【强制结构打破算法】与【全局查重库读取】...`);
 
-            // 👑 查重核心：不仅拉取大盘，且物理级锁定默认 5 大件的核心图库，绝对防止 AI 抽到跟默认模板雷同的封面！
             const globalUsedImages = new Set();
             
             // 强制写入原生 5 大默认模板的底图核心 ID，雷打不动防撞！
-            globalUsedImages.add("photo-1460925895917-afdab827c52f"); // AeroTech
-            globalUsedImages.add("photo-1504384308090-c894fdcc538d"); // SaaS
-            globalUsedImages.add("photo-1551836022-d5d88e9218df"); // FinTech
-            globalUsedImages.add("photo-1543286386-2e659306cd6c"); // Excel ROI
-            globalUsedImages.add("photo-1450133064473-71024230f91b"); // Word ATS
+            globalUsedImages.add("photo-1460925895917-afdab827c52f"); 
+            globalUsedImages.add("photo-1504384308090-c894fdcc538d"); 
+            globalUsedImages.add("photo-1551836022-d5d88e9218df"); 
+            globalUsedImages.add("photo-1543286386-2e659306cd6c"); 
+            globalUsedImages.add("photo-1450133064473-71024230f91b"); 
 
             try {
                 const localAudit = JSON.parse(localStorage.getItem('APEX_AUDIT_PRODUCTS') || '[]');
@@ -187,14 +190,16 @@ window.triggerSwarmAutonomousAction = async function() {
             const targetIndustries = shuffled.slice(0, 3);
             const timestampSeed = Date.now();
             
+            // 👑 核心修复2：Prompt 强约束！明示合法的组件词典，强迫 AI 基于语义排版
             const aiPrompt = `你是一个深谙SaaS高转化率的顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
 【核心铁律：绝对结构异化机制 (Seed: ${timestampSeed})】：
 1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。禁止生成重复的标题和内容！
-2. 必须强行打破"概述->痛点->时间轴->漏斗"的固定出牌套路！你在输出 slides 时，必须为每个模板分配【截然不同】的 layoutType 组合！
-   - PPT 模板的组件排列必须像这样出乎意料: cover -> comparison -> funnel -> kpi-grid -> timeline 等等。
-   - Excel 模板必须强制输出 "bottomKpis" (包含4个行业专属指标，禁止用毛利率)。
-   - Word 模板的 layoutType 排序也必须打乱: title-page -> checklist -> text-block -> quote 等等。
-3. Word 的 content 必须是50字以上的专业深度分析长文！
+2. 必须强行打破"概述->痛点->时间轴->漏斗"的固定出牌套路！你在输出 slides 时，必须为每个模板分配【截然不同且符合语义】的 layoutType！
+   - PPT 专属可选 layoutType: "kpi-grid", "timeline", "funnel", "comparison", "default"
+   - Excel 专属可选 layoutType: "roi-calc", "funnel", "cost-breakdown", "matrix-12m"
+   - Word 专属可选 layoutType: "text-block", "checklist", "quote"
+   例如：PPT讲到阶段必须用 timeline，讲到对比用 comparison，严禁自己瞎编组件名！
+3. Excel 模板必须强制输出 "bottomKpis" (包含4个行业专属指标)。Word 的 content 必须是50字以上的专业深度分析长文！
 请严格返回 JSON 数组格式，绝不包含任何 markdown 符号。不需要提供价格。
 样例：[{"type":"excel", "name":"医疗SaaS财务中枢", "titleEn":"Med-SaaS ROI", "category":"大健康", "categoryEn":"Health", "themeKeyword":"medical AI", "bottomKpis":[{"label":"单院获客成本","value":"$1.2K"},{"label":"客户终身价值","value":"$50K"},{"label":"月度经常性收入","value":"$2M"},{"label":"流失率","value":"<1%"}], "slides":[{"layoutType":"funnel", "title":"AI问诊转化漏斗", "kpi":"34%", "label":"预期诊断率"}]}]`;
             
@@ -218,7 +223,8 @@ window.triggerSwarmAutonomousAction = async function() {
                 const typeStr = t.type ? t.type.toLowerCase() : 'ppt';
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
-                const finalImg = await processRemixAndScoring(t.themeKeyword || "corporate data", t.category || "tech", globalUsedImages);
+                // 传入商品名称(t.name)，供预设图库耗尽时交给 AI 画师定制封面
+                const finalImg = await processRemixAndScoring(t.themeKeyword || "corporate data", t.category || "tech", globalUsedImages, t.name);
 
                 const slideCount = t.slides ? t.slides.length : 8;
                 const isPremium = slideCount >= 10; 
@@ -234,10 +240,15 @@ window.triggerSwarmAutonomousAction = async function() {
                 const processedSlides = Array.from(t.slides || []).map((slide, index) => {
                     let assignedLayout = slide.layoutType;
                     
+                    // 👑 核心修复3：首屏固定展示大封面，但内页【彻底尊重 AI 基于语义选出的排版】
                     if (index === 0) {
                         assignedLayout = typeStr === 'ppt' ? 'cover' : (typeStr === 'word' ? 'title-page' : 'roi-calc');
                     } else {
-                        if (!assignedLayout || assignedLayout === 'default' || !LAYOUT_POOLS[typeStr].includes(assignedLayout)) {
+                        // 如果 AI 给出的 layoutType 在合规池子里，坚决使用，不再强制无脑循环！
+                        if (assignedLayout && LAYOUT_POOLS[typeStr].includes(assignedLayout)) {
+                            // 保持 assignedLayout 不变，落实“按文案生成独特排版”
+                        } else {
+                            // 只有当 AI 偷懒输出非法组件时，才进行兜底
                             assignedLayout = availableLayouts[(index - 1) % availableLayouts.length];
                         }
                     }
@@ -280,7 +291,7 @@ window.triggerSwarmAutonomousAction = async function() {
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
                     window.renderAuditTable();
                 }
-                window.appendLog(`✅ [系统广播]: 排版强制变异装配完毕！全站查重(含原生模板)无雷同，已成功录入大盘。`);
+                window.appendLog(`✅ [系统广播]: 排版强制变异装配完毕！全站查重无雷同，已成功录入大盘。`);
             } finally {
                 window.isCloudSyncing = false;
             }
