@@ -1,5 +1,163 @@
 [
   {
+    "id": "AI-47245",
+    "title": "医疗大健康SaaS·数字疗法引擎",
+    "titleEn": "Digital Therapeutics Command Deck",
+    "category": "5页 · 医疗大健康",
+    "categoryEn": "5 P · Healthcare",
+    "type": "ppt",
+    "thumb": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-47245",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-orange-500 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "cover",
+        "title": "数字疗法全景驾驶舱：从处方到依从性闭环",
+        "kpi": "N/A",
+        "label": "开场定调：重新定义患者成功路径"
+      },
+      {
+        "layoutType": "comparison",
+        "title": "传统随访 vs AI连续干预：同周期疗效差异",
+        "kpi": "2.3x",
+        "label": "AI组用药依从性提升倍数（对比护理随访组）"
+      },
+      {
+        "layoutType": "kpi-grid",
+        "title": "关键临床与商业指标矩阵",
+        "kpi": "42% | 19d | 5.1 | 0.8%",
+        "label": "入组转化率 | 中位处方激活时长 | 月均复诊频次 | 患者流失率"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "医生推荐→患者激活→持续订阅 实时漏斗",
+        "kpi": "38%",
+        "label": "处方后7日激活率（行业内均值21%）"
+      },
+      {
+        "layoutType": "timeline",
+        "title": "未来18个月监管合规与功能里程碑",
+        "kpi": "Q3-2025",
+        "label": "首张FDA 510(k)数字疗法注册证目标节点"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
+    "id": "AI-93501",
+    "title": "智能制造与数字孪生·产线效能联邦",
+    "titleEn": "Twin-ops OEE & Energy Nexus",
+    "category": "4模块 · 制造",
+    "categoryEn": "4 UNITS · Manufacturing",
+    "type": "excel",
+    "thumb": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-93501",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-emerald-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "roi-calc",
+        "title": "车间实时OEE热力分布：瓶颈机台识别",
+        "kpi": "72.5%",
+        "label": "当前全局OEE（目标 85% 推进中）"
+      },
+      {
+        "layoutType": "matrix-12m",
+        "title": "数字孪生仿真场景×能耗-质量联合矩阵",
+        "kpi": "8 scopes",
+        "label": "涵盖换模参数、原料批次、环境温湿度与节拍权衡"
+      },
+      {
+        "layoutType": "funnel",
+        "title": "异常事件回溯日志：从传感器触发到模型根因分析",
+        "kpi": "12ms",
+        "label": "传感器信号→边缘孪生体告警延迟"
+      },
+      {
+        "layoutType": "cost-breakdown",
+        "title": "传统PLC维护 vs 孪生驱动预维护：年度停机对比",
+        "kpi": "37h 减少",
+        "label": "每产线每年非计划停机小时数降幅"
+      }
+    ],
+    "bottomKpis": [
+      {
+        "label": "单线数字孪生部署成本",
+        "value": "$38K"
+      },
+      {
+        "label": "设备综合效率提升值",
+        "value": "+14.7%"
+      },
+      {
+        "label": "紧急停机事件平均响应时间",
+        "value": "3.2s"
+      },
+      {
+        "label": "预测性维护模型误报率",
+        "value": "4.6%"
+      }
+    ]
+  },
+  {
+    "id": "AI-59497",
+    "title": "出海跨境独立站DTC·品牌增长实时作战手册",
+    "titleEn": "DTC Scaling Playbook: Zero-to-EPIC",
+    "category": "4章 · 跨境电商",
+    "categoryEn": "4 UNITS · Cross-border E-commerce",
+    "type": "word",
+    "thumb": "https://images.unsplash.com/photo-1580913428706-c311e67898b3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbnail": "https://images.unsplash.com/photo-1580913428706-c311e67898b3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbKey": "prod_AI-59497",
+    "thumbCloudPath": "https://images.unsplash.com/photo-1580913428706-c311e67898b3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "thumbDefault": "https://images.unsplash.com/photo-1580913428706-c311e67898b3?auto=format&fit=crop&w=800&q=80&fm=webp",
+    "priceRmb": 69,
+    "priceUsd": "9.99",
+    "colorCls": "text-indigo-600 font-bold",
+    "isLinked": true,
+    "status": true,
+    "slides": [
+      {
+        "layoutType": "title-page",
+        "title": "从流量租赁到数据自有：独立站DTC品牌盈利性增长的三重跃迁",
+        "kpi": "N/A",
+        "label": "内部战略备忘录 v2.0"
+      },
+      {
+        "layoutType": "checklist",
+        "title": "上线前90天：关键基座验收清单",
+        "kpi": "90 days",
+        "label": "包含支付合规、物流履约模拟、像素事件完整性与订阅引擎激活"
+      },
+      {
+        "layoutType": "text-block",
+        "title": "深度分析：为什么第一方数据激活应从订单确认页开始而非首页弹窗",
+        "kpi": "5 min read",
+        "label": "传统做法将采集率压在3-5%，而将问卷与积分预告耦合在购物后第7天，可将付费邮箱采集率提升至31-44%，且用户生命周期价值提升22%以上，因为此时用户认知一致性最高，退订率反而最低。"
+      },
+      {
+        "layoutType": "quote",
+        "title": "品牌增长铁律：把广告预算当作租赁成本，把CLV当作你唯一的产权资产。",
+        "kpi": "CLV:CAC > 4.5",
+        "label": "首席增长官内部周会共识"
+      }
+    ],
+    "bottomKpis": null
+  },
+  {
     "id": "AI-86425",
     "title": "数字孪生驱动的离散制造运营中枢",
     "titleEn": "TwinOps: Discrete Manufacturing OS",
