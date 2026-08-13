@@ -122,63 +122,6 @@
     "bottomKpis": null
   },
   {
-    "id": "AI-32077",
-    "title": "AI教育智能硬件·神经重塑作战图",
-    "titleEn": "NeuroEdge Learning Hardware",
-    "category": "6页 · AI教育智能硬件",
-    "categoryEn": "6 P · EdTech Hardware",
-    "type": "ppt",
-    "thumb": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
-    "thumbnail": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
-    "thumbKey": "prod_AI-32077",
-    "thumbCloudPath": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
-    "thumbDefault": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80&fm=webp",
-    "priceRmb": 69,
-    "priceUsd": "9.99",
-    "colorCls": "text-orange-500 font-bold",
-    "isLinked": true,
-    "status": true,
-    "slides": [
-      {
-        "layoutType": "cover",
-        "title": "从算力到心力：AI硬件如何重构儿童认知节奏",
-        "kpi": "0→1",
-        "label": "首发市场切入逻辑"
-      },
-      {
-        "layoutType": "comparison",
-        "title": "旧范式(平板+APP) vs 新范式(神经反馈手环+眼镜)",
-        "kpi": "3.2x",
-        "label": "专注时长提升倍数"
-      },
-      {
-        "layoutType": "funnel",
-        "title": "硬件激活 → 周活 → 家长付费 → 续费扩科",
-        "kpi": "58%",
-        "label": "激活后30天付费转化率"
-      },
-      {
-        "layoutType": "kpi-grid",
-        "title": "四象限硬件健康度看板（非财务）",
-        "kpi": "92/84/71/63",
-        "label": "佩戴时长/纠错反馈/家长打开率/课堂联动率"
-      },
-      {
-        "layoutType": "timeline",
-        "title": "9个月硬件迭代与内容生态冷启动里程碑",
-        "kpi": "3代",
-        "label": "传感器精度与算法轻量化跃迁"
-      },
-      {
-        "layoutType": "funnel",
-        "title": "“硬件不是盒子，是孩子大脑的体外突触”",
-        "kpi": "伦理审查",
-        "label": "儿童数据隐私合规前置"
-      }
-    ],
-    "bottomKpis": null
-  },
-  {
     "id": "AI-70259",
     "title": "农业无人机自动化作业·季候风收益矩阵",
     "titleEn": "AgriDrone Autonomy Yield Matrix",
