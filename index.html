@@ -194,12 +194,13 @@
 
   <script>
     window.ApexMallGallery = {
+        // 替换一：前台商品库（加入 &fm=webp）
         baseProducts: [
-            { id: "aerotech", type: "ppt", title: "AeroTech 创投规划书", titleEn: "AeroTech Pitch Deck", category: "15 页 · 商业计划书", categoryEn: "15 P · Business Plan", thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "saas", type: "ppt", title: "SaaS 增长指标盘点", titleEn: "SaaS Growth Metrics", category: "20 页 · 数据可视化", categoryEn: "20 P · Data Viz", thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "fintech", type: "ppt", title: "FinTech A 轮融资方案", titleEn: "FinTech Series A", category: "12 页 · 科技金融", categoryEn: "12 P · FinTech", thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "excel-roi", type: "excel", title: "全渠道 ROI 动态测算模型", titleEn: "Omnichannel ROI Model", category: "数据模型 · 自动计算", categoryEn: "Data Model · Auto Calc", thumb: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=600&q=80", priceRmb: 69 },
-            { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80", priceRmb: 69 }
+            { id: "aerotech", type: "ppt", title: "AeroTech 创投规划书", titleEn: "AeroTech Pitch Deck", category: "15 页 · 商业计划书", categoryEn: "15 P · Business Plan", thumb: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80&fm=webp", priceRmb: 69 },
+            { id: "saas", type: "ppt", title: "SaaS 增长指标盘点", titleEn: "SaaS Growth Metrics", category: "20 页 · 数据可视化", categoryEn: "20 P · Data Viz", thumb: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80&fm=webp", priceRmb: 69 },
+            { id: "fintech", type: "ppt", title: "FinTech A 轮融资方案", titleEn: "FinTech Series A", category: "12 页 · 科技金融", categoryEn: "12 P · FinTech", thumb: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80&fm=webp", priceRmb: 69 },
+            { id: "excel-roi", type: "excel", title: "全渠道 ROI 动态测算模型", titleEn: "Omnichannel ROI Model", category: "数据模型 · 自动计算", categoryEn: "Data Model · Auto Calc", thumb: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&w=600&q=80&fm=webp", priceRmb: 69 },
+            { id: "word-ats", type: "word", title: "企业级 ATS 智能排版报告", titleEn: "Enterprise ATS Report", category: "标准报告 · ATS 盲测", categoryEn: "Standard · ATS Ready", thumb: "https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=600&q=80&fm=webp", priceRmb: 69 }
         ],
         init: async function() {
             let displayProducts = JSON.parse(JSON.stringify(this.baseProducts));
