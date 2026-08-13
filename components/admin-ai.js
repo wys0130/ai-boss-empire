@@ -419,7 +419,7 @@ window.inspectDept = function(deptName, btnEl) {
 
 window.resetDeptFilter = function() {
     window.activeFilterDept = "";
-    window.isCmdActive = false;
+    // 删除了导致输入框失焦锁死的 window.isCmdActive = false; 
     document.querySelectorAll(".dept-btn").forEach(el => el.style.opacity = "1");
     const activeLabel = document.getElementById("activeDeptLabel");
     if (activeLabel) activeLabel.innerText = `[全景视图]`;
