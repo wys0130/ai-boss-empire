@@ -77,8 +77,9 @@ const HD_IMAGE_VAULT = {
 
 window.usedImageCache = window.usedImageCache || new Set();
 
+// 👑 1. 扩充 PPT 可用排版池：新增 image-text(图文左右) 和 quote-focus(金句高光)
 const LAYOUT_POOLS = {
-    ppt: ["kpi-grid", "timeline", "funnel", "comparison", "default"],
+    ppt: ["kpi-grid", "timeline", "funnel", "comparison", "image-text", "quote-focus", "default"],
     excel: ["roi-calc", "funnel", "cost-breakdown", "matrix-12m"],
     word: ["text-block", "checklist", "quote", "text-block"] 
 };
@@ -169,8 +170,6 @@ window.triggerSwarmAutonomousAction = async function() {
             window.appendLog(`🤖 [大脑中枢]: 收到深度生成指令，启动【强制结构打破算法】与【全局查重库读取】...`);
 
             const globalUsedImages = new Set();
-            
-            // 强制写入原生 5 大默认模板的底图核心 ID，雷打不动防撞！
             globalUsedImages.add("photo-1460925895917-afdab827c52f"); 
             globalUsedImages.add("photo-1504384308090-c894fdcc538d"); 
             globalUsedImages.add("photo-1551836022-d5d88e9218df"); 
@@ -190,18 +189,19 @@ window.triggerSwarmAutonomousAction = async function() {
             const targetIndustries = shuffled.slice(0, 3);
             const timestampSeed = Date.now();
             
-            // 👑 核心修复2：Prompt 强约束！明示合法的组件词典，强迫 AI 基于语义排版
+            // 👑 核心升级 1：给 AI 下达极其严厉的 Prompt，要求“先定版式，再写文案”，并严禁 Word 把长文写进标题！
             const aiPrompt = `你是一个深谙SaaS高转化率的顶尖产品总监。请自动生成3个商业模板作品（1个PPT, 1个Excel, 1个Word）。
-【核心铁律：绝对结构异化机制 (Seed: ${timestampSeed})】：
-1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。禁止生成重复的标题和内容！
-2. 必须强行打破"概述->痛点->时间轴->漏斗"的固定出牌套路！你在输出 slides 时，必须为每个模板分配【截然不同且符合语义】的 layoutType！
-   - PPT 专属可选 layoutType: "kpi-grid", "timeline", "funnel", "comparison", "default"
-   - Excel 专属可选 layoutType: "roi-calc", "funnel", "cost-breakdown", "matrix-12m"
+【核心铁律：绝对结构异化与文案深度贴合机制 (Seed: ${timestampSeed})】：
+1. 强制使用领域：必须分别使用【${targetIndustries[0]}】、【${targetIndustries[1]}】、【${targetIndustries[2]}】。
+2. 你必须根据所选版式，主动生成具有灵魂的商业文案！
+   - PPT 专属可选 layoutType: "kpi-grid", "timeline", "funnel", "comparison", "image-text", "quote-focus", "default"
+   - PPT 必须输出完整字段：layoutType, title, sub (必须是20-30字的深度业务副标题分析，绝不能是占位符!), kpi, label, tag。
+3. 🚨 重点警告 (针对 Word)：
    - Word 专属可选 layoutType: "text-block", "checklist", "quote"
-   例如：PPT讲到阶段必须用 timeline，讲到对比用 comparison，严禁自己瞎编组件名！
-3. Excel 模板必须强制输出 "bottomKpis" (包含4个行业专属指标)。Word 的 content 必须是50字以上的专业深度分析长文！
-请严格返回 JSON 数组格式，绝不包含任何 markdown 符号。不需要提供价格。
-样例：[{"type":"excel", "name":"医疗SaaS财务中枢", "titleEn":"Med-SaaS ROI", "category":"大健康", "categoryEn":"Health", "themeKeyword":"medical AI", "bottomKpis":[{"label":"单院获客成本","value":"$1.2K"},{"label":"客户终身价值","value":"$50K"},{"label":"月度经常性收入","value":"$2M"},{"label":"流失率","value":"<1%"}], "slides":[{"layoutType":"funnel", "title":"AI问诊转化漏斗", "kpi":"34%", "label":"预期诊断率"}]}]`;
+   - Word 的 title 必须是小于15个字的精简标题！绝对禁止把长篇大论写在 title 里！
+   - Word 的 content 必须是50字以上的深度专业长文！内容和标题必须绝对区分开！
+请严格返回 JSON 数组格式，绝不包含任何 markdown 符号。
+样例：[{"type":"ppt", "name":"医疗商业路演", "titleEn":"Med Pitch", "category":"大健康", "categoryEn":"Health", "themeKeyword":"medical", "slides":[{"layoutType":"funnel", "tag":"01. FUNNEL", "title":"AI问诊转化漏斗", "sub":"通过智能分诊系统，有效将初级咨询患者转化为付费核心订阅用户，极大降低获客成本。", "kpi":"34%", "label":"预期诊断率"}]}]`;
             
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
@@ -214,7 +214,7 @@ window.triggerSwarmAutonomousAction = async function() {
             if (!jsonMatch) throw new Error("AI 数据格式异常");
             const generatedData = JSON.parse(jsonMatch[0]);
 
-            window.appendLog(`🔨 [主动产品部]: 差异化结构与行业指标生成完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
+            window.appendLog(`🔨 [主动产品部]: 差异化结构与贴合文案生成完毕！产出：《${generatedData.map(d=>d.name).join('》、《')}》。`);
             
             const newTemplates = [];
             
@@ -223,7 +223,6 @@ window.triggerSwarmAutonomousAction = async function() {
                 const typeStr = t.type ? t.type.toLowerCase() : 'ppt';
                 let col = typeStr === 'excel' ? 'text-emerald-600 font-bold' : (typeStr === 'word' ? 'text-indigo-600 font-bold' : 'text-orange-500 font-bold');
                 
-                // 传入商品名称(t.name)，供预设图库耗尽时交给 AI 画师定制封面
                 const finalImg = await processRemixAndScoring(t.themeKeyword || "corporate data", t.category || "tech", globalUsedImages, t.name);
 
                 const slideCount = t.slides ? t.slides.length : 8;
@@ -239,20 +238,13 @@ window.triggerSwarmAutonomousAction = async function() {
 
                 const processedSlides = Array.from(t.slides || []).map((slide, index) => {
                     let assignedLayout = slide.layoutType;
-                    
-                    // 👑 核心修复3：首屏固定展示大封面，但内页【彻底尊重 AI 基于语义选出的排版】
                     if (index === 0) {
                         assignedLayout = typeStr === 'ppt' ? 'cover' : (typeStr === 'word' ? 'title-page' : 'roi-calc');
                     } else {
-                        // 如果 AI 给出的 layoutType 在合规池子里，坚决使用，不再强制无脑循环！
-                        if (assignedLayout && LAYOUT_POOLS[typeStr].includes(assignedLayout)) {
-                            // 保持 assignedLayout 不变，落实“按文案生成独特排版”
-                        } else {
-                            // 只有当 AI 偷懒输出非法组件时，才进行兜底
+                        if (!assignedLayout || !LAYOUT_POOLS[typeStr].includes(assignedLayout)) {
                             assignedLayout = availableLayouts[(index - 1) % availableLayouts.length];
                         }
                     }
-                    
                     return { ...slide, layoutType: assignedLayout };
                 });
 
@@ -284,20 +276,20 @@ window.triggerSwarmAutonomousAction = async function() {
                 
                 existingDecks = existingDecks.filter(d => !blacklist.includes(d.id));
                 const combinedDecks = [...newTemplates, ...existingDecks];
-                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架绝对无重复封面且差异化结构的产品 [skip ci]", keys.gh);
+                await window.pushGithubJsonFile("data/ai-generated-decks.json", combinedDecks, decksSha, "🤖 AI PM Worker: 上架多版式且文案深度贴合的产品 [skip ci]", keys.gh);
 
                 if (typeof window.AUDIT_PRODUCTS !== "undefined" && typeof window.renderAuditTable === "function") {
                     newTemplates.forEach(t => window.AUDIT_PRODUCTS.unshift(t));
                     localStorage.setItem('APEX_AUDIT_PRODUCTS', JSON.stringify(window.AUDIT_PRODUCTS));
                     window.renderAuditTable();
                 }
-                window.appendLog(`✅ [系统广播]: 排版强制变异装配完毕！全站查重无雷同，已成功录入大盘。`);
+                window.appendLog(`✅ [系统广播]: 排版与专属文案自动装配完毕！`);
             } finally {
                 window.isCloudSyncing = false;
             }
 
         } else {
-            const prompt = `董事长指令：${rawText}。以专业、干练的高管语气简短回复，带部门前缀，严禁废话。`;
+            const prompt = `董事长指令：${rawText}。以专业高管语气简短回复。`;
             const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
                 method: "POST", headers: { "Authorization": `Bearer ${keys.ds}`, "Content-Type": "application/json" },
                 body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], temperature: 0.4 })
