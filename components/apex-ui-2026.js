@@ -1,80 +1,127 @@
 /**
  * APEXWORK 2026 全局流体与光感视觉引擎 (apex-ui-2026.js)
- * 作用：无需修改任何 HTML 结构，强行接管全站视觉反馈、滚动惯性与入场动画
+ * 👑 终极质感版：引入 SVG 噪点材质、Linear 级极简高光边框、纯黑高级暗黑模式
  */
 
 (function () {
-    // 1. 动态注入 2026 最潮流的弥散光感 (Aura) 与弹簧微动效 CSS
+    // 1. 注入顶级极简商业 CSS 材质装甲
     const style = document.createElement('style');
     style.textContent = `
         :root {
-            --aura-primary: rgba(99, 102, 241, 0.15);
-            --aura-success: rgba(16, 185, 129, 0.15);
-            --spring-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --fluid-easing: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* 隐藏原生生硬滚动条，交由 Lenis 接管视觉 */
+        /* 👑 1. 全局材质层：引入高级 SaaS 必备的极微弱噪点 (Noise) 纹理，消除塑料感 */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            letter-spacing: -0.01em !important; /* 全局字距微微收紧，提升精细度 */
+        }
+        body::before {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 9999; mix-blend-mode: overlay;
+        }
+
+        /* 👑 2. 暗黑模式重塑：抛弃发蓝的 slate-950，改用极其高级的“真·纯黑”底色 */
+        [data-theme="dark"] body, body.bg-slate-950 {
+            background-color: #000000 !important;
+            color: #ededed !important;
+        }
+
+        /* 👑 3. 字体排版重塑：标题强制紧凑，强化力量感 */
+        h1, h2, h3, h4, .font-black {
+            letter-spacing: -0.03em !important;
+        }
+
+        /* 👑 4. 顶栏重构：剔除多余边框，仅用极薄底部投影分离层级 */
+        header {
+            background-color: rgba(255, 255, 255, 0.75) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            border-bottom: none !important;
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0,0,0,0.02) !important;
+        }
+        [data-theme="dark"] header, body.bg-slate-950 header {
+            background-color: rgba(10, 10, 10, 0.75) !important;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 24px rgba(0,0,0,0.4) !important;
+        }
+
+        /* 👑 5. 卡片质感革命 (Linear Style)：加入物理厚度的高光 (Inset Shadow) */
+        .bento-card, .saas-card, .kpi-card, .border-slate-200 {
+            background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%) !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            /* 关键质感：顶部边缘 1px 白色内发光，模拟物理切面反光 */
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 
+                        0 2px 4px rgba(0, 0, 0, 0.02), 
+                        0 8px 16px rgba(0, 0, 0, 0.02) !important;
+            border-radius: 12px !important;
+        }
+        [data-theme="dark"] .bento-card, body.bg-slate-950 .bento-card, 
+        [data-theme="dark"] .saas-card, [data-theme="dark"] .kpi-card,
+        [data-theme="dark"] .border-slate-800 {
+            background: linear-gradient(180deg, #161616 0%, #0c0c0c 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            /* 关键质感：暗色模式下的微光边缘 */
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 
+                        0 10px 30px rgba(0,0,0,0.8) !important;
+        }
+
+        /* 卡片极简悬浮反馈：不要大弹跳，只需锐利的上浮和阴影加深 */
+        .bento-card:hover, .saas-card:hover {
+            transform: translateY(-2px) !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 
+                        0 12px 24px rgba(0, 0, 0, 0.04), 
+                        0 24px 48px rgba(0, 0, 0, 0.04) !important;
+        }
+        [data-theme="dark"] .bento-card:hover, [data-theme="dark"] .saas-card:hover,
+        body.bg-slate-950 .saas-card:hover {
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 
+                        0 20px 40px rgba(0,0,0,0.9) !important;
+        }
+
+        /* 👑 6. 按钮高级感：增加微渐变与金属反光边框 */
+        button.bg-blue-600, button.bg-indigo-600, button.bg-emerald-600 {
+            background-image: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 5px rgba(0,0,0,0.2) !important;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important;
+            border-top: 1px solid rgba(255,255,255,0.2) !important;
+        }
+        button:active { transform: scale(0.96) !important; }
+
+        /* 👑 7. 输入框：收敛边框，增加柔和内凹感 */
+        input, select, textarea, [contenteditable="true"] {
+            background-color: rgba(0,0,0,0.02) !important;
+            border: 1px solid rgba(0,0,0,0.08) !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02) !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+        [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea, body.bg-slate-950 [contenteditable="true"] {
+            background-color: rgba(255,255,255,0.03) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.2) !important;
+        }
+        input:focus, textarea:focus, [contenteditable="true"]:focus {
+            background-color: #ffffff !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 1px #6366f1, 0 4px 12px rgba(99,102,241,0.1) !important;
+            outline: none !important;
+        }
+        [data-theme="dark"] input:focus, body.bg-slate-950 [contenteditable="true"]:focus {
+            background-color: #111111 !important;
+            box-shadow: 0 0 0 1px #6366f1, 0 4px 12px rgba(99,102,241,0.2) !important;
+        }
+
+        /* Lenis 基础滚动 */
         html.lenis, html.lenis body { height: auto; width: 100vw; }
         .lenis.lenis-smooth { scroll-behavior: auto !important; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-
-        /* 卡片悬浮态：弹簧阻尼放大 + 环境光晕 */
-        .bento-card, .saas-card, .kpi-card {
-            transition: transform 0.5s var(--spring-easing), box-shadow 0.4s var(--fluid-easing), border-color 0.4s ease !important;
-            will-change: transform, box-shadow;
-        }
-        .bento-card:hover, .saas-card:hover {
-            transform: translateY(-4px) scale(1.005) !important;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08), 0 0 40px -10px var(--aura-primary) !important;
-            border-color: rgba(99, 102, 241, 0.3) !important;
-            z-index: 10;
-        }
-        .kpi-card:hover {
-            transform: translateY(-3px) scale(1.02) !important;
-            box-shadow: 0 10px 20px -5px var(--aura-success) !important;
-        }
-
-        /* 按钮磁性与流体反馈 */
-        button {
-            transition: all 0.3s var(--fluid-easing) !important;
-            position: relative;
-            overflow: hidden;
-        }
-        button:active {
-            transform: scale(0.96) !important; /* 点击时的物理按压感 */
-        }
-        button::after {
-            content: ''; position: absolute; top: 50%; left: 50%; width: 150%; height: 150%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-            transform: translate(-50%, -50%) scale(0); opacity: 0; transition: transform 0.4s ease, opacity 0.4s ease;
-        }
-        button:hover::after {
-            transform: translate(-50%, -50%) scale(1); opacity: 1;
-        }
-
-        /* 沉浸式输入框聚焦体验 (Aura Focus) */
-        input, select, textarea, [contenteditable="true"] {
-            transition: box-shadow 0.4s var(--spring-easing), background-color 0.3s ease, border-color 0.3s ease !important;
-        }
-        input:focus, textarea:focus, [contenteditable="true"]:focus {
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 0 30px -5px var(--aura-primary) !important;
-            border-color: #6366f1 !important;
-            background-color: #ffffff !important;
-        }
-        [data-theme="dark"] input:focus, [data-theme="dark"] [contenteditable="true"]:focus {
-            background-color: #0f172a !important;
-        }
-
-        /* 左侧导航栏与侧边栏的磨砂玻璃进化 */
-        aside {
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-        }
     `;
     document.head.appendChild(style);
 
-    // 2. 动态加载 2026 必备的依赖引擎 (GSAP + Lenis 丝滑滚动)
+    // 2. 加载核心动画引擎
     const loadScript = (src) => new Promise(resolve => {
         if (document.querySelector(`script[src="${src}"]`)) return resolve();
         const s = document.createElement('script');
@@ -82,7 +129,6 @@
     });
 
     async function initModernUI() {
-        // 并发加载 GSAP 核心、ScrollTrigger 插件 和 Lenis 滚动引擎
         await Promise.all([
             loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"),
             loadScript("https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js")
@@ -91,71 +137,48 @@
 
         gsap.registerPlugin(ScrollTrigger);
 
-        // --- A. 注入全局丝滑物理滚动 (Lenis) ---
+        // A. 高级阻尼感物理滚动
         const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // 2026 最优阻尼曲线
+            duration: 1.0, 
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
             direction: 'vertical',
-            gestureDirection: 'vertical',
             smooth: true,
-            mouseMultiplier: 1,
             smoothTouch: false,
-            touchMultiplier: 2,
-            infinite: false,
         });
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
-        // 与 GSAP ScrollTrigger 联动
         lenis.on('scroll', ScrollTrigger.update);
         gsap.ticker.add((time) => { lenis.raf(time * 1000) });
         gsap.ticker.lagSmoothing(0);
 
-        // --- B. 全站自动化入场级联动画 (Stagger Reveal) ---
-        // 自动寻址所有卡片、模块区块，只要出现在视口，就顺滑上浮出现
-        const animateElements = document.querySelectorAll('.bento-card, .saas-card, section, .kpi-card, table tr');
+        // B. 高级入场动效：克制、干脆的透明度与Y轴显现，抛弃廉价的放大缩小回弹
+        const animateElements = document.querySelectorAll('.bento-card, .saas-card, section, .kpi-card');
         
         animateElements.forEach((el, i) => {
-            // 防止重复绑定
             if (el.classList.contains('gsap-bound')) return;
             el.classList.add('gsap-bound');
 
             gsap.fromTo(el, 
-                { y: 30, opacity: 0, scale: 0.98 },
+                { y: 20, opacity: 0 }, 
                 {
-                    y: 0, opacity: 1, scale: 1,
-                    duration: 0.8,
-                    ease: "power3.out",
+                    y: 0, opacity: 1, 
+                    duration: 0.7,
+                    ease: "power2.out", 
                     scrollTrigger: {
                         trigger: el,
-                        start: "top 90%", // 当元素顶部到达屏幕 90% 时触发
-                        toggleActions: "play none none reverse", // 向上滚动时会恢复，再次向下会重新播放
+                        start: "top 95%", 
+                        toggleActions: "play none none reverse", 
                     },
-                    delay: i % 10 * 0.05 // 创造瀑布流级别的递进感
+                    delay: i % 10 * 0.04 
                 }
             );
         });
-
-        // --- C. 特殊编辑器页面的顶栏吸附呼吸效 ---
-        const header = document.querySelector('header');
-        if (header) {
-            ScrollTrigger.create({
-                start: 'top -50',
-                onUpdate: (self) => {
-                    if (self.direction === 1) { // 向下滚动，顶栏收缩并加深毛玻璃
-                        gsap.to(header, { backdropFilter: "blur(24px)", backgroundColor: "rgba(255,255,255,0.8)", boxShadow: "0 10px 30px -10px rgba(0,0,0,0.1)", duration: 0.3 });
-                    } else {
-                        gsap.to(header, { backgroundColor: "rgba(255,255,255,1)", duration: 0.3 });
-                    }
-                }
-            });
-        }
     }
 
-    // 监听页面完全加载后执行（兼容您现有的所有异步渲染）
     if (document.readyState === "complete" || document.readyState === "interactive") {
-        setTimeout(initModernUI, 100);
+        setTimeout(initModernUI, 50);
     } else {
-        window.addEventListener('DOMContentLoaded', () => setTimeout(initModernUI, 100));
+        window.addEventListener('DOMContentLoaded', () => setTimeout(initModernUI, 50));
     }
 })();
