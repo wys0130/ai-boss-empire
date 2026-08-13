@@ -271,8 +271,8 @@
             }
             
             items.forEach(p => {
-                // 👑 防爆图库：必须是有效的 http 或 data:image 链接
-                let finalImg = p.thumbCloudPath || p.thumb || p.thumbnail || p.thumbDefault || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80";
+                // 👑 防爆图库：已补齐 &fm=webp
+                let finalImg = p.thumbCloudPath || p.thumb || p.thumbnail || p.thumbDefault || "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80&fm=webp";
                 if (p.thumbKey) {
                     const localCache = localStorage.getItem("APEX_IMG_CACHE_" + p.thumbKey);
                     if (localCache && localCache.startsWith("data:image")) finalImg = localCache;
@@ -291,7 +291,7 @@
 
                 const textCol = themeColor === 'blue' ? 'text-blue-600' : (themeColor === 'emerald' ? 'text-emerald-600' : (themeColor === 'orange' ? 'text-orange-500' : 'text-indigo-600'));
                 const badgeGrad = themeColor === 'blue' ? 'from-blue-500 to-indigo-500' : (themeColor === 'emerald' ? 'from-emerald-500 to-teal-500' : (themeColor === 'orange' ? 'from-orange-500 to-red-500' : 'from-indigo-500 to-purple-500'));
-                const safeFallback = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80"; // 绝对安全占位图
+                const safeFallback = "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80&fm=webp"; // 绝对安全占位图也补齐 &fm=webp
 
                 grid.innerHTML += `
                     <div onclick="ApexMallGallery.openDetailModal('${p.id}', '${titleZh}', '${finalImg}', ${rmb}, '${editorUrl}')" class="bg-white rounded-xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 group cursor-pointer flex flex-col relative">
@@ -323,7 +323,8 @@
                 <div class="bg-white max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative animate-[fadeIn_0.2s_ease-out]">
                     <button onclick="document.getElementById('productDetailModal').classList.add('hidden')" class="absolute top-4 right-4 z-10 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-black/70 transition font-bold">✕</button>
                     <div class="md:w-3/5 bg-slate-100 relative min-h-[250px] md:min-h-[400px]">
-                        <img src="${img}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80';" class="absolute inset-0 w-full h-full object-cover" alt="预览">
+                        <!-- 👑 onerror 里的 fallback 也补齐 &fm=webp -->
+                        <img src="${img}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=600&q=80&fm=webp';" class="absolute inset-0 w-full h-full object-cover" alt="预览">
                     </div>
                     <div class="md:w-2/5 p-6 md:p-8 flex flex-col justify-between bg-white">
                         <div>
@@ -416,8 +417,9 @@
       init: function() {
         const saved = localStorage.getItem('APEX_BANNER_CONFIG');
         const defaultSlides = [
-          { tag: "ADMIN BANNER 01", titleZh: "破除低效传统冗长，全视觉商业交付新纪元", titleEn: "Break traditional inefficiencies, start a visual business delivery era", descZh: "覆盖 PPT 战略、EXCEL 财务模型与 WORD 报告。", descEn: "Covering PPT strategies, EXCEL models and WORD reports.", bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", bgImg: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1280&q=80" },
-          { tag: "GLOBAL COMPLIANCE 02", titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", titleEn: "Zero-Registration Seamless Checkout, GDPR Compliant", descZh: "一键导出标准格式，支持全球自动结算。", descEn: "One-click export standard formats, global automatic settlement.", bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", bgImg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80" }
+          // 👑 背景大图已补齐 &fm=webp
+          { tag: "ADMIN BANNER 01", titleZh: "破除低效传统冗长，全视觉商业交付新纪元", titleEn: "Break traditional inefficiencies, start a visual business delivery era", descZh: "覆盖 PPT 战略、EXCEL 财务模型与 WORD 报告。", descEn: "Covering PPT strategies, EXCEL models and WORD reports.", bgStyle: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)", bgImg: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1280&q=80&fm=webp" },
+          { tag: "GLOBAL COMPLIANCE 02", titleZh: "零注册无缝收单，满足欧美 GDPR 与金融审计", titleEn: "Zero-Registration Seamless Checkout, GDPR Compliant", descZh: "一键导出标准格式，支持全球自动结算。", descEn: "One-click export standard formats, global automatic settlement.", bgStyle: "linear-gradient(135deg, #064e3b 0%, #0f172a 100%)", bgImg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1280&q=80&fm=webp" }
         ];
         let rawData = saved ? JSON.parse(saved) : defaultSlides;
         this.slidesData = rawData.map((s, i) => {
